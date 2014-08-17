@@ -97,7 +97,7 @@ class ActivityMeet(models.Model):
 	prevented_dtm = models.DateTimeField("Forhindret", blank=True, null = True)
 	prevented_message =  models.TextField('Forhindret grund', blank=True, null = True)
 
-class Payments(models.Model):
+class Payment(models.Model):
 	person = models.ForeignKey(Person, blank=True, null = True)
 	activity = models.ForeignKey(Activity, blank=True, null = True)
 	amount = models.DecimalField('Betalt (kr)', max_digits = 5, decimal_places=2)
