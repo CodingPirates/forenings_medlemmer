@@ -13,8 +13,8 @@ class Address(models.Model):
 	verified_dtm = models.DateField('Sidste gang adressen blev bekræftet', blank = True, null = True)
 
 class Phonenumber(models.Model):
-	country_prefix = models.IntegerField('Landekode', primary_key=True)	
-	number = models.IntegerField('Telefon nummer', primary_key=True)
+	country_prefix = models.IntegerField('Landekode')
+	number = models.IntegerField('Telefon nummer')
 	message_capable = models.BooleanField("Kan modtage SMS'er")
 	verified_dtm = models.DateField('Sidste gang nummeret blev bekræftet', blank = True, null = True)
 	last_message_dtm = models.DateTimeField('Tidspunkt seneste SMS blev sendt til nummeret', blank = True, null = True)
@@ -78,21 +78,21 @@ class Activity(models.Model):
 	signup_closed_dtm = models.DateField("Lukkedato for opskrivning", blank=True, null = True) 
 
 class ActivityDate(models.Model):
-	activity = models.ForeignKey(Activity, primary_key = True)
-	date = models.DateTimeField('Tidspunkt', primary_key = True)
+	activity = models.ForeignKey(Activity)
+	date = models.DateTimeField('Tidspunkt')
 	description = models.TextField('Beskrivelse', blank=True, null = True)
 
 class ActivitySignup(models.Model):
-	person = models.ForeignKey(Person, primary_key = True)
-	activity = models.ForeignKey(Activity, primary_key = True)
+	person = models.ForeignKey(Person)
+	activity = models.ForeignKey(Activity)
 	requested_dtm = models.DateTimeField('Har bedt om indskrivning tidspunkt', blank=True, null = True)
 	invited_dtm = models.DateTimeField('Er blevet inviteret tidspunkt', blank=True, null = True)
 	accepted_dtm = models.DateTimeField('Optaget tidspunkt', blank=True, null = True)
 
 class ActivityMeet(models.Model):
-	person = models.ForeignKey(Person, primary_key = True)
-	activity = models.ForeignKey(Activity, primary_key = True)
-	date = 	models.ForeignKey(ActivityDate, primary_key = True)
+	person = models.ForeignKey(Person)
+	activity = models.ForeignKey(Activity)
+	date = 	models.ForeignKey(ActivityDate)
 	was_present_dtm = models.DateTimeField("Mødte op", blank=True, null = True) 
 	prevented_dtm = models.DateTimeField("Forhindret", blank=True, null = True)
 	prevented_message =  models.TextField('Forhindret grund', blank=True, null = True)
