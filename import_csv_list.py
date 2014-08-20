@@ -26,7 +26,8 @@ for medlem in medlemmer:
 	conditionedAddress = re.sub(' +',' ', conditionedAddress)
 
 	# Get roadname, number and postal code from address
-	m = re.search(r'^(?P<streetname>(?: *[a-zA-ZÆØÅæøå.é]+)+) {0,1}(?:(?P<streetnumber>\d+[ ]{0,1}[a-zA-ZÆØÅæøå]*)(?:[ ,]|$)){0,1} ?,? ?(?P<floor_door>.*?) ?,? ?(?P<postal>(?:[0-9]{4}){0,1})(?:[a-zA-ZÆØÅæøå.]+|[ ])*?$', conditionedAddress)
+	m = re.search(r'^(?P<streetname>(?: *[a-zA-ZÆØÅæøå.é]+)+) {0,1}(?:(?P<streetnumber>\d+[ ]{0,1}[a-zA-ZÆØÅæøå]*)(?:[ ,]|$)){0,1} ?,? ?(?P<floor_door>.*?) ?,? ?(?:(?P<postal>(?:[0-9]{4}){1})(?:[a-zA-ZÆØÅæøå.]|[ ])*)?$', conditionedAddress)
+	#print(m.groups(''))
 	if(m != None):
 		streetname = m.group('streetname')
 		streetnumber = m.group('streetnumber')
@@ -35,10 +36,11 @@ for medlem in medlemmer:
 		streetnumber = re.sub(' +','', streetnumber) # removed spaces
 		floor_door = m.group('floor_door')
 		postal     = m.group('postal')
-
+		if(postal == None):
+			postal =''
 	components = re.findall(r'(?:((?:(?:[-]{0,1}\d+)|(?:th|tv|mf|st|stuen|højre|venstre|til højre|til venstre|midt|midtfor)))[.]{0,1}[ ]{0,1})', floor_door, re.IGNORECASE)
 
-	print(components)
+	#print(components)
 	floor = ''
 	door = ''
 	if(len(components) == 1):
@@ -62,7 +64,7 @@ for medlem in medlemmer:
 	url = 'http://dawa.aws.dk/adresser'
 	params = {'q' : orgAddress}
 	response = requests.get(url, params=params)
-	print(response.url)
+	#print(response.url)
 
 	decoded_response = response.json()
 
@@ -79,7 +81,7 @@ for medlem in medlemmer:
 		if(len(postal) == 4):
 			params['postal_code'] = postal
 		response = requests.get(url, params=params)
-		print(response.url)
+		#print(response.url)
 		decoded_response = response.json()
 
 		if(len(decoded_response['results']) != 0):
@@ -103,7 +105,7 @@ for medlem in medlemmer:
 
 		params = {'q' : query}
 		response = requests.get(url, params=params)
-		print(response.url)
+		#print(response.url)
 
 		decoded_response = response.json()
 
@@ -116,6 +118,7 @@ for medlem in medlemmer:
 		else:
 			print('!ORG:' + orgAddress)
 			print('!AWS: **********************************************')
+			print('!RES: street:' + streetname + ' number:' + streetnumber + ' floor:' + floor + ' door:' + door + " postal:" + postal)
 
 	if(aws_found):
 		final_roadname = decoded_response[0]['adgangsadresse']['vejstykke']['navn']
