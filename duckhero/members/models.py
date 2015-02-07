@@ -9,7 +9,7 @@ class Person(models.Model):
         ordering=['name']
     name = models.CharField('Navn',max_length=200)
     street = models.CharField('Adresse',max_length=200)
-    placename = models.CharField('Stednavn',max_length=200)
+    placename = models.CharField('Stednavn',max_length=200, blank=True)
     zipcity = models.CharField('Postnr. og by',max_length=200)
     email = models.EmailField()
     unique = UUIDField()
