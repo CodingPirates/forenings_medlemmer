@@ -7,38 +7,53 @@ class Person(models.Model):
     placename = models.CharField('Stednavn',max_length=200)
     zipcity = models.CharField('Postnr. og by',max_length=200)
     email = models.EmailField()
+    def __str__(self):
+        return self.name
 
 class Department(models.Model):
     name = models.CharField('Navn',max_length=200)
+    def __str__(self):
+        return self.name
 
 class WaitingList(models.Model):
-    department = models.ForeignKey('Afdeling',Department)
+    department = models.ForeignKey(Department)
     person = models.ForeignKey(Person)
     added = models.DateTimeField('Tilføjet',auto_now_add=True, blank=True)
+    def __str__(self):
+        return '{}, {}'.format(self.department,self.person)
 
 class Member(models.Model):
-    department = models.ForeignKey('Afdeling',Department)
+    department = models.ForeignKey(Department)
     person = models.ForeignKey(Person)
     is_active = models.BooleanField('Aktiv',default=True)
     member_since = models.DateTimeField('Indmeldt',auto_now_add=True, blank=True)
+    def __str__(self):
+        return '{}, {}'.format(self.person,self.department)
 
 class Activity(models.Model):
-    department = models.ForeignKey('Afdeling',Department)
+    department = models.ForeignKey(Department)
     name = models.CharField('Navn',max_length=200)
-    description = models.CharField('description',max_length=10000)
+    description = models.CharField('Beskrivelse',max_length=10000)
     start = models.DateTimeField('Start')
     end = models.DateTimeField('Slut')
+    def __str__(self):
+        return self.name
 
 class ActivityInvite(models.Model):
-    activity = models.ForeignKey('Aktivitet',Activity)
+    activity = models.ForeignKey(Activity)
     person = models.ForeignKey(Person)
+    def __str__(self):
+        return '{}, {}'.format(self.activity,self.person)
 
 class ActivityParticipant(models.Model):
-    activity = models.ForeignKey('Aktivitet',Activity)
-    member = models.ForeignKey('Medlem',Member)
+    activity = models.ForeignKey(Activity)
+    member = models.ForeignKey(Member)
+    def __str__(self):
+        return self.person.__str__()
 
 class Volunteer(models.Model):
-    member = models.ForeignKey('Medlem',Member)
-    department = models.ForeignKey('Afdeling',Department)
+    member = models.ForeignKey(Member)
     has_certificate = models.BooleanField(default=False)
     added = models.DateTimeField(auto_now_add=True, blank=True)
+    def __str__(self):
+        return self.member.__str__()
