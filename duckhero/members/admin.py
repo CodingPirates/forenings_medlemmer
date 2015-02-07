@@ -37,7 +37,7 @@ class WaitingListInline(admin.TabularInline):
     extra = 0
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'street', 'placename','zipcity', 'email')
+    list_display = ('name', 'street', 'placename','zipcity', 'email','unique')
     inlines = [MemberInline,WaitingListInline]
     search_fields = ('name', 'zipcity')
 admin.site.register(Person,PersonAdmin)

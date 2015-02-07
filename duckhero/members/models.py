@@ -1,4 +1,6 @@
 from django.db import models
+from django_extensions.db.fields import UUIDField
+import uuid
 import datetime
 # Create your models here.
 class Person(models.Model):
@@ -10,6 +12,12 @@ class Person(models.Model):
     placename = models.CharField('Stednavn',max_length=200)
     zipcity = models.CharField('Postnr. og by',max_length=200)
     email = models.EmailField()
+    unique = UUIDField()
+    def save(self, *args, **kwargs):
+        ''' On creation set UUID '''
+        if not self.id:
+            self.unique = uuid.uuid4()
+        return super(Person, self).save(*args, **kwargs)
     def __str__(self):
         return self.name
 
