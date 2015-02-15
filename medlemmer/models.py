@@ -11,6 +11,9 @@ class Address(models.Model):
 	postal_code = models.IntegerField('postnummer')
 	city = models.CharField('By', max_length = 256)
 	verified_dtm = models.DateField('Sidste gang adressen blev bekræftet', blank = True, null = True)
+    def __unicode__(self):
+   		return self.road_name + " " + city
+
 
 class Phonenumber(models.Model):
 	country_prefix = models.IntegerField('Landekode')
@@ -87,7 +90,9 @@ class ActivitySignup(models.Model):
 	activity = models.ForeignKey(Activity)
 	requested_dtm = models.DateTimeField('Har bedt om indskrivning tidspunkt', blank=True, null = True)
 	invited_dtm = models.DateTimeField('Er blevet inviteret tidspunkt', blank=True, null = True)
+	invitation_deadline_dtm = models.DateTimeField('Tidspunkt hvor invitationen udløber', blank=True, null = True)
 	accepted_dtm = models.DateTimeField('Optaget tidspunkt', blank=True, null = True)
+	declined_dtm = models.DateTimeField('Har afvist invitation tidspunkt', blank=True, null = True)
 
 class ActivityMeet(models.Model):
 	person = models.ForeignKey(Person)
