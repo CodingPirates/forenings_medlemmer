@@ -46,9 +46,13 @@ class FamilyAdmin(admin.ModelAdmin):
 admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'street', 'placename','zipcity', 'email','family','unique')
+    list_display = ('name', 'street', 'placename','zipcity', 'email','family_url','unique')
     inlines = [MemberInline,WaitingListInline]
     search_fields = ('name', 'zipcity')
+    def family_url(self, item):
+        return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
+    family_url.allow_tags = True
+
 admin.site.register(Person,PersonAdmin)
 
 class WaitingListAdmin(admin.ModelAdmin):
