@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.contrib import admin
 from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, WaitingList, ActivityParticipant,Family
 # Register your models here.
@@ -43,6 +44,17 @@ class PersonInline(admin.TabularInline):
 class FamilyAdmin(admin.ModelAdmin):
     list_display = ('email','unique')
     inlines = [PersonInline]
+    actions = ['create_new_uuid']
+    def create_new_uuid(self,request, queryset):
+        for family in queryset:
+            family.unique = uuid4()
+            family.save()
+        if queryset.count() == 1:
+            message_bit = "1 familie"
+        else:
+            message_bit = "%s familier" % queryset.count()
+        self.message_user(request, "%s fik nyt UUID." % message_bit)
+    create_new_uuid.short_description = 'Opret nyt UUID'
 admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
