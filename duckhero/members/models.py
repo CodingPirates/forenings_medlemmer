@@ -27,6 +27,7 @@ class Person(models.Model):
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     zipcity = models.CharField('Postnr. og by',max_length=200)
     email = models.EmailField(blank=True)
+    phone = models.CharField('Telefon', max_length=50, blank=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     def unique(self):
         return self.family.unique if self.family != None else ''

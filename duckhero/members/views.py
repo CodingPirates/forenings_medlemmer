@@ -5,10 +5,10 @@ from members.models import Person
 def index(request):
     return render(request,'members/index.html',{})
 
-def person(request,person_guid):
-    person = get_object_or_404(Person,unique=person_guid)
-    return render(request,'members/details.html',{'person':person})
+def person(request,family_guid):
+    family = get_object_or_404(Family,unique=family_guid)
+    return render(request,'members/details.html',{'family':family, 'persons':family.person_set})
 
-def updateperson(request,person_guid):
-    person = get_object_or_404(Person,unique=person_guid)
+def updateperson(request,family_guid):
+    person = get_object_or_404(Family,unique=family_guid)
     return render(request,'members/index.html',{})
