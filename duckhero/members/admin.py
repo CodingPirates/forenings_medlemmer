@@ -1,5 +1,5 @@
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, WaitingList, ActivityParticipant
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, WaitingList, ActivityParticipant,Family
 # Register your models here.
 
 
@@ -36,8 +36,17 @@ class WaitingListInline(admin.TabularInline):
     model = WaitingList
     extra = 0
 
+class PersonInline(admin.TabularInline):
+    model = Person
+    extra = 0
+
+class FamilyAdmin(admin.ModelAdmin):
+    list_display = ('email','unique')
+    inlines = [PersonInline]
+admin.site.register(Family, FamilyAdmin)
+
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'street', 'placename','zipcity', 'email','unique')
+    list_display = ('name', 'street', 'placename','zipcity', 'email','family','unique')
     inlines = [MemberInline,WaitingListInline]
     search_fields = ('name', 'zipcity')
 admin.site.register(Person,PersonAdmin)

@@ -3,6 +3,21 @@ from django_extensions.db.fields import UUIDField
 import uuid
 import datetime
 # Create your models here.
+
+class Family(models.Model):
+    class Meta:
+        verbose_name = 'familie'
+        verbose_name_plural = 'Familier'
+    unique = UUIDField()
+    email = models.EmailField(unique=True)
+    def save(self, *args, **kwargs):
+        ''' On creation set UUID '''
+        if not self.id:
+            self.unique = uuid.uuid4()
+        return super(Family, self).save(*args, **kwargs)
+    def __str__(self):
+        return self.email
+
 class Person(models.Model):
     class Meta:
         verbose_name_plural='Personer'
@@ -11,15 +26,22 @@ class Person(models.Model):
     street = models.CharField('Adresse',max_length=200)
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     zipcity = models.CharField('Postnr. og by',max_length=200)
-    email = models.EmailField()
-    has_certificate = models.DateTimeField('Børneattest',blank=True)
-    parents = models.ManyToManyField('Person')
-    unique = UUIDField()
-    def save(self, *args, **kwargs):
-        ''' On creation set UUID '''
-        if not self.id:
-            self.unique = uuid.uuid4()
-        return super(Person, self).save(*args, **kwargs)
+    email = models.EmailField(blank=True)
+    has_certificate = models.DateField('Børneattest',blank=True, null=True)
+    def unique(self):
+        return self.family.unique if self.family != None else ''
+    family = models.ForeignKey(Family)
+    PARENT = 'PA'
+    GUARDIAN = 'GU'
+    CHILD = 'CH'
+    OTHER = 'NA'
+    MEMBER_TYPE_CHOICES = (
+        (PARENT,'Forælder'),
+        (GUARDIAN, 'Værge'),
+        (CHILD, 'Barn'),
+        (OTHER, 'Andet')
+    )
+    membertype = models.CharField(max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     def __str__(self):
         return self.name
 
