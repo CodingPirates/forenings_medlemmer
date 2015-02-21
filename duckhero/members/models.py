@@ -12,6 +12,8 @@ class Person(models.Model):
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     zipcity = models.CharField('Postnr. og by',max_length=200)
     email = models.EmailField()
+    has_certificate = models.DateTimeField('Børneattest',blank=True)
+    parents = models.ManyToManyField('Person')
     unique = UUIDField()
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
@@ -95,7 +97,8 @@ class ActivityParticipant(models.Model):
 
 class Volunteer(models.Model):
     member = models.ForeignKey(Member)
-    has_certificate = models.BooleanField('Børneattest',default=False)
+    def has_certificate(self):
+        return self.person.has_certificate
     added = models.DateTimeField(auto_now_add=True, blank=True, editable=False)
     def __str__(self):
         return self.member.__str__()
