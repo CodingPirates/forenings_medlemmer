@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 from django_extensions.db.fields import UUIDField
 import uuid
 import datetime
@@ -15,6 +16,8 @@ class Family(models.Model):
         if not self.id:
             self.unique = uuid.uuid4()
         return super(Family, self).save(*args, **kwargs)
+    def get_abosolute_url(self):
+        return reverse('family_form', kwargs={'pk':self.unique})
     def __str__(self):
         return self.email
 

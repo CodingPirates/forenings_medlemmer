@@ -1,7 +1,7 @@
 from django.conf.urls import patterns,  url
-from members import views
+from members.views import FamilyCreate, FamilyUpdate
+
 urlpatterns = patterns('',
-    url(r'^$',views.index,name='index'),
-    url(r'^(?P<person_guid>[-\w]+)$',views.person,name='person'),
-    url(r'^(?P<person_guid>[-\w]+)/update$',views.updateperson,name='updateperson'),
+    url(r'family/$', FamilyCreate.as_view(), name='family_add'),
+    url(r'family/(?P<pk>[\w-]+)$', FamilyUpdate.as_view(), name='family_update'),
 )
