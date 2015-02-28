@@ -33,3 +33,23 @@
 </table>
 <a class="btn btn-primary btn-lg active" role="button" href="{% url 'person_add' family.unique %}">Opret ny</a>
 </fieldset>
+<fieldset><legend>Invitationer</legend>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Navn</th>
+      <th align="left">Aktivitet</th>
+      <th align="left"></th>
+      </tr>
+  </thead>
+  <tbody>
+    {% for invite in invites %}
+      <tr>
+        <td>{{invite.person.name}}</td>
+        <td>{{invite.activity.name}}</td>
+        <td><a href="{% url 'invite_accept' invite.unique %}">Acceptér</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</fieldset>

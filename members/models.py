@@ -98,6 +98,12 @@ class ActivityInvite(models.Model):
         verbose_name_plural = 'Invitationer'
     activity = models.ForeignKey(Activity)
     person = models.ForeignKey(Person)
+    unique = UUIDField()
+    def save(self, *args, **kwargs):
+        ''' On creation set UUID '''
+        if not self.id:
+            self.unique = uuid.uuid4()
+        return super(ActivityInvite, self).save(*args, **kwargs)
     def __str__(self):
         return '{}, {}'.format(self.activity,self.person)
 

@@ -3,21 +3,36 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect
-from members.models import Person, Family
+from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member
 from members.forms import PersonForm
 
 class FamilyCreate(CreateView):
     model=Family
     fieds=['email']
     def get_success_url(self):
-        return '../family/{}/'.format(self.object.unique)
+        return reverse('family_detail', args=[self.object.unique])
 
 def Details(request,unique):
     family = get_object_or_404(Family, unique=unique)
+    invites= ActivityInvite.objects.filter(person__family = family)
     context = {
-        'family': family
+        'family': family,
+        'invites': invites
     }
     return render(request, 'members/details.html', context)
+
+def AcceptInvitation(request, unique):
+    activity_invite = get_object_or_404(ActivityInvite, unique=unique)
+    member = Member()
+    member.person = activity_invite.person
+    member.department = activity_invite.activity.department
+    member.save()
+    acticity_participant = ActivityParticipant()
+    acticity_participant.member = member
+    acticity_participant.activity = activity_invite.activity
+    acticity_participant.save()
+    activity_invite.delete()
+    return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
 
 def UpdatePersonFromForm(person, form):
     person.name = form.cleaned_data['name']
