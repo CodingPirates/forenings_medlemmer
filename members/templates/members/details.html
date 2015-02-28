@@ -1,7 +1,11 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
 <h1>Familiedetaljer</h1>
-<h3>Alt info fra Coding Pirates bliver sendt til denne mail: {{family.email}} <a href="#">Ret</a></h3>
+<h3>Din familie er registreret på denne email adresse: {{family.email}} <a class="btn btn-primary btn-lg active" role="button"  href="#">Ret</a></h3>
 <fieldset><legend>Personer i familien</legend>
-<table>
+<table class="table table-striped">
   <thead>
     <tr>
       <th/>
@@ -27,5 +31,5 @@
     {% endfor %}
   </tbody>
 </table>
-<a href="{% url 'person_add' family.unique %}">Opret ny</a>
+<a class="btn btn-primary btn-lg active" role="button" href="{% url 'person_add' family.unique %}">Opret ny</a>
 </fieldset>

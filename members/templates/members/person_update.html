@@ -1,8 +1,13 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
 <form action="{% url 'person_update' person.family.unique person.id %}" method="post">
   <fieldset>
     <legend>Ret familiemedlem</legend>
     {% csrf_token %}
+    {% bootstrap_form form %}
     {{ form.as_p }}
-    <input type="submit" value="Opdater" />
+    <input type="submit" class="btn btn-primary" value="Opdater" />
   </fieldset>
 </form>
