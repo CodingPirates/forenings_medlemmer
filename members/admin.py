@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, WaitingList, ActivityParticipant,Family
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family
 # Register your models here.
 
 
@@ -33,10 +33,6 @@ class ActivityAdmin(admin.ModelAdmin):
     inlines = [ActivityParticipantInline, ActivityInviteInline]
 admin.site.register(Activity, ActivityAdmin)
 
-class WaitingListInline(admin.TabularInline):
-    model = WaitingList
-    extra = 0
-
 class PersonInline(admin.TabularInline):
     model = Person
     extra = 0
@@ -58,16 +54,12 @@ class FamilyAdmin(admin.ModelAdmin):
 admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'street', 'placename','zipcity', 'email','family_url','unique')
-    inlines = [MemberInline,WaitingListInline]
+    list_display = ('name', 'street', 'placename','zipcity', 'email', 'waiting_list_since','family_url','unique')
+    inlines = [MemberInline]
     search_fields = ('name', 'zipcity')
+    list_filter = ['on_waiting_list']
     def family_url(self, item):
         return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
     family_url.allow_tags = True
 
 admin.site.register(Person,PersonAdmin)
-
-class WaitingListAdmin(admin.ModelAdmin):
-    list_display = ('person','department','added')
-    list_filter = ['department']
-admin.site.register(WaitingList,WaitingListAdmin)

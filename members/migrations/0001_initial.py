@@ -14,23 +14,23 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Activity',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(verbose_name='Navn', max_length=200)),
-                ('description', models.CharField(verbose_name='Beskrivelse', max_length=10000)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='Navn')),
+                ('description', models.CharField(max_length=10000, verbose_name='Beskrivelse')),
                 ('start', models.DateField(verbose_name='Start')),
                 ('end', models.DateField(verbose_name='Slut')),
             ],
             options={
                 'verbose_name': 'aktivitet',
-                'ordering': ['start'],
                 'verbose_name_plural': 'Aktiviteter',
+                'ordering': ['start'],
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='ActivityInvite',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('activity', models.ForeignKey(to='members.Activity')),
             ],
             options={
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ActivityParticipant',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('activity', models.ForeignKey(to='members.Activity')),
             ],
             options={
@@ -54,22 +54,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Department',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(verbose_name='Navn', max_length=200)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='Navn')),
             ],
             options={
                 'verbose_name': 'afdeling',
-                'ordering': ['name'],
                 'verbose_name_plural': 'Afdelinger',
+                'ordering': ['name'],
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Family',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('unique', django_extensions.db.fields.UUIDField(blank=True, editable=False)),
-                ('email', models.EmailField(max_length=75)),
+                ('email', models.EmailField(unique=True, max_length=75)),
             ],
             options={
                 'verbose_name': 'familie',
@@ -80,29 +80,32 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Member',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('is_active', models.BooleanField(verbose_name='Aktiv', default=True)),
-                ('member_since', models.DateTimeField(verbose_name='Indmeldt', auto_now_add=True)),
+                ('member_since', models.DateTimeField(auto_now_add=True, verbose_name='Indmeldt')),
                 ('department', models.ForeignKey(to='members.Department')),
             ],
             options={
                 'verbose_name': 'medlem',
-                'ordering': ['is_active', 'member_since'],
                 'verbose_name_plural': 'Medlemmer',
+                'ordering': ['is_active', 'member_since'],
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Person',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(verbose_name='Navn', max_length=200)),
-                ('street', models.CharField(verbose_name='Adresse', max_length=200)),
-                ('placename', models.CharField(verbose_name='Stednavn', max_length=200, blank=True)),
-                ('zipcity', models.CharField(verbose_name='Postnr. og by', max_length=200)),
-                ('email', models.EmailField(max_length=75, blank=True)),
-                ('has_certificate', models.DateField(verbose_name='Børneattest', blank=True, null=True)),
-                ('membertype', models.CharField(default='PA', choices=[('PA', 'Forælder'), ('GU', 'Værge'), ('CH', 'Barn'), ('NA', 'Andet')], max_length=2)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='Navn')),
+                ('street', models.CharField(max_length=200, verbose_name='Adresse')),
+                ('placename', models.CharField(blank=True, max_length=200, verbose_name='Stednavn')),
+                ('zipcity', models.CharField(max_length=200, verbose_name='Postnr. og by')),
+                ('email', models.EmailField(blank=True, max_length=75)),
+                ('phone', models.CharField(blank=True, max_length=50, verbose_name='Telefon')),
+                ('has_certificate', models.DateField(blank=True, null=True, verbose_name='Børneattest')),
+                ('on_waitingList', models.BooleanField(verbose_name='Venteliste', default=False)),
+                ('on_waitingList_since', models.DateTimeField(auto_now_add=True, verbose_name='Tilføjet')),
+                ('membertype', models.CharField(max_length=2, choices=[('PA', 'Forælder'), ('GU', 'Værge'), ('CH', 'Barn'), ('NA', 'Andet')], default='PA')),
                 ('family', models.ForeignKey(to='members.Family')),
             ],
             options={
@@ -114,26 +117,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Volunteer',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('added', models.DateTimeField(auto_now_add=True)),
                 ('member', models.ForeignKey(to='members.Member')),
             ],
             options={
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='WaitingList',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('added', models.DateTimeField(verbose_name='Tilføjet', auto_now_add=True)),
-                ('department', models.ForeignKey(to='members.Department')),
-                ('person', models.ForeignKey(to='members.Person')),
-            ],
-            options={
-                'verbose_name': 'person på venteliste',
-                'ordering': ['added'],
-                'verbose_name_plural': 'Venteliste',
             },
             bases=(models.Model,),
         ),

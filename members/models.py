@@ -35,6 +35,10 @@ class Person(models.Model):
     def unique(self):
         return self.family.unique if self.family != None else ''
     family = models.ForeignKey(Family)
+    on_waiting_list = models.BooleanField('Venteliste', default=False)
+    on_waiting_list_since = models.DateTimeField('Tilføjet',auto_now_add=True, blank=True, editable=False)
+    def waiting_list_since(self):
+        return self.on_waiting_list_since if self.on_waiting_list else None
     PARENT = 'PA'
     GUARDIAN = 'GU'
     CHILD = 'CH'
@@ -60,17 +64,6 @@ class Department(models.Model):
     no_members.short_description = 'Antal medlemmer'
     def __str__(self):
         return self.name
-
-class WaitingList(models.Model):
-    class Meta:
-        verbose_name='person på venteliste'
-        verbose_name_plural = 'Venteliste'
-        ordering=['added']
-    department = models.ForeignKey(Department)
-    person = models.ForeignKey(Person)
-    added = models.DateTimeField('Tilføjet',auto_now_add=True, blank=True, editable=False)
-    def __str__(self):
-        return '{}, {}'.format(self.department,self.person)
 
 class Member(models.Model):
     class Meta:
