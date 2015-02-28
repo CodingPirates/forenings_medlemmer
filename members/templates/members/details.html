@@ -16,7 +16,7 @@
     {% for person in family.person_set.all %}
       <tr>
         <td>{{person.get_membertype_display}}</td>
-        <td><a href="#">{{person.name}}</a></td>
+        <td><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></td>
         <td>{{person.street}}</td>
         <td>{{person.zipcity}}</td>
         <td>{{person.email}}</td>
@@ -25,5 +25,5 @@
     {% endfor %}
   </tbody>
 </table>
-<a href="#">Opret ny</a>
+<a href="{% url 'person_add' family.unique %}">Opret ny</a>
 </fieldset>
