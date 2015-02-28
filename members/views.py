@@ -3,8 +3,9 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member
+from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity
 from members.forms import PersonForm
+import datetime
 
 class FamilyCreate(CreateView):
     model=Family
@@ -15,18 +16,31 @@ class FamilyCreate(CreateView):
 def Details(request,unique):
     family = get_object_or_404(Family, unique=unique)
     invites= ActivityInvite.objects.filter(person__family = family)
+    currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
     context = {
         'family': family,
-        'invites': invites
+        'invites': invites,
+        'currents': currents
     }
     return render(request, 'members/details.html', context)
 
+def DeclineInvitation(request, unique):
+    activity_invite = get_object_or_404(ActivityInvite, unique=unique)
+    activity_invite.delete()
+    return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
+
 def AcceptInvitation(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)
-    member = Member()
-    member.person = activity_invite.person
-    member.department = activity_invite.activity.department
-    member.save()
+    person = activity_invite.person
+    person.on_waiting_list = False
+    person.save()
+    try:
+        member = Member.objects.get(person=person,department=activity_invite.activity.department)
+    except Member.DoesNotExist:
+        member = Member()
+        member.person = person
+        member.department = activity_invite.activity.department
+        member.save()
     acticity_participant = ActivityParticipant()
     acticity_participant.member = member
     acticity_participant.activity = activity_invite.activity

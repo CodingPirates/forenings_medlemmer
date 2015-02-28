@@ -80,14 +80,14 @@ class Activity(models.Model):
     class Meta:
         verbose_name='aktivitet'
         verbose_name_plural = 'Aktiviteter'
-        ordering =['start']
+        ordering =['start_date']
     department = models.ForeignKey(Department)
     name = models.CharField('Navn',max_length=200)
     description = models.CharField('Beskrivelse',max_length=10000)
-    start = models.DateField('Start')
-    end = models.DateField('Slut')
+    start_date = models.DateField('Start')
+    end_date = models.DateField('Slut')
     def is_historic(self):
-        return self.end < datetime.date.today()
+        return self.end_date < datetime.date.today()
     is_historic.short_description = 'Historisk?'
     def __str__(self):
         return self.name

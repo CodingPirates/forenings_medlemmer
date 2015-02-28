@@ -7,12 +7,17 @@ from members.models import Person, Department, Volunteer, Member, Activity, Acti
 class MemberInline(admin.TabularInline):
     model = Member
     extra = 0
+
+class ActivityInline(admin.TabularInline):
+    model = Activity
+    extra = 0
+
 class DepartmentAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields':['name']})
     ]
     list_display = ('name','no_members')
-    inlines = [MemberInline]
+    inlines = [MemberInline, ActivityInline]
 admin.site.register(Department,DepartmentAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
@@ -29,7 +34,7 @@ class ActivityInviteInline(admin.TabularInline):
     extra = 1
 
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'start', 'end', 'is_historic')
+    list_display = ('name', 'description', 'start_date', 'end_date', 'is_historic')
     inlines = [ActivityParticipantInline, ActivityInviteInline]
 admin.site.register(Activity, ActivityAdmin)
 
