@@ -25,18 +25,6 @@ class Person(models.Model):
     class Meta:
         verbose_name_plural='Personer'
         ordering=['name']
-    name = models.CharField('Navn',max_length=200)
-    street = models.CharField('Adresse',max_length=200)
-    placename = models.CharField('Stednavn',max_length=200, blank=True)
-    zipcity = models.CharField('Postnr. og by',max_length=200)
-    email = models.EmailField(blank=True)
-    phone = models.CharField('Telefon', max_length=50, blank=True)
-    has_certificate = models.DateField('Børneattest',blank=True, null=True)
-    def unique(self):
-        return self.family.unique if self.family != None else ''
-    family = models.ForeignKey(Family)
-    on_waiting_list = models.BooleanField('Venteliste', default=False)
-    on_waiting_list_since = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
     PARENT = 'PA'
     GUARDIAN = 'GU'
     CHILD = 'CH'
@@ -48,6 +36,16 @@ class Person(models.Model):
         (OTHER, 'Andet')
     )
     membertype = models.CharField(max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
+    name = models.CharField('Navn',max_length=200)
+    street = models.CharField('Adresse',max_length=200)
+    placename = models.CharField('Stednavn',max_length=200, blank=True)
+    zipcity = models.CharField('Postnr. og by',max_length=200)
+    email = models.EmailField(blank=True)
+    phone = models.CharField('Telefon', max_length=50, blank=True)
+    has_certificate = models.DateField('Børneattest',blank=True, null=True)
+    family = models.ForeignKey(Family)
+    on_waiting_list = models.BooleanField('Venteliste', default=False)
+    on_waiting_list_since = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
     def __str__(self):
         return self.name
 

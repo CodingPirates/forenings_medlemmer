@@ -3,7 +3,10 @@
 
 <form action="{% url 'family_add' %}" method="post">
   {% csrf_token %}
-  <div>Email:</div>
-  <input type="text" name="email" id="email" value="{{ family.email }}" />
-  <input type="submit" value="Opret" />
+  <fieldset>
+    <legend>Indtast den e-mail adresse, hvor du gerne vil have alt information fra Coding Pirates</legend>
+    <div>Email:</div>
+    <input type="text" name="email" id="email" value="{{ family.email }}" />
+    <input type="submit" value="Opret" />
+  </fieldset>
 </form>
