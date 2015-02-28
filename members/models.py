@@ -36,9 +36,7 @@ class Person(models.Model):
         return self.family.unique if self.family != None else ''
     family = models.ForeignKey(Family)
     on_waiting_list = models.BooleanField('Venteliste', default=False)
-    on_waiting_list_since = models.DateTimeField('Tilføjet',auto_now_add=True, blank=True, editable=False)
-    def waiting_list_since(self):
-        return self.on_waiting_list_since if self.on_waiting_list else None
+    on_waiting_list_since = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
     PARENT = 'PA'
     GUARDIAN = 'GU'
     CHILD = 'CH'

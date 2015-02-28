@@ -61,5 +61,13 @@ class PersonAdmin(admin.ModelAdmin):
     def family_url(self, item):
         return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
     family_url.allow_tags = True
+    family_url.short_description = 'Familie'
+    def waiting_list_since(self,item):
+        return item.on_waiting_list_since if item.on_waiting_list else None
+    waiting_list_since.short_description = 'Venteliste siden'
+    waiting_list_since.admin_order_field = 'on_waiting_list_since'
+    def unique(self, item):
+        return item.family.unique if item.family != None else ''
+
 
 admin.site.register(Person,PersonAdmin)
