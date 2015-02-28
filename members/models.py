@@ -35,7 +35,7 @@ class Person(models.Model):
         (CHILD, 'Barn'),
         (OTHER, 'Andet')
     )
-    membertype = models.CharField(max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
+    membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)
     street = models.CharField('Adresse',max_length=200)
     placename = models.CharField('Stednavn',max_length=200, blank=True)

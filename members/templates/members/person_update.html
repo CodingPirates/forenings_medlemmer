@@ -1,0 +1,8 @@
+<form action="{% url 'person_update' person.family.unique person.id %}" method="post">
+  <fieldset>
+    <legend>Ret familiemedlem</legend>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Opdater" />
+  </fieldset>
+</form>

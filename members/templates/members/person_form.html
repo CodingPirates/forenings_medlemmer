@@ -1,8 +1,0 @@
-<form method="post">
-  {% csrf_token %}
-<fieldset>
-<legend>Familiemedlem</legend>
-    <div>Email:</div>
-  <input type="text" name="email" id="email" value="{{ person.email }}" />
-  <input type="submit" value="Opret" />
-</form>

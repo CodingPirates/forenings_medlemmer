@@ -10,7 +10,8 @@
       <th align="left">Postnr./by</th>
       <th align="left">Email</th>
       <th align="left">Telefon</th>
-    </tr>
+      <th align="left">Venteliste</th>
+      </tr>
   </thead>
   <tbody>
     {% for person in family.person_set.all %}
@@ -21,6 +22,7 @@
         <td>{{person.zipcity}}</td>
         <td>{{person.email}}</td>
         <td>{{person.phone}}</td>
+        <td>{{person.on_waiting_list}}</td>
       </tr>
     {% endfor %}
   </tbody>
