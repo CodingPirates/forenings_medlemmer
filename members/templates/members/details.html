@@ -1,113 +1,107 @@
 {% load bootstrap3 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-
-<h1>Familiedetaljer</h1>
-<h3>Din familie er registreret på denne email adresse: {{family.email}} <a class="btn btn-link btn-lg active" role="button"  href="#">Ret</a></h3>
-<div class="row">
-  <div class="col-xs-12">
-    <section class="panel panel-defualt">
-      <header class="panel-heading">
-        <h1 class="panel-title">Personer i familien</h3>
-      </header>
-      <table class="table table-striped table-responsive">
-        <thead>
-          <tr>
-            <th/>
-            <th align="left">Navn</th>
-            <th align="left">Adresse</th>
-            <th align="left">Postnr./by</th>
-            <th align="left">Email</th>
-            <th align="left">Telefon</th>
-            <th align="left">Venteliste</th>
-            </tr>
-        </thead>
-        <tbody>
-          {% for person in family.person_set.all %}
+<div class="container-fluid">
+  <h1>Familiedetaljer</h1>
+  <h3>Din familie er registreret på denne email adresse: {{family.email}} <a class="btn btn-link btn-lg active" role="button"  href="#">Ret</a></h3>
+  <div class="row">
+    <div class="col-xs-12">
+      <section class="panel panel-defualt">
+        <table class="table table-striped table-responsive">
+          <thead>
             <tr>
-              <td>{{person.get_membertype_display}}</td>
-              <td><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></td>
-              <td>{{person.street}}</td>
-              <td>{{person.zipcity}}</td>
-              <td>{{person.email}}</td>
-              <td>{{person.phone}}</td>
-              <td>{{person.on_waiting_list}}</td>
+              <th class="col-xs-1"/>
+              <th class="col-xs-3" align="left">Navn</th>
+              <th class="col-xs-3" align="left">Adresse</th>
+              <th class="col-xs-2" align="left">Postnr./by</th>
+              <th class="col-xs-1" align="left">Email</th>
+              <th class="col-xs-1" align="left">Telefon</th>
+              <th class="col-xs-1" align="left">Venteliste</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for person in family.person_set.all %}
+              <tr>
+                <td>{{person.get_membertype_display}}</td>
+                <td><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></td>
+                <td>{{person.street}}</td>
+                <td>{{person.zipcity}}</td>
+                <td>{{person.email}}</td>
+                <td>{{person.phone}}</td>
+                <td>{{person.on_waiting_list}}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
             </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          <tr>
-          </tr>
-        </tfoot>
-      </table>
-      <a class="btn btn-primary btn-lg active" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
-      <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
-      <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
-      <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'NA' %}">Opret frivillig</a>
-    </section>
+          </tfoot>
+        </table>
+        <a class="btn btn-primary btn-lg active" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
+        <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
+        <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
+        <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'NA' %}">Opret frivillig</a>
+      </section>
+    </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <section class="panel panel-defualt">
-      <header class="panel-heading">
-        <h1 class="panel-title">Invitationer</h3>
-      </header>
-      {% if invites %}
+  <h2>Invitationer</h2>
+  <div class="row">
+    <div class="col-xs-12">
+      <section class="panel panel-defualt">
+        {% if invites %}
+          <table class="table table-striped table-responsive">
+            <thead>
+              <tr>
+                <th class="col-sm-3" align="left">Navn</th>
+                <th align="left">Aktivitet</th>
+                <th class="col-sm-3 text-center" colspan="2">Reaktion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for invite in invites %}
+                <tr>
+                  <td>{{invite.person.name}}</td>
+                  <td>{{invite.activity.name}}</td>
+                  <td><a class="btn btn-success" href="{% url 'invite_accept' invite.unique %}">Acceptér</a></td>
+                  <td><a class="btn btn-danger" href="{% url 'invite_decline' invite.unique %}">Afslå</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+            <div class="col-xs-12">Der er ingen aktuelle invitationer.
+            </div>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+  {% if currents %}
+  <h2>Aktiviteter</h2>
+  <div class="row">
+    <div class="col-xs-12">
+      <section class="panel panel-defualt">
         <table class="table table-striped table-responsive">
           <thead>
             <tr>
               <th class="col-sm-3" align="left">Navn</th>
-              <th align="left">Aktivitet</th>
-              <th class="col-sm-3 text-center" colspan="2">Reaktion</th>
+              <th>Aktivitet</th>
+              <th class="col-sm-2">Start</th>
+              <th class="col-sm-2">Slut</th>
             </tr>
           </thead>
           <tbody>
-            {% for invite in invites %}
+            {% for activity in currents %}
               <tr>
-                <td>{{invite.person.name}}</td>
-                <td>{{invite.activity.name}}</td>
-                <td><a class="btn btn-primary" href="{% url 'invite_accept' invite.unique %}">Acceptér</a></td>
-                <td><a class="btn btn-default" href="{% url 'invite_decline' invite.unique %}">Afslå</a></td>
+                <td>{{activity.member.person.name}}</td>
+                <td>{{activity.activity.name}}</td>
+                <td>{{activity.activity.start_date}}</td>
+                <td>{{activity.activity.end_date}}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
-      {% else %}
-          <div class="col-sm-12">Der er ingen aktuelle invitationer.
-          </div>
-      {% endif %}
-    </section>
+      </section>
+    </div>
   </div>
+  {% endif %}
 </div>
-{% if currents %}
-<div class="row">
-  <div class="col-xs-12">
-    <section class="panel panel-defualt">
-      <header class="panel-heading">
-        <h1 class="panel-title">Aktiviteter</h3>
-      </header>
-      <table class="table table-striped table-responsive">
-        <thead>
-          <tr>
-            <th class="col-sm-3" align="left">Navn</th>
-            <th>Aktivitet</th>
-            <th class="col-sm-2">Start</th>
-            <th class="col-sm-2">Slut</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for activity in currents %}
-            <tr>
-              <td>{{activity.member.person.name}}</td>
-              <td>{{activity.activity.name}}</td>
-              <td>{{activity.activity.start_date}}</td>
-              <td>{{activity.activity.end_date}}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
-  </div>
-</div>
-{% endif %}

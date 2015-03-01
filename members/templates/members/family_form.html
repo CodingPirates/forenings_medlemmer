@@ -1,16 +1,24 @@
 {% load bootstrap3 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-
-<h1>Familie</h1>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-<form action="{% url 'family_add' %}" method="post">
-  {% csrf_token %}
-  <fieldset>
-    <legend>Indtast den e-mail adresse, hvor du gerne vil have alt information fra Coding Pirates</legend>
-    <div>Email:</div>
-    <input type="text" name="email" id="email" value="{{ family.email }}" />
-    <input type="submit" value="Opret" />
-  </fieldset>
-</form>
+<div class="container-fluid">
+  <h1>Opret familie</h1>
+  <div class="row">
+    <div class="col-xs-12">
+      <section class="panel panel-defualt">
+        <header class="panel-heading">
+          <h3 class="panel-title">Familiens e-mail adresse</h3>
+        </header>
+        <form action="{% url 'family_add' %}" method="post">
+          {% csrf_token %}
+          <fieldset>
+            <legend>Indtast den e-mail adresse, hvor du gerne vil have alt information fra Coding Pirates</legend>
+            <div>Email:</div>
+            <input type="text" name="email" id="email" value="{{ family.email }}" />
+            <input class="btn btn-success" type="submit" value="Opret" />
+          </fieldset>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>
