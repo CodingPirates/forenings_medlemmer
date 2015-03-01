@@ -33,7 +33,7 @@ class Person(models.Model):
         (PARENT,'Forælder'),
         (GUARDIAN, 'Værge'),
         (CHILD, 'Barn'),
-        (OTHER, 'Andet')
+        (OTHER, 'Frivillig')
     )
     membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)

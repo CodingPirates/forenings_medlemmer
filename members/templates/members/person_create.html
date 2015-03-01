@@ -2,12 +2,11 @@
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 
-<form action="{% url 'person_add' family.unique %}" method="post">
+<form action="{% url 'person_add' family.unique membertype %}" method="post">
   <fieldset>
     <legend>Opret familiemedlem</legend>
     {% csrf_token %}
     {% bootstrap_form form %}
-    {{ form.as_p }}
     <input type="submit" class="btn btn-primary" value="Opret" />
   </fieldset>
 </form>

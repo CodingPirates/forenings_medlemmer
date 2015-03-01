@@ -53,23 +53,23 @@ def UpdatePersonFromForm(person, form):
     person.street = form.cleaned_data['street']
     person.zipcity = form.cleaned_data['zipcity']
     person.on_waiting_list = form.cleaned_data['on_waiting_list']
-    person.membertype = form.cleaned_data['membertype']
     person.email = form.cleaned_data['email']
     person.phone = form.cleaned_data['phone']
     person.save()
 
-def PersonCreate(request, unique):
+def PersonCreate(request, unique, membertype):
     family = get_object_or_404(Family, unique=unique)
     if request.method == 'POST':
         form = PersonForm(request.POST)
         if form.is_valid():
             person = Person()
+            person.membertype = membertype
             person.family = family
             UpdatePersonFromForm(person,form)
             return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
     else:
         form = PersonForm()
-    return render(request, 'members/person_create.html', {'form': form, 'family': family})
+    return render(request, 'members/person_create.html', {'form': form, 'family': family, 'membertype': membertype})
 
 def PersonUpdate(request, unique, id):
     person = get_object_or_404(Person, pk=id)
