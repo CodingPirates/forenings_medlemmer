@@ -13,7 +13,7 @@ class FamilyCreate(CreateView):
     def get_success_url(self):
         return reverse('family_detail', args=[self.object.unique])
 
-def Details(request,unique):
+def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
     invites= ActivityInvite.objects.filter(person__family = family)
     currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
@@ -22,7 +22,13 @@ def Details(request,unique):
         'invites': invites,
         'currents': currents
     }
-    return render(request, 'members/details.html', context)
+    return render(request, 'members/family_details.html', context)
+def InviteDetails(request, unique):
+    activity_invite = get_object_or_404(ActivityInvite, unique=unique)
+    context = {
+        'invite': activity_invite
+    }
+    return render(request, 'members/activity_invite_details.html',context)
 
 def DeclineInvitation(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)

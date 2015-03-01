@@ -1,0 +1,33 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<div class="container-fluid">
+  <h1>Invitation</h1>
+  <div class="row">
+    <div class="col-xs-12">
+      <section class="panel panel-defualt">
+        <h3>Hej {{invite.person.name}}</h3>
+        <div>Du er inviteret til <strong>{{invite.activity.name}}</strong>!</div>
+        <br/>
+        <div class="row">
+          <div class="col-xs-12">Det er i <strong>{{invite.activity.department.name}}</strong> fra: <strong>{{invite.activity.start_date}} - {{invite.activity.end_date}}</strong></div>
+        </div>
+        <br/>
+        <div class="row">
+          <div class="col-xs-12">{{invite.activity.description}}</div>
+        </div>
+        <br/>
+        <div class="row">
+          <div class="col-xs-12">Hvis du har lyst til at være med, skal du trykke på "Acceptér" - ellers skal du trykke "Afslå", så der er en anden, der kan få pladsen på holdet.</div>
+        </div>
+        <br/>
+        <div class="row">
+          <div class="col-xs-12">
+            <a class="btn btn-success" href="{% url 'invite_accept' invite.unique %}">Acceptér</a>
+            <a class="btn btn-danger" href="{% url 'invite_decline' invite.unique %}">Afslå</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

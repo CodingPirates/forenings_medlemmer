@@ -31,7 +31,7 @@ class ActivityParticipantInline(admin.TabularInline):
 
 class ActivityInviteInline(admin.TabularInline):
     model = ActivityInvite
-    extra = 1
+    extra = 3
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'start_date', 'end_date', 'is_historic')
