@@ -46,6 +46,12 @@ class Person(models.Model):
     family = models.ForeignKey(Family)
     on_waiting_list = models.BooleanField('Venteliste', default=False)
     on_waiting_list_since = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
+    def save(self, *args, **kwargs):
+        ''' On creation set UUID '''
+        if not self.id:
+            self.on_waiting_list = self.membertype == CHILD
+            self.unique = uuid.uuid4()
+        return super(Person, self).save(*args, **kwargs)
     def __str__(self):
         return self.name
 
