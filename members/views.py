@@ -73,7 +73,11 @@ def PersonCreate(request, unique, membertype):
             UpdatePersonFromForm(person,form)
             return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
     else:
-        form = PersonForm()
+        person = Person()
+        if family.person_set.count() > 0 :
+            person.street = family.person_set.first().street
+            person.zipcity = family.person_set.first().zipcity
+        form = PersonForm(instance=person)
     return render(request, 'members/person_create.html', {'form': form, 'family': family, 'membertype': membertype})
 
 def PersonUpdate(request, unique, id):
