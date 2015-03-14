@@ -46,11 +46,13 @@ class Person(models.Model):
     family = models.ForeignKey(Family)
     on_waiting_list = models.BooleanField('Venteliste', default=False)
     on_waiting_list_since = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
+    @property
+    def number_on_waiting_list(self):
+        return Person.objects.filter(on_waiting_list_since__lt = self.on_waiting_list_since,on_waiting_list=True).count()+1 if self.on_waiting_list else ''
     def save(self, *args, **kwargs):
-        ''' On creation set UUID '''
+        ''' On creation set on_waiting_list '''
         if not self.id:
-            self.on_waiting_list = self.membertype == CHILD
-            self.unique = uuid.uuid4()
+            self.on_waiting_list = self.membertype == Person.CHILD
         return super(Person, self).save(*args, **kwargs)
     def __str__(self):
         return self.name

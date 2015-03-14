@@ -58,7 +58,6 @@ def UpdatePersonFromForm(person, form):
     person.name = form.cleaned_data['name']
     person.street = form.cleaned_data['street']
     person.zipcity = form.cleaned_data['zipcity']
-    person.on_waiting_list = form.cleaned_data['on_waiting_list']
     person.email = form.cleaned_data['email']
     person.phone = form.cleaned_data['phone']
     person.save()
