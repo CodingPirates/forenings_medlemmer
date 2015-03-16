@@ -1,18 +1,28 @@
-{% load bootstrap3 %}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-<div class="container-fluid">
-  <h1>Ret familiemedlem</h1>
-  <div class="row">
-    <div class="col-xs-12">
-      <section class="panel panel-defualt">
-        <form action="{% url 'person_update' person.family.unique person.id %}" method="post">
-          {% csrf_token %}
-          {% bootstrap_form form %}
-          <input type="submit" class="btn btn-success" value="Opdater" />
-          <a class="btn btn-danger" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>
-        </form>
-      </section>
+<!DOCTYPE html>
+<html>
+  <head>
+ 	  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+    {% load bootstrap3 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+  </head>
+  <body>
+    <div class="container-fluid">
+      <h1>Ret familiemedlem</h1>
+      <div class="row">
+        <div class="col-xs-12">
+          <section class="panel panel-defualt">
+            <form action="{% url 'person_update' person.family.unique person.id %}" method="post">
+              {% csrf_token %}
+              {% bootstrap_form form %}
+              <input type="submit" class="btn btn-success" value="Opdater" />
+              <a class="btn btn-danger" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>
+            </form>
+          </section>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  </body>
+</html>
