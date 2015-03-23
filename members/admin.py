@@ -1,8 +1,6 @@
 from uuid import uuid4
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family
-# Register your models here.
-
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -29,13 +27,24 @@ class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 1
 
+class EmailItemInline(admin.TabularInline):
+    model = EmailItem
+    fields = ['person','activity','subject','created_dtm','sent_dtm']
+    can_delete = False
+    readonly_fields = ['person','activity','subject','created_dtm','sent_dtm']
+    def has_add_permission(self,request,obj=None):
+        return False
+    def has_delete_permission(self,request,obj=None):
+        return False
+    extra = 0
+
 class ActivityInviteInline(admin.TabularInline):
     model = ActivityInvite
     extra = 3
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'start_date', 'end_date', 'is_historic')
-    inlines = [ActivityParticipantInline, ActivityInviteInline]
+    inlines = [ActivityParticipantInline, ActivityInviteInline, EmailItemInline]
 admin.site.register(Activity, ActivityAdmin)
 
 class PersonInline(admin.TabularInline):
@@ -60,7 +69,7 @@ admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'street', 'placename','zipcity', 'email', 'waiting_list_since','family_url','unique')
-    inlines = [MemberInline]
+    inlines = [MemberInline, EmailItemInline]
     search_fields = ('name', 'zipcity')
     list_filter = ['on_waiting_list']
     def family_url(self, item):

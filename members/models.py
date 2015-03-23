@@ -111,6 +111,13 @@ class ActivityInvite(models.Model):
         ''' On creation set UUID '''
         if not self.id:
             self.unique = uuid.uuid4()
+            super(ActivityInvite, self).save(*args, **kwargs)
+            invite = EmailItem()
+            invite.activity = self.activity
+            invite.person = self.person
+            invite.subject = 'Du er blevet inviteret til aktiviteten: {}'.format(self.activity.name)
+            invite.body = self.activity.description
+            return invite.save()
         return super(ActivityInvite, self).save(*args, **kwargs)
     def __str__(self):
         return '{}, {}'.format(self.activity,self.person)
@@ -131,3 +138,12 @@ class Volunteer(models.Model):
     added = models.DateTimeField(auto_now_add=True, blank=True, editable=False)
     def __str__(self):
         return self.member.__str__()
+
+class EmailItem(models.Model):
+    person = models.ForeignKey(Person)
+    activity = models.ForeignKey(Activity, null=True)
+    created_dtm = models.DateTimeField('Oprettet',auto_now_add=True)
+    subject = models.CharField('Emne',max_length=200, blank=True)
+    body = models.CharField('Indhold', max_length=10000, blank=True)
+    sent_dtm = models.DateTimeField('Sendt', blank=True, null=True)
+    send_error = models.CharField('Fejl i afsendelse',max_length=200,blank=True, editable=False)
