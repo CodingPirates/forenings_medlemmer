@@ -15,12 +15,11 @@
         <div class="col-xs-12">
           <section class="panel panel-defualt">
             <div id="soeg">
-            	<div role="main" class="ui-content">
+            	<div role="main" class="form control ui-content">
               	<form id="searchform">
+                  <label>Søg adresse:</label>
                   <ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="vejnavn husnr, etage. dør, postnr" data-filter-theme="a"></ul>
                 </form>
-                <ul id='adresseinfo' data-role="listview" data-inset="true">
-                </ul>
             	</div>
             </div>
             <form action="{% url 'person_add' family.unique membertype %}" method="post">
@@ -41,9 +40,6 @@ $(function () {
       vejnavn= null,
       ul = null,
       input= null;
-  function danAdresse(adresse) {
-    return adresse.adgangsadresse.vejstykke.navn + (adresse.adgangsadresse.husnr.length > 0?' '+adresse.adgangsadresse.husnr:"")  + (adresse.etage?', '+adresse.etage+'.':"") + (adresse.dør?' '+adresse.dør:"")+ "<br />" +(adresse.adgangsadresse.supplerendebynavn?' '+adresse.adgangsadresse.supplerendebynavn+"<br />":"") +  (adresse.adgangsadresse.postnummer?adresse.adgangsadresse.postnummer.nr+' '+adresse.adgangsadresse.postnummer.navn:"");
-  }
 
   function visAdresseInfo(url) {
     $.ajax({
@@ -54,7 +50,9 @@ $(function () {
       alert(jqXHR.status + " " + jqXHR.statusText); // kaldes ikke ved jsonp
     })
     .then( function ( adresse, textStatus, jqXHR ) {
-      console.log(adresse);
+      $('#id_street').val(adresse.adgangsadresse.vejstykke.navn + (adresse.adgangsadresse.husnr.length > 0?' '+adresse.adgangsadresse.husnr:"")  + (adresse.etage?', '+adresse.etage+'.':"") + (adresse.dør?' '+adresse.dør:""));
+      $('#id_placename').val(adresse.adgangsadresse.supplerendebynavn);
+      $('#id_zipcity').val(adresse.adgangsadresse.postnummer?adresse.adgangsadresse.postnummer.nr+' '+adresse.adgangsadresse.postnummer.navn:"");
       info.html( "" );
       info.listview( "refresh" );
     });
