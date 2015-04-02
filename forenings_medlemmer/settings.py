@@ -1,5 +1,5 @@
 """
-Django settings for duckhero project.
+Django settings for forenings_medlemmer project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -50,9 +50,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'duckhero.urls'
+ROOT_URLCONF = 'forenings_medlemmer.urls'
 
-WSGI_APPLICATION = 'duckhero.wsgi.application'
+WSGI_APPLICATION = 'forenings_medlemmer.wsgi.application'
 
 
 # Database
