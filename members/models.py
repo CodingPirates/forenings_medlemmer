@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from django.db import models
 from django.core.urlresolvers import reverse
 from django_extensions.db.fields import UUIDField
@@ -37,9 +40,12 @@ class Person(models.Model):
     )
     membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)
-    street = models.CharField('Adresse',max_length=200)
+    zipcode = models.CharField('Postnummer',max_length=4)
+    streetname = models.CharField('Vejnavn',max_length=200)
+    housenumber = models.CharField('Husnummer',max_length=5)
+    floor = models.CharField('Etage',max_length=3, blank=True)
+    door = models.CharField('Dør',max_length=5, blank=True)
     placename = models.CharField('Stednavn',max_length=200, blank=True)
-    zipcity = models.CharField('Postnr. og by',max_length=200)
     email = models.EmailField(blank=True)
     phone = models.CharField('Telefon', max_length=50, blank=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)

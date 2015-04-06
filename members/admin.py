@@ -68,7 +68,7 @@ class FamilyAdmin(admin.ModelAdmin):
 admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'street', 'placename','zipcity', 'email', 'waiting_list_since','family_url','unique')
+    list_display = ('name', 'zipcode', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email', 'waiting_list_since','family_url','unique')
     inlines = [MemberInline, EmailItemInline]
     search_fields = ('name', 'zipcity')
     list_filter = ['on_waiting_list']

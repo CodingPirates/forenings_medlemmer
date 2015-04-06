@@ -56,8 +56,14 @@ def AcceptInvitation(request, unique):
 
 def UpdatePersonFromForm(person, form):
     person.name = form.cleaned_data['name']
-    person.street = form.cleaned_data['street']
-    person.zipcity = form.cleaned_data['zipcity']
+
+    person.zipcode = form.cleaned_data['zipcode']
+    person.streetname = form.cleaned_data['streetname']
+    person.housenumber = form.cleaned_data['housenumber']
+    person.floor = form.cleaned_data['floor']
+    person.door = form.cleaned_data['door']
+    person.placename = form.cleaned_data['placename']
+
     person.email = form.cleaned_data['email']
     person.phone = form.cleaned_data['phone']
     person.save()
@@ -75,8 +81,12 @@ def PersonCreate(request, unique, membertype):
     else:
         person = Person()
         if family.person_set.count() > 0 :
-            person.street = family.person_set.first().street
-            person.zipcity = family.person_set.first().zipcity
+            person.zipcode = family.person_set.first().zipcode
+            person.streetname = family.person_set.first().streetname
+            person.housenumber = family.person_set.first().housenumber
+            person.floor = family.person_set.first().floor
+            person.door = family.person_set.first().door
+            person.placename = family.person_set.first().placename
         form = PersonForm(instance=person)
     return render(request, 'members/person_create.html', {'form': form, 'family': family, 'membertype': membertype})
 
