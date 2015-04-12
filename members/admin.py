@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -53,6 +53,7 @@ class PersonInline(admin.TabularInline):
 
 class FamilyAdmin(admin.ModelAdmin):
     list_display = ('email','unique')
+    search_fields = ('email',)
     inlines = [PersonInline]
     actions = ['create_new_uuid']
     def create_new_uuid(self,request, queryset):
@@ -70,7 +71,7 @@ admin.site.register(Family, FamilyAdmin)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'zipcode', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email', 'waiting_list_since','family_url','unique')
     inlines = [MemberInline, EmailItemInline]
-    search_fields = ('name', 'zipcity')
+    search_fields = ('name', 'zipcode')
     list_filter = ['on_waiting_list']
     def family_url(self, item):
         return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
@@ -85,3 +86,8 @@ class PersonAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Person,PersonAdmin)
+
+class JournalAdmin(admin.ModelAdmin):
+    readonly_fields = ['family', 'person']
+
+admin.site.register(Journal, JournalAdmin)

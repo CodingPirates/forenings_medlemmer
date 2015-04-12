@@ -153,3 +153,14 @@ class EmailItem(models.Model):
     body = models.CharField('Indhold', max_length=10000, blank=True)
     sent_dtm = models.DateTimeField('Sendt', blank=True, null=True)
     send_error = models.CharField('Fejl i afsendelse',max_length=200,blank=True, editable=False)
+
+class Journal(models.Model):
+    class Meta:
+        verbose_name = 'Journal'
+        verbose_name_plural = 'Journaler'
+    family = models.ForeignKey(Family)
+    person = models.ForeignKey(Person, null=True)
+    created_dtm = models.DateTimeField('Oprettet',auto_now_add=True)
+    body = models.TextField('Indhold')
+    def __str__(self):
+        return self.family.email
