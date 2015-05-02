@@ -14,6 +14,14 @@
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-defualt">
+            <div id="soeg">
+            	<div role="main" class="form control ui-content">
+              	<form id="searchform">
+                  <label>Søg adresse:</label>
+                  <ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="vejnavn husnr, etage. dør, postnr" data-filter-theme="a"></ul>
+                </form>
+            	</div>
+            </div>
             <form action="{% url 'person_update' person.family.unique person.id %}" method="post">
               {% csrf_token %}
               {% bootstrap_form form %}
@@ -26,3 +34,98 @@
     </div>
   </body>
 </html>
+<script>
+$(function () {
+  var info= $("#adresseinfo"),
+      vejnavn= null,
+      ul = null,
+      input= null;
+
+  function visAdresseInfo(url) {
+    $.ajax({
+      url: url,
+      dataType: "jsonp"
+    })
+    .fail( function(jqXHR, textStatus) {
+      alert(jqXHR.status + " " + jqXHR.statusText); // kaldes ikke ved jsonp
+    })
+    .then( function ( adresse, textStatus, jqXHR ) {
+      $('#id_streetname').val(adresse.adgangsadresse.vejstykke.navn);
+      $('#id_housenumber').val(adresse.adgangsadresse.husnr);
+      $('#id_floor').val(adresse.etage);
+      $('#id_door').val(adresse.dør);
+      $('#id_placename').val(adresse.adgangsadresse.supplerendebynavn);
+      $('#id_zipcode').val(adresse.adgangsadresse.postnummer?adresse.adgangsadresse.postnummer.nr:"");
+      $('#id_city').val(adresse.adgangsadresse.postnummer?adresse.adgangsadresse.postnummer.navn:"");
+      info.html( "" );
+      info.listview( "refresh" );
+    });
+  }
+
+  function hentliste(q) {
+    info.html( "" );
+    info.listview( "refresh" );
+    ul.listview( "refresh" );
+    var parametre=  {
+      side: 1,
+      per_side: 10,
+      q: q,
+      vejnavn: vejnavn
+    };
+    $.ajax({
+        url: "http://dawa.aws.dk/"+(vejnavn?"adresser":"vejnavne")+"/autocomplete",
+        dataType: "jsonp",
+        data: parametre
+    })
+    .then( function ( response ) {
+      if (response.length === 1) {
+        if ("adresse" in response[0]) {
+          visAdresseInfo(response[0].adresse.href);
+        }
+        else {
+          vejnavn= response[0].tekst;
+          hentliste(q);
+        }
+        input.val(response[0].tekst+" ");
+        input.focus();
+      }
+      else {
+        $.each( response, function ( i, val ) {
+          ul.append("<li id='" + i + "'>" + val.tekst + "</li>");
+          $("#" + i).data("data",val);
+          $("#" + i).bind("vclick", vælgItem(val));
+        });
+      }
+      ul.listview( "refresh" );
+      ul.trigger( "updatelayout");
+    });
+  }
+
+  function vælgItem(res) {
+    return function (e) {
+      var valg= $(this).data("data");
+      ul.html( "" );
+      ul.listview( "refresh" );
+      if ("adresse" in valg) {
+        visAdresseInfo(valg.adresse.href);
+      } else {
+        vejnavn= valg.tekst;
+      }
+    };
+  };
+
+  $( "#autocomplete" ).on( "filterablebeforefilter", function ( e, data ) {
+    ul = $( this );
+    input = $( data.input );
+    value = input.val();
+    ul.html( "" );
+    if ( value && value.length > 1 ) {
+      if (vejnavn && value.length < vejnavn.length)
+			{
+				vejnavn= null;
+			}
+      hentliste(value);
+    }
+  });
+});
+</script>

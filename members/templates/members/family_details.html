@@ -34,12 +34,8 @@
                   <tr>
                     <td>{{person.get_membertype_display}}</td>
                     <td><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></td>
-                    <td>{{person.zipcode}}</td>
-                    <td>{{person.streetname}}</td>
-                    <td>{{person.housenumber}}</td>
-                    <td>{{person.floor}}</td>
-                    <td>{{person.door}}</td>
-                    <td>{{person.placename}}</td>
+                    <td>{{person.streetname}} {{person.housenumber}} {{person.floor}} {{person.door}}</td>
+                    <td>{{person.zipcode}} {{person.city}}</td>
                     <td>{{person.email}}</td>
                     <td>{{person.phone}}</td>
                     <td>{{person.number_on_waiting_list}}</td>

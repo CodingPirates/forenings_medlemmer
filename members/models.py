@@ -41,6 +41,7 @@ class Person(models.Model):
     membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)
     zipcode = models.CharField('Postnummer',max_length=4)
+    city = models.CharField('By', max_length=200)
     streetname = models.CharField('Vejnavn',max_length=200)
     housenumber = models.CharField('Husnummer',max_length=5)
     floor = models.CharField('Etage',max_length=3, blank=True)

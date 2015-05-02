@@ -9,7 +9,7 @@ import datetime
 
 class FamilyCreate(CreateView):
     model=Family
-    fieds=['email']
+    fields=['email']
     def get_success_url(self):
         return reverse('family_detail', args=[self.object.unique])
 
@@ -56,14 +56,13 @@ def AcceptInvitation(request, unique):
 
 def UpdatePersonFromForm(person, form):
     person.name = form.cleaned_data['name']
-
+    person.city = form.cleaned_data['city']
     person.zipcode = form.cleaned_data['zipcode']
     person.streetname = form.cleaned_data['streetname']
     person.housenumber = form.cleaned_data['housenumber']
     person.floor = form.cleaned_data['floor']
     person.door = form.cleaned_data['door']
     person.placename = form.cleaned_data['placename']
-
     person.email = form.cleaned_data['email']
     person.phone = form.cleaned_data['phone']
     person.save()

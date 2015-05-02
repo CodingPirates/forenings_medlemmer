@@ -50,9 +50,13 @@ $(function () {
       alert(jqXHR.status + " " + jqXHR.statusText); // kaldes ikke ved jsonp
     })
     .then( function ( adresse, textStatus, jqXHR ) {
-      $('#id_street').val(adresse.adgangsadresse.vejstykke.navn + (adresse.adgangsadresse.husnr.length > 0?' '+adresse.adgangsadresse.husnr:"")  + (adresse.etage?', '+adresse.etage+'.':"") + (adresse.dør?' '+adresse.dør:""));
+      $('#id_streetname').val(adresse.adgangsadresse.vejstykke.navn);
+      $('#id_housenumber').val(adresse.adgangsadresse.husnr);
+      $('#id_floor').val(adresse.etage);
+      $('#id_door').val(adresse.dør);
       $('#id_placename').val(adresse.adgangsadresse.supplerendebynavn);
-      $('#id_zipcity').val(adresse.adgangsadresse.postnummer?adresse.adgangsadresse.postnummer.nr+' '+adresse.adgangsadresse.postnummer.navn:"");
+      $('#id_zipcode').val(adresse.adgangsadresse.postnummer?adresse.adgangsadresse.postnummer.nr:"");
+      $('#id_city').val(adresse.adgangsadresse.postnummer?adresse.adgangsadresse.postnummer.navn:"");
       info.html( "" );
       info.listview( "refresh" );
     });
