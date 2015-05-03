@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -10,12 +10,16 @@ class ActivityInline(admin.TabularInline):
     model = Activity
     extra = 0
 
+class WaitingListInline(admin.TabularInline):
+    model = WaitingList
+    extra = 0
+
 class DepartmentAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields':['name']})
+        (None, {'fields':['name','has_waiting_list']})
     ]
     list_display = ('name','no_members')
-    inlines = [MemberInline, ActivityInline]
+    inlines = [MemberInline, ActivityInline,WaitingListInline]
 admin.site.register(Department,DepartmentAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
@@ -72,7 +76,6 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'zipcode', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email', 'waiting_list_since','family_url','unique')
     inlines = [MemberInline, EmailItemInline]
     search_fields = ('name', 'zipcode')
-    list_filter = ['on_waiting_list']
     def family_url(self, item):
         return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
     family_url.allow_tags = True

@@ -20,14 +20,12 @@
               <thead>
                 <tr>
                   <th class="col-xs-1"/>
-                  <th class="col-xs-2" align="left">Navn</th>
-                  <th class="col-xs-2" align="left">Adresse</th>
+                  <th class="col-xs-3" align="left">Navn</th>
+                  <th class="col-xs-3" align="left">Adresse</th>
                   <th class="col-xs-2" align="left">Postnr./by</th>
-                  <th class="col-xs-1" align="left">Email</th>
+                  <th class="col-xs-2" align="left">Email</th>
                   <th class="col-xs-1" align="left">Telefon</th>
-                  <th class="col-xs-1" align="left">Venteliste#</th>
-                  <th class="col-xs-2" align="left">På venteliste siden</th>
-                  </tr>
+                </tr>
               </thead>
               <tbody>
                 {% for person in family.person_set.all %}
@@ -38,12 +36,6 @@
                     <td>{{person.zipcode}} {{person.city}}</td>
                     <td>{{person.email}}</td>
                     <td>{{person.phone}}</td>
-                    <td>{{person.number_on_waiting_list}}</td>
-                    {% if person.on_waiting_list %}
-                    <td>{{person.on_waiting_list_since}}</td>
-                    {% else %}
-                    <td></td>
-                    {% endif %}
                   </tr>
                 {% endfor %}
               </tbody>

@@ -46,16 +46,14 @@ class Person(models.Model):
     housenumber = models.CharField('Husnummer',max_length=5)
     floor = models.CharField('Etage',max_length=3, blank=True)
     door = models.CharField('Dør',max_length=5, blank=True)
+    def address(self):
+        return '{} {}{}'.format(self.streetname,self.housenumber,', {}{}'.format(self.floor,self.door) if self.floor != '' or self.door != '' else '')
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField('Telefon', max_length=50, blank=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
-    on_waiting_list = models.BooleanField('Venteliste', default=False)
-    on_waiting_list_since = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
-    @property
-    def number_on_waiting_list(self):
-        return Person.objects.filter(on_waiting_list_since__lt = self.on_waiting_list_since,on_waiting_list=True).count()+1 if self.on_waiting_list else ''
+    added = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
     def save(self, *args, **kwargs):
         ''' On creation set on_waiting_list '''
         if not self.id:
@@ -70,11 +68,26 @@ class Department(models.Model):
         verbose_name='afdeling'
         ordering=['name']
     name = models.CharField('Navn',max_length=200)
+    has_waiting_list = models.BooleanField('Venteliste',default=False)
     def no_members(self):
         return self.member_set.count()
     no_members.short_description = 'Antal medlemmer'
     def __str__(self):
         return self.name
+
+class WaitingList(models.Model):
+    class Meta:
+        verbose_name_plural='På venteliste'
+        ordering=['on_waiting_list_since']
+    person = models.ForeignKey(Person)
+    department = models.ForeignKey(Department)
+    on_waiting_list_since = models.DateField('Tilføjet', blank=True, null=True)
+    def number_on_waiting_list(self):
+        return WaitingList.objects.filter(department = self.department,on_waiting_list_since__lt = self.on_waiting_list_since).count()+1
+    def save(self, *args,**kwargs):
+        ''' On creation set on_waiting_list '''
+        if not self.id:
+            self.on_waiting_list_since = self.person.added
 
 class Member(models.Model):
     class Meta:
