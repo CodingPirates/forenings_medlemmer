@@ -54,6 +54,11 @@ class Person(models.Model):
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
     added = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
+    on_waiting_list = models.BooleanField('Venteliste', default=False)
+    on_waiting_list_since = models.DateTimeField('Tilføjet', blank=False, editable=False)
+    @property
+    def number_on_waiting_list(self):
+        return Person.objects.filter(on_waiting_list_since__lt = self.on_waiting_list_since,on_waiting_list=True).count()+1 if self.on_waiting_list else ''
     def save(self, *args, **kwargs):
         ''' On creation set on_waiting_list '''
         if not self.id:
@@ -97,7 +102,7 @@ class Member(models.Model):
     department = models.ForeignKey(Department)
     person = models.ForeignKey(Person)
     is_active = models.BooleanField('Aktiv',default=True)
-    member_since = models.DateTimeField('Indmeldt',auto_now_add=True, blank=True, editable=False)
+    member_since = models.DateTimeField('Indmeldt', blank=False, editable=False)
     def name(self):
         return '{}'.format(self.person)
     name.short_description = 'Navn'

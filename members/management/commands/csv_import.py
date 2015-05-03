@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import csv
-import time
+import datetime
 from django.db import IntegrityError, transaction
 from django.core.management.base import BaseCommand, CommandError
 from members.models import Journal, Person, Family
@@ -34,13 +34,13 @@ class Command(BaseCommand):
 
         dialect = csv.Sniffer().sniff(csvfile.read(1024))
         csvfile.seek(0)
-        members = csv.reader(csvfile, dialect)
-        columns = len(next(members))
+        entries = csv.reader(csvfile, dialect)
+        columns = len(next(entries))
         csvfile.seek(0)
-        members = csv.reader(csvfile, dialect)
+        entries = csv.reader(csvfile, dialect)
 
         if(options['first_row_is_label']):
-            labels = next(members)
+            labels = next(entries)
         else:
             # make list of empty labels
             labels = []
@@ -54,22 +54,38 @@ class Command(BaseCommand):
                 else:
                     labels.append('')
 
-        for member in members:
 
-            date = member[options['date_column']]
-            email = member[options['email_column']]
+        datetimeobject = datetime.datetime.today()
+
+        for entry in entries:
+
+            email = entry[options['email_column']]
 
             journal = 'Importeret fra CSV fil:\n'
             for col in range(columns):
-                journal = journal + labels[col] + ': ' + member[col] + '\n'
+                journal = journal + labels[col] + ': ' + entry[col] + '\n'
+
+            date = datetimeobject.strptime(entry[options['date_column']] + " +0001", '%m/%d/%Y %H:%M:%S %z')
 
             # find or create the family
             family, created = Family.objects.get_or_create(email = email)
 
-            # create the person
-            person = Person(name=member[options['name_column']], membertype=Person.CHILD, family = family, on_waiting_list_since = member[options['date_column']])
-            person.save()
 
+            #lookup person
+            try:
+               person = Person.objects.get(name=entry[options['name_column']].title(), family = family)
+
+               # if corrent waiting list is older, replace timestamp
+               if(date < person.on_waiting_list_since):
+                   person.on_waiting_list_since = date
+                   person.save()
+
+            except ObjectDoesNotExist:
+                # create the person
+                person = Person(name=entry[options['name_column']].title(), membertype=Person.CHILD, family = family, on_waiting_list_since = date)
+                person.save()
+
+            # store original data in log entry.
             logentry = Journal(family = family, person = person, body = journal)
 
-            logentry.save()
+            logentry.save
