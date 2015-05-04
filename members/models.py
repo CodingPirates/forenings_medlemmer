@@ -18,6 +18,7 @@ class Family(models.Model):
         ''' On creation set UUID '''
         if not self.id:
             self.unique = uuid.uuid4()
+        self.email = self.email.lower()
         return super(Family, self).save(*args, **kwargs)
     def get_abosolute_url(self):
         return reverse('family_form', kwargs={'pk':self.unique})

@@ -59,7 +59,8 @@ class Command(BaseCommand):
 
         for entry in entries:
 
-            email = entry[options['email_column']]
+            email = entry[options['email_column']].lower()
+            name = entry[options['name_column']].title().strip()
 
             journal = 'Importeret fra CSV fil:\n'
             for col in range(columns):
@@ -73,7 +74,7 @@ class Command(BaseCommand):
 
             #lookup person
             try:
-               person = Person.objects.get(name=entry[options['name_column']].title(), family = family)
+               person = Person.objects.get(name=name, family = family)
 
                # if corrent waiting list is older, replace timestamp
                if(date < person.on_waiting_list_since):
@@ -82,7 +83,7 @@ class Command(BaseCommand):
 
             except ObjectDoesNotExist:
                 # create the person
-                person = Person(name=entry[options['name_column']].title(), membertype=Person.CHILD, family = family, on_waiting_list_since = date)
+                person = Person(name=name, membertype=Person.CHILD, family = family, on_waiting_list_since = date)
                 person.save()
 
             # store original data in log entry.
