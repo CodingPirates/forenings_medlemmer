@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django_extensions.db.fields import UUIDField
 import uuid
 import datetime
+from pytz import timezone
 # Create your models here.
 
 class Family(models.Model):
@@ -64,6 +65,8 @@ class Person(models.Model):
         ''' On creation set on_waiting_list '''
         if not self.id:
             self.on_waiting_list = self.membertype == Person.CHILD
+        if not self.on_waiting_list_since:
+            self.on_waiting_list_since = datetime.datetime.now(timezone('Europe/Copenhagen'))
         return super(Person, self).save(*args, **kwargs)
     def __str__(self):
         return self.name
