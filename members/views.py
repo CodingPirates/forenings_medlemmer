@@ -2,9 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity
-from members.forms import PersonForm
+from members.forms import PersonForm, getLoginForm
 import datetime
 
 class FamilyCreate(CreateView):
@@ -101,3 +101,13 @@ def PersonUpdate(request, unique, id):
     else:
         form = PersonForm(instance=person)
     return render(request, 'members/person_update.html', {'form': form, 'person': person})
+
+def EntryPage(request):
+    if request.method == 'POST':
+        getLogin = getLoginForm(request.POST)
+        # send email to user
+        return render(request, 'members/entry_page.html', {'form' : getLogin, 'sendEmail' : True})
+    else:    
+        getLogin = getLoginForm()
+        return render(request, 'members/entry_page.html', {'form' : getLogin, 'sendEmail' : False})
+

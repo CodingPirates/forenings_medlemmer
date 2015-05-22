@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="da">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+    {% load bootstrap3 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-8">
+          <h1>Ret indtastning</h1>
+          <p>Hvis du allerede har tilmeldt dig, så kan du ved at skrive din emailadresse her, få et nyt link til at ændre dine data, eller se din positon på ventelisten.<p>
+        </div>
+        <div class="col-xs-8">
+          <form action="{% url 'entry_page' %}" method="post">
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <input type="submit" class="btn btn-success" value="send" />
+          {% if sendEmail %}
+            <div><p class="text-info">Du vil om lidt modtage en email med et link til at redigere dine oplysninger.</p></div>
+          {% endif %}  
+          </form>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <h1>Tilmelding til Coding Pirates</h1>
+          <p>Indtast dine informationer, for at komme videre og tilmelde dig en Coding Pirates workshop, eller for at komme med på interesse liste</p>
+        </div>
+      </div>
+    </div>
+
+
+  </body>
+</html>
