@@ -2,7 +2,7 @@ from django.conf.urls import patterns,  url
 from members.views import FamilyCreate, FamilyDetails, PersonCreate, PersonUpdate, AcceptInvitation, DeclineInvitation, InviteDetails, EntryPage
 
 urlpatterns = patterns('',
-    url(r'', EntryPage, name='entry_page'),
+    url(r'^/{0,1}$', EntryPage, name='entry_page'),
     url(r'family/(?P<unique>[\w-]+)/$', FamilyDetails, name='family_detail'),
     url(r'invite/(?P<unique>[\w-]+)/accept/$', AcceptInvitation, name='invite_accept'),
     url(r'invite/(?P<unique>[\w-]+)/decline/$', DeclineInvitation, name='invite_decline'),
