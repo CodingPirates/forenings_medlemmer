@@ -10,19 +10,32 @@ class PersonForm(forms.ModelForm):
         fields= ['name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
 
 class getLoginForm(forms.Form):
-    email = forms.EmailField(required=True, label="Email", initial="din@email.dk", help_text="Indtast den email adresse du oprindeligt opskrev dig med.", error_messages={'required': 'Indtast din email adresse først', 'invalid' : 'Ikke en gyldig email adresse!'})
-
-class getSignupForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(getSignupForm, self).__init__(*args, **kwargs)
+        super(getLoginForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_id = 'id-getSignupForm'
-        self.helper.form_class = 'blueForms'
+        self.helper.form_id = 'id-getLoginForm'
         self.helper.form_method = 'post'
         self.helper.form_action = 'entry_page'
         self.helper.help_text_inline = False
         self.helper.html5_required = True
         self.helper.layout = Layout(
+            Hidden('form_id', 'getlogin',  id="id_form_id"),
+            'email')
+        self.helper.add_input(Submit('submit', 'Send'))
+
+    email = forms.EmailField(required=True, label="Email", initial="din@email.dk", help_text="Indtast den email adresse du oprindeligt opskrev dig med.", error_messages={'required': 'Indtast din email adresse først', 'invalid' : 'Ikke en gyldig email adresse!'})
+
+class signupForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(signupForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-getSignupForm'
+        self.helper.form_method = 'post'
+        self.helper.form_action = 'entry_page'
+        self.helper.help_text_inline = False
+        self.helper.html5_required = True
+        self.helper.layout = Layout(
+            Hidden('form_id', 'signup',  id="id_form_id"),
             Fieldset('Barnets oplysninger',
                         Div(
                              Div(Field('child_name'), css_class="col-md-12"),
@@ -51,7 +64,7 @@ class getSignupForm(forms.Form):
                             Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
                             Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
                             Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                            Hidden('dawa_id', ''),
+                            Hidden('dawa_id', '',  id="id_dawa_id"),
                             css_class="row"
                            )
                      )
@@ -76,5 +89,6 @@ class getSignupForm(forms.Form):
     placename = forms.CharField(label='Stednavn', required=False,max_length=200)
     zipcode = forms.CharField(label='Postnummer', max_length=4)
     city = forms.CharField(label='By', max_length=200, required=False)
-    dawa_id = forms.CharField()
+    dawa_id = forms.HiddenInput()
+    form_id = forms.HiddenInput()
     manual_entry = forms.TypedChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False)

@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity
-from members.forms import PersonForm, getLoginForm, getSignupForm
+from members.forms import PersonForm, getLoginForm, signupForm
 import datetime
 
 class FamilyCreate(CreateView):
@@ -104,12 +104,22 @@ def PersonUpdate(request, unique, id):
 
 def EntryPage(request):
     if request.method == 'POST':
-        getLogin = getLoginForm(request.POST)
-        signupForm = getSignupForm()
-        # send email to user
-        return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : True})
-    else:
-        getLogin = getLoginForm()
-        signupForm = getSignupForm()
-        return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : False})
+        # figure out which form was filled out.
+        if request.POST['form_id'] == 'signup':
+            # signup has been filled
+            getLogin = getLoginForm()
+            signup = signupForm(request.POST)
+            return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : False})
+
+        elif request.POST['form_id'] == 'getlogin':
+            # just resend email
+            getLogin = getLoginForm(request.POST)
+            signup = signupForm()
+            # send email to user
+            return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : True})
+
+    # initial load (if we did not return above)
+    getLogin = getLoginForm()
+    signup = signupForm()
+    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : False})
 

@@ -29,6 +29,7 @@
         $("#id_placename").val(adresse.adresse.supplerendebynavn);
         $("#id_zipcode").val(adresse.adresse.postnr);
         $("#id_city").val(adresse.adresse.postnrnavn);
+        $("#id_dawa_id").val(adresse.adresse.id);
       }});
       $("#manual-entry").click(function() {
         if($("#manual-entry").get(0).checked) {
@@ -51,30 +52,21 @@
           <p>Hvis du allerede har tilmeldt dig, så kan du ved at skrive din emailadresse her, få et nyt link til at ændre dine data, eller se din positon på ventelisten.</p>
         </div>
       </div>
+
       <div class="row">
         <div class="col-md-4">
           <div class="panel panel-default">
             <div class="panel-body">
-              <form action="{% url 'entry_page' %}" method="post">
-              {% csrf_token %}
-              {% bootstrap_form loginform %}
+              {% crispy loginform %}
 
               {% if sendEmail %}
-                <div><p class="alert alert-info">Du vil om lidt modtage en email med et link til at redigere dine oplysninger.</p></div>
+              <p class="alert alert-info">Du vil om lidt modtage en email med et link til at redigere dine oplysninger.</p>
               {% endif %}
-
-              {% buttons %}
-              <button type="submit" class="btn btn-primary">
-              Send
-              </button>
-              {% endbuttons %}
-
-              </form>
             </div>
           </div>
         </div>
-
       </div>
+
       <div class="row">
         <div class="col-md-10">
           <h1>Tilmelding til Coding Pirates</h1>
@@ -85,11 +77,10 @@
         <div class="col-md-10">
           <div class="panel panel-default">
             <div class="panel-body">
-              {% crispy signupform %}
+            {% crispy signupform %}
             </div>
           </div>
         </div>
       </div>
-    </div>
   </body>
 </html>
