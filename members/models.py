@@ -48,11 +48,13 @@ class Person(models.Model):
     housenumber = models.CharField('Husnummer',max_length=5)
     floor = models.CharField('Etage',max_length=3, blank=True)
     door = models.CharField('Dør',max_length=5, blank=True)
+    dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     def address(self):
         return '{} {}{}'.format(self.streetname,self.housenumber,', {}{}'.format(self.floor,self.door) if self.floor != '' or self.door != '' else '')
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField('Telefon', max_length=50, blank=True)
+    birthday = models.DateField('Fødselsdag', blank=True, null=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
     added = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
