@@ -31,7 +31,7 @@
         $("#id_city").val(adresse.adresse.postnrnavn);
       }});
       $("#manual-entry").click(function() {
-        if(document.getElementById("manual-entry").checked) {
+        if($("#manual-entry").get(0).checked) {
           $(".autofilled-address").attr("readonly", false);
           $("#search-address").attr("readonly", true);
         } else {
