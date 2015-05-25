@@ -30,6 +30,15 @@
         $("#id_zipcode").val(adresse.adresse.postnr);
         $("#id_city").val(adresse.adresse.postnrnavn);
       }});
+      $("#manual-entry").click(function() {
+        if(document.getElementById("manual-entry").checked) {
+          $(".autofilled-address").attr("readonly", false);
+          $("#search-address").attr("readonly", true);
+        } else {
+          $(".autofilled-address").attr("readonly", true);
+          $("#search-address").attr("readonly", false);
+        }
+      });
     });
     </script>
 
@@ -37,32 +46,48 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-xs-8">
+        <div class="col-md-10">
           <h1>Ret indtastning</h1>
-          <p>Hvis du allerede har tilmeldt dig, så kan du ved at skrive din emailadresse her, få et nyt link til at ændre dine data, eller se din positon på ventelisten.<p>
+          <p>Hvis du allerede har tilmeldt dig, så kan du ved at skrive din emailadresse her, få et nyt link til at ændre dine data, eller se din positon på ventelisten.</p>
         </div>
-        <div class="col-xs-8">
-          <form action="{% url 'entry_page' %}" method="post">
-          {% csrf_token %}
-          {% bootstrap_form loginform %}
-          {% buttons %}
-          <button type="submit" class="btn btn-primary">
-          {% bootstrap_icon "star" %} Send
-          </button>
-          {% endbuttons %}
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <form action="{% url 'entry_page' %}" method="post">
+              {% csrf_token %}
+              {% bootstrap_form loginform %}
 
-          {% if sendEmail %}
-            <div><p class="text-info">Du vil om lidt modtage en email med et link til at redigere dine oplysninger.</p></div>
-          {% endif %}
-          </form>
+              {% if sendEmail %}
+                <div><p class="alert alert-info">Du vil om lidt modtage en email med et link til at redigere dine oplysninger.</p></div>
+              {% endif %}
+
+              {% buttons %}
+              <button type="submit" class="btn btn-primary">
+              Send
+              </button>
+              {% endbuttons %}
+
+              </form>
+            </div>
+          </div>
         </div>
 
       </div>
       <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-10">
           <h1>Tilmelding til Coding Pirates</h1>
           <p>Indtast barnets og forældres informationer, for at tilmelde en Coding Pirates workshop, eller for at komme med på ventelisten.</p>
-          {% crispy signupform %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-10">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              {% crispy signupform %}
+            </div>
+          </div>
         </div>
       </div>
     </div>

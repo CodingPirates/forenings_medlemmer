@@ -1,7 +1,7 @@
 from django import forms
 from members.models import Person
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div
 from crispy_forms.bootstrap import StrictButton
 
 class PersonForm(forms.ModelForm):
@@ -23,30 +23,41 @@ class getSignupForm(forms.Form):
         self.helper.help_text_inline = False
         self.helper.html5_required = True
         self.helper.layout = Layout(
-            MultiField('Barnets oplysninger',
-                     'child_name',
-                     'child_email',
-                     'child_phone',
-                     Field('child_birthday', css_class="datepicker")),
+            Fieldset('Barnets oplysninger',
+                        Div(
+                             Div(Field('child_name'), css_class="col-md-12"),
+                             Div(Field('child_email'), css_class="col-md-6"),
+                             Div(Field('child_phone'), css_class="col-md-6"),
+                             Div(Field('child_birthday', css_class="datepicker"), css_class="col-md-6"),
+                             css_class="row"
+                           )
+                    ),
             Fieldset('Forældres oplysninger',
-                     'parent_name',
-                     'parent_email',
-                     'parent_phone'
+                        Div(
+                            Div(Field('parent_name'), css_class="col-md-12"),
+                            Div(Field('parent_email'), css_class="col-md-6"),
+                            Div(Field('parent_phone'), css_class="col-md-6"),
+                            css_class="row"
+                           )
                      ),
             Fieldset('Adresse oplysninger',
-                     Field('search_address', id="search-address"),
-                     Field('streetname', readonly=True),
-                     Field('housenumber', readonly=True),
-                     Field('floor', readonly=True),
-                     Field('door', readonly=True),
-                     Field('placename', readonly=True),
-                     Field('zipcode', readonly=True),
-                     Field('city', readonly=True),
-                     Hidden('dawa_id', '')
+                        Div(
+                            Div(Field('search_address', id="search-address"), css_class="col-md-10"),
+                            Div(Field('manual_entry', id="manual-entry"), css_class="col-md-2"),
+                            Div(Field('streetname', readonly=True, css_class="autofilled-address"), css_class="col-md-9"),
+                            Div(Field('housenumber', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
+                            Div(Field('floor', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
+                            Div(Field('door', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
+                            Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
+                            Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
+                            Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
+                            Hidden('dawa_id', ''),
+                            css_class="row"
+                           )
                      )
 
         )
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Opret'))
 
     child_name = forms.CharField(label='Barns navn', required=True, max_length=200)
     child_email = forms.EmailField(label='Barns email', required=False)
@@ -59,10 +70,11 @@ class getSignupForm(forms.Form):
 
     search_address = forms.CharField(label='Indtast adresse', required=True, max_length=200)
     streetname = forms.CharField(label='Vejnavn', required=True, max_length=200)
-    housenumber = forms.CharField(label='Husnummer', required=True, max_length=5)
+    housenumber = forms.CharField(label='Nummer', required=True, max_length=5)
     floor = forms.CharField(label='Etage', required=False,max_length=3)
     door = forms.CharField(label='Dør', required=False,max_length=5)
     placename = forms.CharField(label='Stednavn', required=False,max_length=200)
     zipcode = forms.CharField(label='Postnummer', max_length=4)
     city = forms.CharField(label='By', max_length=200, required=False)
     dawa_id = forms.CharField()
+    manual_entry = forms.TypedChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False)
