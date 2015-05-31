@@ -1,8 +1,9 @@
 from django.conf.urls import patterns,  url
-from members.views import FamilyCreate, FamilyDetails, PersonCreate, PersonUpdate, AcceptInvitation, DeclineInvitation, InviteDetails, EntryPage
+from members.views import FamilyCreate, FamilyDetails, PersonCreate, PersonUpdate, AcceptInvitation, DeclineInvitation, InviteDetails, EntryPage, loginEmailSent
 
 urlpatterns = patterns('',
     url(r'^/{0,1}$', EntryPage, name='entry_page'),
+    url(r'login_email_sent/$', loginEmailSent, name='login_email_sent'),
     url(r'family/(?P<unique>[\w-]+)/$', FamilyDetails, name='family_detail'),
     url(r'invite/(?P<unique>[\w-]+)/accept/$', AcceptInvitation, name='invite_accept'),
     url(r'invite/(?P<unique>[\w-]+)/decline/$', DeclineInvitation, name='invite_decline'),

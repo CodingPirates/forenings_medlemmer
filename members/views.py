@@ -123,3 +123,6 @@ def EntryPage(request):
     signup = signupForm()
     return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : False})
 
+def loginEmailSent(request):
+    return render(request, 'members/login_email_sent.html')
+
