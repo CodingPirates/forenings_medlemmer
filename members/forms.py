@@ -73,13 +73,13 @@ class signupForm(forms.Form):
     child_name = forms.CharField(label='Barns fulde navn', required=True, max_length=200)
     child_email = forms.EmailField(label='Barns email', required=False)
     child_phone = forms.CharField(label='Barns telefon', required=False, max_length=50)
-    child_birthday = forms.DateField(label='Barns fødselsdato', input_formats=['%d-%m-%Y'], required=True)
+    child_birthday = forms.DateField(label='Barns fødselsdato', input_formats=['%d-%m-%Y'], error_messages={'required': 'Indtast en gyldig dato. (dd-mm-åååå'})
 
     parent_name = forms.CharField(label='Forældres navn', required=True, max_length=200)
     parent_email = forms.EmailField(label='Forældres email', required=True)
     parent_phone = forms.CharField(label='Forældres telefon', required=True, max_length=50)
 
-    search_address = forms.CharField(label='Indtast adresse', required=True, max_length=200)
+    search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     streetname = forms.CharField(label='Vejnavn', required=True, max_length=200)
     housenumber = forms.CharField(label='Nummer', required=True, max_length=5)
     floor = forms.CharField(label='Etage', required=False,max_length=3)

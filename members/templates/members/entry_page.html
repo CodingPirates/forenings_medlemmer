@@ -17,6 +17,9 @@
      $(function() {
       $( ".datepicker" ).datepicker({
         format: "dd-mm-yyyy",
+        autoclose: true,
+        weekStart: 1,
+        language: 'da'
       });
       $('#search-address').dawaautocomplete({
       select: function(event, adresse) {
