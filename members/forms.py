@@ -29,10 +29,8 @@ class signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(signupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_id = 'id-getSignupForm'
         self.helper.form_method = 'post'
         self.helper.form_action = 'entry_page'
-        self.helper.help_text_inline = False
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden('form_id', 'signup',  id="id_form_id"),
@@ -72,10 +70,10 @@ class signupForm(forms.Form):
         )
         self.helper.add_input(Submit('submit', 'Opret'))
 
-    child_name = forms.CharField(label='Barns navn', required=True, max_length=200)
+    child_name = forms.CharField(label='Barns fulde navn', required=True, max_length=200)
     child_email = forms.EmailField(label='Barns email', required=False)
     child_phone = forms.CharField(label='Barns telefon', required=False, max_length=50)
-    child_birthday = forms.DateField(label='Barns fødselsdato', required=True)
+    child_birthday = forms.DateField(label='Barns fødselsdato', input_formats=['%d-%m-%Y'], required=True)
 
     parent_name = forms.CharField(label='Forældres navn', required=True, max_length=200)
     parent_email = forms.EmailField(label='Forældres email', required=True)
@@ -89,6 +87,6 @@ class signupForm(forms.Form):
     placename = forms.CharField(label='Stednavn', required=False,max_length=200)
     zipcode = forms.CharField(label='Postnummer', max_length=4)
     city = forms.CharField(label='By', max_length=200, required=False)
-    dawa_id = forms.HiddenInput()
-    form_id = forms.HiddenInput()
-    manual_entry = forms.TypedChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False)
+    dawa_id = forms.CharField(label='Dawa ID', max_length=10, widget=forms.HiddenInput(), required=False) 
+    form_id = forms.CharField(label='Form ID', max_length=10, widget=forms.HiddenInput(), initial='signup')
+    manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, choices=[[True, False]], required=False)

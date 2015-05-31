@@ -109,19 +109,39 @@ def EntryPage(request):
             # signup has been filled
             getLogin = getLoginForm()
             signup = signupForm(request.POST)
-            return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : False})
+            if signup.is_valid():
+                # check if family already exists
+                try:
+                    family = Family.objects.get(email=request.POST['parent_email'])
+                    # family was already created - we can't create this family again
+                    signup.add_error('parent_email', 'denne email adresse er allerede oprettet. Benyt "Ret indtastning" for at få gensendt et link.')
+                    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : False})
+                except:
+                    # all is fine - we did not expect any
+                    pass
+                #create new family.
+
+                # send email with login link
+                #redirect to success
+                return HttpResponseRedirect(reverse('login_email_sent'))
+            else:
+                getLogin = getLoginForm()
+                return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : False})
 
         elif request.POST['form_id'] == 'getlogin':
             # just resend email
             getLogin = getLoginForm(request.POST)
-            signup = signupForm()
-            # send email to user
-            return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : True})
+            if getLogin.is_valid():
+                # send email to user
+                return HttpResponseRedirect(reverse('login_email_sent'))
+            else:
+                signup = signupForm()
+                return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : True})
 
     # initial load (if we did not return above)
     getLogin = getLoginForm()
     signup = signupForm()
-    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signupForm, 'sendEmail' : False})
+    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : False})
 
 def loginEmailSent(request):
     return render(request, 'members/login_email_sent.html')
