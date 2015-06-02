@@ -170,14 +170,41 @@ class Volunteer(models.Model):
     def __str__(self):
         return self.member.__str__()
 
+class EmailTemplate(models.Model):
+    class Meta:
+        verbose_name = 'Email Skabelon'
+        verbose_name_plural = 'Email Skabeloner'
+    idname = models.SlugField('Unikt reference navn',max_length=50, blank=False, unique=True)
+    updated_dtm = models.DateTimeField('Sidst redigeret', auto_now_add=True)
+    name = models.CharField('Skabelon navn',max_length=200, blank=False)
+    description = models.CharField('Skabelon beskrivelse',max_length=200, blank=False)
+    from_address = models.EmailField();
+    subject = models.CharField('Emne',max_length=200, blank=False)
+    body_html = models.TextField('HTML Indhold', blank=True)
+    body_text = models.TextField('Text Indhold', blank=True)
+    def __str__(self):
+        return self.name + " (ID:" + self.idname + ")"
+
 class EmailItem(models.Model):
     person = models.ForeignKey(Person)
+    template = models.ForeignKey(EmailTemplate, null=True)
+    bounce_token = UUIDField(default=uuid.uuid4, null=False)
     activity = models.ForeignKey(Activity, null=True)
+    department = models.ForeignKey(Department, null=True)
     created_dtm = models.DateTimeField('Oprettet',auto_now_add=True)
     subject = models.CharField('Emne',max_length=200, blank=True)
-    body = models.CharField('Indhold', max_length=10000, blank=True)
-    sent_dtm = models.DateTimeField('Sendt', blank=True, null=True)
+    body_html = models.TextField('HTML Indhold', blank=True)
+    body_text = models.TextField('Text Indhold', blank=True)
+    sent_dtm = models.DateTimeField('Sendt tidstempel', blank=True, null=True)
     send_error = models.CharField('Fejl i afsendelse',max_length=200,blank=True, editable=False)
+
+class Notification(models.Model):
+    family = models.ForeignKey(Family)
+    email = models.ForeignKey(EmailItem)
+    update_info_dtm = models.DateTimeField('Bedt om opdatering af info', blank=True, null=True)
+    warned_deletion_info_dtm = models.DateTimeField('Advaret om sletning fra liste', blank=True, null=True)
+    anounced_department = models.ForeignKey(Department, null=True)
+    anounced_activity = models.ForeignKey(Activity, null=True)
 
 class Journal(models.Model):
     class Meta:

@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -94,3 +94,5 @@ class JournalAdmin(admin.ModelAdmin):
     readonly_fields = ['family', 'person']
 
 admin.site.register(Journal, JournalAdmin)
+
+admin.site.register(EmailTemplate)
