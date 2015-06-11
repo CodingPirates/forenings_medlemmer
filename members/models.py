@@ -7,6 +7,8 @@ from django_extensions.db.fields import UUIDField
 import uuid
 import datetime
 from pytz import timezone
+from django.template import Engine, Context
+
 # Create your models here.
 
 class Family(models.Model):
@@ -178,6 +180,7 @@ class EmailTemplate(models.Model):
     updated_dtm = models.DateTimeField('Sidst redigeret', auto_now_add=True)
     name = models.CharField('Skabelon navn',max_length=200, blank=False)
     description = models.CharField('Skabelon beskrivelse',max_length=200, blank=False)
+    template_help = models.TextField('Hjælp omkring template variable', blank=True)
     from_address = models.EmailField();
     subject = models.CharField('Emne',max_length=200, blank=False)
     body_html = models.TextField('HTML Indhold', blank=True)
@@ -185,8 +188,53 @@ class EmailTemplate(models.Model):
     def __str__(self):
         return self.name + " (ID:" + self.idname + ")"
 
+    def makeEmail(self, recievers, context, department=None):
+
+        if(type(recievers) is not list):
+            recievers = [recievers]
+
+        for reciever in recievers:
+            # each reciever must be Person, Family or string (email)
+            if type(reciever) not in (Person, Family, str):
+                raise Exception("Reciever must be of type Person, Family or string")
+
+            # Figure our reciever
+            if(type(reciever) is str):
+                destination_address = reciever;
+            elif(type(reciever) is Person):
+                context['family'] = reciever
+                destination_address = reciever.email;
+            elif(type(reciever) is Family):
+                context['family'] = reciever
+                destination_address = reciever.email;
+
+            context['email'] = destination_address
+
+            # Make real context from dict
+            context = Context(context)
+
+            # render the template
+            html_template = Engine.get_default().from_string(self.body_html)
+            text_template = Engine.get_default().from_string(self.body_text)
+            subject_template = Engine.get_default().from_string(self.subject)
+
+            html_content = html_template.render(context)
+            text_content = text_template.render(context)
+            subject_content = subject_template.render(context)
+
+            email = EmailItem.objects.create(template = self,
+                reciever = destination_address,
+                department = department,
+                subject = subject_content,
+                body_html = html_content,
+                body_text = text_content)
+            email.save()
+
+
 class EmailItem(models.Model):
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, null=True)
+    family = models.ForeignKey(Family, null=True)
+    reciever = models.EmailField(null=False)
     template = models.ForeignKey(EmailTemplate, null=True)
     bounce_token = UUIDField(default=uuid.uuid4, null=False)
     activity = models.ForeignKey(Activity, null=True)
