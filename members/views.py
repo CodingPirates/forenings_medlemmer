@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity
+from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate
 from members.forms import PersonForm, getLoginForm, signupForm
 import datetime
 
@@ -120,8 +120,47 @@ def EntryPage(request):
                     # all is fine - we did not expect any
                     pass
                 #create new family.
+                family = Family.objects.create(email = signup.cleaned_data['parent_email'])
+                family.save()
+
+                #create parent
+                parent = Person.objects.create(membertype = Person.PARENT,
+                    name = signup.cleaned_data['parent_name'],
+                    zipcode = signup.cleaned_data['zipcode'],
+                    city = signup.cleaned_data['city'],
+                    streetname = signup.cleaned_data['streetname'],
+                    housenumber = signup.cleaned_data['housenumber'],
+                    floor = signup.cleaned_data['floor'],
+                    door = signup.cleaned_data['door'],
+                    dawa_id = signup.cleaned_data['dawa_id'],
+                    placename = signup.cleaned_data['placename'],
+                    email = signup.cleaned_data['parent_email'],
+                    phone = signup.cleaned_data['parent_phone'],
+                    family = family
+                    )
+                parent.save()
+
+                #create child
+                child = Person.objects.create(membertype = Person.CHILD,
+                    name = signup.cleaned_data['child_name'],
+                    zipcode = signup.cleaned_data['zipcode'],
+                    city = signup.cleaned_data['city'],
+                    streetname = signup.cleaned_data['streetname'],
+                    housenumber = signup.cleaned_data['housenumber'],
+                    floor = signup.cleaned_data['floor'],
+                    door = signup.cleaned_data['door'],
+                    dawa_id = signup.cleaned_data['dawa_id'],
+                    placename = signup.cleaned_data['placename'],
+                    email = signup.cleaned_data['child_email'],
+                    phone = signup.cleaned_data['child_phone'],
+                    birthday = signup.cleaned_data['child_birthday'],
+                    family = family
+                    )
+                child.save()
 
                 # send email with login link
+                EmailTemplate.objects.get(idname = 'LINK').makeEmail(family, {})
+
                 #redirect to success
                 return HttpResponseRedirect(reverse('login_email_sent'))
             else:
@@ -130,18 +169,25 @@ def EntryPage(request):
 
         elif request.POST['form_id'] == 'getlogin':
             # just resend email
+            signup = signupForm()
             getLogin = getLoginForm(request.POST)
             if getLogin.is_valid():
-                # send email to user
-                return HttpResponseRedirect(reverse('login_email_sent'))
-            else:
-                signup = signupForm()
-                return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : True})
+                # find family
+                try:
+                    family = Family.objects.get(email=getLogin.cleaned_data['email'])
+                    # send email to user
+                    EmailTemplate.objects.get(idname = 'LINK').makeEmail(family, {})
+                    return HttpResponseRedirect(reverse('login_email_sent'))
+
+                except Family.DoesNotExist:
+                    getLogin.add_error('email', 'Denne addresse er ikke kendt i systemet. Hvis du er sikker på du er oprettet, så check adressen, eller opret dig via tilmeldings formularen først.')
+
+            return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
 
     # initial load (if we did not return above)
     getLogin = getLoginForm()
     signup = signupForm()
-    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : False})
+    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
 
 def loginEmailSent(request):
     return render(request, 'members/login_email_sent.html')

@@ -8,6 +8,7 @@ import uuid
 import datetime
 from pytz import timezone
 from django.template import Engine, Context
+from django.contrib.sites.models import Site
 
 # Create your models here.
 
@@ -209,6 +210,7 @@ class EmailTemplate(models.Model):
                 destination_address = reciever.email;
 
             context['email'] = destination_address
+            context['site'] = 'https://members.codingpirates.dk' # hardcoded. Sites module seems awfully bloated
 
             # Make real context from dict
             context = Context(context)
