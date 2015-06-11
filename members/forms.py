@@ -2,7 +2,6 @@ from django import forms
 from members.models import Person
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div
-from crispy_forms.bootstrap import StrictButton
 
 class PersonForm(forms.ModelForm):
     class Meta:
@@ -87,6 +86,6 @@ class signupForm(forms.Form):
     placename = forms.CharField(label='Stednavn', required=False,max_length=200)
     zipcode = forms.CharField(label='Postnummer', max_length=4)
     city = forms.CharField(label='By', max_length=200, required=False)
-    dawa_id = forms.CharField(label='Dawa ID', max_length=10, widget=forms.HiddenInput(), required=False) 
+    dawa_id = forms.CharField(label='Dawa ID', max_length=10, widget=forms.HiddenInput(), required=False)
     form_id = forms.CharField(label='Form ID', max_length=10, widget=forms.HiddenInput(), initial='signup')
-    manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, choices=[[True, False]], required=False)
+    manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
