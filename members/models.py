@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django_extensions.db.fields import UUIDField
 import uuid
@@ -210,7 +211,7 @@ class EmailTemplate(models.Model):
                 destination_address = reciever.email;
 
             context['email'] = destination_address
-            context['site'] = 'https://members.codingpirates.dk' # hardcoded. Sites module seems awfully bloated
+            context['site'] = settings.BASE_URL 
 
             # Make real context from dict
             context = Context(context)

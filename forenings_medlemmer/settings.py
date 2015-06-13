@@ -26,6 +26,7 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+BASE_URL = 'https://members.codingpirates.dk'
 
 # Application definition
 
