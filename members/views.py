@@ -81,12 +81,14 @@ def PersonCreate(request, unique, membertype):
         person = Person()
         person.membertype = membertype
         if family.person_set.count() > 0 :
-            person.zipcode = family.person_set.first().zipcode
-            person.streetname = family.person_set.first().streetname
-            person.housenumber = family.person_set.first().housenumber
-            person.floor = family.person_set.first().floor
-            person.door = family.person_set.first().door
-            person.placename = family.person_set.first().placename
+            first_person = family.person_set.first()
+            person.zipcode = first_person.zipcode
+            person.city = first_person.city
+            person.streetname = first_person.streetname
+            person.housenumber = first_person.housenumber
+            person.floor = first_person.floor
+            person.door = first_person.door
+            person.placename = first_person.placename
         form = PersonForm(instance=person)
     return render(request, 'members/person_create.html', {'form': form, 'family': family, 'membertype': membertype})
 

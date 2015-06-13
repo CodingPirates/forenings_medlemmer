@@ -9,8 +9,8 @@ class PersonForm(forms.ModelForm):
         self.helper = FormHelper(self)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.form_action = 'entry_page'
         self.helper.html5_required = True
+
         if self.instance != None and self.instance.membertype == Person.CHILD:
             nameFieldSet = Fieldset('Barnets oplysninger',
                     Div(
@@ -18,7 +18,6 @@ class PersonForm(forms.ModelForm):
                          Div(Field('birthday', css_class="datepicker"), css_class="col-md-4"),
                          Div(Field('email'), css_class="col-md-4"),
                          Div(Field('phone'), css_class="col-md-4"),
-                         Hidden('membertype', 'membertype'),
                          css_class="row"
                        )
                 )
@@ -28,8 +27,6 @@ class PersonForm(forms.ModelForm):
                             Div(Field('name'), css_class="col-md-12"),
                             Div(Field('email'), css_class="col-md-6"),
                             Div(Field('phone'), css_class="col-md-6"),
-                            Hidden('birthday', ''),
-                            Hidden('membertype', ''),
                             css_class="row"
                            )
                      )
@@ -56,10 +53,9 @@ class PersonForm(forms.ModelForm):
                 Button('cancel', 'Fortryd', css_class='btn btn-link', onclick="window.history.back()")
             )
         )
-        #self.helper.add_input(Button('cancel', 'Fortryd', css_class='btn btn-link', onclick="window.history.back()"))
     class Meta:
         model=Person
-        fields= ['membertype', 'birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
+        fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     dawa_id = forms.CharField(label='Dawa ID', max_length=10, widget=forms.HiddenInput(), required=False)
