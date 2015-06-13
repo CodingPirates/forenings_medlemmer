@@ -35,13 +35,19 @@
         $("#id_dawa_id").val(adresse.adresse.id);
       }});
       $("#manual-entry").click(function() {
-        if($("#manual-entry").get(0).checked) {
-          $(".autofilled-address").attr("readonly", false);
-          $("#search-address").attr("readonly", true);
-        } else {
-          $(".autofilled-address").attr("readonly", true);
-          $("#search-address").attr("readonly", false);
-        }
+        $("#id_streetname").val('');
+        $("#id_housenumber").val('');
+        $("#id_floor").val('');
+        $("#id_door").val('');
+        $("#id_placename").val('');
+        $("#id_zipcode").val('');
+        $("#id_city").val('');
+        $("#id_dawa_id").val(null);
+        $("#search-address").val(null);
+
+        var checked = $("#manual-entry").get(0).checked;
+        $(".autofilled-address").attr("readonly", !checked);
+        $("#search-address").attr("readonly", checked);
       });
     });
     </script>
