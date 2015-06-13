@@ -12,7 +12,7 @@ def FamilyDetails(request,unique):
     invites= ActivityInvite.objects.filter(person__family = family)
     currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
     departments_with_waiting_list = Department.objects.filter(has_waiting_list = True)
-    waiting = WaitingList.objects.all()
+    waiting = WaitingList.objects.filter(person__family = family)
     def has_no_activity(person):
         return currents.filter(member__person = person).count() == 0
     children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD))) 

@@ -103,7 +103,8 @@ class WaitingList(models.Model):
         ''' On creation set on_waiting_list '''
         if not self.id:
             self.on_waiting_list_since = self.person.added
-
+        return super(WaitingList, self).save(*args, **kwargs)    
+        
 class Member(models.Model):
     class Meta:
         verbose_name = 'medlem'

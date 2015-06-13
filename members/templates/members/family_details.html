@@ -97,7 +97,7 @@
           </section>
         </div>
       </div>
-      {% if currents %}
+      {% if currents or waiting %}
       <h2>Aktiviteter</h2>
       <div class="row">
         <div class="col-xs-12">
@@ -122,7 +122,10 @@
                 {% endfor %}
                 {% for wait in waiting %}
                   <tr>
-                    <td>{{wait.department.name}}</td>
+                    <td>{{wait.person.name}}</td>
+                    <td>{{wait.department.name}}, venteliste</td>
+                    <td>{{wait.on_waiting_list_since}}</td>
+                    <td></td>
                   </tr>
                 {% endfor %}
               </tbody>
