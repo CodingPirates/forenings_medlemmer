@@ -72,15 +72,13 @@ class getLoginForm(forms.Form):
         self.helper.form_id = 'id-getLoginForm'
         self.helper.form_method = 'post'
         self.helper.form_action = 'entry_page'
-        self.helper.help_text_inline = False
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden('form_id', 'getlogin',  id="id_form_id"),
-            'email',
-            ButtonHolder(Submit('submit','Send',css_class='btn btn-primary')),
-            )
+            Field('email', placeholder="din@email.dk (den e-mail adresse, du oprindeligt skrev dig op med.)"),
+            Submit('submit','Send',css_class='btn btn-primary'))
 
-    email = forms.EmailField(required=True, label="Email", initial="din@email.dk", help_text="Indtast den email adresse du oprindeligt opskrev dig med.", error_messages={'required': 'Indtast din email adresse først', 'invalid' : 'Ikke en gyldig email adresse!'})
+    email = forms.EmailField(required=True, label="Email", error_messages={'required': 'Indtast din email adresse først', 'invalid' : 'Ikke en gyldig email adresse!'})
 
 class signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -95,9 +93,9 @@ class signupForm(forms.Form):
             Fieldset('Barnets oplysninger',
                         Div(
                              Div(Field('child_name'), css_class="col-md-12"),
-                             Div(Field('child_email'), css_class="col-md-6"),
-                             Div(Field('child_phone'), css_class="col-md-6"),
-                             Div(Field('child_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-6"),
+                             Div(Field('child_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
+                             Div(Field('child_email'), css_class="col-md-4"),
+                             Div(Field('child_phone'), css_class="col-md-4"),
                              css_class="row"
                            )
                     ),
