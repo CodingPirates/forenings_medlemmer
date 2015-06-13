@@ -19,8 +19,9 @@ class getLoginForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden('form_id', 'getlogin',  id="id_form_id"),
-            'email')
-        self.helper.add_input(Submit('submit', 'Send'))
+            'email',
+            ButtonHolder(Submit('submit','Send',css_class='btn btn-primary')),
+            )
 
     email = forms.EmailField(required=True, label="Email", initial="din@email.dk", help_text="Indtast den email adresse du oprindeligt opskrev dig med.", error_messages={'required': 'Indtast din email adresse først', 'invalid' : 'Ikke en gyldig email adresse!'})
 
@@ -64,10 +65,12 @@ class signupForm(forms.Form):
                             Hidden('dawa_id', '',  id="id_dawa_id"),
                             css_class="row"
                            )
-                     )
+                     ),
+            ButtonHolder(
+                Submit('submit', 'Opret', css_class="btn-success")
+            )
 
         )
-        self.helper.add_input(Submit('submit', 'Opret'))
 
     child_name = forms.CharField(label='Barns fulde navn', required=True, max_length=200)
     child_email = forms.EmailField(label='Barns email', required=False)
