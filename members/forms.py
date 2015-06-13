@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from members.models import Person
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div, Button
@@ -14,13 +15,13 @@ class PersonForm(forms.ModelForm):
             nameFieldSet = Fieldset('Barnets oplysninger',
                     Div(
                          Div(Field('name'), css_class="col-md-12"),
-                         Div(Field('birthday', css_class="datepicker"), css_class="col-md-4"),
+                         Div(Field('birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
                          Div(Field('email'), css_class="col-md-4"),
                          Div(Field('phone'), css_class="col-md-4"),
                          css_class="row"
                        )
                 )
-            self.fields['birthday'].widget.format = '%m-%d-%y'
+            self.fields['birthday'].widget.format = '%d-%m-%Y'
         else:
             nameFieldSet = Fieldset('Forældres oplysninger',
                         Div(
@@ -55,6 +56,7 @@ class PersonForm(forms.ModelForm):
             )
         )
         self.helper.render_unmentioned_fields = False
+        self.fields['birthday'].input_formats=(settings.DATE_INPUT_FORMATS)
     class Meta:
         model=Person
         fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
@@ -87,6 +89,7 @@ class signupForm(forms.Form):
         self.helper.form_method = 'post'
         self.helper.form_action = 'entry_page'
         self.helper.html5_required = True
+        self.fields['child_birthday'].widget.format = '%d-%m-%Y'
         self.helper.layout = Layout(
             Hidden('form_id', 'signup',  id="id_form_id"),
             Fieldset('Barnets oplysninger',
@@ -94,7 +97,7 @@ class signupForm(forms.Form):
                              Div(Field('child_name'), css_class="col-md-12"),
                              Div(Field('child_email'), css_class="col-md-6"),
                              Div(Field('child_phone'), css_class="col-md-6"),
-                             Div(Field('child_birthday', css_class="datepicker"), css_class="col-md-6"),
+                             Div(Field('child_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-6"),
                              css_class="row"
                            )
                     ),

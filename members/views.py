@@ -59,6 +59,7 @@ def UpdatePersonFromForm(person, form):
     person.placename = form.cleaned_data['placename']
     person.email = form.cleaned_data['email']
     person.phone = form.cleaned_data['phone']
+    person.birthday = form.cleaned_data['birthday']
     person.save()
 
 def PersonCreate(request, unique, membertype):
