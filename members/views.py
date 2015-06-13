@@ -43,6 +43,8 @@ def AcceptWaitingList(request, unique, id, departmentId):
     if person.family.unique != unique:
         raise Http404("Person eksisterer ikke")
     department = get_object_or_404(Department,pk=departmentId)
+    if WaitingList.objects.filter(person = person, department = department).count() != 0:
+        raise Http404("{} er allerede på {}s venteliste".format(person.name,department.name))
     waiting_list = WaitingList()
     waiting_list.person = person
     waiting_list.department = department
