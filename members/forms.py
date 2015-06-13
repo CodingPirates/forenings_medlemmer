@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from members.models import Person
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div, Button
@@ -52,7 +53,7 @@ class PersonForm(forms.ModelForm):
                      ),
             ButtonHolder(
                 Submit('submit', 'Opret' if self.instance.id == None else 'Ret', css_class="btn-success"),
-                #HTML("""<a class="btn btn-link" href="{% url 'family_detail' family.unique %}">Fortryd</a>""")
+                HTML("""<a class="btn btn-link" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>""")
             )
         )
         self.helper.render_unmentioned_fields = False
