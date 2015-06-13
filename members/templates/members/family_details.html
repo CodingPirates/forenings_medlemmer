@@ -84,7 +84,7 @@
                     <tr>
                       <td>{{child.name}}</td>
                       <td>{{department.name}}, venteliste</td>
-                      <td><a class="btn btn-success">Tilføj på venteliste</a></td>
+                      <td><a class="btn btn-success" href="{% url 'waiting_list_accept' family.unique child.id department.id %}">Tilføj på venteliste</a></td>
                     </tr>
                   {% endfor %}    
                   {% endfor %}    
@@ -118,6 +118,11 @@
                     <td>{{activity.activity.name}}</td>
                     <td>{{activity.activity.start_date}}</td>
                     <td>{{activity.activity.end_date}}</td>
+                  </tr>
+                {% endfor %}
+                {% for wait in waiting %}
+                  <tr>
+                    <td>{{wait.department.name}}</td>
                   </tr>
                 {% endfor %}
               </tbody>

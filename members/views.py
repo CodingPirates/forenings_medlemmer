@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department
+from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList
 from members.forms import PersonForm, getLoginForm, signupForm
 import datetime
 
@@ -12,6 +12,7 @@ def FamilyDetails(request,unique):
     invites= ActivityInvite.objects.filter(person__family = family)
     currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
     departments_with_waiting_list = Department.objects.filter(has_waiting_list = True)
+    waiting = WaitingList.objects.all()
     def has_no_activity(person):
         return currents.filter(member__person = person).count() == 0
     children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD))) 
@@ -21,6 +22,7 @@ def FamilyDetails(request,unique):
         'invites': invites,
         'currents': currents,
         'children': children,
+        'waiting': waiting,
         'waiting_lists': departments_with_waiting_list
     }
     return render(request, 'members/family_details.html', context)
@@ -35,7 +37,18 @@ def DeclineInvitation(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)
     activity_invite.delete()
     return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
-
+    
+def AcceptWaitingList(request, unique, id, departmentId):
+    person = get_object_or_404(Person, pk=id)
+    if person.family.unique != unique:
+        raise Http404("Person eksisterer ikke")
+    department = get_object_or_404(Department,pk=departmentId)
+    waiting_list = WaitingList()
+    waiting_list.person = person
+    waiting_list.department = department
+    waiting_list.save()
+    return HttpResponseRedirect(reverse('family_detail', args=[unique]))
+    
 def AcceptInvitation(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)
     person = activity_invite.person
