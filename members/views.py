@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate
+from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department
 from members.forms import PersonForm, getLoginForm, signupForm
 import datetime
 
@@ -11,10 +11,17 @@ def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
     invites= ActivityInvite.objects.filter(person__family = family)
     currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
+    departments_with_waiting_list = Department.objects.filter(has_waiting_list = True)
+    def has_no_activity(person):
+        return currents.filter(member__person = person).count() == 0
+    children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD))) 
+    
     context = {
         'family': family,
         'invites': invites,
-        'currents': currents
+        'currents': currents,
+        'children': children,
+        'waiting_lists': departments_with_waiting_list
     }
     return render(request, 'members/family_details.html', context)
 def InviteDetails(request, unique):

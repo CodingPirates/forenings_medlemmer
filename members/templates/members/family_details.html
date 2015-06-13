@@ -61,7 +61,7 @@
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-defualt">
-            {% if invites %}
+            {% if invites or waiting_lists %}
               <table class="table table-striped table-responsive">
                 <thead>
                   <tr>
@@ -79,7 +79,16 @@
                       <td><a class="btn btn-danger" href="{% url 'invite_decline' invite.unique %}">Afslå</a></td>
                     </tr>
                   {% endfor %}
-                </tbody>
+                  {% for department in waiting_lists %}
+                  {% for child in children %}
+                    <tr>
+                      <td>{{child.name}}</td>
+                      <td>{{department.name}}, venteliste</td>
+                      <td><a class="btn btn-success">Tilføj på venteliste</a></td>
+                    </tr>
+                  {% endfor %}    
+                  {% endfor %}    
+                  </tbody>
               </table>
             {% else %}
                 <div class="col-xs-12">Der er ingen aktuelle invitationer.
@@ -92,7 +101,7 @@
       <h2>Aktiviteter</h2>
       <div class="row">
         <div class="col-xs-12">
-          <section class="panel panel-defualt">
+          <section class="panel panel-default">
             <table class="table table-striped table-responsive">
               <thead>
                 <tr>
