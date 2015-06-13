@@ -7,12 +7,6 @@ from members.models import Person, Family, ActivityInvite, ActivityParticipant, 
 from members.forms import PersonForm, getLoginForm, signupForm
 import datetime
 
-class FamilyCreate(CreateView):
-    model=Family
-    fields=['email']
-    def get_success_url(self):
-        return reverse('family_detail', args=[self.object.unique])
-
 def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
     invites= ActivityInvite.objects.filter(person__family = family)

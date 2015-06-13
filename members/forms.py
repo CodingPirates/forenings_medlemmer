@@ -10,7 +10,6 @@ class PersonForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.html5_required = True
-
         if self.instance != None and self.instance.membertype == Person.CHILD:
             nameFieldSet = Fieldset('Barnets oplysninger',
                     Div(
@@ -21,12 +20,14 @@ class PersonForm(forms.ModelForm):
                          css_class="row"
                        )
                 )
+            self.fields['birthday'].widget.format = '%m-%d-%y'
         else:
             nameFieldSet = Fieldset('Forældres oplysninger',
                         Div(
                             Div(Field('name'), css_class="col-md-12"),
                             Div(Field('email'), css_class="col-md-6"),
                             Div(Field('phone'), css_class="col-md-6"),
+                            Div(Field('birthday'), css_class="hidden"),
                             css_class="row"
                            )
                      )
@@ -50,9 +51,10 @@ class PersonForm(forms.ModelForm):
                      ),
             ButtonHolder(
                 Submit('submit', 'Opret' if self.instance.id == None else 'Ret', css_class="btn-success"),
-                Button('cancel', 'Fortryd', css_class='btn btn-link', onclick="window.history.back()")
+                #HTML("""<a class="btn btn-link" href="{% url 'family_detail' family.unique %}">Fortryd</a>""")
             )
         )
+        self.helper.render_unmentioned_fields = False
     class Meta:
         model=Person
         fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
