@@ -1,12 +1,69 @@
 from django import forms
 from members.models import Person
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div, Button
 
 class PersonForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PersonForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_action = 'entry_page'
+        self.helper.html5_required = True
+        if self.instance != None and self.instance.membertype == Person.CHILD:
+            nameFieldSet = Fieldset('Barnets oplysninger',
+                    Div(
+                         Div(Field('name'), css_class="col-md-12"),
+                         Div(Field('birthday', css_class="datepicker"), css_class="col-md-4"),
+                         Div(Field('email'), css_class="col-md-4"),
+                         Div(Field('phone'), css_class="col-md-4"),
+                         Hidden('membertype', 'membertype'),
+                         css_class="row"
+                       )
+                )
+        else:
+            nameFieldSet = Fieldset('Forældres oplysninger',
+                        Div(
+                            Div(Field('name'), css_class="col-md-12"),
+                            Div(Field('email'), css_class="col-md-6"),
+                            Div(Field('phone'), css_class="col-md-6"),
+                            Hidden('birthday', ''),
+                            Hidden('membertype', ''),
+                            css_class="row"
+                           )
+                     )
+
+        self.helper.layout = Layout(
+            nameFieldSet,
+            Fieldset('Adresse oplysninger',
+                        Div(
+                            Div(Field('search_address', id="search-address"), css_class="col-md-10"),
+                            Div(Field('manual_entry', id="manual-entry"), css_class="col-md-2"),
+                            Div(Field('streetname', readonly=True, css_class="autofilled-address"), css_class="col-md-9"),
+                            Div(Field('housenumber', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
+                            Div(Field('floor', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
+                            Div(Field('door', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
+                            Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
+                            Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
+                            Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
+                            Hidden('dawa_id', '',  id="id_dawa_id"),
+                            css_class="row"
+                           )
+                     ),
+            ButtonHolder(
+                Submit('submit', 'Opret' if self.instance.id == None else 'Ret', css_class="btn-success"),
+                Button('cancel', 'Fortryd', css_class='btn btn-link', onclick="window.history.back()")
+            )
+        )
+        #self.helper.add_input(Button('cancel', 'Fortryd', css_class='btn btn-link', onclick="window.history.back()"))
     class Meta:
         model=Person
-        fields= ['name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
+        fields= ['membertype', 'birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
+
+    search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
+    dawa_id = forms.CharField(label='Dawa ID', max_length=10, widget=forms.HiddenInput(), required=False)
+    manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
 
 class getLoginForm(forms.Form):
     def __init__(self, *args, **kwargs):

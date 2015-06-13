@@ -79,6 +79,7 @@ def PersonCreate(request, unique, membertype):
             return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
     else:
         person = Person()
+        person.membertype = membertype
         if family.person_set.count() > 0 :
             person.zipcode = family.person_set.first().zipcode
             person.streetname = family.person_set.first().streetname
@@ -191,4 +192,3 @@ def EntryPage(request):
 
 def loginEmailSent(request):
     return render(request, 'members/login_email_sent.html')
-
