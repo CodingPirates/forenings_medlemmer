@@ -15,8 +15,8 @@ def FamilyDetails(request,unique):
     waiting = WaitingList.objects.filter(person__family = family)
     def has_no_activity(person):
         return currents.filter(member__person = person).count() == 0
-    children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD))) 
-    
+    children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD)))
+
     context = {
         'family': family,
         'invites': invites,
@@ -37,7 +37,7 @@ def DeclineInvitation(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)
     activity_invite.delete()
     return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
-    
+
 def AcceptWaitingList(request, unique, id, departmentId):
     person = get_object_or_404(Person, pk=id)
     if person.family.unique != unique:
@@ -50,7 +50,7 @@ def AcceptWaitingList(request, unique, id, departmentId):
     waiting_list.department = department
     waiting_list.save()
     return HttpResponseRedirect(reverse('family_detail', args=[unique]))
-    
+
 def AcceptInvitation(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)
     person = activity_invite.person
@@ -135,7 +135,7 @@ def EntryPage(request):
                     family = Family.objects.get(email=request.POST['parent_email'])
                     # family was already created - we can't create this family again
                     signup.add_error('parent_email', 'denne email adresse er allerede oprettet. Benyt "Ret indtastning" for at få gensendt et link.')
-                    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : False})
+                    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
                 except:
                     # all is fine - we did not expect any
                     pass
@@ -185,7 +185,7 @@ def EntryPage(request):
                 return HttpResponseRedirect(reverse('login_email_sent'))
             else:
                 getLogin = getLoginForm()
-                return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup, 'sendEmail' : False})
+                return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
 
         elif request.POST['form_id'] == 'getlogin':
             # just resend email
