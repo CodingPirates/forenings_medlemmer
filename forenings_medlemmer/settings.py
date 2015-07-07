@@ -39,7 +39,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'bootstrap3',
     'members',
-    'crispy_forms'
+    'crispy_forms',
+    'django_cron',
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
@@ -89,3 +90,29 @@ DATE_INPUT_FORMATS = (
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+ADMINS = (('Administrator', 'admin@example.org'),)
+MANAGERS = ADMINS
+
+EMAIL_SUBJECT_PREFIX = '[Acme Medlemsdatabase] '
+SERVER_EMAIL = 'hostmaster@example.org'
+SITE_CONTACT = 'contact@example.org'
+DEBUG_EMAIL_DESTINATION = 'debug@example.org'
+
+EMAIL_HOST = 'smtp.example.org'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'username'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 30
+
+if DEBUG:
+    pass #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend';
+
+CRON_CLASSES = [
+    "members.jobs.EmailSendCronJob",
+]
+
+# Dont keep job logs more than 7 days old
+DJANGO_CRON_DELETE_LOGS_OLDER_THAN=7
+

@@ -9,7 +9,7 @@ import uuid
 import datetime
 from pytz import timezone
 from django.template import Engine, Context
-from django.contrib.sites.models import Site
+from django.core.mail import send_mail
 
 # Create your models here.
 
@@ -251,6 +251,26 @@ class EmailItem(models.Model):
     body_text = models.TextField('Text Indhold', blank=True)
     sent_dtm = models.DateTimeField('Sendt tidstempel', blank=True, null=True)
     send_error = models.CharField('Fejl i afsendelse',max_length=200,blank=True, editable=False)
+
+    # send this email. Notice no checking of race condition, so this should be called by
+    # cronscript and made sure the same mail is not sent multiple times in parallel
+    def send(self):
+        if settings.DEBUG:
+            # never use actual destination in debug
+            destination_email = settings.DEBUG_EMAIL_DESTINATION
+        else:
+            destination_email = self.reciever
+
+        self.sent_dtm = datetime.datetime.now(timezone('Europe/Copenhagen'))
+        try:
+            send_mail(self.subject, self.body_text, settings.SITE_CONTACT, (destination_email,), html_message=self.body_html)
+        except Exception as e:
+            self.send_error = str(type(e))
+            self.send_error = self.send_error + str(e)
+            self.save()
+            raise e # forward exception to job control
+
+        self.save()
 
 class Notification(models.Model):
     family = models.ForeignKey(Family)

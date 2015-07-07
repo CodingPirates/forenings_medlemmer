@@ -3,3 +3,4 @@ django-bootstrap3
 django_extensions
 pytz
 django-crispy-forms
+django_cron
