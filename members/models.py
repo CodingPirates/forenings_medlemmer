@@ -19,6 +19,7 @@ class Family(models.Model):
         verbose_name_plural = 'Familier'
     unique = UUIDField()
     email = models.EmailField(unique=True)
+    updated = models.DateTimeField('Opdateret', blank=True, null=True)
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
         if not self.id:
@@ -53,6 +54,7 @@ class Person(models.Model):
     floor = models.CharField('Etage',max_length=3, blank=True)
     door = models.CharField('Dør',max_length=5, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
+    updated = models.DateTimeField('Opdateret', blank=True, null=True)
     def address(self):
         return '{} {}{}'.format(self.streetname,self.housenumber,', {}{}'.format(self.floor,self.door) if self.floor != '' or self.door != '' else '')
     placename = models.CharField('Stednavn',max_length=200, blank=True)
@@ -103,8 +105,8 @@ class WaitingList(models.Model):
         ''' On creation set on_waiting_list '''
         if not self.id:
             self.on_waiting_list_since = self.person.added
-        return super(WaitingList, self).save(*args, **kwargs)    
-        
+        return super(WaitingList, self).save(*args, **kwargs)
+
 class Member(models.Model):
     class Meta:
         verbose_name = 'medlem'
@@ -212,7 +214,7 @@ class EmailTemplate(models.Model):
                 destination_address = reciever.email;
 
             context['email'] = destination_address
-            context['site'] = settings.BASE_URL 
+            context['site'] = settings.BASE_URL
 
             # Make real context from dict
             context = Context(context)
