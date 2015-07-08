@@ -74,7 +74,7 @@ class FamilyAdmin(admin.ModelAdmin):
 admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'zipcode', 'email', 'waiting_list_since','family_url', 'membertype')
+    list_display = ('name', 'zipcode', 'email', 'family_url', 'membertype')
     list_filter = ['membertype']
     inlines = [MemberInline, EmailItemInline]
     search_fields = ('name', 'zipcode')
@@ -89,10 +89,6 @@ class PersonAdmin(admin.ModelAdmin):
         return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
     family_url.allow_tags = True
     family_url.short_description = 'Familie'
-    def waiting_list_since(self,item):
-        return item.on_waiting_list_since if item.on_waiting_list else None
-    waiting_list_since.short_description = 'Venteliste siden'
-    waiting_list_since.admin_order_field = 'on_waiting_list_since'
 
     def unique(self, item):
         return item.family.unique if item.family != None else ''
