@@ -10,20 +10,21 @@ import datetime
 def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
     invites= ActivityInvite.objects.filter(person__family = family)
+    open_activities = Activity.objects.filter(open_invite = True)
     currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
     departments_with_waiting_list = Department.objects.filter(has_waiting_list = True)
     waiting = WaitingList.objects.filter(person__family = family)
     def has_no_activity(person):
         return currents.filter(member__person = person).count() == 0
     children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD)))
-
     context = {
         'family': family,
         'invites': invites,
         'currents': currents,
         'children': children,
         'waiting': waiting,
-        'waiting_lists': departments_with_waiting_list
+        'waiting_lists': departments_with_waiting_list,
+        'open_activities': open_activities,
     }
     return render(request, 'members/family_details.html', context)
 def InviteDetails(request, unique):

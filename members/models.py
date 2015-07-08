@@ -74,7 +74,6 @@ class Person(models.Model):
     family = models.ForeignKey(Family)
     added = models.DateField('Tilføjet', default=django_timezone.now, blank=False)
     photo_permission = models.CharField('Fotogri tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
-    @property
     def __str__(self):
         return self.name
 
@@ -128,6 +127,7 @@ class Member(models.Model):
     person = models.ForeignKey(Person)
     is_active = models.BooleanField('Aktiv',default=True)
     member_since = models.DateTimeField('Indmeldt', blank=False, default=django_timezone.now)
+    member_until = models.DateTimeField('Udmeldt', blank=True, default=None, null=True)
     def name(self):
         return '{}'.format(self.person)
     name.short_description = 'Navn'
@@ -156,6 +156,7 @@ class Activity(models.Model):
     start_date = models.DateField('Start')
     end_date = models.DateField('Slut')
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
+    open_invite = models.BooleanField('Fri tilmelding', default=False)
     def is_historic(self):
         return self.end_date < datetime.date.today()
     is_historic.short_description = 'Historisk?'

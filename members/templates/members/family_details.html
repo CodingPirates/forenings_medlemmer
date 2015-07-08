@@ -57,7 +57,7 @@
           </section>
         </div>
       </div>
-      <h2>Invitationer</h2>
+      <h2>Ventelister / Invitationer / Aktiviteter</h2>
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-defualt">
@@ -71,23 +71,37 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for invite in invites %}
+
+                  {% for child in children %}
+                  {% for activity in open_activities %}
                     <tr>
-                      <td>{{invite.person.name}}</td>
-                      <td><a href="{% url 'invite_detail' invite.unique %}">{{invite.activity.name}}</a></td>
-                      <td><a class="btn btn-success" href="{% url 'invite_accept' invite.unique %}">Acceptér</a></td>
-                      <td><a class="btn btn-danger" href="{% url 'invite_decline' invite.unique %}">Afslå</a></td>
+                      <td>{{child.name}}</td>
+                      <td>{{activity.department.name}}, {{activity.name}}</td>
+                      <td><a class="btn btn-success" href="http://">Tilmeld aktivitet</a></td>
+                      <td></td>
                     </tr>
                   {% endfor %}
+
                   {% for department in waiting_lists %}
-                  {% for child in children %}
                     <tr>
                       <td>{{child.name}}</td>
                       <td>{{department.name}}, venteliste</td>
                       <td><a class="btn btn-success" href="{% url 'waiting_list_accept' family.unique child.id department.id %}">Tilføj på venteliste</a></td>
+                      <td></td>
                     </tr>
-                  {% endfor %}    
-                  {% endfor %}    
+                  {% endfor %}
+                  {% endfor %}
+
+                  {% for invite in invites %}
+                    <tr>
+                      <td>{{invite.person.name}}</td>
+                      <td>{{invite.activity.department.name}}, <a href="{% url 'invite_detail' invite.unique %}">{{invite.activity.name}}</a></td>
+                      <td><a class="btn btn-success" href="{% url 'invite_accept' invite.unique %}">Acceptér</a></td>
+                      <td><a class="btn btn-danger" href="{% url 'invite_decline' invite.unique %}">Afslå</a></td>
+                    </tr>
+                  {% endfor %}
+
+
                   </tbody>
               </table>
             {% else %}
