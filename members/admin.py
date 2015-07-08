@@ -60,6 +60,7 @@ class FamilyAdmin(admin.ModelAdmin):
     search_fields = ('email',)
     inlines = [PersonInline]
     actions = ['create_new_uuid']
+    view_on_site = True
     def create_new_uuid(self,request, queryset):
         for family in queryset:
             family.unique = uuid4()
@@ -73,9 +74,17 @@ class FamilyAdmin(admin.ModelAdmin):
 admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'zipcode', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email', 'waiting_list_since','family_url','unique')
+    list_display = ('name', 'zipcode', 'email', 'waiting_list_since','family_url', 'membertype')
+    list_filter = ['membertype']
     inlines = [MemberInline, EmailItemInline]
     search_fields = ('name', 'zipcode')
+    fieldsets = (
+        ('Informationer' , {
+            'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission'),
+        }),
+        ('Kontakt Oplysninger', {
+            'fields' : ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone')
+        }))
     def family_url(self, item):
         return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
     family_url.allow_tags = True
@@ -84,6 +93,7 @@ class PersonAdmin(admin.ModelAdmin):
         return item.on_waiting_list_since if item.on_waiting_list else None
     waiting_list_since.short_description = 'Venteliste siden'
     waiting_list_since.admin_order_field = 'on_waiting_list_since'
+
     def unique(self, item):
         return item.family.unique if item.family != None else ''
 

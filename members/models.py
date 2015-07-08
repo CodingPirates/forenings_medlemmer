@@ -20,7 +20,7 @@ class Family(models.Model):
         verbose_name_plural = 'Familier'
     unique = UUIDField()
     email = models.EmailField(unique=True)
-    updated = models.DateTimeField('Opdateret', blank=True, null=True)
+    updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
         if not self.id:
@@ -63,7 +63,7 @@ class Person(models.Model):
     floor = models.CharField('Etage',max_length=3, blank=True)
     door = models.CharField('Dør',max_length=5, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
-    updated = models.DateTimeField('Opdateret', blank=True, null=True)
+    updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     def address(self):
         return '{} {}{}'.format(self.streetname,self.housenumber,', {}{}'.format(self.floor,self.door) if self.floor != '' or self.door != '' else '')
     placename = models.CharField('Stednavn',max_length=200, blank=True)
@@ -72,7 +72,7 @@ class Person(models.Model):
     birthday = models.DateField('Fødselsdag', blank=True, null=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
-    added = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
+    added = models.DateField('Tilføjet', default=timezone.now, blank=False)
     on_waiting_list = models.BooleanField('Venteliste', default=False)
     on_waiting_list_since = models.DateTimeField('Tilføjet', blank=False, editable=False)
     photo_permission = models.CharField('Fotogri tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
@@ -108,6 +108,7 @@ class Department(models.Model):
     door = models.CharField('Dør',max_length=5, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     has_waiting_list = models.BooleanField('Venteliste',default=False)
+    updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     def no_members(self):
         return self.member_set.count()
     no_members.short_description = 'Antal medlemmer'
@@ -165,6 +166,7 @@ class Activity(models.Model):
     description = models.CharField('Beskrivelse',max_length=10000)
     start_date = models.DateField('Start')
     end_date = models.DateField('Slut')
+    updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     def is_historic(self):
         return self.end_date < datetime.date.today()
     is_historic.short_description = 'Historisk?'
