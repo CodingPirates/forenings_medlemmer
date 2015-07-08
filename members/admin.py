@@ -16,7 +16,7 @@ class WaitingListInline(admin.TabularInline):
 
 class DepartmentAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields':['name','has_waiting_list']})
+        (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'placename', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'has_waiting_list']})
     ]
     list_display = ('name','no_members')
     inlines = [MemberInline, ActivityInline,WaitingListInline]

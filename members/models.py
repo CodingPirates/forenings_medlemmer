@@ -45,6 +45,14 @@ class Person(models.Model):
         (CHILD, 'Barn'),
         (OTHER, 'Frivillig')
     )
+    PHOTO_OK = 'OK'
+    PHOTO_ND = 'ND'
+    PHOTO_NOTOK = 'NO'
+    PHOTO_PERMISSION_CHOICES = (
+        (PHOTO_OK, 'Tilladelse givet'),
+        (PHOTO_ND, 'Ikke taget stilling'),
+        (PHOTO_NOTOK, 'Ikke tilladt'),
+    )
     membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)
     zipcode = models.CharField('Postnummer',max_length=4)
@@ -66,6 +74,7 @@ class Person(models.Model):
     added = models.DateField('Tilføjet',auto_now_add=True, blank=True, editable=False)
     on_waiting_list = models.BooleanField('Venteliste', default=False)
     on_waiting_list_since = models.DateTimeField('Tilføjet', blank=False, editable=False)
+    photo_permission = models.CharField('Fotogri tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
     @property
     def number_on_waiting_list(self):
         return Person.objects.filter(on_waiting_list_since__lt = self.on_waiting_list_since,on_waiting_list=True).count()+1 if self.on_waiting_list else ''
@@ -85,6 +94,18 @@ class Department(models.Model):
         verbose_name='afdeling'
         ordering=['name']
     name = models.CharField('Navn',max_length=200)
+    description = models.TextField('Beskrivelse af afdeling', blank=True)
+    open_hours = models.CharField('Åbningstid',max_length=4, blank=True)
+    responsible_name = models.CharField('Afdelingsleder',max_length=4, blank=True)
+    responsible_contact = models.EmailField('E-mail', blank=True)
+    placename = models.CharField('Stednavn',max_length=4, blank=True)
+    zipcode = models.CharField('Postnummer',max_length=4)
+    city = models.CharField('By', max_length=200)
+    streetname = models.CharField('Vejnavn',max_length=200)
+    housenumber = models.CharField('Husnummer',max_length=5)
+    floor = models.CharField('Etage',max_length=3, blank=True)
+    door = models.CharField('Dør',max_length=5, blank=True)
+    dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     has_waiting_list = models.BooleanField('Venteliste',default=False)
     def no_members(self):
         return self.member_set.count()
@@ -129,6 +150,17 @@ class Activity(models.Model):
         ordering =['start_date']
     department = models.ForeignKey(Department)
     name = models.CharField('Navn',max_length=200)
+    open_hours = models.CharField('Tidspunkt',max_length=4, blank=True)
+    responsible_name = models.CharField('Afdelingsleder',max_length=4, blank=True)
+    responsible_contact = models.EmailField('E-mail', blank=True)
+    placename = models.CharField('Stednavn',max_length=4)
+    zipcode = models.CharField('Postnummer',max_length=4)
+    city = models.CharField('By', max_length=200)
+    streetname = models.CharField('Vejnavn',max_length=200)
+    housenumber = models.CharField('Husnummer',max_length=5)
+    floor = models.CharField('Etage',max_length=3, blank=True)
+    door = models.CharField('Dør',max_length=5, blank=True)
+    dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     description = models.CharField('Beskrivelse',max_length=10000)
     start_date = models.DateField('Start')
     end_date = models.DateField('Slut')
@@ -166,6 +198,7 @@ class ActivityParticipant(models.Model):
         verbose_name_plural = 'Deltagere'
     activity = models.ForeignKey(Activity)
     member = models.ForeignKey(Member)
+    note = models.TextField('Besked / Note til arrangement', blank=True)
     def __str__(self):
         return self.member.__str__()
 
