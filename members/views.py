@@ -87,11 +87,11 @@ def UpdatePersonFromForm(person, form):
 def PersonCreate(request, unique, membertype):
     family = get_object_or_404(Family, unique=unique)
     if request.method == 'POST':
-        form = PersonForm(request.POST)
+        person = Person()
+        person.membertype = membertype
+        person.family = family
+        form = PersonForm(request.POST, instance=person)
         if form.is_valid():
-            person = Person()
-            person.membertype = membertype
-            person.family = family
             UpdatePersonFromForm(person,form)
             return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
     else:

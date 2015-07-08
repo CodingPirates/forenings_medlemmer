@@ -10,7 +10,7 @@ import datetime
 from pytz import timezone
 from django.template import Engine, Context
 from django.core.mail import send_mail
-from django.utils import timezone
+from django.utils import timezone as django_timezone
 
 # Create your models here.
 
@@ -72,20 +72,9 @@ class Person(models.Model):
     birthday = models.DateField('Fødselsdag', blank=True, null=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
-    added = models.DateField('Tilføjet', default=timezone.now, blank=False)
-    on_waiting_list = models.BooleanField('Venteliste', default=False)
-    on_waiting_list_since = models.DateTimeField('Tilføjet', blank=False, editable=False)
+    added = models.DateField('Tilføjet', default=django_timezone.now, blank=False)
     photo_permission = models.CharField('Fotogri tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
     @property
-    def number_on_waiting_list(self):
-        return Person.objects.filter(on_waiting_list_since__lt = self.on_waiting_list_since,on_waiting_list=True).count()+1 if self.on_waiting_list else ''
-    def save(self, *args, **kwargs):
-        ''' On creation set on_waiting_list '''
-        if not self.id:
-            self.on_waiting_list = self.membertype == Person.CHILD
-        if not self.on_waiting_list_since:
-            self.on_waiting_list_since = datetime.datetime.now(timezone('Europe/Copenhagen'))
-        return super(Person, self).save(*args, **kwargs)
     def __str__(self):
         return self.name
 
@@ -138,7 +127,7 @@ class Member(models.Model):
     department = models.ForeignKey(Department)
     person = models.ForeignKey(Person)
     is_active = models.BooleanField('Aktiv',default=True)
-    member_since = models.DateTimeField('Indmeldt', blank=False, default=timezone.now)
+    member_since = models.DateTimeField('Indmeldt', blank=False, default=django_timezone.now)
     def name(self):
         return '{}'.format(self.person)
     name.short_description = 'Navn'
