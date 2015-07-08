@@ -61,6 +61,13 @@ class PersonForm(forms.ModelForm):
     class Meta:
         model=Person
         fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
+        labels = {
+            'birthday': 'Barns fødselsdato (dd-mm-åååå)',
+        }
+        error_messages = {
+            'birthday': {'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'},
+        }
+
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     dawa_id = forms.CharField(label='Dawa ID', max_length=128, widget=forms.HiddenInput(), required=False)
@@ -132,7 +139,7 @@ class signupForm(forms.Form):
     child_name = forms.CharField(label='Barns fulde navn', required=True, max_length=200)
     child_email = forms.EmailField(label='Barns email', required=False)
     child_phone = forms.CharField(label='Barns telefon', required=False, max_length=50)
-    child_birthday = forms.DateField(label='Barns fødselsdato', input_formats=['%d-%m-%Y'], error_messages={'required': 'Indtast en gyldig dato. (dd-mm-åååå'})
+    child_birthday = forms.DateField(label='Barns fødselsdato (dd-mm-åååå)', input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
 
     parent_name = forms.CharField(label='Forældres navn', required=True, max_length=200)
     parent_email = forms.EmailField(label='Forældres email', required=True)

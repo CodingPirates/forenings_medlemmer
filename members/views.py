@@ -114,7 +114,7 @@ def PersonUpdate(request, unique, id):
     if person.family.unique != unique:
         raise Http404("Person eksisterer ikke")
     if request.method == 'POST':
-        form = PersonForm(request.POST)
+        form = PersonForm(request.POST, instance=person)
         if form.is_valid():
             UpdatePersonFromForm(person,form)
             return HttpResponseRedirect(reverse('family_detail', args=[person.family.unique]))
