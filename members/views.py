@@ -99,6 +99,7 @@ def PersonCreate(request, unique, membertype):
         person.membertype = membertype
         if family.person_set.count() > 0 :
             first_person = family.person_set.first()
+            person.family = family
             person.zipcode = first_person.zipcode
             person.city = first_person.city
             person.streetname = first_person.streetname
@@ -107,7 +108,7 @@ def PersonCreate(request, unique, membertype):
             person.door = first_person.door
             person.placename = first_person.placename
         form = PersonForm(instance=person)
-    return render(request, 'members/person_create.html', {'form': form, 'family': family, 'membertype': membertype})
+    return render(request, 'members/person_create.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
 
 def PersonUpdate(request, unique, id):
     person = get_object_or_404(Person, pk=id)

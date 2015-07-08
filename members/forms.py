@@ -23,16 +23,20 @@ class PersonForm(forms.ModelForm):
                        )
                 )
             self.fields['birthday'].widget.format = '%d-%m-%Y'
+            self.fields['birthday'].required = True
         else:
-            nameFieldSet = Fieldset('Forældres oplysninger',
+            nameFieldSet = Fieldset('Forældres / Værges oplysninger',
                         Div(
                             Div(Field('name'), css_class="col-md-12"),
-                            Div(Field('email'), css_class="col-md-6"),
-                            Div(Field('phone'), css_class="col-md-6"),
-                            Div(Field('birthday'), css_class="hidden"),
+                            Div(Field('birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
+                            Div(Field('email'), css_class="col-md-4"),
+                            Div(Field('phone'), css_class="col-md-4"),
                             css_class="row"
                            )
                      )
+            self.fields['email'].required = True
+            self.fields['phone'].required = True
+
 
         self.helper.layout = Layout(
             nameFieldSet,
@@ -62,11 +66,12 @@ class PersonForm(forms.ModelForm):
         model=Person
         fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
         labels = {
-            'birthday': 'Barns fødselsdato (dd-mm-åååå)',
+            'birthday': 'Fødselsdato (dd-mm-åååå)',
         }
         error_messages = {
             'birthday': {'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'},
         }
+
 
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
