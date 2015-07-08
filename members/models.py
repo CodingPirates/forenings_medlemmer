@@ -10,6 +10,7 @@ import datetime
 from pytz import timezone
 from django.template import Engine, Context
 from django.core.mail import send_mail
+from django.utils import timezone
 
 # Create your models here.
 
@@ -136,7 +137,7 @@ class Member(models.Model):
     department = models.ForeignKey(Department)
     person = models.ForeignKey(Person)
     is_active = models.BooleanField('Aktiv',default=True)
-    member_since = models.DateTimeField('Indmeldt', blank=False, editable=False)
+    member_since = models.DateTimeField('Indmeldt', blank=False, default=timezone.now)
     def name(self):
         return '{}'.format(self.person)
     name.short_description = 'Navn'
