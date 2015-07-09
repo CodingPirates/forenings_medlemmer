@@ -21,10 +21,14 @@ class Family(models.Model):
     unique = UUIDField()
     email = models.EmailField(unique=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
+    confirmed_dtm = models.DateTimeField('Bekræftet', null=True, blank=True)
+    last_visit_dtm = models.DateTimeField('Sidst besøgt', null=True, blank=True)
+    deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
         if not self.id:
             self.unique = uuid.uuid4()
+
         self.email = self.email.lower()
         return super(Family, self).save(*args, **kwargs)
     def get_abosolute_url(self):
@@ -72,8 +76,9 @@ class Person(models.Model):
     birthday = models.DateField('Fødselsdag', blank=True, null=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
+    photo_permission = models.CharField('Foto tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
     added = models.DateField('Tilføjet', default=django_timezone.now, blank=False)
-    photo_permission = models.CharField('Fotogri tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
+    deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
     def __str__(self):
         return self.name
 

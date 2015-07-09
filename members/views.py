@@ -6,9 +6,13 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList
 from members.forms import PersonForm, getLoginForm, signupForm
 import datetime
+from pytz import timezone
 
 def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
+    #update visited field
+    family.last_visit_dtm = datetime.datetime.now(timezone('Europe/Copenhagen'))
+    family.save()
     invites= ActivityInvite.objects.filter(person__family = family)
     open_activities = Activity.objects.filter(open_invite = True)
     currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
