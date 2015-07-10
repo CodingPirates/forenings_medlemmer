@@ -14,12 +14,23 @@ class WaitingListInline(admin.TabularInline):
     model = WaitingList
     extra = 0
 
+class EmailItemInline(admin.TabularInline):
+    model = EmailItem
+    fields = ['person', 'family', 'activity','subject','created_dtm','sent_dtm']
+    can_delete = False
+    readonly_fields = ['person','activity','subject','created_dtm','sent_dtm']
+    def has_add_permission(self,request,obj=None):
+        return False
+    def has_delete_permission(self,request,obj=None):
+        return False
+    extra = 0
+
 class DepartmentAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'placename', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'has_waiting_list']})
     ]
     list_display = ('name','no_members')
-    inlines = [MemberInline, ActivityInline,WaitingListInline]
+    inlines = [MemberInline, ActivityInline,WaitingListInline, EmailItemInline]
 admin.site.register(Department,DepartmentAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
@@ -30,17 +41,6 @@ admin.site.register(Member, MemberAdmin)
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 1
-
-class EmailItemInline(admin.TabularInline):
-    model = EmailItem
-    fields = ['person','activity','subject','created_dtm','sent_dtm']
-    can_delete = False
-    readonly_fields = ['person','activity','subject','created_dtm','sent_dtm']
-    def has_add_permission(self,request,obj=None):
-        return False
-    def has_delete_permission(self,request,obj=None):
-        return False
-    extra = 0
 
 class ActivityInviteInline(admin.TabularInline):
     model = ActivityInvite
@@ -58,7 +58,7 @@ class PersonInline(admin.TabularInline):
 class FamilyAdmin(admin.ModelAdmin):
     list_display = ('email','unique')
     search_fields = ('email',)
-    inlines = [PersonInline]
+    inlines = [PersonInline, EmailItemInline]
     actions = ['create_new_uuid']
     view_on_site = True
     def create_new_uuid(self,request, queryset):
