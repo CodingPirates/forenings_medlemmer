@@ -224,7 +224,18 @@ class EmailTemplate(models.Model):
     def __str__(self):
         return self.name + " (ID:" + self.idname + ")"
 
-    def makeEmail(self, recievers, context, department=None):
+    # Will create and put an email in Queue from this template.
+    # It will try to to put usefull details in context, which in many cases can just be {}
+
+    # context is always filled with:
+    #  email, site
+
+    # If possible it will also be filled with:
+    #  person, family
+
+    # recievers is expected to be a list of Person, Family or strings (email adresses)
+
+    def makeEmail(self, recievers, context):
 
         if(type(recievers) is not list):
             recievers = [recievers]
@@ -234,7 +245,7 @@ class EmailTemplate(models.Model):
             if type(reciever) not in (Person, Family, str):
                 raise Exception("Reciever must be of type Person, Family or string")
 
-            # Figure our reciever
+            # figure out reciever
             if(type(reciever) is str):
                 destination_address = reciever;
             elif(type(reciever) is Person):
@@ -244,8 +255,41 @@ class EmailTemplate(models.Model):
                 context['family'] = reciever
                 destination_address = reciever.email;
 
-            context['email'] = destination_address
-            context['site'] = settings.BASE_URL
+            # figure out Person and Family is applicable
+            if(type(reciever) is Person):
+                person = reciever
+            elif('person' in context):
+                person = context['person']
+            else:
+                person=None
+
+            # figure out family
+            if(type(reciever) is Family):
+                family = reciever
+            elif(type(reciever) is Person):
+                family = reciever.family
+            elif('family' in context):
+                family = context['family']
+            else:
+                family=None
+
+            # figure out activity
+            if 'activity' in context:
+                activity = context['activity']
+            else:
+                activity = None
+
+            # department
+            if 'department' in context:
+                department = context['department']
+            else:
+                department = None
+
+            # fill out known usefull stuff for context
+            if 'email' not in context: context['email'] = destination_address
+            if 'site' not in context: context['site'] = settings.BASE_URL
+            if 'person' not in context: context['person'] = person
+            if 'family' not in context: context['family'] = family
 
             # Make real context from dict
             context = Context(context)
@@ -261,11 +305,15 @@ class EmailTemplate(models.Model):
 
             email = EmailItem.objects.create(template = self,
                 reciever = destination_address,
+                person=person,
+                family=family,
+                activity=activity,
                 department = department,
                 subject = subject_content,
                 body_html = html_content,
                 body_text = text_content)
             email.save()
+            return email
 
 
 class EmailItem(models.Model):
