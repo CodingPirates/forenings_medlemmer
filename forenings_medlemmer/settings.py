@@ -89,6 +89,10 @@ DATE_INPUT_FORMATS = (
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
+# How many days is Family data considered valid. After this period an E-mail asking for information
+# Checkup is sent to the Family.
+REQUEST_FAMILY_VALIDATION_PERIOD = 180
+
 STATIC_URL = '/static/'
 
 ADMINS = (('Administrator', 'admin@example.org'),)
@@ -107,12 +111,12 @@ EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 30
 
 if DEBUG:
-    pass #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend';
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend';
 
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",
+    'members.jobs.RequestConfirmationCronJob',
 ]
 
 # Dont keep job logs more than 7 days old
 DJANGO_CRON_DELETE_LOGS_OLDER_THAN=7
-

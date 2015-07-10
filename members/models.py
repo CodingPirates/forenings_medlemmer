@@ -213,7 +213,7 @@ class EmailTemplate(models.Model):
         verbose_name = 'Email Skabelon'
         verbose_name_plural = 'Email Skabeloner'
     idname = models.SlugField('Unikt reference navn',max_length=50, blank=False, unique=True)
-    updated_dtm = models.DateTimeField('Sidst redigeret', auto_now_add=True)
+    updated_dtm = models.DateTimeField('Sidst redigeret', auto_now=True)
     name = models.CharField('Skabelon navn',max_length=200, blank=False)
     description = models.CharField('Skabelon beskrivelse',max_length=200, blank=False)
     template_help = models.TextField('Hjælp omkring template variable', blank=True)
