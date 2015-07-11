@@ -7,10 +7,9 @@ from django.core.urlresolvers import reverse
 from django_extensions.db.fields import UUIDField
 import uuid
 import datetime
-from pytz import timezone
 from django.template import Engine, Context
 from django.core.mail import send_mail
-from django.utils import timezone as django_timezone
+from django.utils import timezone
 
 # Create your models here.
 
@@ -77,7 +76,7 @@ class Person(models.Model):
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
     photo_permission = models.CharField('Foto tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
-    added = models.DateField('Tilføjet', default=django_timezone.now, blank=False)
+    added = models.DateField('Tilføjet', default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
     def __str__(self):
         return self.name
@@ -131,7 +130,7 @@ class Member(models.Model):
     department = models.ForeignKey(Department)
     person = models.ForeignKey(Person)
     is_active = models.BooleanField('Aktiv',default=True)
-    member_since = models.DateTimeField('Indmeldt', blank=False, default=django_timezone.now)
+    member_since = models.DateTimeField('Indmeldt', blank=False, default=timezone.now)
     member_until = models.DateTimeField('Udmeldt', blank=True, default=None, null=True)
     def name(self):
         return '{}'.format(self.person)
@@ -340,7 +339,7 @@ class EmailItem(models.Model):
         else:
             destination_email = self.reciever
 
-        self.sent_dtm = datetime.datetime.now(timezone('Europe/Copenhagen'))
+        self.sent_dtm = timezone.now()
         try:
             send_mail(self.subject, self.body_text, settings.SITE_CONTACT, (destination_email,), html_message=self.body_html)
         except Exception as e:

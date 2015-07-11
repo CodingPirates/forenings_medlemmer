@@ -1,6 +1,5 @@
 Django==1.8.0
 django-bootstrap3
 django_extensions
-pytz
 django-crispy-forms
 django_cron

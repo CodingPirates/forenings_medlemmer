@@ -3,7 +3,7 @@ from django_cron import CronJobBase, Schedule
 from members.models import EmailItem, Family, Notification, EmailTemplate
 from django.db.models import Q, F
 import datetime
-from pytz import timezone
+from django.utils import timezone
 
 
 # Send out all queued emails
@@ -30,14 +30,14 @@ class RequestConfirmationCronJob(CronJobBase):
         pass
         # Find all Families, which has an updated_dtm older than the specified time for updates from today.
         # Exclude the families which has already recieved a notification after they updated last. (to avoid sending again)
-        outdated_dtm = datetime.datetime.now(timezone('Europe/Copenhagen')) - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
+        outdated_dtm = timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
         unconfirmed_families = Family.objects.filter(Q(confirmed_dtm__lt=outdated_dtm) | Q(confirmed_dtm=None)).exclude(Q(notification__update_info_dtm__gt=F('confirmed_dtm')) | Q(~Q(notification__update_info_dtm=None), confirmed_dtm=None))
 
         # send notification to all families asking them to update
         # their family details
         for family in unconfirmed_families:
             email = EmailTemplate.objects.get(idname='UPDATE_DATA').makeEmail(family, {})
-            notification = Notification(family=family, email=email, update_info_dtm=datetime.datetime.now(timezone('Europe/Copenhagen')))
+            notification = Notification(family=family, email=email, update_info_dtm=timezone.now())
             notification.save()
 
 
