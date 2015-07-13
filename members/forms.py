@@ -43,7 +43,9 @@ class PersonForm(forms.ModelForm):
             Fieldset('Adresse oplysninger',
                         Div(
                             Div(Field('search_address', id="search-address"), css_class="col-md-10"),
-                            Div(Field('manual_entry', id="manual-entry"), css_class="col-md-2"),
+                            Div(Field('manual_entry', id="manual-entry"),
+                                Field('address_global', id="address-global"),
+                                css_class="col-md-2"),
                             Div(Field('streetname', readonly=True, css_class="autofilled-address"), css_class="col-md-9"),
                             Div(Field('housenumber', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
                             Div(Field('floor', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
@@ -77,6 +79,7 @@ class PersonForm(forms.ModelForm):
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     dawa_id = forms.CharField(label='Dawa ID', max_length=128, widget=forms.HiddenInput(), required=False)
     manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
+    address_global = forms.ChoiceField(label="Opdater hele familien med denne adresse", widget=forms.CheckboxInput, initial=True, required=False, choices=((True, 'True'), (False, 'False')))
 
 class getLoginForm(forms.Form):
     def __init__(self, *args, **kwargs):
