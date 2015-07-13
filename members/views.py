@@ -6,6 +6,7 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList
 from members.forms import PersonForm, getLoginForm, signupForm
 from django.utils import timezone
+from django.conf import settings
 import datetime
 
 def FamilyDetails(request,unique):
@@ -21,6 +22,7 @@ def FamilyDetails(request,unique):
     def has_no_activity(person):
         return currents.filter(member__person = person).count() == 0
     children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD)))
+
     context = {
         'family': family,
         'invites': invites,
@@ -29,14 +31,34 @@ def FamilyDetails(request,unique):
         'waiting': waiting,
         'waiting_lists': departments_with_waiting_list,
         'open_activities': open_activities,
+        'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
     }
     return render(request, 'members/family_details.html', context)
+
 def InviteDetails(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)
     context = {
         'invite': activity_invite
     }
     return render(request, 'members/activity_invite_details.html',context)
+
+def ConfirmFamily(request, unique):
+    family = get_object_or_404(Family, unique=unique)
+    persons = Person.objects.filter(family=family)
+    subscribed_waiting_lists = WaitingList.objects.filter(person__family=family)
+
+    if request.method == 'POST':
+        ''' No data recieved - just set confirmed_dtm date to now '''
+        family.confirmed_dtm = timezone.now()
+        family.save()
+        return HttpResponseRedirect(reverse('family_detail', args=[unique]))
+    else:
+        context = {
+            'family':family,
+            'persons':persons,
+            'subscribed_waitinglists': subscribed_waiting_lists
+        }
+        return render(request, 'members/family_confirm_details.html',context)
 
 def DeclineInvitation(request, unique):
     activity_invite = get_object_or_404(ActivityInvite, unique=unique)

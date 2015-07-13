@@ -54,6 +54,11 @@
             <blockquote class="bg-warning">
               <p>Opret gerne begge forældre/værge med kontaktoplysninger, så vi i Coding Pirates kan få fat i jer.</p>
             </blockquote>
+            {% if need_confirmation %}
+            <blockquote class="bg-danger">
+            <p> Det er længe siden du sidste bekræftede dine oplysninger. <a class="btn btn-success" href="{% url 'confirm_details' family.unique %}">Bekræft</a>
+            </blockquote>
+            {%endif%}
           </section>
         </div>
       </div>
