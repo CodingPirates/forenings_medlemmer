@@ -89,7 +89,7 @@ class Person(models.Model):
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
     photo_permission = models.CharField('Foto tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
-    added = models.DateField('Tilføjet', default=timezone.now, blank=False)
+    added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
     def __str__(self):
         return self.name
