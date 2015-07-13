@@ -21,7 +21,7 @@
             <table class="table table-striped table-responsive">
               <thead>
                 <tr>
-                  <th class="col-xs-1"/>
+                  <th class="col-xs-1">Opskrevet</th>
                   <th class="col-xs-3" align="left">Navn</th>
                   <th class="col-xs-3" align="left">Adresse</th>
                   <th class="col-xs-2" align="left">Postnr./by</th>
@@ -32,9 +32,9 @@
               <tbody>
                 {% for person in family.person_set.all %}
                   <tr>
-                    <td>{{person.get_membertype_display}}</td>
+                    <td>{{person.added}}</td>
                     <td><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></td>
-                    <td>{{person.streetname}} {{person.housenumber}} {{person.floor}} {{person.door}}</td>
+                    <td>{{person.address}}</td>
                     <td>{{person.zipcode}} {{person.city}}</td>
                     <td>{{person.email}}</td>
                     <td>{{person.phone}}</td>
@@ -98,6 +98,18 @@
                       <td></td>
                     </tr>
                   {% endfor %}
+
+                  {%for department in departments_with_no_waiting_list%}
+                    <tr>
+                      <td>{{department.name}}</td>
+                      <td>{{department.address}}, {{department.zipcode}} {{department.city}}</td>
+                      <td>{{department.open_hours}}</td>
+                      <td>
+                          <i>Inden venteliste, tilmeld blot aktivitet, når de er åbne for tilmelding</i>
+                      </td>
+                      <td></td>
+                    </tr>
+                  {%endfor%}
                   </tbody>
               </table>
             {% else %}
