@@ -76,14 +76,14 @@ class Command(BaseCommand):
             try:
                person = Person.objects.get(name=name, family = family)
 
-               # if corrent waiting list is older, replace timestamp
-               if(date < person.on_waiting_list_since):
-                   person.on_waiting_list_since = date
+               # if current waiting list is older, replace timestamp
+               if(date < person.added):
+                   person.added = date
                    person.save()
 
             except ObjectDoesNotExist:
                 # create the person
-                person = Person(name=name, membertype=Person.CHILD, family = family, on_waiting_list_since = date)
+                person = Person(name=name, membertype=Person.CHILD, family = family, added = date)
                 person.save()
 
             # store original data in log entry.
