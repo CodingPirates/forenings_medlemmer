@@ -31,7 +31,8 @@ def FamilyDetails(request,unique):
         'waiting': waiting,
         'waiting_lists': departments_with_waiting_list,
         'open_activities': open_activities,
-        'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
+        'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
+        'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 2,
     }
     return render(request, 'members/family_details.html', context)
 

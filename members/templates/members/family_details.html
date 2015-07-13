@@ -51,9 +51,11 @@
             <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
             <br/>
             <br/>
+            {%if request_parents %}
             <blockquote class="bg-warning">
-              <p>Opret gerne begge forældre/værge med kontaktoplysninger, så vi i Coding Pirates kan få fat i jer.</p>
+              <p>Opret mindst 2 forældre / værger med kontaktoplysninger, så vi i Coding Pirates kan få fat i jer.</p>
             </blockquote>
+            {%endif%}
             {% if need_confirmation %}
             <blockquote class="bg-danger">
             <p> Det er længe siden du sidste bekræftede dine oplysninger. <a class="btn btn-success" href="{% url 'confirm_details' family.unique %}">Bekræft</a>
