@@ -11,6 +11,19 @@ from django.template import Engine, Context
 from django.core.mail import send_mail
 from django.utils import timezone
 
+def format_address(streetname, housenumber, floor=None, door=None):
+    address = streetname + " " + housenumber
+    if(floor != '' and door != ''):
+        address = address + ", " + floor + ". " + door + "."
+
+    if(floor != '' and door == ''):
+        address = address + ", " + floor + "."
+
+    if(floor == '' and door != ''):
+        address = address + ", " + door + "."
+
+    return address
+
 # Create your models here.
 
 class Family(models.Model):
@@ -68,7 +81,7 @@ class Person(models.Model):
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     def address(self):
-        return '{} {}{}'.format(self.streetname,self.housenumber,', {}{}'.format(self.floor,self.door) if self.floor != '' or self.door != '' else '')
+        return format_address(self.streetname, self.housenumber, self.floor, self.door)
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField('Telefon', max_length=50, blank=True)
@@ -88,16 +101,16 @@ class Department(models.Model):
         ordering=['name']
     name = models.CharField('Navn',max_length=200)
     description = models.TextField('Beskrivelse af afdeling', blank=True)
-    open_hours = models.CharField('Åbningstid',max_length=4, blank=True)
-    responsible_name = models.CharField('Afdelingsleder',max_length=4, blank=True)
+    open_hours = models.CharField('Åbningstid',max_length=200, blank=True)
+    responsible_name = models.CharField('Afdelingsleder',max_length=200, blank=True)
     responsible_contact = models.EmailField('E-mail', blank=True)
-    placename = models.CharField('Stednavn',max_length=4, blank=True)
-    zipcode = models.CharField('Postnummer',max_length=4)
+    placename = models.CharField('Stednavn',max_length=200, blank=True)
+    zipcode = models.CharField('Postnummer',max_length=10)
     city = models.CharField('By', max_length=200)
     streetname = models.CharField('Vejnavn',max_length=200)
-    housenumber = models.CharField('Husnummer',max_length=5)
-    floor = models.CharField('Etage',max_length=3, blank=True)
-    door = models.CharField('Dør',max_length=5, blank=True)
+    housenumber = models.CharField('Husnummer',max_length=10)
+    floor = models.CharField('Etage',max_length=10, blank=True)
+    door = models.CharField('Dør',max_length=10, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     has_waiting_list = models.BooleanField('Venteliste',default=False)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
@@ -106,6 +119,8 @@ class Department(models.Model):
     no_members.short_description = 'Antal medlemmer'
     def __str__(self):
         return self.name
+    def address(self):
+        return format_address(self.streetname, self.housenumber, self.floor, self.door)
 
 class WaitingList(models.Model):
     class Meta:
@@ -316,13 +331,13 @@ class EmailTemplate(models.Model):
 
 
 class EmailItem(models.Model):
-    person = models.ForeignKey(Person, null=True)
-    family = models.ForeignKey(Family, null=True)
+    person = models.ForeignKey(Person, blank=True, null=True)
+    family = models.ForeignKey(Family, blank=True, null=True)
     reciever = models.EmailField(null=False)
     template = models.ForeignKey(EmailTemplate, null=True)
     bounce_token = UUIDField(default=uuid.uuid4, null=False)
     activity = models.ForeignKey(Activity, null=True)
-    department = models.ForeignKey(Department, null=True)
+    department = models.ForeignKey(Department, blank=True, null=True)
     created_dtm = models.DateTimeField('Oprettet',auto_now_add=True)
     subject = models.CharField('Emne',max_length=200, blank=True)
     body_html = models.TextField('HTML Indhold', blank=True)
