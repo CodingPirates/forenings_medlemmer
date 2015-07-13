@@ -11,28 +11,43 @@ import datetime
 
 def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
+    invites= ActivityInvite.objects.filter(person__family = family)
+    open_activities = Activity.objects.filter(open_invite = True)
+    participating = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
+    departments_with_no_waiting_list = Department.objects.filter(has_waiting_list = False)
+    waiting_lists = WaitingList.objects.filter(person__family = family)
+    children = family.person_set.filter(membertype = Person.CHILD)
+
     #update visited field
     family.last_visit_dtm = timezone.now()
     family.save()
-    invites= ActivityInvite.objects.filter(person__family = family)
-    open_activities = Activity.objects.filter(open_invite = True)
-    currents = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
-    departments_with_waiting_list = Department.objects.filter(has_waiting_list = True)
-    waiting = WaitingList.objects.filter(person__family = family)
-    def has_no_activity(person):
-        return currents.filter(member__person = person).count() == 0
-    children = filter(has_no_activity, list(family.person_set.filter(membertype = Person.CHILD)))
+
+    department_children_waiting = {'departments': {}}
+    for department in Department.objects.filter(has_waiting_list = True):
+        department_children_waiting['departments'][department.pk] = {}
+        department_children_waiting['departments'][department.pk]['object'] = department
+        department_children_waiting['departments'][department.pk]['children_status'] = {}
+        for child in children:
+            department_children_waiting['departments'][department.pk]['children_status'][child.pk] = {}
+            department_children_waiting['departments'][department.pk]['children_status'][child.pk]['object'] = child
+            department_children_waiting['departments'][department.pk]['children_status'][child.pk]['firstname'] = child.name.partition(' ')[0]
+            department_children_waiting['departments'][department.pk]['children_status'][child.pk]['waiting'] = False # default not waiting
+            for current_wait in waiting_lists:
+                if(current_wait.department == department and current_wait.person == child):
+                    #child is waiting on this department
+                    department_children_waiting['departments'][department.pk]['children_status'][child.pk]['waiting'] = True
+                    break
 
     context = {
         'family': family,
         'invites': invites,
-        'currents': currents,
-        'children': children,
-        'waiting': waiting,
-        'waiting_lists': departments_with_waiting_list,
+        'participating': participating,
         'open_activities': open_activities,
         'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
         'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 2,
+        'department_children_waiting' : department_children_waiting,
+        'departments_with_no_waiting_list' : departments_with_no_waiting_list,
+        'children': children
     }
     return render(request, 'members/family_details.html', context)
 
@@ -66,17 +81,29 @@ def DeclineInvitation(request, unique):
     activity_invite.delete()
     return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
 
-def AcceptWaitingList(request, unique, id, departmentId):
+def WaitingListSetSubscription(request, unique, id, departmentId, action):
     person = get_object_or_404(Person, pk=id)
     if person.family.unique != unique:
         raise Http404("Person eksisterer ikke")
     department = get_object_or_404(Department,pk=departmentId)
-    if WaitingList.objects.filter(person = person, department = department).count() != 0:
-        raise Http404("{} er allerede på {}s venteliste".format(person.name,department.name))
-    waiting_list = WaitingList()
-    waiting_list.person = person
-    waiting_list.department = department
-    waiting_list.save()
+
+    if action == 'subscribe':
+        print('subscribing')
+        if WaitingList.objects.filter(person = person, department = department):
+            raise Http404("{} er allerede på {}s venteliste".format(person.name,department.name))
+        waiting_list = WaitingList()
+        waiting_list.person = person
+        waiting_list.department = department
+        waiting_list.save()
+
+    if action == 'unsubscribe':
+        print('un-subscribing')
+        try:
+            waiting_list = WaitingList.objects.get(person = person, department = department)
+            waiting_list.delete()
+        except:
+            raise Http404("{} er ikke på {}s venteliste".format(person.name,department.name))
+
     return HttpResponseRedirect(reverse('family_detail', args=[unique]))
 
 def AcceptInvitation(request, unique):
