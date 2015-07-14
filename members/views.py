@@ -139,6 +139,7 @@ def UpdatePersonFromForm(person, form):
     person.floor = form.cleaned_data['floor']
     person.door = form.cleaned_data['door']
     person.placename = form.cleaned_data['placename']
+    person.dawa_id = form.cleaned_data['dawa_id']
 
     person.save()
 
@@ -153,6 +154,7 @@ def UpdatePersonFromForm(person, form):
             relative.floor = form.cleaned_data['floor']
             relative.door = form.cleaned_data['door']
             relative.placename = form.cleaned_data['placename']
+            relative.dawa_id = form.cleaned_data['dawa_id']
 
             relative.save()
 
@@ -180,6 +182,7 @@ def PersonCreate(request, unique, membertype):
             person.floor = first_person.floor
             person.door = first_person.door
             person.placename = first_person.placename
+            person.dawa_id = first_person.dawa_id
         form = PersonForm(instance=person)
     return render(request, 'members/person_create.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
 

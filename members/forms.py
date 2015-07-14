@@ -66,7 +66,7 @@ class PersonForm(forms.ModelForm):
         self.fields['birthday'].input_formats=(settings.DATE_INPUT_FORMATS)
     class Meta:
         model=Person
-        fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone']
+        fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone', 'dawa_id']
         labels = {
             'birthday': 'Fødselsdato (dd-mm-åååå)',
         }
