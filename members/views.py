@@ -44,7 +44,7 @@ def FamilyDetails(request,unique):
         'participating': participating,
         'open_activities': open_activities,
         'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
-        'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 2,
+        'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 1,
         'department_children_waiting' : department_children_waiting,
         'departments_with_no_waiting_list' : departments_with_no_waiting_list,
         'children': children
