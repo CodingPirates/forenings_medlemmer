@@ -215,6 +215,7 @@ def EntryPage(request):
                     pass
                 #create new family.
                 family = Family.objects.create(email = signup.cleaned_data['parent_email'])
+                family.confirmed_dtm = timezone.now()
                 family.save()
 
                 #create parent
