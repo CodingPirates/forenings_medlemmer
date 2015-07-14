@@ -183,6 +183,8 @@ class Activity(models.Model):
     end_date = models.DateField('Slut')
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
+    price = models.IntegerField('Pris (øre)', default=0)
+    max_participants = models.PositiveIntegerField('Max Holdstørrelse', default=30)
     def is_historic(self):
         return self.end_date < datetime.date.today()
     is_historic.short_description = 'Historisk?'
@@ -223,6 +225,7 @@ class ActivityParticipant(models.Model):
 
 class Volunteer(models.Model):
     member = models.ForeignKey(Member)
+    department = models.ForeignKey(Department)
     def has_certificate(self):
         return self.person.has_certificate
     added = models.DateTimeField(auto_now_add=True, blank=True, editable=False)
