@@ -75,7 +75,7 @@ admin.site.register(Family, FamilyAdmin)
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'zipcode', 'email', 'family_url', 'membertype')
-    list_filter = ['membertype']
+    list_filter = ['membertype', 'gender']
     inlines = [MemberInline, EmailItemInline]
     search_fields = ('name', 'zipcode')
     fieldsets = (

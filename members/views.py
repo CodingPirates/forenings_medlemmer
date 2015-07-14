@@ -252,6 +252,7 @@ def EntryPage(request):
                     email = signup.cleaned_data['child_email'],
                     phone = signup.cleaned_data['child_phone'],
                     birthday = signup.cleaned_data['child_birthday'],
+                    gender = signup.cleaned_data['child_gender'],
                     family = family
                     )
                 child.save()

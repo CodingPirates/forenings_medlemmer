@@ -15,7 +15,8 @@ class PersonForm(forms.ModelForm):
         if self.instance != None and self.instance.membertype == Person.CHILD:
             nameFieldSet = Fieldset('Barnets oplysninger',
                     Div(
-                         Div(Field('name'), css_class="col-md-12"),
+                         Div(Field('gender'), css_class="col-md-2"),
+                         Div(Field('name'), css_class="col-md-10"),
                          Div(Field('birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
                          Div(Field('email'), css_class="col-md-4"),
                          Div(Field('phone'), css_class="col-md-4"),
@@ -27,7 +28,8 @@ class PersonForm(forms.ModelForm):
         else:
             nameFieldSet = Fieldset('Forældres / Værges oplysninger',
                         Div(
-                            Div(Field('name'), css_class="col-md-12"),
+                            Div(Field('gender'), css_class="col-md-2"),
+                            Div(Field('name'), css_class="col-md-10"),
                             Div(Field('birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
                             Div(Field('email'), css_class="col-md-4"),
                             Div(Field('phone'), css_class="col-md-4"),
@@ -66,7 +68,7 @@ class PersonForm(forms.ModelForm):
         self.fields['birthday'].input_formats=(settings.DATE_INPUT_FORMATS)
     class Meta:
         model=Person
-        fields= ['birthday', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone', 'dawa_id']
+        fields= ['birthday', 'gender', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone', 'dawa_id']
         labels = {
             'birthday': 'Fødselsdato (dd-mm-åååå)',
         }
@@ -108,7 +110,8 @@ class signupForm(forms.Form):
             Hidden('form_id', 'signup',  id="id_form_id"),
             Fieldset('Barnets oplysninger',
                         Div(
-                             Div(Field('child_name'), css_class="col-md-12"),
+                             Div(Field('child_gender'), css_class="col-md-2"),
+                             Div(Field('child_name'), css_class="col-md-10"),
                              Div(Field('child_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
                              Div(Field('child_email'), css_class="col-md-4"),
                              Div(Field('child_phone'), css_class="col-md-4"),
@@ -144,6 +147,7 @@ class signupForm(forms.Form):
 
         )
 
+    child_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_GENDER_CHOICES)
     child_name = forms.CharField(label='Barns fulde navn', required=True, max_length=200)
     child_email = forms.EmailField(label='Barns email', required=False)
     child_phone = forms.CharField(label='Barns telefon', required=False, max_length=50)

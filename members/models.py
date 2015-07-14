@@ -70,6 +70,12 @@ class Person(models.Model):
         (PHOTO_ND, 'Ikke taget stilling'),
         (PHOTO_NOTOK, 'Ikke tilladt'),
     )
+    MALE = 'MA'
+    FEMALE = 'FM'
+    MEMBER_GENDER_CHOICES = (
+        (MALE, 'Dreng'),
+        (FEMALE, 'Pige')
+        )
     membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)
     zipcode = models.CharField('Postnummer',max_length=4)
@@ -85,6 +91,7 @@ class Person(models.Model):
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField('Telefon', max_length=50, blank=True)
+    gender = models.CharField('Køn',max_length=20,choices=MEMBER_GENDER_CHOICES,default=None, null=True)
     birthday = models.DateField('Fødselsdag', blank=True, null=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
