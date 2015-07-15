@@ -7,6 +7,7 @@ from members.models import Person, Family, ActivityInvite, ActivityParticipant, 
 from members.forms import PersonForm, getLoginForm, signupForm
 from django.utils import timezone
 from django.conf import settings
+from django.views.decorators.clickjacking import xframe_options_exempt
 import datetime
 
 def FamilyDetails(request,unique):
@@ -199,6 +200,7 @@ def PersonUpdate(request, unique, id):
         form = PersonForm(instance=person)
     return render(request, 'members/person_update.html', {'form': form, 'person': person})
 
+@xframe_options_exempt
 def EntryPage(request):
     if request.method == 'POST':
         # figure out which form was filled out.
