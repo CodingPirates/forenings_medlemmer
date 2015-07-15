@@ -18,8 +18,15 @@
       {% for person in persons %}
         <div>
         <address>
-        <b>Person {{forloop.counter}}</b><br>
-        <i>{{person.name}}</i><br>
+        <i>{{person.name}}</i>
+        {%if person.membertype == 'CH' %}
+          {%if person.birthday %}
+            ({{person.birthday|timesince}} gammel)
+          {%else%}
+            <i><b class="text-danger">(Fødselsdag mangler!)</b></i>
+          {%endif%}
+        {%endif%}
+        <br>
         {%if person.streetname%}
         {{person.streetname}} {{person.housenumber}} {{person.floor}} {{person.door}}<br>
         {% if person.placename %} {{person.placename}}<br> {%endif%}
