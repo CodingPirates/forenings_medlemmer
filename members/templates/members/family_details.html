@@ -104,9 +104,9 @@
                       <td>
                       {%for key, child in department.children_status.items %}
                         {%if child.waiting %}
-                          <a class="btn btn-danger" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'unsubscribe' %}">Afmeld: {{child.firstname}}</a>
+                          <a class="btn btn-success" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'unsubscribe' %}">Tilmeldt: {{child.firstname}}</a>
                         {%else%}
-                          <a class="btn btn-success" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'subscribe' %}">Opskriv: {{child.firstname}}</a>
+                          <a class="btn btn-danger" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'subscribe' %}">Opskriv: {{child.firstname}}</a>
                         {%endif%}
                       {%endfor%}
                       </td>
