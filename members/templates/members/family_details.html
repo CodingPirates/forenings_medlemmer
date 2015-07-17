@@ -23,7 +23,7 @@
               <thead>
                 <tr>
                   <th class="col-xs-1">Opskrevet</th>
-                  <th class="col-xs-3" align="left">Navn</th>
+                  <th class="col-xs-2" align="left">Navn</th>
                   <th class="col-xs-3" align="left">Adresse</th>
                   <th class="col-xs-2" align="left">Postnr./by</th>
                   <th class="col-xs-2" align="left">Email</th>
@@ -31,14 +31,28 @@
                 </tr>
               </thead>
               <tbody>
-                {% for person in family.person_set.all %}
+                {% for person in ordered_persons %}
                   <tr>
-                    <td>{{person.added}}</td>
-                    <td><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></td>
-                    <td>{{person.address}}</td>
-                    <td>{{person.zipcode}} {{person.city}}</td>
-                    <td>{{person.email}}</td>
-                    <td>{{person.phone}}</td>
+                    {%if person.membertype == 'CH' %}
+                    <td><p>{{person.added|date:"d M Y"}}</p>
+                    <p class="text-muted">({{person.added|timesince}} siden)</p></td>
+                    {%else%}
+                    <td></td>
+                    {%endif%}
+
+                    <td><p><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></p>
+
+                    {%if person.membertype == 'PA' %} <p class="text-muted">(Forælder)</p> {%endif%}
+                    {%if person.membertype == 'GU' %} <p class="text-muted">(Værge)</p> {%endif%}
+                    {%if person.membertype == 'CH' %} <p class="text-muted">(Barn {{person.age_years}} år)</p> {%endif%}
+                    {%if person.membertype == 'NA' %} <p class="text-muted">(Frivillig)</p> {%endif%}
+
+                    </td>
+
+                    <td><p>{{person.address}}</p></td>
+                    <td><p>{{person.zipcode}} {{person.city}}</p></td>
+                    <td><p>{{person.email}}</p></td>
+                    <td><p>{{person.phone}}</p></td>
                   </tr>
                 {% endfor %}
               </tbody>

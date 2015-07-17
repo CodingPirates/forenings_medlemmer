@@ -18,6 +18,7 @@ def FamilyDetails(request,unique):
     departments_with_no_waiting_list = Department.objects.filter(has_waiting_list = False)
     waiting_lists = WaitingList.objects.filter(person__family = family)
     children = family.person_set.filter(membertype = Person.CHILD)
+    ordered_persons = family.person_set.order_by('membertype').all()
 
     #update visited field
     family.last_visit_dtm = timezone.now()
@@ -48,7 +49,8 @@ def FamilyDetails(request,unique):
         'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 1,
         'department_children_waiting' : department_children_waiting,
         'departments_with_no_waiting_list' : departments_with_no_waiting_list,
-        'children': children
+        'children': children,
+        'ordered_persons' : ordered_persons,
     }
     return render(request, 'members/family_details.html', context)
 

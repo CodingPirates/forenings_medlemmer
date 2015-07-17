@@ -101,6 +101,9 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
+    def age_years(self):
+        return (timezone.now().date() - self.birthday).days // 365
+
 class Department(models.Model):
     class Meta:
         verbose_name_plural='Afdelinger'
