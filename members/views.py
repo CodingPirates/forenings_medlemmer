@@ -25,20 +25,22 @@ def FamilyDetails(request,unique):
     family.save()
 
     department_children_waiting = {'departments': {}}
-    for department in Department.objects.filter(has_waiting_list = True):
-        department_children_waiting['departments'][department.pk] = {}
-        department_children_waiting['departments'][department.pk]['object'] = department
-        department_children_waiting['departments'][department.pk]['children_status'] = {}
+    loop_counter=0
+    for department in Department.objects.filter(has_waiting_list = True).order_by('zipcode'):
+        department_children_waiting['departments'][loop_counter] = {}
+        department_children_waiting['departments'][loop_counter]['object'] = department
+        department_children_waiting['departments'][loop_counter]['children_status'] = {}
         for child in children:
-            department_children_waiting['departments'][department.pk]['children_status'][child.pk] = {}
-            department_children_waiting['departments'][department.pk]['children_status'][child.pk]['object'] = child
-            department_children_waiting['departments'][department.pk]['children_status'][child.pk]['firstname'] = child.name.partition(' ')[0]
-            department_children_waiting['departments'][department.pk]['children_status'][child.pk]['waiting'] = False # default not waiting
+            department_children_waiting['departments'][loop_counter]['children_status'][child.pk] = {}
+            department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['object'] = child
+            department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['firstname'] = child.name.partition(' ')[0]
+            department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['waiting'] = False # default not waiting
             for current_wait in waiting_lists:
                 if(current_wait.department == department and current_wait.person == child):
                     #child is waiting on this department
-                    department_children_waiting['departments'][department.pk]['children_status'][child.pk]['waiting'] = True
+                    department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['waiting'] = True
                     break
+        loop_counter = loop_counter + 1
 
     context = {
         'family': family,
