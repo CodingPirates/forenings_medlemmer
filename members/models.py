@@ -102,7 +102,10 @@ class Person(models.Model):
         return self.name
 
     def age_years(self):
-        return (timezone.now().date() - self.birthday).days // 365
+        if(self.birthday != None):
+            return (timezone.now().date() - self.birthday).days // 365
+        else:
+            return 0
 
 class Department(models.Model):
     class Meta:
