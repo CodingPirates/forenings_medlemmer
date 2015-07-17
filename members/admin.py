@@ -48,6 +48,7 @@ class ActivityInviteInline(admin.TabularInline):
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'start_date', 'end_date', 'is_historic')
+    date_hierarchy = 'start_date'
     inlines = [ActivityParticipantInline, ActivityInviteInline, EmailItemInline]
 admin.site.register(Activity, ActivityAdmin)
 
@@ -73,11 +74,48 @@ class FamilyAdmin(admin.ModelAdmin):
     create_new_uuid.short_description = 'Opret nyt UUID'
 admin.site.register(Family, FamilyAdmin)
 
+class PersonWaitinglistListFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = 'Venteliste'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'waiting_list'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+
+        departments = []
+        for department in Department.objects.filter(has_waiting_list=True).order_by('zipcode'):
+            departments.append(( str(department.pk), department.name))
+
+        return departments
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+
+        if(self.value() == None):
+            return queryset
+        else:
+            return queryset.filter(waitinglist__department__pk=self.value())
+
+
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'zipcode', 'email', 'family_url', 'membertype')
-    list_filter = ['membertype', 'gender']
+    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'email', 'added')
+    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
     inlines = [MemberInline, EmailItemInline]
-    search_fields = ('name', 'zipcode')
+    search_fields = ('name', 'streetname', 'email', 'phone', 'family')
     fieldsets = (
         ('Informationer' , {
             'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission'),

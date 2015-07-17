@@ -106,6 +106,9 @@ class Person(models.Model):
             return (timezone.now().date() - self.birthday).days // 365
         else:
             return 0
+    age_years.admin_order_field = '-birthday'
+    age_years.short_description = 'Alder'
+
 
 class Department(models.Model):
     class Meta:
