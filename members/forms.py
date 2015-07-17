@@ -55,7 +55,7 @@ class PersonForm(forms.ModelForm):
                             Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
                             Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
                             Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                            Hidden('dawa_id', '',  id="id_dawa_id"),
+                            Field('dawa_id', '',  id="id_dawa_id"),
                             css_class="row"
                            )
                      ),
@@ -75,11 +75,10 @@ class PersonForm(forms.ModelForm):
         error_messages = {
             'birthday': {'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'},
         }
-
+        widgets = {'dawa_id': forms.HiddenInput()}
 
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
-    dawa_id = forms.CharField(label='Dawa ID', max_length=128, widget=forms.HiddenInput(), required=False)
     manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
     address_global = forms.ChoiceField(label="Opdater hele familien med denne adresse", widget=forms.CheckboxInput, initial=True, required=False, choices=((True, 'True'), (False, 'False')))
 
@@ -165,6 +164,6 @@ class signupForm(forms.Form):
     placename = forms.CharField(label='Stednavn', required=False,max_length=200)
     zipcode = forms.CharField(label='Postnummer', max_length=4)
     city = forms.CharField(label='By', max_length=200, required=False)
-    dawa_id = forms.CharField(label='Dawa ID', max_length=128, widget=forms.HiddenInput(), required=False)
+    dawa_id = forms.CharField(label='Dawa ID', max_length=200, widget=forms.HiddenInput(), required=False)
     form_id = forms.CharField(label='Form ID', max_length=10, widget=forms.HiddenInput(), initial='signup')
     manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
