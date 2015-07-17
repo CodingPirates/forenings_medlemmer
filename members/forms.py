@@ -23,7 +23,6 @@ class PersonForm(forms.ModelForm):
                          css_class="row"
                        )
                 )
-            self.fields['birthday'].widget.format = '%d-%m-%Y'
             self.fields['birthday'].required = True
         else:
             nameFieldSet = Fieldset('Forældres / Værges oplysninger',
@@ -38,6 +37,8 @@ class PersonForm(forms.ModelForm):
                      )
             self.fields['email'].required = True
             self.fields['phone'].required = True
+
+        self.fields['birthday'].widget.format = '%d-%m-%Y'
 
 
         self.helper.layout = Layout(
