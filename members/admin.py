@@ -115,7 +115,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'email', 'added')
     list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
     inlines = [MemberInline, EmailItemInline]
-    search_fields = ('name', 'streetname', 'email', 'phone', 'family')
+    search_fields = ('name', 'streetname', 'email', 'phone')
     fieldsets = (
         ('Informationer' , {
             'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission'),
