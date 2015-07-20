@@ -4,13 +4,17 @@ from members.models import Person, Department, Volunteer, Member, Activity, Acti
 
 class MemberInline(admin.TabularInline):
     model = Member
+    fields = ('member_since', 'person')
+    readonly_fields = fields
     extra = 0
 
 class ActivityInline(admin.TabularInline):
     model = Activity
+    fields = ('name', 'start_date', 'end_date')
+    readonly_fields = fields
     extra = 0
 
-class WaitingListInline(admin.TabularInline):
+class WaitingListInline(admin.StackedInline):
     model = WaitingList
     extra = 0
 
@@ -30,7 +34,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'placename', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'has_waiting_list']})
     ]
     list_display = ('name','no_members')
-    inlines = [MemberInline, ActivityInline,WaitingListInline, EmailItemInline]
+    inlines = [MemberInline, ActivityInline]
 admin.site.register(Department,DepartmentAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
@@ -114,15 +118,35 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'email', 'added')
     list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
-    inlines = [MemberInline, EmailItemInline]
-    search_fields = ('name', 'streetname', 'email', 'phone')
-    fieldsets = (
-        ('Informationer' , {
-            'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission'),
-        }),
-        ('Kontakt Oplysninger', {
-            'fields' : ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone')
-        }))
+    search_fields = ('name',)
+
+    # needs 'view_full_address' to seet personal details.
+    # email and phonenumber only shown on adults.
+    def get_fieldsets(self, request, person=None):
+        if(request.user.has_perm('members.view_full_address')):
+            contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone')
+        else:
+            if(person.membertype == Person.CHILD):
+                contact_fields = ('name', 'city', 'zipcode')
+            else:
+                contact_fields = ('name', 'city', 'zipcode', 'email', 'phone')
+
+        fieldsets = (
+            ('Informationer' , {
+                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission'),
+            }),
+            ('Kontakt Oplysninger', {
+                'fields' : contact_fields
+            }))
+
+        return fieldsets
+
+    def get_readonly_fields(self, request, obj=None):
+        if type(obj) == Person and not request.user.is_superuser:
+            return tuple(obj._meta.get_all_field_names())
+        else:
+            return []
+
     def family_url(self, item):
         return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
     family_url.allow_tags = True
