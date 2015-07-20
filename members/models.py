@@ -52,6 +52,10 @@ class Person(models.Model):
     class Meta:
         verbose_name_plural='Personer'
         ordering=['name']
+        permissions = (
+            ("view_full_address", "Can view persons full address + phonenumber + email"),
+        )
+
     PARENT = 'PA'
     GUARDIAN = 'GU'
     CHILD = 'CH'
@@ -176,10 +180,10 @@ class Activity(models.Model):
         ordering =['start_date']
     department = models.ForeignKey(Department)
     name = models.CharField('Navn',max_length=200)
-    open_hours = models.CharField('Tidspunkt',max_length=4, blank=True)
-    responsible_name = models.CharField('Afdelingsleder',max_length=4, blank=True)
-    responsible_contact = models.EmailField('E-mail', blank=True)
-    placename = models.CharField('Stednavn',max_length=4)
+    open_hours = models.CharField('Tidspunkt',max_length=200)
+    responsible_name = models.CharField('Afdelingsleder',max_length=4)
+    responsible_contact = models.EmailField('E-mail')
+    placename = models.CharField('Stednavn',max_length=200, blank=True)
     zipcode = models.CharField('Postnummer',max_length=4)
     city = models.CharField('By', max_length=200)
     streetname = models.CharField('Vejnavn',max_length=200)
@@ -187,12 +191,13 @@ class Activity(models.Model):
     floor = models.CharField('Etage',max_length=3, blank=True)
     door = models.CharField('Dør',max_length=5, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
-    description = models.CharField('Beskrivelse',max_length=10000)
+    description = models.TextField('Beskrivelse', blank=True)
+    instructions = models.TextField('Tilmeldings instruktioner', blank=True)
     start_date = models.DateField('Start')
     end_date = models.DateField('Slut')
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
-    price = models.IntegerField('Pris (øre)', default=0)
+    price = models.IntegerField('Pris (øre)', default=500)
     max_participants = models.PositiveIntegerField('Max Holdstørrelse', default=30)
     def is_historic(self):
         return self.end_date < datetime.date.today()
