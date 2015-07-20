@@ -12,9 +12,14 @@
   </head>
   <body>
     <div class="container-fluid">
-      <p>For hjælp med at bruge denne side - se på <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores medlemssystem"</a></p>
       <h1>Familiedetaljer</h1>
-      <h3>Din familie er registreret på denne email adresse: {{family.email}}</h3>
+      <p>Velkommen til Coding Pirates medlems system. Du ser nu oversigten over de oplysninger vi har registreret om jeres familie. Det er vigtigt du sikrer dig at oplysningerne er korrekte.</p>
+      <p>For yderlig hjælp med at bruge denne side - se på <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores medlemssystem"</a> eller skriv til os på <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
+      <p>Din familie er registreret på e-mail adressen <a class="text-info">{{family.email}}</a>. Det er denne adresse vi sender information til dig om tilmeding til hold og aktiviteter.</p>
+
+      <h2>Personer</h2>
+      <p>Tryk på hvert navn, for at checke og opdatere oplysningerne på de personer der er på listen.</p>
+      <p>Tryk på <kbd>opret</kbd> knapperne, for at tilføje flere personer. Opret gerne flere forældre, så vi kan få fat i jer nemt</p>
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-defualt">
@@ -62,9 +67,9 @@
               </tfoot>
             </table>
             {% endif %}
-            <a class="btn btn-primary btn-lg active" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
-            <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
-            <a class="btn btn-default btn-lg active" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
+            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
+            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
+            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
             <br/>
             <br/>
             {%if request_parents %}
@@ -82,6 +87,9 @@
       </div>
 
       <h2>Ventelister</h2>
+      <p>Tryk på <kbd>tilmeld</kbd> knapperne for hver afdeling der har interesse for jer. Bemærk at jeres position på ventelisten afgøres ud fra barnets oprettelses tidspunkt i systemet (datoen "Opskrevet" i Personer) - <i> ikke tidspunktet i melder jeg på ventelisterne nedenfor! - </i> I kan derfor frit tilmelde og framelde jer ventelisterne uden at frygte i mister jeres position på listen.</p>
+      <p>Tryk på <kbd>afmeld</kbd> knapperne for at forlade en afdelings ventelisten igen.</p>
+      <p>Opret jer kun på de lister der har interesse for jer. Det er en god ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun tilbud om at komme med på de afdelinger de har skrevet sig op til.</p>
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-defualt">
@@ -90,23 +98,29 @@
                 <thead>
                   <tr>
                     <th class="col-xs-2" align="left">Navn</th>
-                    <th class="col-xs-3" align="left">Adresse</th>
+                    <th class="col-xs-2" align="left">Adresse</th>
                     <th class="col-xs-2" align="left">Åbningstid</th>
-                    <th class="col-xs-5" align="right">Tilmeld / Afmeld</th>
+                    <th class="col-xs-3" align="right">Ikke tilmeldt ventelisten<br/>på denne afdeling</th>
+                    <th class="col-xs-3" align="right">Tilmeldt ventelisten<br/>på denne afdeling</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for key, department in department_children_waiting.departments.items %}
                     <tr>
                       <td>{{department.object.name}}</td>
-                      <td>{{department.object.address}}, {{department.object.zipcode}} {{department.object.city}}</td>
+                      <td><p>{{department.object.address}}</p> <p>{{department.object.zipcode}} {{department.object.city}}</p></td>
                       <td>{{department.object.open_hours}}</td>
                       <td>
                       {%for key, child in department.children_status.items %}
+                        {%if not child.waiting %}
+                          <a class="btn btn-success" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'subscribe' %}">Tilmeld: {{child.firstname}}</a>
+                        {%endif%}
+                      {%endfor%}
+                      </td>
+                      <td>
+                      {%for key, child in department.children_status.items %}
                         {%if child.waiting %}
-                          <a class="btn btn-success" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'unsubscribe' %}">Tilmeldt: {{child.firstname}}</a>
-                        {%else%}
-                          <a class="btn btn-danger" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'subscribe' %}">Opskriv: {{child.firstname}}</a>
+                          <a class="btn btn-danger" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'unsubscribe' %}">Afmeld: {{child.firstname}}</a>
                         {%endif%}
                       {%endfor%}
                       </td>
@@ -136,6 +150,7 @@
       </div>
 
       <h2>Invitationer / Åbne aktiviteter</h2>
+      <p>Denne liste indeholder invitationer til aktiviteter der enten er fri tilmelding (først til mølle) eller invitationer til aktiviteter i har stået på venteliste til. I vil modtage en email på adressen {{family.email}} når der er aktiviteter i kan tilmelde jer.</p>
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-defualt">
@@ -182,8 +197,9 @@
                   </tbody>
               </table>
             {% else %}
-                <div class="col-xs-12">Der er ingen aktuelle invitationer.
-                </div>
+              <blockquote class="bg-info">
+              <p>Der er endnu ikke åbnet for tilmelding til aktiviteter. Vi sender en email til {{family.email}} når vi er klar til at modtage tilmeldinger.</p>
+            </blockquote>
             {% endif %}
           </section>
         </div>
