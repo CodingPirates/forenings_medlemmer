@@ -418,3 +418,33 @@ class Journal(models.Model):
 class AdminUserInformation(models.Model):
     user = models.OneToOneField(User)
     department = models.ForeignKey(Department)
+
+class Payment(models.Model):
+    CASH = 'CA'
+    BANKTRANSFER = 'BA'
+    CREDITCARD = 'CC'
+    REFUND = 'RE'
+    DEBIT = 'DE'
+    PAYMENT_METHODS = (
+            (CASH, 'Kontant betaling'),
+            (BANKTRANSFER, 'Bankoverførsel'),
+            (CREDITCARD, 'Kreditkort'),
+            (REFUND, 'Refunderet'),
+        )
+    added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
+    payment_type = models.CharField('Type',max_length=2,choices=PAYMENT_METHODS,default=CASH)
+    activity = models.ForeignKey(Activity, blank=True)
+    person = models.ForeignKey(Person, blank=True)
+    family = models.ForeignKey(Family)
+    body_text = models.TextField('Beskrivelse', blank=True)
+    amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
+    confirmed_dtm = models.DateTimeField('Bekræftet', blank=True)
+    rejected_dtm = models.DateTimeField('Bekræftet', blank=True)
+    rejected_message = models.TextField('Afvist årsag', blank=True)
+
+class QuickpayTransaction(models.Model):
+    payment = models.ForeignKey(Payment)
+    link_url =  models.CharField('Link til Quickpay formular',max_length=512, blank=True, editable=False)
+    transaction_id = models.IntegerField('Transaktions ID')
+    refunding = models.ForeignKey('self')
+    amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
