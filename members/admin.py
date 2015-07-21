@@ -3,6 +3,7 @@ from django.contrib import admin
 from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate, AdminUserInformation
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -130,6 +131,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
     list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
     search_fields = ('name',)
+    actions = ['invite_to_own_activity', 'export_emaillist']
 
     # needs 'view_full_address' to seet personal details.
     # email and phonenumber only shown on adults.
@@ -166,6 +168,19 @@ class PersonAdmin(admin.ModelAdmin):
     def unique(self, item):
         return item.family.unique if item.family != None else ''
 
+    def invite_to_own_activity(self,request, queryset):
+        return HttpResponse("Ikke klar endnu")
+    invite_to_own_activity.short_description = "Inviter valgte personer til en aktivitet"
+
+    def export_emaillist(self,request, queryset):
+        result_string = "kopier denne liste direkte ind i dit email program (Hush at bruge Bcc!)\n\n"
+        family_email = []
+        for person in queryset:
+            family_email.append(person.family.email)
+        result_string = result_string + ',\n'.join(list(set(family_email)))
+
+        return HttpResponse(result_string, content_type="text/plain")
+    export_emaillist.short_description = "Exporter en liste af familie e-mail adresser fra de valgte personer"
 
 admin.site.register(Person,PersonAdmin)
 
