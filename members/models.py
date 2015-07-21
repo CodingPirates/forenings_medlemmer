@@ -30,6 +30,10 @@ class Family(models.Model):
     class Meta:
         verbose_name = 'familie'
         verbose_name_plural = 'Familier'
+        permissions = (
+            ("view_family_unique", "Can view family UUID field (password) - gives access to address"),
+        )
+
     unique = UUIDField()
     email = models.EmailField(unique=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)

@@ -58,14 +58,23 @@ admin.site.register(Activity, ActivityAdmin)
 
 class PersonInline(admin.TabularInline):
     model = Person
+    fields = ('membertype', 'name', 'zipcode', 'added')
+    readonly_fields = fields
     extra = 0
 
 class FamilyAdmin(admin.ModelAdmin):
-    list_display = ('email','unique')
+    def get_list_display(self, request):
+        if(request.user.has_perm('members.view_family_unique')):
+            return ('email', 'unique')
+        else:
+            return ('email',)
     search_fields = ('email',)
     inlines = [PersonInline, EmailItemInline]
     actions = ['create_new_uuid']
-    view_on_site = True
+
+    fields = ('email', 'confirmed_dtm')
+    readonly_fields = ('confirmed_dtm',)
+
     def create_new_uuid(self,request, queryset):
         for family in queryset:
             family.unique = uuid4()
@@ -116,7 +125,7 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'email', 'added')
+    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
     list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
     search_fields = ('name',)
 
