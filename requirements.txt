@@ -3,3 +3,4 @@ django-bootstrap3
 django_extensions
 django-crispy-forms
 django_cron
+git+https://github.com/QuickPay/quickpay-python-client.git

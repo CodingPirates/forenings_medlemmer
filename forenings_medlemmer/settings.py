@@ -120,3 +120,5 @@ CRON_CLASSES = [
 
 # Dont keep job logs more than 7 days old
 DJANGO_CRON_DELETE_LOGS_OLDER_THAN=7
+
+QUICKPAY_API_KEY=None

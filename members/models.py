@@ -11,6 +11,8 @@ from django.template import Engine, Context
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.models import User
+from quickpay import QPClient
+
 
 def format_address(streetname, housenumber, floor=None, door=None):
     address = streetname + " " + housenumber
@@ -431,20 +433,61 @@ class Payment(models.Model):
             (CREDITCARD, 'Kreditkort'),
             (REFUND, 'Refunderet'),
         )
-    added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
+    added = models.DateTimeField('Tilføjet', default=timezone.now)
     payment_type = models.CharField('Type',max_length=2,choices=PAYMENT_METHODS,default=CASH)
-    activity = models.ForeignKey(Activity, blank=True)
-    person = models.ForeignKey(Person, blank=True)
+    activity = models.ForeignKey(Activity, null=True)
+    person = models.ForeignKey(Person, null=True)
     family = models.ForeignKey(Family)
     body_text = models.TextField('Beskrivelse', blank=True)
     amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
-    confirmed_dtm = models.DateTimeField('Bekræftet', blank=True)
-    rejected_dtm = models.DateTimeField('Bekræftet', blank=True)
+    confirmed_dtm = models.DateTimeField('Bekræftet', null=True)
+    rejected_dtm = models.DateTimeField('Bekræftet', null=True)
     rejected_message = models.TextField('Afvist årsag', blank=True)
+
+    def save(self, *args, **kwargs):
+        super_return = super(Payment, self).save(*args, **kwargs)
+
+        ''' On creation make quickpay transaction if paymenttype CREDITCARD '''
+        if(self.payment_type == Payment.CREDITCARD):
+            quickpay_transaction = QuickpayTransaction(payment=self, amount_ore=self.amount_ore)
+            quickpay_transaction.save()
+        return super_return
 
 class QuickpayTransaction(models.Model):
     payment = models.ForeignKey(Payment)
     link_url =  models.CharField('Link til Quickpay formular',max_length=512, blank=True, editable=False)
-    transaction_id = models.IntegerField('Transaktions ID')
-    refunding = models.ForeignKey('self')
+    transaction_id = models.IntegerField('Transaktions ID', null=True, default=None)
+    refunding = models.ForeignKey('self', null=True, default=None)
     amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
+    order_id = models.CharField('Quickpay order id',max_length=20, blank=True, editable=False, unique=True)
+
+    def save(self, *args, **kwargs):
+        ''' On creation make quickpay order_id from payment id '''
+        self.order_id = 'test%06d' % self.payment.pk
+        return super(QuickpayTransaction, self).save(*args, **kwargs)
+
+    # method requests payment URL from Quickpay.
+    # return_url is the url which Quickpay redirects to (used for both success and failure)
+    def get_link_url(self, return_url=''):
+        if(self.link_url == ''):
+            #request only if not already requested
+            client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+
+            activity = client.post('/payments', currency='DKK', order_id=self.order_id)
+            self.transaction_id = activity['id']
+            self.save()
+
+            link = client.put(
+                '/payments/{0}/link'.format(self.transaction_id),
+                amount=self.payment.amount_ore,
+                id=self.transaction_id,
+                continueurl=return_url,
+                cancelurl=return_url,
+                customer_email=self.payment.family.email,
+                autocapture=True
+                )
+
+            self.link_url = link['url']
+            self.save()
+
+        return self.link_url
