@@ -1,6 +1,8 @@
 from uuid import uuid4
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate, AdminUserInformation
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -173,3 +175,15 @@ class JournalAdmin(admin.ModelAdmin):
 admin.site.register(Journal, JournalAdmin)
 
 admin.site.register(EmailTemplate)
+
+class AdminUserInformationInline(admin.StackedInline):
+    model = AdminUserInformation
+    can_delete = False
+
+# Define a new User admin
+class UserAdmin(UserAdmin):
+    inlines = (AdminUserInformationInline, )
+
+# Re-register UserAdmin
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)

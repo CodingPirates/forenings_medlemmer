@@ -10,6 +10,7 @@ import datetime
 from django.template import Engine, Context
 from django.core.mail import send_mail
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 def format_address(streetname, housenumber, floor=None, door=None):
     address = streetname + " " + housenumber
@@ -411,3 +412,7 @@ class Journal(models.Model):
     body = models.TextField('Indhold')
     def __str__(self):
         return self.family.email
+
+class AdminUserInformation(models.Model):
+    user = models.OneToOneField(User)
+    department = models.ForeignKey(Department)
