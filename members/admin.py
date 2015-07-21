@@ -23,9 +23,9 @@ class WaitingListInline(admin.StackedInline):
 
 class EmailItemInline(admin.TabularInline):
     model = EmailItem
-    fields = ['person', 'family', 'activity','subject','created_dtm','sent_dtm']
+    fields = ['reciever', 'subject', 'sent_dtm']
     can_delete = False
-    readonly_fields = ['person','activity','subject','created_dtm','sent_dtm']
+    readonly_fields = fields
     def has_add_permission(self,request,obj=None):
         return False
     def has_delete_permission(self,request,obj=None):
@@ -157,7 +157,7 @@ class PersonAdmin(admin.ModelAdmin):
 
         fieldsets = (
             ('Informationer' , {
-                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission'),
+                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission', 'family'),
             }),
             ('Kontakt Oplysninger', {
                 'fields' : contact_fields
