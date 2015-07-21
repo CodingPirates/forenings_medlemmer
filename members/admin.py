@@ -73,7 +73,7 @@ class FamilyAdmin(admin.ModelAdmin):
             return ('email',)
     search_fields = ('email',)
     inlines = [PersonInline, EmailItemInline]
-    actions = ['create_new_uuid']
+    actions = ['create_new_uuid', 'resend_link_email']
 
     fields = ('email', 'confirmed_dtm')
     readonly_fields = ('confirmed_dtm',)
@@ -88,6 +88,17 @@ class FamilyAdmin(admin.ModelAdmin):
             message_bit = "%s familier" % queryset.count()
         self.message_user(request, "%s fik nyt UUID." % message_bit)
     create_new_uuid.short_description = 'Opret nyt UUID'
+
+    def resend_link_email(self,request, queryset):
+        for family in queryset:
+            family.send_link_email()
+        if queryset.count() == 1:
+            message_bit = "1 familie"
+        else:
+            message_bit = "%s familier" % queryset.count()
+        self.message_user(request, "%s fik fik tilsendt link e-mail." % message_bit)
+    resend_link_email.short_description = "Gensend link e-mail"
+
 admin.site.register(Family, FamilyAdmin)
 
 class PersonWaitinglistListFilter(admin.SimpleListFilter):

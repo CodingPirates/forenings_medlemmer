@@ -52,6 +52,8 @@ class Family(models.Model):
         return reverse('family_form', kwargs={'pk':self.unique})
     def __str__(self):
         return self.email
+    def send_link_email(self,):
+        EmailTemplate.objects.get(idname = 'LINK').makeEmail(self, {})
 
 class Person(models.Model):
     class Meta:

@@ -264,7 +264,7 @@ def EntryPage(request):
                 child.save()
 
                 # send email with login link
-                EmailTemplate.objects.get(idname = 'LINK').makeEmail(family, {})
+                family.send_link_email()
 
                 #redirect to success
                 return HttpResponseRedirect(reverse('login_email_sent'))
@@ -281,7 +281,7 @@ def EntryPage(request):
                 try:
                     family = Family.objects.get(email=getLogin.cleaned_data['email'])
                     # send email to user
-                    EmailTemplate.objects.get(idname = 'LINK').makeEmail(family, {})
+                    family.send_link_email()
                     return HttpResponseRedirect(reverse('login_email_sent'))
 
                 except Family.DoesNotExist:
