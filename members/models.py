@@ -445,10 +445,11 @@ class Payment(models.Model):
     rejected_message = models.TextField('Afvist årsag', blank=True)
 
     def save(self, *args, **kwargs):
+        is_new = not self.pk # set when calling super, which is needed before we can link to this
         super_return = super(Payment, self).save(*args, **kwargs)
 
         ''' On creation make quickpay transaction if paymenttype CREDITCARD '''
-        if(self.payment_type == Payment.CREDITCARD):
+        if(is_new and self.payment_type == Payment.CREDITCARD):
             quickpay_transaction = QuickpayTransaction(payment=self, amount_ore=self.amount_ore)
             quickpay_transaction.save()
         return super_return
@@ -463,7 +464,8 @@ class QuickpayTransaction(models.Model):
 
     def save(self, *args, **kwargs):
         ''' On creation make quickpay order_id from payment id '''
-        self.order_id = 'test%06d' % self.payment.pk
+        if(self.pk is None):
+            self.order_id = 'test%06d' % self.payment.pk
         return super(QuickpayTransaction, self).save(*args, **kwargs)
 
     # method requests payment URL from Quickpay.
