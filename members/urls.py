@@ -1,5 +1,5 @@
 from django.conf.urls import patterns,  url
-from members.views import FamilyDetails, PersonCreate, PersonUpdate, AcceptInvitation, WaitingListSetSubscription, DeclineInvitation, InviteDetails, EntryPage, loginEmailSent, ConfirmFamily
+from members.views import FamilyDetails, PersonCreate, PersonUpdate, AcceptInvitation, WaitingListSetSubscription, DeclineInvitation, InviteDetails, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback
 
 urlpatterns = patterns('',
     url(r'^/{0,1}$', EntryPage, name='entry_page'),
@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     url(r'invite/(?P<unique>[\w-]+)/$', InviteDetails, name='invite_detail'),
     url(r'family/(?P<unique>[\w-]+)/Person/(?P<id>[\d]+)/$', PersonUpdate, name='person_update'),
     url(r'family/(?P<unique>[\w-]+)/Person/(?P<membertype>[A-Z]{2})$', PersonCreate, name='person_add'),
+    url(r'quickpay_callback$', QuickpayCallback, name='quickpay_callback'),
 )

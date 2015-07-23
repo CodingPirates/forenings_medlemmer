@@ -3,12 +3,15 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList
+from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction
 from members.forms import PersonForm, getLoginForm, signupForm
 from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
 import datetime
+import hashlib, hmac
+import json
 
 def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
@@ -297,3 +300,39 @@ def EntryPage(request):
 @xframe_options_exempt
 def loginEmailSent(request):
     return render(request, 'members/login_email_sent.html')
+
+def signQuickpay(base, private_key):
+   return hmac.new(private_key, base, hashlib.sha256).hexdigest()
+
+@csrf_exempt
+def QuickpayCallback(request):
+    checksum = signQuickpay(request.body, bytearray(settings.QUICKPAY_PRIVATE_KEY, 'ascii'))
+
+    #print("comparing checksum: " + request.META['HTTP_QUICKPAY_CHECKSUM_SHA256'] + " (recieved) to: " + checksum + " (calculated)")
+    if checksum == request.META['HTTP_QUICKPAY_CHECKSUM_SHA256']:
+        # Request is authenticated
+
+        #JSON decode
+        callback = json.loads(str(request.body, 'utf8'))
+
+        # We only care about state = processed
+        if(callback['state'] != 'processed'):
+            HttpResponse('OK')
+
+        print('parsed:')
+        print(repr(callback))
+
+        quickpay_transaction = get_object_or_404(QuickpayTransaction, order_id=callback['order_id'])
+
+        if(callback['accepted'] == True):
+            quickpay_transaction.payment.confirmed_dtm = timezone.now()
+            quickpay_transaction.payment.save()
+        else:
+            quickpay_transaction.payment.rejected_dtm = timezone.now()
+            quickpay_transaction.payment.rejected_message = request.body
+            quickpay_transaction.payment.save()
+
+        return HttpResponse('OK')
+    else:
+        # Request is Not authenticated
+        return HttpResponseForbidden('Invalid request')
