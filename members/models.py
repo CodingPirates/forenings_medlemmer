@@ -175,8 +175,8 @@ class Member(models.Model):
     department = models.ForeignKey(Department)
     person = models.ForeignKey(Person)
     is_active = models.BooleanField('Aktiv',default=True)
-    member_since = models.DateTimeField('Indmeldt', blank=False, default=timezone.now)
-    member_until = models.DateTimeField('Udmeldt', blank=True, default=None, null=True)
+    member_since = models.DateField('Indmeldt', blank=False, default=timezone.now)
+    member_until = models.DateField('Udmeldt', blank=True, default=None, null=True)
     def name(self):
         return '{}'.format(self.person)
     name.short_description = 'Navn'
@@ -208,13 +208,20 @@ class Activity(models.Model):
     signup_closing = models.DateField('Tilmelding lukker', null=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
-    price = models.IntegerField('Pris (øre)', default=500)
+    price = models.IntegerField('Pris (øre)', blank=True, null=True, default=None)
     max_participants = models.PositiveIntegerField('Max Holdstørrelse', default=30)
     def is_historic(self):
         return self.end_date < datetime.date.today()
     is_historic.short_description = 'Historisk?'
     def __str__(self):
         return self.name
+    def save(self, *args,**kwargs):
+        ''' Validate price is not between 999 and 1
+        (would be 0,01 to 9,99 kr and probaly forgot to specify in øre'''
+        if self.price is not None and self.price < 999 and self.price > 1:
+            raise Exception("Seems like price was specified in Kroner, not Øre")
+        return super(Activity, self).save(*args, **kwargs)
+
 
 class ActivityInvite(models.Model):
     class Meta:
@@ -440,15 +447,15 @@ class Payment(models.Model):
             (OTHER, 'Andet')
         )
     added = models.DateTimeField('Tilføjet', default=timezone.now)
-    payment_type = models.CharField('Type',max_length=2,choices=PAYMENT_METHODS,default=CASH)
-    activity = models.ForeignKey(Activity, null=True)
-    person = models.ForeignKey(Person, null=True)
-    family = models.ForeignKey(Family)
-    body_text = models.TextField('Beskrivelse', blank=True)
-    amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
-    confirmed_dtm = models.DateTimeField('Bekræftet', null=True)
-    rejected_dtm = models.DateTimeField('Bekræftet', null=True)
-    rejected_message = models.TextField('Afvist årsag', blank=True)
+    payment_type = models.CharField('Type', blank=False, null=False, max_length=2, choices=PAYMENT_METHODS,default=CASH)
+    activity = models.ForeignKey(Activity, blank=True, null=True)
+    person = models.ForeignKey(Person, blank=True, null=True)
+    family = models.ForeignKey(Family, blank=False, null=False)
+    body_text = models.TextField('Beskrivelse', blank=False)
+    amount_ore = models.IntegerField('Beløb i øre', blank=False, null=False, default=0) # payments to us is positive
+    confirmed_dtm = models.DateTimeField('Bekræftet', blank=True, null=True)
+    rejected_dtm = models.DateTimeField('Bekræftet', blank=True, null=True)
+    rejected_message = models.TextField('Afvist årsag', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         is_new = not self.pk # set when calling super, which is needed before we can link to this
