@@ -188,9 +188,9 @@
                   {% for invite in invites %}
                     <tr>
                       <td>{{invite.person.name}}</td>
-                      <td>{{invite.activity.department.name}}, <a href="{% url 'invite_detail' invite.unique %}">{{invite.activity.name}}</a></td>
-                      <td><a class="btn btn-success" href="{% url 'invite_accept' invite.unique %}">Acceptér</a></td>
-                      <td><a class="btn btn-danger" href="{% url 'invite_decline' invite.unique %}">Afslå</a></td>
+                      <td>{{invite.activity.department.name}}, <a href="">{{invite.activity.name}}</a></td>
+                      <td><a class="btn btn-success" href="">Acceptér</a></td>
+                      <td><a class="btn btn-danger" href="">Afslå</a></td>
                     </tr>
                   {% endfor %}
 

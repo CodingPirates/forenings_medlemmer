@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      {% load staticfiles %}
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+      {% load bootstrap3 %}
+      {% load crispy_forms_tags %}
+      {% bootstrap_css %}
+      {% bootstrap_javascript %}
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1>{{activity.name}}, {{activity.department.name}}</h1>
+          <p>
+            {{ activity.description }}
+          </p>
+          </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <strong>Sted:</strong><br>
+            <address>
+              {{activity.streetname}} {{activity.housenumber}}{%if activity.floor or activity.door%}, {%endif%}
+              {%if activity.floor %}{{activity.floor}}.{%endif%}
+              {%if activity.door%}{{activity.door}}{%endif%}
+              <br>
+              {%if activity.placename%}{{activity.placename}}<br>{%endif%}
+              {{activity.zipcode}} {{activity.city}}<br>
+              {{activity.placenave}}<br>
+            </address>
+        </div>
+        <div class="col-lg-6">
+          <p>
+          <strong>Tidspunkt:</strong><br>
+          {{ activity.open_hours}}
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <p>
+          <strong>Afdelings leder:</strong><br>
+          {{ activity.responsible_name}}<br>
+          <a href="mailto:{{activity.responsible_contact}}">{{activity.responsible_contact}}</a>
+          </p>
+        </div>
+        <div class="col-lg-6">
+          <p>
+          <strong>pris:</strong><br>
+          {{ price | floatformat:2}} kr<br>
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <p>
+          <strong>Pladser:</strong><br>
+            {{ seats_left }} af {{ activity.max_participants}} pladser ledige.
+          </p>
+        </div>
+        <div class="col-lg-6">
+          <p>
+          <strong>Periode:</strong><br>
+            {{ activity.start_date|date:"j. F"}} - {{ activity.end_date|date:"j. F"}}
+          </p>
+        </div>
+      </div>
+
+              {% crispy signupform %}
+
+    </div>
+  </body>
+</html>

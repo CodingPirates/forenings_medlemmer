@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from members.models import Person
+from members.models import Person, Payment
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div, Button
 
@@ -168,3 +168,28 @@ class signupForm(forms.Form):
     dawa_id = forms.CharField(label='Dawa ID', max_length=200, widget=forms.HiddenInput(), required=False)
     form_id = forms.CharField(label='Form ID', max_length=10, widget=forms.HiddenInput(), initial='signup')
     manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
+
+class ActivitySignupForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ActivitySignupForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_action = ''
+        self.helper.html5_required = True
+        self.helper.layout = Layout(
+            Fieldset('Tilmeldings oplysninger',
+                HTML("<p>{{activity.instructions}}</p>"),
+                Div(Field('note'), css_class="col-md-8"),
+                Div(Field('photo_permission'), Field('address_permission'), css_class="col-md-4"),
+            ),
+            Fieldset('Betaling',
+                Div(Field('payment_option'), css_class="col-md-12"),
+                Div(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href=''>Tilbage</a>"), css_class="col-md-2"),
+
+            ),
+        )
+
+    note = forms.CharField(label='Besked til arrangører', widget=forms.Textarea, required=False)
+    photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten?", required=True, choices=Person.PHOTO_PERMISSION_CHOICES)
+    address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", required=True, choices=( ('YES', 'Ja'), ('NO', 'Nej') ))
+    payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'VISA/Dankort'), (Payment.OTHER, 'Andet er aftalt')))

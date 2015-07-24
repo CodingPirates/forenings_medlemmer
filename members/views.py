@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction
-from members.forms import PersonForm, getLoginForm, signupForm
+from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm
 from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -132,6 +132,54 @@ def AcceptInvitation(request, unique):
     acticity_participant.save()
     activity_invite.delete()
     return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
+
+def ActivitySignup(request, activity_id, unique=None, person_id=None):
+    if(unique is None or person_id is None):
+        # View only mode
+        view_only_mode = True
+    else:
+        view_only_mode = False
+
+    activity = get_object_or_404(Activity, pk=activity_id)
+
+    if not view_only_mode:
+        family = get_object_or_404(Family, unique=unique)
+        try:
+            person = family.person_set.get(pk=person_id)
+        except Person.DoesNotExist:
+            raise Http404("Person not found on this family UUID")
+
+        if(not activity.open_invite):
+            ''' Make sure invitation to event exists '''
+            try:
+                invitation = ActivityInvite.objects.get(activity=activity, person=person)
+            except ActivityInvite.DoesNotExist:
+                raise Http404("You are not invited to this activity!")
+        else:
+            invitation = None
+    else:
+        family = None
+        person = None
+        invitation = None
+
+    if(request.method == "POST"):
+        return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
+        pass
+    else:
+
+        signup_form = ActivitySignupForm()
+
+        context = {
+                    'family' : family,
+                    'activity' : activity,
+                    'person' : person,
+                    'invitation' : invitation,
+                    'price' : activity.price / 100,
+                    'seats_left' : activity.max_participants - activity.activityparticipant_set.count(),
+                    'signupform' : signup_form
+                  }
+
+        return render(request, 'members/activity_signup.html', context)
 
 def UpdatePersonFromForm(person, form):
     # Update person and if selected - relatives
