@@ -454,7 +454,7 @@ class Payment(models.Model):
     body_text = models.TextField('Beskrivelse', blank=False)
     amount_ore = models.IntegerField('Beløb i øre', blank=False, null=False, default=0) # payments to us is positive
     confirmed_dtm = models.DateTimeField('Bekræftet', blank=True, null=True)
-    rejected_dtm = models.DateTimeField('Bekræftet', blank=True, null=True)
+    rejected_dtm = models.DateTimeField('Afvist', blank=True, null=True)
     rejected_message = models.TextField('Afvist årsag', blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -466,14 +466,19 @@ class Payment(models.Model):
             quickpay_transaction = QuickpayTransaction(payment=self, amount_ore=self.amount_ore)
             quickpay_transaction.save()
         return super_return
+    def __str__(self):
+        return str(self.family.email) + " - " + self.body_text
+    def get_quickpaytransaction(self):
+        return self.quickpaytransaction_set.order_by('-payment__added')[0]
+
 
 class QuickpayTransaction(models.Model):
     payment = models.ForeignKey(Payment)
-    link_url =  models.CharField('Link til Quickpay formular',max_length=512, blank=True, editable=False)
+    link_url =  models.CharField('Link til Quickpay formular',max_length=512, blank=True)
     transaction_id = models.IntegerField('Transaktions ID', null=True, default=None)
     refunding = models.ForeignKey('self', null=True, default=None)
     amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
-    order_id = models.CharField('Quickpay order id',max_length=20, blank=True, editable=False, unique=True)
+    order_id = models.CharField('Quickpay order id',max_length=20, blank=True, unique=True)
 
     def save(self, *args, **kwargs):
         ''' On creation make quickpay order_id from payment id '''
@@ -506,3 +511,6 @@ class QuickpayTransaction(models.Model):
             self.save()
 
         return self.link_url
+
+    def __str__(self):
+        return str(self.payment.family.email) + " - QuickPay orderid: '" + str(self.order_id) + "' confirmed: '" + str(self.payment.confirmed_dtm) + "'"
