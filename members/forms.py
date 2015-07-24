@@ -178,11 +178,20 @@ class ActivitySignupForm(forms.Form):
         self.helper.form_action = ''
         self.helper.html5_required = True
         self.helper.layout = Layout(
+            Div(Div(HTML("<h2>Tilmelding</h2>"), css_class="panel-heading"),
+            Div(
+            Div(Div(HTML('''
+                <p class="lead">Du tilmeder nu <strong>{{person.name}}</strong> til aktiviteten <strong>{{activity.name}}</strong>.
+                Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
+                <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
+                '''),
+                css_class="col-md-12"),
+                css_class="row"),
             Fieldset('Tilmeldings oplysninger',
                 Div(
                     Div(
-                        HTML('<blockquote class="bg-info"><p>{{activity.instructions}}</p></blockquote>'),
-                        'note',
+                        Field('note', aria_describedby="noteHelp"),
+                        HTML('<span class="noteHelp"><p>{{activity.instructions}}</p></span>'),
                         css_class="col-md-6"),
                     Div(
                         'photo_permission', 'address_permission',
@@ -193,6 +202,8 @@ class ActivitySignupForm(forms.Form):
                 'payment_option',
                 FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href=''>Tilbage</a>")),
             ),
+            css_class="panel-body"),
+            css_class="panel panel-success"),
         )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
