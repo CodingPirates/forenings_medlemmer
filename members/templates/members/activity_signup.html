@@ -51,8 +51,22 @@
         </div>
         <div class="col-lg-6">
           <p>
-          <strong>pris:</strong><br>
+          <strong>Pris:</strong><br>
           {{ price | floatformat:2}} kr<br>
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <p>
+          <strong>Tilmeldingsfrist:</strong><br>
+            {{ activity.signup_closing}} (om {{ activity.signup_closing|timeuntil}})
+          </p>
+        </div>
+        <div class="col-lg-6">
+          <p>
+          <strong>Periode:</strong><br>
+            {{ activity.start_date|date:"j. F"}} - {{ activity.end_date|date:"j. F"}}
           </p>
         </div>
       </div>
@@ -65,14 +79,23 @@
         </div>
         <div class="col-lg-6">
           <p>
-          <strong>Periode:</strong><br>
-            {{ activity.start_date|date:"j. F"}} - {{ activity.end_date|date:"j. F"}}
+          <strong>Venteliste:</strong><br>
+            {% if activity.open_invite %}
+              Nej. Åben invitation uden venteliste
+            {% else %}
+              Ja. Kræver invitation igennem ventelisten
+            {%endif%}
           </p>
         </div>
       </div>
+      {% if not view_only_mode %}
+      {% crispy signupform %}
 
-              {% crispy signupform %}
-
+      {% else %}
+        {% if family.unique %}
+          <a class="btn btn-primary" href="{% url 'family_detail' family.unique %}">Tilbage</a>
+        {% endif%}
+      {% endif %}
     </div>
   </body>
 </html>

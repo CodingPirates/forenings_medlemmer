@@ -185,11 +185,10 @@ class ActivitySignupForm(forms.Form):
             Fieldset('Betaling',
                 Div(Field('payment_option'), css_class="col-md-12"),
                 Div(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href=''>Tilbage</a>"), css_class="col-md-2"),
-
             ),
         )
 
-    note = forms.CharField(label='Besked til arrangører', widget=forms.Textarea, required=False)
+    note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
     photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten?", required=True, choices=Person.PHOTO_PERMISSION_CHOICES)
     address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", required=True, choices=( ('YES', 'Ja'), ('NO', 'Nej') ))
     payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'VISA/Dankort'), (Payment.OTHER, 'Andet er aftalt')))

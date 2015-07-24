@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
-from django.http import Http404, HttpResponseRedirect, HttpResponse
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction
+from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
 from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm
 from django.utils import timezone
 from django.conf import settings
@@ -142,44 +142,114 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
     activity = get_object_or_404(Activity, pk=activity_id)
 
-    if not view_only_mode:
+    if unique:
         family = get_object_or_404(Family, unique=unique)
+    else:
+        family = None
+
+    if person_id:
         try:
             person = family.person_set.get(pk=person_id)
         except Person.DoesNotExist:
-            raise Http404("Person not found on this family UUID")
+            raise Http404('Person not found on family')
+    else:
+        person = None
 
-        if(not activity.open_invite):
-            ''' Make sure invitation to event exists '''
-            try:
-                invitation = ActivityInvite.objects.get(activity=activity, person=person)
-            except ActivityInvite.DoesNotExist:
-                raise Http404("You are not invited to this activity!")
-        else:
+    if(not activity.open_invite):
+        ''' Make sure valid not expired invitation to event exists '''
+        try:
+            invitation = ActivityInvite.objects.get(activity=activity, person=person, expire_dtm__gte=timezone.now())
+        except ActivityInvite.DoesNotExist:
+            view_only_mode = True # not invited - switch to view mode
             invitation = None
     else:
-        family = None
-        person = None
         invitation = None
 
+    if activity.signup_closing < timezone.now().date():
+        view_only_mode = True # Activivty closed for signup
+
     if(request.method == "POST"):
-        return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
-        pass
+        if view_only_mode:
+            return HttpResponseForbidden('Cannot join this activity')
+
+        signup_form = ActivitySignupForm(request.POST)
+
+        if signup_form.is_valid():
+            # Sign up and redirect to payment link or family page
+
+            # Check not already signed up
+            try:
+                perticipant = ActivityParticipant.objects.get(activity=activity, member__person=person)
+                # found - we can only allow one
+                return HttpResponseForbidden('Already signed up to this activity')
+            except ActivityParticipant.DoesNotExist:
+                pass # this was expected - not signed up yet
+
+            # Calculate membership
+            membership_start = timezone.datetime(year=activity.start_date.year, month=1, day=1)
+            membership_end = timezone.datetime(year=activity.start_date.year, month=12, day=31)
+            # check if person is member, otherwise make a member
+            try:
+                member = Member.objects.get(person=person)
+            except Member.DoesNotExist:
+                member = Member(
+                    department = activity.department,
+                    person=person,
+                    member_since=membership_start,
+                    member_until=membership_end,
+                    )
+                member.save()
+
+            # update membership end date
+            member.member_until=membership_end
+            member.save()
+
+            # Make ActivityParticipant
+            participant = ActivityParticipant(member=member, activity=activity, note=signup_form.cleaned_data['note'])
+            participant.save()
+
+            # Make payment if activity costs
+            if activity.price is not None and activity.price != 0:
+                # using creditcard ?
+                if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
+                    payment = Payment(
+                        payment_type = Payment.CREDITCARD,
+                        activity=activity,
+                        person=person,
+                        family=family,
+                        body_text=timezone.now().strftime("%Y-%m-%d") + ' Betaling for ' + activity.name + ' på ' + activity.department.name,
+                        amount_ore = activity.price,
+                    )
+                    payment.save()
+
+                    quickpay_link = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('family_detail', args=[family.unique]))
+
+            # expire invitation
+            if invitation:
+                invitation.expire_dtm=timezone.now()
+                invitation.save()
+
+            if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
+                return HttpResponseRedirect(quickpay_link)
+            else:
+                return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
+
     else:
 
         signup_form = ActivitySignupForm()
 
-        context = {
-                    'family' : family,
-                    'activity' : activity,
-                    'person' : person,
-                    'invitation' : invitation,
-                    'price' : activity.price / 100,
-                    'seats_left' : activity.max_participants - activity.activityparticipant_set.count(),
-                    'signupform' : signup_form
-                  }
 
-        return render(request, 'members/activity_signup.html', context)
+    context = {
+                'family' : family,
+                'activity' : activity,
+                'person' : person,
+                'invitation' : invitation,
+                'price' : activity.price / 100,
+                'seats_left' : activity.max_participants - activity.activityparticipant_set.count(),
+                'signupform' : signup_form,
+                'view_only_mode' : view_only_mode,
+              }
+    return render(request, 'members/activity_signup.html', context)
 
 def UpdatePersonFromForm(person, form):
     # Update person and if selected - relatives
