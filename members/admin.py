@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate, AdminUserInformation
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -47,11 +47,11 @@ admin.site.register(Member, MemberAdmin)
 
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
-    extra = 1
+    extra = 0
 
 class ActivityInviteInline(admin.TabularInline):
     model = ActivityInvite
-    extra = 3
+    extra = 0
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'start_date', 'end_date', 'is_historic')
@@ -213,3 +213,12 @@ class UserAdmin(UserAdmin):
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ['added', 'payment_type', 'family', 'confirmed_dtm', 'rejected_dtm']
+    list_filter = ['payment_type']
+    date_hierarchy = 'added'
+    search_fields = ('family__email',)
+
+admin.site.register(Payment, PaymentAdmin)
+admin.site.register(QuickpayTransaction)
