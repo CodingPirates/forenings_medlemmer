@@ -204,6 +204,7 @@ class Activity(models.Model):
     instructions = models.TextField('Tilmeldings instruktioner', blank=True)
     start_date = models.DateField('Start')
     end_date = models.DateField('Slut')
+    signup_closing = models.DateField('Tilmelding lukker', null=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
     price = models.IntegerField('Pris (øre)', default=500)
@@ -220,7 +221,8 @@ class ActivityInvite(models.Model):
         verbose_name_plural = 'Invitationer'
     activity = models.ForeignKey(Activity)
     person = models.ForeignKey(Person)
-    unique = UUIDField()
+    invite_dtm = models.DateField('Inviteret', default=timezone.now)
+    expire_dtm = models.DateField('Udløber')
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
         if not self.id:
@@ -427,11 +429,13 @@ class Payment(models.Model):
     CREDITCARD = 'CC'
     REFUND = 'RE'
     DEBIT = 'DE'
+    OTHER = 'OT'
     PAYMENT_METHODS = (
             (CASH, 'Kontant betaling'),
             (BANKTRANSFER, 'Bankoverførsel'),
             (CREDITCARD, 'Kreditkort'),
             (REFUND, 'Refunderet'),
+            (OTHER, 'Andet')
         )
     added = models.DateTimeField('Tilføjet', default=timezone.now)
     payment_type = models.CharField('Type',max_length=2,choices=PAYMENT_METHODS,default=CASH)
