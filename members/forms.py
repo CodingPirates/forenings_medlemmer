@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from members.models import Person, Payment
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div, Button
+from crispy_forms.bootstrap import FormActions
 
 class PersonForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -178,13 +179,19 @@ class ActivitySignupForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Fieldset('Tilmeldings oplysninger',
-                HTML("<p>{{activity.instructions}}</p>"),
-                Div(Field('note'), css_class="col-md-8"),
-                Div(Field('photo_permission'), Field('address_permission'), css_class="col-md-4"),
+                Div(
+                    Div(
+                        HTML('<blockquote class="bg-info"><p>{{activity.instructions}}</p></blockquote>'),
+                        'note',
+                        css_class="col-md-6"),
+                    Div(
+                        'photo_permission', 'address_permission',
+                        css_class="col-md-6"),
+                    css_class="row"),
             ),
             Fieldset('Betaling',
-                Div(Field('payment_option'), css_class="col-md-12"),
-                Div(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href=''>Tilbage</a>"), css_class="col-md-2"),
+                'payment_option',
+                FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href=''>Tilbage</a>")),
             ),
         )
 
