@@ -223,6 +223,7 @@ class ActivityInvite(models.Model):
     person = models.ForeignKey(Person)
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
     expire_dtm = models.DateField('Udløber')
+    rejected_dtm = models.DateField('Afslået', null=True)
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
         if not self.id:
