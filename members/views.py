@@ -229,6 +229,13 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 invitation.expire_dtm=timezone.now()
                 invitation.save()
 
+            # update photo permission and contact open info
+            person.photo_permission = signup_form.cleaned_data['photo_permission']
+            person.save()
+
+            family.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
+            family.save()
+
             if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
                 return HttpResponseRedirect(quickpay_link)
             else:
