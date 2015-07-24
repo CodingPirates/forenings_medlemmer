@@ -214,7 +214,7 @@ class Activity(models.Model):
         return self.end_date < datetime.date.today()
     is_historic.short_description = 'Historisk?'
     def __str__(self):
-        return self.name
+        return self.department.name + ", " + self.name
     def save(self, *args,**kwargs):
         ''' Validate price is not between 999 and 1
         (would be 0,01 to 9,99 kr and probaly forgot to specify in øre'''
