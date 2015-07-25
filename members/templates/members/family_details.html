@@ -106,7 +106,12 @@
                 {% for participation in participating %}
                   <tr>
                     <td>{{participation.member.person.name}}</td>
-                    <td><a href="{%url 'activity_view_person' family.unique participation.activity.id participation.member.person.id %}">{{participation.activity.name}} - {{participation.activity.department.name}}</a></td>
+                    <td><a href="{%url 'activity_view_person' family.unique participation.activity.id participation.member.person.id %}">{{participation.activity.name}} - {{participation.activity.department.name}}</a>
+                    {% if not participation.paid %}
+                    <a class="btn btn-danger" role="button" href="{{participation.get_payment_link}}">Betal</a>
+                    {%endif%}
+
+                    </td>
                     <td>{{participation.activity.start_date}}</td>
                     <td>{{participation.activity.end_date}}</td>
                   </tr>

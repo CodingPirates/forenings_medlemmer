@@ -257,6 +257,12 @@ class ActivityParticipant(models.Model):
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
         return not Payment.objects.filter(activityparticipant=self, confirmed_dtm=None)
+    def get_payment_link(self):
+        payment = Payment.objects.get(activityparticipant=self, confirmed_dtm=None)
+        if(payment.payment_type==Payment.CREDITCARD):
+            return payment.get_quickpaytransaction().get_link_url()
+        else:
+            return ''
 
 class Volunteer(models.Model):
     member = models.ForeignKey(Member)
