@@ -299,7 +299,7 @@ def PersonCreate(request, unique, membertype):
             person.placename = first_person.placename
             person.dawa_id = first_person.dawa_id
         form = PersonForm(instance=person)
-    return render(request, 'members/person_create.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
+    return render(request, 'members/person_create_or_update.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
 
 def PersonUpdate(request, unique, id):
     person = get_object_or_404(Person, pk=id)
@@ -312,7 +312,7 @@ def PersonUpdate(request, unique, id):
             return HttpResponseRedirect(reverse('family_detail', args=[person.family.unique]))
     else:
         form = PersonForm(instance=person)
-    return render(request, 'members/person_update.html', {'form': form, 'person': person})
+    return render(request, 'members/person_create_or_update.html', {'form': form, 'person': person})
 
 @xframe_options_exempt
 def EntryPage(request):
