@@ -207,6 +207,8 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             participant.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
             participant.save()
 
+            return_link_url = reverse('activity_view_person', args=[family.unique, activity.id, person.id])
+
             # Make payment if activity costs
             if activity.price is not None and activity.price != 0:
                 # using creditcard ?
@@ -221,17 +223,15 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                     )
                     payment.save()
 
-                    quickpay_link = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('family_detail', args=[family.unique]))
+                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('activity_view_person', args=[family.unique, activity.id, person.id]))
+
 
             # expire invitation
             if invitation:
                 invitation.expire_dtm=timezone.now() - timezone.timedelta(days=1)
                 invitation.save()
 
-            if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
-                return HttpResponseRedirect(quickpay_link)
-            else:
-                return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
+            return HttpResponseRedirect(return_link_url)
 
     else:
 
