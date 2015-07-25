@@ -87,7 +87,7 @@
       </div>
 
       {% if participating or waiting %}
-      <h2>Aktiviteter</h2>
+      <h2>Tilmedte aktiviteter</h2>
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-default">
@@ -101,12 +101,12 @@
                 </tr>
               </thead>
               <tbody>
-                {% for activity in participating %}
+                {% for participation in participating %}
                   <tr>
-                    <td>{{activity.member.person.name}}</td>
-                    <td>{{activity.activity.name}}</td>
-                    <td>{{activity.activity.start_date}}</td>
-                    <td>{{activity.activity.end_date}}</td>
+                    <td>{{participation.member.person.name}}</td>
+                    <td><a href="{%url 'activity_view_person' family.unique participation.activity.id participation.member.person.id %}">{{participation.activity.name}} - {{participation.activity.department.name}}</a></td>
+                    <td>{{participation.activity.start_date}}</td>
+                    <td>{{participation.activity.end_date}}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -136,7 +136,7 @@
                     {% for activity in open_activities %}
                       <tr>
                         <td>{{child.name}}</td>
-                        <td>{{activity.department.name}}, {{activity.name}}</td>
+                        <td><a href="{%url 'activity_view_person' family.unique activity.id child.id %}">{{activity.name}} - {{activity.department.name}}</a></td>
                         <td><a class="btn btn-success" href="{%url 'activity_signup' family.unique activity.id child.id %}">Tilmeld aktivitet</a></td>
                         <td></td>
                       </tr>
@@ -146,7 +146,7 @@
                   {% for invite in invites %}
                     <tr>
                       <td>{{invite.person.name}}</td>
-                      <td><a href="{%url 'activity_view' invite.activity.id %}">{{invite.activity.name}} - {{invite.activity.department.name}}</a></td>
+                      <td><a href="{%url 'activity_view_person' family.unique invite.activity.id invite.person.id %}">{{invite.activity.name}} - {{invite.activity.department.name}}</a></td>
                       <td><a class="btn btn-success" href="{%url 'activity_signup' family.unique invite.activity.id invite.person.id %}">Tilmeld aktivitet</a></td>
                       <td><a class="btn btn-danger" href="{%url 'invitation_decline' family.unique invite.id %}">Afslå</a></td>
                     </tr>

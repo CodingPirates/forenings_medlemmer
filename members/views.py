@@ -121,14 +121,31 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
     activity = get_object_or_404(Activity, pk=activity_id)
 
+    if(request.resolver_match.url_name == 'activity_view_person'):
+        view_only_mode = True
+
     if unique:
         family = get_object_or_404(Family, unique=unique)
     else:
         family = None
 
+    participants = None # to declare variable
+    participating = False
+
     if person_id:
         try:
             person = family.person_set.get(pk=person_id)
+
+            # Check not already signed up
+            try:
+                participant = ActivityParticipant.objects.get(activity=activity, member__person=person)
+                # found - we can only allow one - switch to view mode
+                participating = True
+                participants = ActivityParticipant.objects.filter(activity=activity).order_by('member__person__name')
+                view_only_mode = True
+            except ActivityParticipant.DoesNotExist:
+                participating = False # this was expected - if not signed up yet
+
         except Person.DoesNotExist:
             raise Http404('Person not found on family')
     else:
@@ -156,14 +173,6 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
         if signup_form.is_valid():
             # Sign up and redirect to payment link or family page
-
-            # Check not already signed up
-            try:
-                perticipant = ActivityParticipant.objects.get(activity=activity, member__person=person)
-                # found - we can only allow one
-                return HttpResponseForbidden('Already signed up to this activity')
-            except ActivityParticipant.DoesNotExist:
-                pass # this was expected - not signed up yet
 
             # Remove person from all waitinglists if
             # Activity is a seasonal event (more than 30 days long)
@@ -238,6 +247,8 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 'seats_left' : activity.max_participants - activity.activityparticipant_set.count(),
                 'signupform' : signup_form,
                 'view_only_mode' : view_only_mode,
+                'participating' : participating,
+                'participants': participants,
               }
     return render(request, 'members/activity_signup.html', context)
 
