@@ -225,6 +225,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                     payment = Payment(
                         payment_type = Payment.CREDITCARD,
                         activity=activity,
+                        activityparticipant=participant,
                         person=person,
                         family=family,
                         body_text=timezone.now().strftime("%Y-%m-%d") + ' Betaling for ' + activity.name + ' på ' + activity.department.name,

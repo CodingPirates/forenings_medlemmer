@@ -163,7 +163,7 @@ class Member(models.Model):
         verbose_name_plural = 'Medlemmer'
         ordering = ['is_active','member_since']
     department = models.ForeignKey(Department)
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
     is_active = models.BooleanField('Aktiv',default=True)
     member_since = models.DateField('Indmeldt', blank=False, default=timezone.now)
     member_until = models.DateField('Udmeldt', blank=True, default=None, null=True)
@@ -254,6 +254,9 @@ class ActivityParticipant(models.Model):
     contact_visible = models.BooleanField('Kontaktoplysninger synlige for andre holddeltagere', default=False)
     def __str__(self):
         return self.member.__str__()
+    def paid(self):
+        # not paid if unconfirmed payments on this activity participation
+        return not Payment.objects.filter(activityparticipant=self, confirmed_dtm=None)
 
 class Volunteer(models.Model):
     member = models.ForeignKey(Member)
@@ -431,7 +434,7 @@ class Journal(models.Model):
 
 class AdminUserInformation(models.Model):
     user = models.OneToOneField(User)
-    department = models.ForeignKey(Department)
+    department = models.ForeignKey(Department, on_delete=models.PROTECT)
 
 class Payment(models.Model):
     CASH = 'CA'
@@ -449,14 +452,15 @@ class Payment(models.Model):
         )
     added = models.DateTimeField('Tilføjet', default=timezone.now)
     payment_type = models.CharField('Type', blank=False, null=False, max_length=2, choices=PAYMENT_METHODS,default=CASH)
-    activity = models.ForeignKey(Activity, blank=True, null=True)
-    person = models.ForeignKey(Person, blank=True, null=True)
-    family = models.ForeignKey(Family, blank=False, null=False)
+    activity = models.ForeignKey(Activity, blank=True, null=True, on_delete=models.PROTECT)
+    activityparticipant = models.ForeignKey(ActivityParticipant, blank=True, null=True, on_delete=models.PROTECT) # unlink if failed and new try is made
+    person = models.ForeignKey(Person, blank=True, null=True, on_delete=models.PROTECT)
+    family = models.ForeignKey(Family, blank=False, null=False, on_delete=models.PROTECT)
     body_text = models.TextField('Beskrivelse', blank=False)
     amount_ore = models.IntegerField('Beløb i øre', blank=False, null=False, default=0) # payments to us is positive
-    confirmed_dtm = models.DateTimeField('Bekræftet', blank=True, null=True)
-    rejected_dtm = models.DateTimeField('Afvist', blank=True, null=True)
-    rejected_message = models.TextField('Afvist årsag', blank=True, null=True)
+    confirmed_dtm = models.DateTimeField('Bekræftet', blank=True, null=True) # Set when paid (and checked)
+    rejected_dtm = models.DateTimeField('Afvist', blank=True, null=True) # Set if paiment failed
+    rejected_message = models.TextField('Afvist årsag', blank=True, null=True) # message describing failure
 
     def save(self, *args, **kwargs):
         is_new = not self.pk # set when calling super, which is needed before we can link to this
@@ -477,7 +481,7 @@ class QuickpayTransaction(models.Model):
     payment = models.ForeignKey(Payment)
     link_url =  models.CharField('Link til Quickpay formular',max_length=512, blank=True)
     transaction_id = models.IntegerField('Transaktions ID', null=True, default=None)
-    refunding = models.ForeignKey('self', null=True, default=None)
+    refunding = models.ForeignKey('self', null=True, default=None, on_delete=models.PROTECT)
     amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
     order_id = models.CharField('Quickpay order id',max_length=20, blank=True, unique=True)
 
