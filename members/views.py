@@ -15,8 +15,8 @@ import json
 
 def FamilyDetails(request,unique):
     family = get_object_or_404(Family, unique=unique)
-    invites= ActivityInvite.objects.filter(person__family = family)
-    open_activities = Activity.objects.filter(open_invite = True)
+    invites= ActivityInvite.objects.filter(person__family = family, expire_dtm__gte=timezone.now(), rejected_dtm=None)
+    open_activities = Activity.objects.filter(open_invite = True, signup_closing__gte=timezone.now()).order_by('zipcode')
     participating = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
     departments_with_no_waiting_list = Department.objects.filter(has_waiting_list = False)
     waiting_lists = WaitingList.objects.filter(person__family = family)
@@ -144,7 +144,8 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
     else:
         invitation = None
 
-    if activity.signup_closing < timezone.now().date():
+    # if activity is closed for signup, only invited persons can still join
+    if activity.signup_closing < timezone.now().date() and invitation==None:
         view_only_mode = True # Activivty closed for signup
 
     if(request.method == "POST"):
