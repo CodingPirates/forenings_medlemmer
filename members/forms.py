@@ -191,7 +191,7 @@ class ActivitySignupForm(forms.Form):
                 Div(
                     Div(
                         Field('note', aria_describedby="noteHelp"),
-                        HTML('<span class="noteHelp"><p>{{activity.instructions}}</p></span>'),
+                        HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
                         css_class="col-md-6"),
                     Div(
                         'photo_permission', 'address_permission',
