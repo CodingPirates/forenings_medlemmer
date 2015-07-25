@@ -253,7 +253,7 @@ class ActivityParticipant(models.Model):
     photo_permission = models.CharField('Foto tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_NOTOK)
     contact_visible = models.BooleanField('Kontaktoplysninger synlige for andre holddeltagere', default=False)
     def __str__(self):
-        return self.member.__str__()
+        return self.member.__str__() + ', ' + self.activity.name
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
         return not Payment.objects.filter(activityparticipant=self, confirmed_dtm=None)
@@ -262,7 +262,7 @@ class ActivityParticipant(models.Model):
         if(payment.payment_type==Payment.CREDITCARD):
             return payment.get_quickpaytransaction().get_link_url()
         else:
-            return ''
+            return 'javascript:alert("Kan ikke betales her:  Kontakt Coding Pirates for hjælp");'
 
 class Volunteer(models.Model):
     member = models.ForeignKey(Member)
