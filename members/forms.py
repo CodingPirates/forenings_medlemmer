@@ -210,3 +210,15 @@ class ActivitySignupForm(forms.Form):
     photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial=ActivityParticipant.PHOTO_OK, required=True, choices=((ActivityParticipant.PHOTO_OK, 'Ja, det er OK'),(ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
     address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", initial='YES', required=True, choices=( ('YES', 'Ja'), ('NO', 'Nej') ))
     payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'VISA/Dankort'), (Payment.OTHER, 'Andet er aftalt')))
+
+class ActivivtyInviteDeclineForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ActivivtyInviteDeclineForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_action = ''
+        self.helper.html5_required = True
+        self.helper.layout = Layout(
+                                    Submit('submit', 'Afslå invitationen', css_class="btn-danger"),
+                                    HTML('<a class="btn btn-link" href="{% url "family_detail" activity_invite.person.family.unique %}">Tilbage</a>')
+                                    )

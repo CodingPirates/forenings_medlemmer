@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
-from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm
+from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm
 from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -104,13 +104,22 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
 
 def DeclineInvitation(request, unique, invitation_id):
     activity_invite = get_object_or_404(ActivityInvite, pk=invitation_id, person__family__unique=unique)
+
+    if(request.method == 'POST'):
+        form = ActivivtyInviteDeclineForm(request.POST)
+        if form.is_valid():
+            activity_invite.rejected_dtm=timezone.now()
+            activity_invite.save()
+            return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
+    else:
+        form = ActivivtyInviteDeclineForm()
+
     context = {
                 'activity_invite' : activity_invite,
+                'form' : form
               }
     return render(request, 'members/decline_activivty_invite.html', context)
 
-    activity_invite.delete()
-    return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
 
 def ActivitySignup(request, activity_id, unique=None, person_id=None):
     if(unique is None or person_id is None):
