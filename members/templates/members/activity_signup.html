@@ -94,33 +94,40 @@
 
       {% else %}
         {% if participating %}
-          <div class="row">
-            <div class="col-md-12">
-              {{person.name}} er tilmeldt dette arrangement, sammen med:
-            </div>
-            <div class="col-md-12">
-              <table class="table table-striped table-responsive">
-                <thead>
-                  <tr>
-                    <th>Navn</th>
-                    <th>Forældres E-Mail</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for participant in participants %}
-                    <tr>
-                      <td>{{participant.member.person.name}}</td>
-                      {% if participant.contact_visible %}
-                        <td>{{participant.member.person.family.email}}</td>
-                      {% else %}
-                        <td></td>
-                      {% endif %}
-                    </tr>
-                  {%endfor%}
-                </tbody>
-              </table>
-            </div>
 
+          <hr/>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h2 class="panel-title">{{person.name}} er tilmeldt dette arrangement</h2>
+            </div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <h3>Hold liste</h3>
+                  <table class="table table-striped table-responsive">
+                    <thead>
+                      <tr>
+                        <th>Navn</th>
+                        <th>Forældres E-Mail</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for participant in participants %}
+                        <tr>
+                          <td>{{participant.member.person.name}}</td>
+                          {% if participant.contact_visible %}
+                            <td>{{participant.member.person.family.email}}</td>
+                          {% else %}
+                            <td></td>
+                          {% endif %}
+                        </tr>
+                      {%endfor%}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         {% endif %}
         {% if family.unique %}
