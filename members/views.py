@@ -59,13 +59,6 @@ def FamilyDetails(request,unique):
     }
     return render(request, 'members/family_details.html', context)
 
-def InviteDetails(request, unique):
-    activity_invite = get_object_or_404(ActivityInvite, unique=unique)
-    context = {
-        'invite': activity_invite
-    }
-    return render(request, 'members/activity_invite_details.html',context)
-
 def ConfirmFamily(request, unique):
     family = get_object_or_404(Family, unique=unique)
     persons = Person.objects.filter(family=family)
@@ -83,11 +76,6 @@ def ConfirmFamily(request, unique):
             'subscribed_waitinglists': subscribed_waiting_lists
         }
         return render(request, 'members/family_confirm_details.html',context)
-
-def DeclineInvitation(request, unique):
-    activity_invite = get_object_or_404(ActivityInvite, unique=unique)
-    activity_invite.delete()
-    return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
 
 def WaitingListSetSubscription(request, unique, id, departmentId, action):
     person = get_object_or_404(Person, pk=id)
@@ -114,22 +102,13 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
 
     return HttpResponseRedirect(reverse('family_detail', args=[unique]))
 
-def AcceptInvitation(request, unique):
-    activity_invite = get_object_or_404(ActivityInvite, unique=unique)
-    person = activity_invite.person
-    person.on_waiting_list = False
-    person.save()
-    try:
-        member = Member.objects.get(person=person,department=activity_invite.activity.department)
-    except Member.DoesNotExist:
-        member = Member()
-        member.person = person
-        member.department = activity_invite.activity.department
-        member.save()
-    acticity_participant = ActivityParticipant()
-    acticity_participant.member = member
-    acticity_participant.activity = activity_invite.activity
-    acticity_participant.save()
+def DeclineInvitation(request, unique, invitation_id):
+    activity_invite = get_object_or_404(ActivityInvite, pk=invitation_id, person__family__unique=unique)
+    context = {
+                'activity_invite' : activity_invite,
+              }
+    return render(request, 'members/decline_activivty_invite.html', context)
+
     activity_invite.delete()
     return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
 

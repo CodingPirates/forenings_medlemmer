@@ -200,7 +200,7 @@ class ActivitySignupForm(forms.Form):
             ),
             Fieldset('Betaling',
                 'payment_option',
-                FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href=''>Tilbage</a>")),
+                FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' family.unique %}'>Tilbage</a>")),
             ),
             css_class="panel-body"),
             css_class="panel panel-success"),
