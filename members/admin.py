@@ -157,7 +157,7 @@ class PersonAdmin(admin.ModelAdmin):
 
         fieldsets = (
             ('Informationer' , {
-                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'photo_permission', 'family'),
+                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'family'),
             }),
             ('Kontakt Oplysninger', {
                 'fields' : contact_fields

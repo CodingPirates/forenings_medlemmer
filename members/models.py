@@ -43,7 +43,6 @@ class Family(models.Model):
     confirmed_dtm = models.DateTimeField('Bekræftet', null=True, blank=True)
     last_visit_dtm = models.DateTimeField('Sidst besøgt', null=True, blank=True)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
-    contact_visible = models.BooleanField('Kontaktoplysninger synlige for andre holddeltagere', default=False)
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
         if not self.id:
@@ -76,14 +75,6 @@ class Person(models.Model):
         (CHILD, 'Barn'),
         (OTHER, 'Frivillig')
     )
-    PHOTO_OK = 'OK'
-    PHOTO_ND = 'ND'
-    PHOTO_NOTOK = 'NO'
-    PHOTO_PERMISSION_CHOICES = (
-        (PHOTO_OK, 'Tilladelse givet'),
-        (PHOTO_ND, 'Ikke taget stilling'),
-        (PHOTO_NOTOK, 'Ikke tilladt'),
-    )
     MALE = 'MA'
     FEMALE = 'FM'
     MEMBER_GENDER_CHOICES = (
@@ -109,7 +100,6 @@ class Person(models.Model):
     birthday = models.DateField('Fødselsdag', blank=True, null=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
-    photo_permission = models.CharField('Foto tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_ND)
     added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
     def __str__(self):
@@ -254,6 +244,14 @@ class ActivityParticipant(models.Model):
     activity = models.ForeignKey(Activity)
     member = models.ForeignKey(Member)
     note = models.TextField('Besked / Note til arrangement', blank=True)
+    PHOTO_OK = 'OK'
+    PHOTO_NOTOK = 'NO'
+    PHOTO_PERMISSION_CHOICES = (
+        (PHOTO_OK, 'Tilladelse givet'),
+        (PHOTO_NOTOK, 'Ikke tilladt'),
+    )
+    photo_permission = models.CharField('Foto tilladelse', max_length=2, choices=PHOTO_PERMISSION_CHOICES, default=PHOTO_NOTOK)
+    contact_visible = models.BooleanField('Kontaktoplysninger synlige for andre holddeltagere', default=False)
     def __str__(self):
         return self.member.__str__()
 
@@ -408,6 +406,9 @@ class EmailItem(models.Model):
             raise e # forward exception to job control
 
         self.save()
+    def __str__(self):
+        return str(self.reciever) + " '"+self.subject+"'"
+
 
 class Notification(models.Model):
     family = models.ForeignKey(Family)

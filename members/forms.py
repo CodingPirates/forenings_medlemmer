@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from members.models import Person, Payment
+from members.models import Person, Payment, ActivityParticipant
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div, Button
 from crispy_forms.bootstrap import FormActions
@@ -207,6 +207,6 @@ class ActivitySignupForm(forms.Form):
         )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
-    photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten?", required=True, choices=Person.PHOTO_PERMISSION_CHOICES)
-    address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", required=True, choices=( ('YES', 'Ja'), ('NO', 'Nej') ))
+    photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial=ActivityParticipant.PHOTO_OK, required=True, choices=((ActivityParticipant.PHOTO_OK, 'Ja, det er OK'),(ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
+    address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", initial='YES', required=True, choices=( ('YES', 'Ja'), ('NO', 'Nej') ))
     payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'VISA/Dankort'), (Payment.OTHER, 'Andet er aftalt')))

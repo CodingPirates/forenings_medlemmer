@@ -206,6 +206,10 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
             # Make ActivityParticipant
             participant = ActivityParticipant(member=member, activity=activity, note=signup_form.cleaned_data['note'])
+
+            # update photo permission and contact open info
+            participant.photo_permission = signup_form.cleaned_data['photo_permission']
+            participant.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
             participant.save()
 
             # Make payment if activity costs
@@ -228,13 +232,6 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             if invitation:
                 invitation.expire_dtm=timezone.now()
                 invitation.save()
-
-            # update photo permission and contact open info
-            person.photo_permission = signup_form.cleaned_data['photo_permission']
-            person.save()
-
-            family.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
-            family.save()
 
             if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
                 return HttpResponseRedirect(quickpay_link)
@@ -443,9 +440,6 @@ def QuickpayCallback(request):
         # We only care about state = processed
         if(callback['state'] != 'processed'):
             HttpResponse('OK')
-
-        print('parsed:')
-        print(repr(callback))
 
         quickpay_transaction = get_object_or_404(QuickpayTransaction, order_id=callback['order_id'])
 
