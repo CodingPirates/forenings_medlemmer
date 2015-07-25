@@ -164,6 +164,12 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             except ActivityParticipant.DoesNotExist:
                 pass # this was expected - not signed up yet
 
+            # Remove person from all waitinglists if
+            # Activity is a seasonal event (more than 30 days long)
+            # (seasonal event)
+            if (activity.end_date - activity.start_date).days > 30:
+                WaitingList.objects.filter(person=person).delete()
+
             # Calculate membership
             membership_start = timezone.datetime(year=activity.start_date.year, month=1, day=1)
             membership_end = timezone.datetime(year=activity.start_date.year, month=12, day=31)
@@ -209,7 +215,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
             # expire invitation
             if invitation:
-                invitation.expire_dtm=timezone.now()
+                invitation.expire_dtm=timezone.now() - timezone.timedelta(days=1)
                 invitation.save()
 
             if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
