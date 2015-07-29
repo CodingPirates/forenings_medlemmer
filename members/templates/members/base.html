@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      {% load staticfiles %}
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+      {% load bootstrap3 %}
+      {% bootstrap_css %}
+      {% bootstrap_javascript %}
+  </head>
+  <body>
+    {% block content %}{% endblock %}
+    {% block footer %}
+            <small></small><p>Coding Pirates Denmark - Hækmosen 10 A, 2730 Herlev <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a> CVR: 35552316</p></small>
+    {% endblock %}
+  </body>
+</html>
