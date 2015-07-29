@@ -225,14 +225,14 @@ class ActivityInvite(models.Model):
     def save(self, *args, **kwargs):
         ''' On creation set UUID '''
         if not self.id:
-            self.unique = uuid.uuid4()
             super(ActivityInvite, self).save(*args, **kwargs)
-            invite = EmailItem()
-            invite.activity = self.activity
-            invite.person = self.person
-            invite.subject = 'Du er blevet inviteret til aktiviteten: {}'.format(self.activity.name)
-            invite.body = self.activity.description
-            return invite.save()
+            template = EmailTemplate.objects.get(idname='ACT_INVITE')
+            context={'activity': self.activity,
+                     'activity_invite' : self,
+                     'person' : self.person,
+                     'family' : self.person.family,
+                     }
+            template.makeEmail([self.person, self.person.family], context)
         return super(ActivityInvite, self).save(*args, **kwargs)
     def __str__(self):
         return '{}, {}'.format(self.activity,self.person)
@@ -305,6 +305,8 @@ class EmailTemplate(models.Model):
         if(type(recievers) is not list):
             recievers = [recievers]
 
+        emails = []
+
         for reciever in recievers:
             # each reciever must be Person, Family or string (email)
             if type(reciever) not in (Person, Family, str):
@@ -314,7 +316,7 @@ class EmailTemplate(models.Model):
             if(type(reciever) is str):
                 destination_address = reciever;
             elif(type(reciever) is Person):
-                context['family'] = reciever
+                context['person'] = reciever
                 destination_address = reciever.email;
             elif(type(reciever) is Family):
                 context['family'] = reciever
@@ -378,7 +380,8 @@ class EmailTemplate(models.Model):
                 body_html = html_content,
                 body_text = text_content)
             email.save()
-            return email
+            emails.append(email)
+        return emails
 
 
 class EmailItem(models.Model):
