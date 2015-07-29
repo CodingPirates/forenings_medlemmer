@@ -502,7 +502,11 @@ class QuickpayTransaction(models.Model):
     def save(self, *args, **kwargs):
         ''' On creation make quickpay order_id from payment id '''
         if(self.pk is None):
-            self.order_id = 'test%06d' % self.payment.pk
+            if settings.DEBUG:
+                prefix = 'test'
+            else:
+                prefix = 'prod'
+            self.order_id = prefix + '%06d' % self.payment.pk
         return super(QuickpayTransaction, self).save(*args, **kwargs)
 
     # method requests payment URL from Quickpay.
