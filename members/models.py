@@ -232,7 +232,12 @@ class ActivityInvite(models.Model):
                      'person' : self.person,
                      'family' : self.person.family,
                      }
-            template.makeEmail([self.person, self.person.family], context)
+            if self.person.email and (self.person.email != self.person.family.email):
+                # If invited has own email, also send to that.
+                template.makeEmail([self.person, self.person.family], context)
+            else:
+                #otherwise use only family
+                template.makeEmail(self.person.family, context)
         return super(ActivityInvite, self).save(*args, **kwargs)
     def __str__(self):
         return '{}, {}'.format(self.activity,self.person)
