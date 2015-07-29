@@ -242,7 +242,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 invitation.save()
 
             return HttpResponseRedirect(return_link_url)
-
+        # fall through else
     else:
 
         signup_form = ActivitySignupForm()
