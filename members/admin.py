@@ -266,7 +266,6 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = ['payment_type', 'activity']
     date_hierarchy = 'added'
     search_fields = ('family__email',)
-    readonly_fields = ('family',)
 
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(QuickpayTransaction)
