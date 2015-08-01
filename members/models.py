@@ -165,7 +165,7 @@ class Member(models.Model):
         verbose_name_plural = 'Medlemmer'
         ordering = ['is_active','member_since']
     department = models.ForeignKey(Department)
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT, unique=True)
     is_active = models.BooleanField('Aktiv',default=True)
     member_since = models.DateField('Indmeldt', blank=False, default=timezone.now)
     member_until = models.DateField('Udmeldt', blank=True, default=None, null=True)
@@ -213,6 +213,8 @@ class Activity(models.Model):
         if self.price is not None and self.price < 999 and self.price > 1:
             raise Exception("Seems like price was specified in Kroner, not Øre")
         return super(Activity, self).save(*args, **kwargs)
+    def is_season(self):
+        return (self.end_date - self.start_date).days > 30
 
 
 class ActivityInvite(models.Model):
@@ -272,6 +274,13 @@ class ActivityParticipant(models.Model):
             return payment.get_quickpaytransaction().get_link_url()
         else:
             return 'javascript:alert("Kan ikke betales her:  Kontakt Coding Pirates for hjælp");'
+    def save(self, *args, **kwargs):
+        ''' On creation if seasonal - clear all waiting lists '''
+        if not self.id:
+            if self.activity.is_season():
+                # remove from all waiting lists
+                WaitingList.objects.filter(person=self.member.person).delete()
+        return super(ActivityParticipant, self).save(*args, **kwargs)
 
 class Volunteer(models.Model):
     member = models.ForeignKey(Member)

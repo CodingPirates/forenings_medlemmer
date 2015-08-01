@@ -183,12 +183,6 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         if signup_form.is_valid():
             # Sign up and redirect to payment link or family page
 
-            # Remove person from all waitinglists if
-            # Activity is a seasonal event (more than 30 days long)
-            # (seasonal event)
-            if (activity.end_date - activity.start_date).days > 30:
-                WaitingList.objects.filter(person=person).delete()
-
             # Calculate membership
             membership_start = timezone.datetime(year=activity.start_date.year, month=1, day=1)
             membership_end = timezone.datetime(year=activity.start_date.year, month=12, day=31)
