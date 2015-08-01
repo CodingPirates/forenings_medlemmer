@@ -34,7 +34,7 @@ class EmailItemInline(admin.TabularInline):
 
 class DepartmentAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'placename', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'has_waiting_list']})
+        (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename', 'has_waiting_list']})
     ]
     list_display = ('name','no_members')
     inlines = [MemberInline, ActivityInline]
@@ -106,6 +106,12 @@ class PersonInline(admin.TabularInline):
     readonly_fields = fields
     extra = 0
 
+class PaymentInline(admin.TabularInline):
+    model = Payment
+    fields = ('added', 'payment_type', 'confirmed_dtm', 'rejected_dtm', 'amount_ore')
+    readonly_fields = ('family',)
+    extra = 0
+
 class FamilyAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         if(request.user.has_perm('members.view_family_unique')):
@@ -113,7 +119,7 @@ class FamilyAdmin(admin.ModelAdmin):
         else:
             return ('email',)
     search_fields = ('email',)
-    inlines = [PersonInline, EmailItemInline]
+    inlines = [PersonInline, PaymentInline, EmailItemInline]
     actions = ['create_new_uuid', 'resend_link_email']
 
     fields = ('email', 'confirmed_dtm')
@@ -260,6 +266,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = ['payment_type', 'activity']
     date_hierarchy = 'added'
     search_fields = ('family__email',)
+    readonly_fields = ('family',)
 
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(QuickpayTransaction)
