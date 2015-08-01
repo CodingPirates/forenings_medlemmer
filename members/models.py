@@ -332,7 +332,7 @@ class EmailTemplate(models.Model):
         for reciever in recievers:
             # each reciever must be Person, Family or string (email)
             if type(reciever) not in (Person, Family, str):
-                raise Exception("Reciever must be of type Person, Family or string")
+                raise Exception("Reciever must be of type Person, Family or string, not " + str(type(reciever)))
 
             # figure out reciever
             if(type(reciever) is str):
@@ -451,6 +451,7 @@ class Notification(models.Model):
     warned_deletion_info_dtm = models.DateTimeField('Advaret om sletning fra liste', blank=True, null=True)
     anounced_department = models.ForeignKey(Department, null=True)
     anounced_activity = models.ForeignKey(Activity, null=True)
+    anounced_activity_participant = models.ForeignKey(ActivityParticipant, null=True)
 
 class Journal(models.Model):
     class Meta:

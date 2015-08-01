@@ -116,6 +116,7 @@ if DEBUG:
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",
     'members.jobs.RequestConfirmationCronJob',
+    'members.jobs.SendActivitySignupConfirmationsCronJob',
 ]
 
 # Dont keep job logs more than 7 days old
