@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django_extensions.db.fields import UUIDField
@@ -165,7 +166,7 @@ class Member(models.Model):
         verbose_name_plural = 'Medlemmer'
         ordering = ['is_active','member_since']
     department = models.ForeignKey(Department)
-    person = models.ForeignKey(Person, on_delete=models.PROTECT, unique=True)
+    person = models.OneToOneField(Person, on_delete=models.PROTECT)
     is_active = models.BooleanField('Aktiv',default=True)
     member_since = models.DateField('Indmeldt', blank=False, default=timezone.now)
     member_until = models.DateField('Udmeldt', blank=True, default=None, null=True)
@@ -209,16 +210,16 @@ class Activity(models.Model):
     is_historic.short_description = 'Historisk?'
     def __str__(self):
         return self.department.name + ", " + self.name
-    def save(self, *args,**kwargs):
-        ''' Validate price is not between 999 and 1
-        (would be 0,01 to 9,99 kr and probaly forgot to specify in øre'''
-        if self.price is not None and self.price < 999 and self.price > 1:
-            raise Exception("Seems like price was specified in Kroner, not Øre")
-        return super(Activity, self).save(*args, **kwargs)
     def is_season(self):
         return (self.end_date - self.start_date).days > 30
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
+    def clean(self):
+        ''' Validate price is not between 999 and 1
+        (would be 0,01 to 9,99 kr and probaly forgot to specify in øre'''
+        if self.price is not None and self.price < 999 and self.price > 1:
+            raise forms.ValidationError("Seems like price was specified in Kroner, not Øre")
+
 
 class ActivityInvite(models.Model):
     class Meta:

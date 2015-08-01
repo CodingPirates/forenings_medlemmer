@@ -70,6 +70,7 @@ class ActivityAdmin(admin.ModelAdmin):
             'description',
             'instructions',
             'open_invite',
+            'price',
             'start_date',
             'end_date',
             'signup_closing',
