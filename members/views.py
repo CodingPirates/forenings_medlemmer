@@ -130,6 +130,9 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
     activity = get_object_or_404(Activity, pk=activity_id)
 
+    participants = ActivityParticipant.objects.filter(activity=activity).order_by('member__person__name')
+    participating = False
+
     if(request.resolver_match.url_name == 'activity_view_person'):
         view_only_mode = True
 
@@ -137,9 +140,6 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         family = get_object_or_404(Family, unique=unique)
     else:
         family = None
-
-    participants = None # to declare variable
-    participating = False
 
     if person_id:
         try:
@@ -150,7 +150,6 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 participant = ActivityParticipant.objects.get(activity=activity, member__person=person)
                 # found - we can only allow one - switch to view mode
                 participating = True
-                participants = ActivityParticipant.objects.filter(activity=activity).order_by('member__person__name')
                 view_only_mode = True
             except ActivityParticipant.DoesNotExist:
                 participating = False # this was expected - if not signed up yet
@@ -174,9 +173,13 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
     if activity.signup_closing < timezone.now().date() and invitation==None:
         view_only_mode = True # Activivty closed for signup
 
+    # check if activity is full
+    if activity.seats_left() <= 0:
+         view_only_mode = True # activity full
+
     if(request.method == "POST"):
         if view_only_mode:
-            return HttpResponseForbidden('Cannot join this activity')
+            return HttpResponseForbidden('Cannot join this activity now (not invited / signup closed / activity full / already signed up)')
 
         signup_form = ActivitySignupForm(request.POST)
 
@@ -248,7 +251,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 'person' : person,
                 'invitation' : invitation,
                 'price' : activity.price / 100,
-                'seats_left' : activity.max_participants - activity.activityparticipant_set.count(),
+                'seats_left' : activity.seats_left(),
                 'signupform' : signup_form,
                 'view_only_mode' : view_only_mode,
                 'participating' : participating,

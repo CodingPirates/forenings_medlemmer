@@ -215,7 +215,8 @@ class Activity(models.Model):
         return super(Activity, self).save(*args, **kwargs)
     def is_season(self):
         return (self.end_date - self.start_date).days > 30
-
+    def seats_left(self):
+        return self.max_participants - self.activityparticipant_set.count()
 
 class ActivityInvite(models.Model):
     class Meta:
