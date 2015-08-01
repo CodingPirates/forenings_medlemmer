@@ -56,6 +56,8 @@ class Family(models.Model):
         return self.email
     def send_link_email(self,):
         EmailTemplate.objects.get(idname = 'LINK').makeEmail(self, {})
+    def get_first_parent(self):
+        return self.person_set.filter(membertype__in=(Person.PARENT, Person.GUARDIAN))[0]
 
 class Person(models.Model):
     class Meta:
@@ -73,7 +75,7 @@ class Person(models.Model):
         (PARENT,'Forælder'),
         (GUARDIAN, 'Værge'),
         (CHILD, 'Barn'),
-        (OTHER, 'Frivillig')
+        (OTHER, 'Anden')
     )
     MALE = 'MA'
     FEMALE = 'FM'
@@ -238,6 +240,8 @@ class ActivityInvite(models.Model):
             else:
                 #otherwise use only family
                 template.makeEmail(self.person.family, context)
+            # remove from department waiting list
+                WaitingList.objects.filter(person=self.person, department=self.activity.department).delete()
         return super(ActivityInvite, self).save(*args, **kwargs)
     def __str__(self):
         return '{}, {}'.format(self.activity,self.person)
@@ -516,7 +520,25 @@ class QuickpayTransaction(models.Model):
             #request only if not already requested
             client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
 
-            activity = client.post('/payments', currency='DKK', order_id=self.order_id)
+            parent = self.payment.family.get_first_parent()
+
+            address = {'name' : parent.name,
+                       'street' : parent.address(),
+                       'city' : parent.city,
+                       'zip_code' : parent.zipcode,
+                       'att' : self.payment.family.email,
+                       'country_code' : 'DNK'
+                       }
+
+            variables = address.copy()
+            variables['family'] = self.payment.family.email
+            if(self.payment.person):
+                variables['person_name'] = self.payment.person.name
+            if(self.payment.activity):
+                variables['activity_department'] = self.payment.activity.department.name
+                variables['activity_name'] = self.payment.activity.name
+
+            activity = client.post('/payments', currency='DKK', order_id=self.order_id, variables=variables, invoice_address=address, shipping_address=address)
             self.transaction_id = activity['id']
             self.save()
 
