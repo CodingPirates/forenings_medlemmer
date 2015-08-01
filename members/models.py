@@ -247,7 +247,7 @@ class ActivityInvite(models.Model):
                 #otherwise use only family
                 template.makeEmail(self.person.family, context)
             # remove from department waiting list
-                WaitingList.objects.filter(person=self.person, department=self.activity.department).delete()
+            WaitingList.objects.filter(person=self.person, department=self.activity.department).delete()
         return super(ActivityInvite, self).save(*args, **kwargs)
     def __str__(self):
         return '{}, {}'.format(self.activity,self.person)
