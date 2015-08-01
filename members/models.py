@@ -165,7 +165,7 @@ class Member(models.Model):
         verbose_name = 'medlem'
         verbose_name_plural = 'Medlemmer'
         ordering = ['is_active','member_since']
-    department = models.ForeignKey(Department)
+    department = models.ForeignKey(Department, on_delete=models.PROTECT)
     person = models.OneToOneField(Person, on_delete=models.PROTECT)
     is_active = models.BooleanField('Aktiv',default=True)
     member_since = models.DateField('Indmeldt', blank=False, default=timezone.now)
@@ -256,7 +256,7 @@ class ActivityParticipant(models.Model):
     class Meta:
         verbose_name = 'deltager'
         verbose_name_plural = 'Deltagere'
-    activity = models.ForeignKey(Activity)
+    activity = models.ForeignKey(Activity, on_delete=models.PROTECT)
     member = models.ForeignKey(Member)
     note = models.TextField('Besked / Note til arrangement', blank=True)
     PHOTO_OK = 'OK'
