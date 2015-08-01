@@ -54,9 +54,49 @@ class ActivityInviteInline(admin.TabularInline):
     extra = 0
 
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'start_date', 'end_date', 'is_historic')
+    list_display = ('name', 'department', 'start_date', 'open_invite', 'price', 'max_participants')
     date_hierarchy = 'start_date'
-    inlines = [ActivityParticipantInline, ActivityInviteInline, EmailItemInline]
+    list_filter = ('department','open_invite')
+
+    fieldsets = (
+        ('Afdeling', {'fields': (
+            'department',
+        )
+        }
+         ),
+        ('Aktivitet', {'fields': (
+            'name',
+            'open_hours',
+            'description',
+            'instructions',
+            'open_invite',
+            'start_date',
+            'end_date',
+            'signup_closing',
+            'max_participants',
+            'min_age',
+            'max_age',
+            'responsible_name',
+            'responsible_contact',
+
+        )
+        }
+         ),
+        ('Lokation', {'fields': (
+            'streetname',
+            'housenumber',
+            'floor',
+            'door',
+            'zipcode',
+            'city',
+            'placename'
+        )
+        }
+         )
+    )
+
+
+    inlines = [ActivityParticipantInline, ActivityInviteInline]
 admin.site.register(Activity, ActivityAdmin)
 
 class PersonInline(admin.TabularInline):
