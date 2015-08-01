@@ -181,6 +181,9 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         if view_only_mode:
             return HttpResponseForbidden('Cannot join this activity now (not invited / signup closed / activity full / already signed up)')
 
+        if activity.max_age < person.age_years() or activity.min_age > person.age_years():
+            return HttpResponseForbidden('Barnet skal være mellem ' + str(activity.min_age) + ' og ' + str(activity.max_age) + ' år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)')
+
         signup_form = ActivitySignupForm(request.POST)
 
         if signup_form.is_valid():

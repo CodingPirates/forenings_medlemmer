@@ -202,6 +202,8 @@ class Activity(models.Model):
     open_invite = models.BooleanField('Fri tilmelding', default=False)
     price = models.IntegerField('Pris (øre)', blank=True, null=True, default=None)
     max_participants = models.PositiveIntegerField('Max Holdstørrelse', default=30)
+    max_age = models.PositiveIntegerField('Maximum Alder', default=17)
+    min_age = models.PositiveIntegerField('Minimum Alder', default=7)
     def is_historic(self):
         return self.end_date < datetime.date.today()
     is_historic.short_description = 'Historisk?'
