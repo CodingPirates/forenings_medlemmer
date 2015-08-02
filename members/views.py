@@ -184,6 +184,9 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         if activity.max_age < person.age_years() or activity.min_age > person.age_years():
             return HttpResponseForbidden('Barnet skal være mellem ' + str(activity.min_age) + ' og ' + str(activity.max_age) + ' år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)')
 
+        if Person.objects.filter(family=family).exclude(membertype=Person.CHILD).count() <=0:
+            return HttpResponseForbidden('Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.')
+
         signup_form = ActivitySignupForm(request.POST)
 
         if signup_form.is_valid():
