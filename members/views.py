@@ -215,7 +215,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             participant = ActivityParticipant(member=member, activity=activity, note=signup_form.cleaned_data['note'])
 
             # update photo permission and contact open info
-            participant.photo_permission = signup_form.cleaned_data['photo_permission']
+            participant.photo_permission = True # signup_form.cleaned_data['photo_permission']
             participant.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
             participant.save()
 
