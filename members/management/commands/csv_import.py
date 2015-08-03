@@ -3,7 +3,7 @@ import csv
 import datetime
 from django.db import IntegrityError, transaction
 from django.core.management.base import BaseCommand, CommandError
-from members.models import Journal, Person, Family
+from members.models import Person, Family
 from optparse import make_option
 from  django.core.exceptions import ObjectDoesNotExist
 
@@ -63,11 +63,6 @@ class Command(BaseCommand):
             email = entry[options['email_column']].lower()
             name = entry[options['name_column']].title().strip()
 
-            journal = 'Importeret fra CSV fil:\n'
-            for col in range(columns):
-                journal = journal + labels[col] + ': ' + entry[col] + '\n'
-
-
             if(options['date_format'] == 0):
                 date_format = '%m/%d/%Y %H:%M:%S %z' # '3/20/2014 19:51:32'
                 date = datetimeobject.strptime(entry[options['date_column']].lstrip() + " +0001", date_format)
@@ -98,7 +93,7 @@ class Command(BaseCommand):
 
             #lookup person
             try:
-               person = Person.objects.get(name=name, family = family)
+               person = Person.objects.get(name=name, family=family)
 
                # if current waiting list is older, replace timestamp
                if(date < person.added):
@@ -109,8 +104,5 @@ class Command(BaseCommand):
                 # create the person
                 person = Person(name=name, membertype=Person.CHILD, family = family, added = date)
                 person.save()
-
-            # store original data in log entry.
-            logentry = Journal(family = family, person = person, body = journal)
-
-            logentry.save
+            except Person.MultipleObjectsReturned:
+                print("family " + family.email + " has duplicate mebers named " + name + " - signup date : " + str(date) + " not recorded")
