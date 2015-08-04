@@ -244,6 +244,15 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 invitation.expire_dtm=timezone.now() - timezone.timedelta(days=1)
                 invitation.save()
 
+            # reject all seasonal invitations on person if this was a seasonal invite
+            # (to avoid signups on multiple departments for club season)
+            if activity.is_season():
+                invites = ActivityInvite.objects.filter(person=person).exclude(activity=activity)
+                for invite in invites:
+                    if invite.activity.is_season():
+                        invite.rejected_dtm = timezone.now()
+                        invite.save()
+
             return HttpResponseRedirect(return_link_url)
         # fall through else
     else:

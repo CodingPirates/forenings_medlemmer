@@ -201,7 +201,7 @@ class Activity(models.Model):
     signup_closing = models.DateField('Tilmelding lukker', null=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
-    price = models.IntegerField('Pris (øre)', blank=True, null=True, default=None)
+    price = models.IntegerField('Pris (øre)', default=0)
     max_participants = models.PositiveIntegerField('Max deltagere', default=30)
     max_age = models.PositiveIntegerField('Maximum Alder', default=17)
     min_age = models.PositiveIntegerField('Minimum Alder', default=7)
@@ -232,7 +232,6 @@ class ActivityInvite(models.Model):
     expire_dtm = models.DateField('Udløber')
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
     def save(self, *args, **kwargs):
-        ''' On creation set UUID '''
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
             template = EmailTemplate.objects.get(idname='ACT_INVITE')
@@ -248,7 +247,8 @@ class ActivityInvite(models.Model):
                 #otherwise use only family
                 template.makeEmail(self.person.family, context)
             # remove from department waiting list
-            WaitingList.objects.filter(person=self.person, department=self.activity.department).delete()
+            if self.activity.is_season():
+                WaitingList.objects.filter(person=self.person, department=self.activity.department).delete()
         return super(ActivityInvite, self).save(*args, **kwargs)
     def __str__(self):
         return '{}, {}'.format(self.activity,self.person)
