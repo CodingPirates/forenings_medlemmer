@@ -86,10 +86,10 @@ class Person(models.Model):
         )
     membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)
-    zipcode = models.CharField('Postnummer',max_length=4)
-    city = models.CharField('By', max_length=200)
-    streetname = models.CharField('Vejnavn',max_length=200)
-    housenumber = models.CharField('Husnummer',max_length=5)
+    zipcode = models.CharField('Postnummer',max_length=4, blank=True)
+    city = models.CharField('By', max_length=200, blank=True)
+    streetname = models.CharField('Vejnavn',max_length=200, blank=True)
+    housenumber = models.CharField('Husnummer',max_length=5, blank=True)
     floor = models.CharField('Etage',max_length=3, blank=True)
     door = models.CharField('Dør',max_length=5, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
@@ -225,6 +225,7 @@ class ActivityInvite(models.Model):
     class Meta:
         verbose_name='invitation'
         verbose_name_plural = 'Invitationer'
+        unique_together = ('activity', 'person')
     activity = models.ForeignKey(Activity)
     person = models.ForeignKey(Person)
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
@@ -256,6 +257,7 @@ class ActivityParticipant(models.Model):
     class Meta:
         verbose_name = 'deltager'
         verbose_name_plural = 'Deltagere'
+        unique_together = ('activity', 'member')
     activity = models.ForeignKey(Activity, on_delete=models.PROTECT)
     member = models.ForeignKey(Member)
     note = models.TextField('Besked / Note til arrangement', blank=True)

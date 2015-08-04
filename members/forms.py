@@ -40,7 +40,10 @@ class PersonForm(forms.ModelForm):
             self.fields['phone'].required = True
 
         self.fields['birthday'].widget.format = '%d-%m-%Y'
-
+        self.fields['streetname'].required = True
+        self.fields['housenumber'].required = True
+        self.fields['zipcode'].required = True
+        self.fields['city'].required = True
 
         self.helper.layout = Layout(
             nameFieldSet,
@@ -164,8 +167,8 @@ class signupForm(forms.Form):
     floor = forms.CharField(label='Etage', required=False,max_length=3)
     door = forms.CharField(label='Dør', required=False,max_length=5)
     placename = forms.CharField(label='Stednavn', required=False,max_length=200)
-    zipcode = forms.CharField(label='Postnummer', max_length=4)
-    city = forms.CharField(label='By', max_length=200, required=False)
+    zipcode = forms.CharField(label='Postnummer', max_length=4., required=True)
+    city = forms.CharField(label='By', max_length=200, required=True)
     dawa_id = forms.CharField(label='Dawa ID', max_length=200, widget=forms.HiddenInput(), required=False)
     form_id = forms.CharField(label='Form ID', max_length=10, widget=forms.HiddenInput(), initial='signup')
     manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
