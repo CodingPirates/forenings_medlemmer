@@ -458,14 +458,17 @@ def QuickpayCallback(request):
 
         # We only care about state = processed
         if(callback['state'] != 'processed'):
-            HttpResponse('OK')
+            HttpResponse('OK') # processing stops here - but tell QuickPay we are OK
 
         quickpay_transaction = get_object_or_404(QuickpayTransaction, order_id=callback['order_id'])
 
         if(callback['accepted'] == True):
             quickpay_transaction.payment.confirmed_dtm = timezone.now()
+            quickpay_transaction.payment.rejected_dtm = None
+            quickpay_transaction.payment.rejected_message = None
             quickpay_transaction.payment.save()
         else:
+            quickpay_transaction.payment.confirmed_dtm = None
             quickpay_transaction.payment.rejected_dtm = timezone.now()
             quickpay_transaction.payment.rejected_message = request.body
             quickpay_transaction.payment.save()
