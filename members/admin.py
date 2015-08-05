@@ -18,6 +18,8 @@ class ActivityInline(admin.TabularInline):
     extra = 0
 
 class WaitingListInline(admin.StackedInline):
+    fields = ['department']
+    readonly_fields = ['department']
     model = WaitingList
     extra = 0
 
@@ -190,6 +192,8 @@ class PersonAdmin(admin.ModelAdmin):
     list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
     search_fields = ('name',)
     actions = ['invite_to_own_activity', 'export_emaillist']
+
+    inlines = [WaitingListInline]
 
     # needs 'view_full_address' to seet personal details.
     # email and phonenumber only shown on adults.
