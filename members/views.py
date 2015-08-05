@@ -463,15 +463,9 @@ def QuickpayCallback(request):
         quickpay_transaction = get_object_or_404(QuickpayTransaction, order_id=callback['order_id'])
 
         if(callback['accepted'] == True):
-            quickpay_transaction.payment.confirmed_dtm = timezone.now()
-            quickpay_transaction.payment.rejected_dtm = None
-            quickpay_transaction.payment.rejected_message = None
-            quickpay_transaction.payment.save()
+            quickpay_transaction.payment.set_confirmed()
         else:
-            quickpay_transaction.payment.confirmed_dtm = None
-            quickpay_transaction.payment.rejected_dtm = timezone.now()
-            quickpay_transaction.payment.rejected_message = request.body
-            quickpay_transaction.payment.save()
+            quickpay_transaction.payment.set_rejected(request.body)
 
         return HttpResponse('OK')
     else:

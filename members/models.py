@@ -510,6 +510,19 @@ class Payment(models.Model):
     def get_quickpaytransaction(self):
         return self.quickpaytransaction_set.order_by('-payment__added')[0]
 
+    def set_confirmed(self):
+        if self.confirmed_dtm == None:
+            self.confirmed_dtm = timezone.now()
+            self.rejected_dtm = None
+            self.rejected_message = None
+            self.save()
+
+    def set_rejected(self, message):
+        if self.rejected_dtm == None:
+            self.confirmed_dtm = None
+            self.rejected_dtm = timezone.now()
+            self.rejected_message = message
+            self.save()
 
 class QuickpayTransaction(models.Model):
     payment = models.ForeignKey(Payment)
@@ -572,6 +585,18 @@ class QuickpayTransaction(models.Model):
             self.save()
 
         return self.link_url
+
+    # If callback was lost - we can get transaction status directly
+    def update_status(self):
+        client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+
+        # get payment id from order id
+        transaction = client.get('/payments', order_id=self.order_id)[0]
+
+        if transaction['state'] == 'processed' and transaction['accepted']:
+            self.payment.set_confirmed()
+        if transaction['state'] == 'rejected' and not transaction['accepted']:
+            self.payment.set_rejected(repr(transaction))
 
     def __str__(self):
         return str(self.payment.family.email) + " - QuickPay orderid: '" + str(self.order_id) + "' confirmed: '" + str(self.payment.confirmed_dtm) + "'"

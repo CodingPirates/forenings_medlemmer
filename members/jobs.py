@@ -1,6 +1,6 @@
 from django.conf import settings
 from django_cron import CronJobBase, Schedule
-from members.models import EmailItem, Family, Notification, EmailTemplate, ActivityParticipant
+from members.models import EmailItem, Family, Notification, EmailTemplate, ActivityParticipant, Payment
 from django.db.models import Q, F
 import datetime
 from django.utils import timezone
@@ -61,6 +61,20 @@ class RequestConfirmationCronJob(CronJobBase):
             notification = Notification(family=family, email=email, update_info_dtm=timezone.now())
             notification.save()
 
+# Poll payments which did not recieve callback
+class PollQuickpayPaymentsCronJob(CronJobBase):
+    RUN_EVERY_MINS = 60 # every minute
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'members.poll_quickpayPayments_cronjob'    # a unique code
+
+    def do(self):
+        outdated_dtm = timezone.now() - datetime.timedelta(days=14) # Timeout checking payments after 14 days
+        payments = Payment.objects.filter(rejected_dtm__isnull=True, confirmed_dtm__isnull=True, payment_type=Payment.CREDITCARD, added__gt=outdated_dtm)
+
+        for payment in payments:
+            payment.get_quickpaytransaction().update_status()
+
 
 # TODO:Find created families/persons, which never clicked the link (spambots etc.)
 
@@ -68,4 +82,4 @@ class RequestConfirmationCronJob(CronJobBase):
 
 # TODO:Find Members which are active, but have expired memberships
 
-# TODO:Poll payments which did not recieve callback
+
