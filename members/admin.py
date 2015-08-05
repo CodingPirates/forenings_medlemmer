@@ -262,7 +262,7 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['added', 'payment_type', 'family', 'confirmed_dtm', 'rejected_dtm', 'activityparticipant']
+    list_display = ['pk', 'added', 'payment_type', 'family', 'confirmed_dtm', 'rejected_dtm', 'activityparticipant']
     list_filter = ['payment_type', 'activity']
     date_hierarchy = 'added'
     search_fields = ('family__email',)
