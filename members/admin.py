@@ -5,24 +5,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 
-class MemberInline(admin.TabularInline):
-    model = Member
-    fields = ('member_since', 'person')
-    readonly_fields = fields
-    extra = 0
-
-class ActivityInline(admin.TabularInline):
-    model = Activity
-    fields = ('name', 'start_date', 'end_date')
-    readonly_fields = fields
-    extra = 0
-
-class WaitingListInline(admin.StackedInline):
-    fields = ['department']
-    readonly_fields = ['department']
-    model = WaitingList
-    extra = 0
-
 class EmailItemInline(admin.TabularInline):
     model = EmailItem
     fields = ['reciever', 'subject', 'sent_dtm']
@@ -39,21 +21,12 @@ class DepartmentAdmin(admin.ModelAdmin):
         (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename', 'has_waiting_list']})
     ]
     list_display = ('name','no_members')
-    inlines = [MemberInline, ActivityInline]
 admin.site.register(Department,DepartmentAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name','department', 'member_since','is_active')
     list_filter = ['department']
 admin.site.register(Member, MemberAdmin)
-
-class ActivityParticipantInline(admin.TabularInline):
-    model = ActivityParticipant
-    extra = 0
-
-class ActivityInviteInline(admin.TabularInline):
-    model = ActivityInvite
-    extra = 0
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'department', 'start_date', 'open_invite', 'price', 'max_participants')
@@ -98,8 +71,7 @@ class ActivityAdmin(admin.ModelAdmin):
          )
     )
 
-
-    inlines = [ActivityParticipantInline, ActivityInviteInline]
+    #inlines = [ActivityParticipantInline, ActivityInviteInline]
 admin.site.register(Activity, ActivityAdmin)
 
 class PersonInline(admin.TabularInline):
@@ -122,7 +94,8 @@ class FamilyAdmin(admin.ModelAdmin):
             return ('email',)
     search_fields = ('email',)
     inlines = [PersonInline, PaymentInline, EmailItemInline]
-    actions = ['create_new_uuid', 'resend_link_email']
+    #actions = ['create_new_uuid', 'resend_link_email'] # new UUID gets used accidentially
+    actions = ['resend_link_email']
 
     fields = ('email', 'confirmed_dtm')
     readonly_fields = ('confirmed_dtm',)
@@ -149,6 +122,20 @@ class FamilyAdmin(admin.ModelAdmin):
     resend_link_email.short_description = "Gensend link e-mail"
 
 admin.site.register(Family, FamilyAdmin)
+
+class ActivityParticipantAdmin(admin.ModelAdmin):
+    list_display = ['added_dtm', 'member', 'activity', 'note']
+    list_filter = ('activity',)
+    list_display_links = ('member',)
+admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
+
+class ActivityInviteAdmin(admin.ModelAdmin):
+    list_display = ('person', 'invite_dtm', 'rejected_dtm')
+    list_filter = ('activity',)
+    list_display_links = None
+
+admin.site.register(ActivityInvite, ActivityInviteAdmin)
+
 
 class PersonWaitinglistListFilter(admin.SimpleListFilter):
     # Title shown in filter view
@@ -186,14 +173,17 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(waitinglist__department__pk=self.value())
 
+class ActivityInviteInline(admin.TabularInline):
+    model = ActivityInvite
+    extra = 0
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
     list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
-    search_fields = ('name',)
+    search_fields = ('name', 'family__email',)
     actions = ['invite_to_own_activity', 'export_emaillist']
 
-    inlines = [WaitingListInline]
+    inlines = [ActivityInviteInline]
 
     # needs 'view_full_address' to seet personal details.
     # email and phonenumber only shown on adults.
@@ -231,7 +221,7 @@ class PersonAdmin(admin.ModelAdmin):
         return item.family.unique if item.family != None else ''
 
     def invite_to_own_activity(self,request, queryset):
-        return HttpResponse("Ikke klar endnu")
+        return HttpResponse("Ikke klar endnu. Vi implementerer denne når vi får tid. Tryk på hver person for at invitere i stedet for.")
     invite_to_own_activity.short_description = "Inviter valgte personer til en aktivitet"
 
     def export_emaillist(self,request, queryset):
