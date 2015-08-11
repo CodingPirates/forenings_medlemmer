@@ -184,7 +184,7 @@ class ActivitySignupForm(forms.Form):
             Div(Div(HTML("<h2>Tilmelding</h2>"), css_class="panel-heading"),
             Div(
             Div(Div(HTML('''
-                <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten <strong>{{activity.name}}</strong>.
+                <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
                 Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
                 <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
                 '''),
