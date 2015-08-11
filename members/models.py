@@ -258,6 +258,7 @@ class ActivityParticipant(models.Model):
         verbose_name = 'deltager'
         verbose_name_plural = 'Deltagere'
         unique_together = ('activity', 'member')
+    added_dtm = models.DateField('Tilmeldt', default=timezone.now)
     activity = models.ForeignKey(Activity, on_delete=models.PROTECT)
     member = models.ForeignKey(Member)
     note = models.TextField('Besked / Note til arrangement', blank=True)
