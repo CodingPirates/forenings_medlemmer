@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ## Herefter kan systemet blot startes med
 ```
-source venv/bin/activate
+source virtualenv/bin/activate
 ./manage.py runserver
 ```
 
