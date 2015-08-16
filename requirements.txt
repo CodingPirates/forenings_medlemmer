@@ -1,6 +1,6 @@
 Django==1.8.3
 django-bootstrap3
 django_extensions
-django-crispy-forms
+django-crispy-forms==1.4.0
 django_cron
 git+https://github.com/QuickPay/quickpay-python-client.git
