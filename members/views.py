@@ -179,13 +179,13 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
     if(request.method == "POST"):
         if view_only_mode:
-            return HttpResponseForbidden('Cannot join this activity now (not invited / signup closed / activity full / already signed up)')
+            return HttpResponse('Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)')
 
         if activity.max_age < person.age_years() or activity.min_age > person.age_years():
-            return HttpResponseForbidden('Barnet skal være mellem ' + str(activity.min_age) + ' og ' + str(activity.max_age) + ' år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)')
+            return HttpResponse('Barnet skal være mellem ' + str(activity.min_age) + ' og ' + str(activity.max_age) + ' år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)')
 
         if Person.objects.filter(family=family).exclude(membertype=Person.CHILD).count() <=0:
-            return HttpResponseForbidden('Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.')
+            return HttpResponse('Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.')
 
         signup_form = ActivitySignupForm(request.POST)
 
