@@ -36,7 +36,7 @@ def FamilyDetails(request,unique):
         for child in children:
             department_children_waiting['departments'][loop_counter]['children_status'][child.pk] = {}
             department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['object'] = child
-            department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['firstname'] = child.name.partition(' ')[0]
+            department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['firstname'] = child.firstname()
             department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['waiting'] = False # default not waiting
             for current_wait in waiting_lists:
                 if(current_wait.department == department and current_wait.person == child):
@@ -471,3 +471,26 @@ def QuickpayCallback(request):
     else:
         # Request is Not authenticated
         return HttpResponseForbidden('Invalid request')
+
+
+def waitinglistView(request):
+
+    department_children_waiting = {'departments': {}}
+    department_loop_counter=0
+    for department in Department.objects.filter(has_waiting_list = True).order_by('zipcode'):
+        department_children_waiting['departments'][department_loop_counter] = {}
+        department_children_waiting['departments'][department_loop_counter]['name'] = department.name
+        department_children_waiting['departments'][department_loop_counter]['waiting'] = {}
+
+        waiting_in_department = WaitingList.objects.filter(department__pk=department.pk).select_related('person').order_by('on_waiting_list_since')
+        child_loop_counter=1
+        for waiting in waiting_in_department:
+            department_children_waiting['departments'][department_loop_counter]['waiting'][child_loop_counter] = {}
+            department_children_waiting['departments'][department_loop_counter]['waiting'][child_loop_counter]['firstname'] = waiting.person.firstname()
+            department_children_waiting['departments'][department_loop_counter]['waiting'][child_loop_counter]['zipcode'] = waiting.person.zipcode
+            department_children_waiting['departments'][department_loop_counter]['waiting'][child_loop_counter]['added'] = waiting.person.added
+            child_loop_counter = child_loop_counter + 1
+        department_loop_counter = department_loop_counter + 1
+
+
+    return render(request, 'members/waitinglist.html', {'department_children_waiting': department_children_waiting})

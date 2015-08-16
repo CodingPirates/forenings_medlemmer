@@ -116,6 +116,11 @@ class Person(models.Model):
     age_years.admin_order_field = '-birthday'
     age_years.short_description = 'Alder'
 
+    def firstname(self):
+        return self.name.partition(' ')[0]
+    firstname.admin_order_field = 'name'
+    firstname.short_description = 'Fornavn'
+
 
 class Department(models.Model):
     class Meta:
