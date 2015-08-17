@@ -18,9 +18,18 @@
 
           <p>Tryk på en afdeling for at springe til den</p>
 
+          {% if unique %}
+            <p><a href="{% url 'family_detail' unique %}">Tilbage til familie oversigt</a></p>
+          {% else %}
+            <p>Listerne er anonymiserede. Log ind på "min familie side" for at se dine børns navne på listerne.</p>
+          {% endif %}
+
+          <p>
           {% for key, department in department_children_waiting.departments.items %}
               [<a href="#dep{{ key }}">{{ department.name }}</a>]
           {% endfor  %}
+          </p>
+
 
           {% for key, department in department_children_waiting.departments.items %}
 
@@ -36,7 +45,11 @@
                 <th>Har ventet (ancienitet)</th>
             </tr>
             {% for key, child in department.waiting.items %}
-            <tr>
+            {% if child.color %}
+              <tr class="success">
+            {% else %}
+              <tr>
+            {% endif %}
                 <td>{{ key }}</td>
 
                 <td>{{child.firstname}}</td>
@@ -50,6 +63,7 @@
               {% else %}
                   <p>Der er ingen opskrevet på venteliste til denne afdeling</p>
               {% endif %}
+
           {% endfor %}
 
         </div>
