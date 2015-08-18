@@ -138,9 +138,47 @@ class FamilyAdmin(admin.ModelAdmin):
 
 admin.site.register(Family, FamilyAdmin)
 
+class ParticipantPaymentListFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = 'Betaling'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'payment_list'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+
+        activitys = [('none', 'Ikke betalt'), ('ok', 'Betalt'), ('pending', 'Afventende'), ('rejected', 'Afvist')]
+        return activitys
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+
+        if self.value() == 'none':
+            return queryset.filter(payment__isnull=True)
+        elif self.value() == 'ok':
+            return queryset.filter(payment__isnull=False, payment__confirmed_dtm__isnull=False)
+        elif self.value() == 'pending':
+            return queryset.filter(payment__isnull=False, payment__confirmed_dtm__isnull=True)
+        elif self.value() == 'rejected':
+            return queryset.filter(payment__isnull=False, payment__rejected_dtm__isnull=False)
+
+
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = ['added_dtm', 'member', 'activity', 'note']
-    list_filter = ('activity',)
+    list_filter = ('activity',ParticipantPaymentListFilter)
     list_display_links = ('member',)
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
 
@@ -205,7 +243,7 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
         """
 
         activitys = [('none', 'Deltager ikke')]
-        for activity in Activity.objects.filter():
+        for activity in Activity.objects.filter().order_by('zipcode'):
             activitys.append(( str(activity.pk), str(activity)))
 
         return activitys
@@ -226,14 +264,53 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(member__activityparticipant__activity=self.value())
 
+class PersonFamilyConfirmedListFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = 'Familie bekræftet'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'fam_confirmed_list'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+
+        activitys = [('unconfirmed', 'Ikke bekræftet'), ('confirmed', 'Bekræftet')]
+
+        return activitys
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+
+        if(self.value() == 'unconfirmed'):
+            return queryset.filter(family__confirmed_dtm=None)
+        elif(self.value() == 'confirmed'):
+            return queryset.filter(family__confirmed_dtm__isnull=False)
+        else:
+            return queryset
+
+class WaitingListInline(admin.TabularInline):
+    model = WaitingList
+    extra = 0
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
-    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter, PersonParticipantListFilter)
+    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter, PersonParticipantListFilter, PersonFamilyConfirmedListFilter)
     search_fields = ('name', 'family__email',)
     actions = ['invite_to_own_activity', 'export_emaillist']
 
-    inlines = [PaymentInline, ActivityInviteInline, MemberInline]
+    inlines = [PaymentInline, ActivityInviteInline, MemberInline, WaitingListInline]
 
     # needs 'view_full_address' to seet personal details.
     # email and phonenumber only shown on adults.
