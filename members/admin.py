@@ -86,6 +86,21 @@ class PaymentInline(admin.TabularInline):
     readonly_fields = ('family',)
     extra = 0
 
+class ActivityParticipantInline(admin.TabularInline):
+    model = ActivityParticipant
+    extra = 0
+
+    def get_queryset(self, request):
+        return ActivityParticipant.objects.all()
+
+class ActivityInviteInline(admin.TabularInline):
+    model = ActivityInvite
+    extra = 0
+
+class MemberInline(admin.TabularInline):
+    model = Member
+    extra = 0
+
 class FamilyAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         if(request.user.has_perm('members.view_family_unique')):
@@ -173,17 +188,52 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(waitinglist__department__pk=self.value())
 
-class ActivityInviteInline(admin.TabularInline):
-    model = ActivityInvite
-    extra = 0
+class PersonParticipantListFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = 'Deltager på'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'participant_list'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+
+        activitys = [('none', 'Deltager ikke')]
+        for activity in Activity.objects.filter():
+            activitys.append(( str(activity.pk), str(activity)))
+
+        return activitys
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+
+        if(self.value() == 'none'):
+            return queryset.filter(member__activityparticipant__isnull=True)
+        elif(self.value() == None):
+            return queryset
+        else:
+            return queryset.filter(member__activityparticipant__activity=self.value())
+
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
-    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter)
+    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter, PersonParticipantListFilter)
     search_fields = ('name', 'family__email',)
     actions = ['invite_to_own_activity', 'export_emaillist']
 
-    inlines = [ActivityInviteInline]
+    inlines = [PaymentInline, ActivityInviteInline, MemberInline]
 
     # needs 'view_full_address' to seet personal details.
     # email and phonenumber only shown on adults.
@@ -256,10 +306,11 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'added', 'payment_type', 'family', 'confirmed_dtm', 'rejected_dtm', 'activityparticipant']
+    list_display = ['pk', 'added', 'payment_type', 'amount_ore', 'family', 'confirmed_dtm', 'cancelled_dtm', 'rejected_dtm', 'activityparticipant']
     list_filter = ['payment_type', 'activity']
     date_hierarchy = 'added'
     search_fields = ('family__email',)
+    select_related = ('activityparticipant')
 
 admin.site.register(Payment, PaymentAdmin)
-admin.site.register(QuickpayTransaction)
+#admin.site.register(QuickpayTransaction)
