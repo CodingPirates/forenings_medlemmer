@@ -308,11 +308,11 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
     list_filter = ('membertype', 'gender', PersonWaitinglistListFilter, PersonParticipantListFilter, PersonFamilyConfirmedListFilter)
     search_fields = ('name', 'family__email',)
-    actions = ['invite_to_own_activity', 'export_emaillist']
+    actions = ['invite_to_own_activity', 'export_emaillist', 'export_csv']
 
     inlines = [PaymentInline, ActivityInviteInline, MemberInline, WaitingListInline]
 
-    # needs 'view_full_address' to seet personal details.
+    # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
     def get_fieldsets(self, request, person=None):
         if(request.user.has_perm('members.view_full_address')):
@@ -352,14 +352,30 @@ class PersonAdmin(admin.ModelAdmin):
     invite_to_own_activity.short_description = "Inviter valgte personer til en aktivitet"
 
     def export_emaillist(self,request, queryset):
-        result_string = "kopier denne liste direkte ind i dit email program (Hush at bruge Bcc!)\n\n"
+        result_string = "kopier denne liste direkte ind i dit email program (Husk at bruge Bcc!)\n\n"
         family_email = []
         for person in queryset:
             family_email.append(person.family.email)
         result_string = result_string + ',\n'.join(list(set(family_email)))
+        result_string = result_string + "\n\n\nHusk nu at bruge Bcc! ... IKKE TO: og heller IKKE CC: felterne\n\n"
 
         return HttpResponse(result_string, content_type="text/plain")
-    export_emaillist.short_description = "Exporter en liste af familie e-mail adresser fra de valgte personer"
+    export_emaillist.short_description = "Exporter e-mail liste"
+
+    def export_csv(self,request, queryset):
+        result_string = '"Navn";"Alder";"Opskrevet";"Tlf (barn)";"Email (barn)";"Tlf (forælder)";"Email (familie)"\n'
+        for person in queryset:
+            parent = person.family.get_first_parent();
+            if parent:
+                parent_phone=parent.phone
+            else:
+                parent_phone=""
+
+            result_string = result_string + person.name + ";" + str(person.age_years()) + ";" + str(person.added) + ";" + person.phone + ";" + person.email + ";" + parent_phone + ";" + person.family.email + "\n"
+            response = HttpResponse(result_string, content_type="text/csv")
+            response['Content-Disposition'] = 'attachment; filename="personer.csv"'
+        return response
+    export_csv.short_description = "Exporter CSV"
 
 admin.site.register(Person,PersonAdmin)
 

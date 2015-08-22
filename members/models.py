@@ -58,7 +58,11 @@ class Family(models.Model):
     def send_link_email(self,):
         EmailTemplate.objects.get(idname = 'LINK').makeEmail(self, {})
     def get_first_parent(self):
-        return self.person_set.filter(membertype__in=(Person.PARENT, Person.GUARDIAN))[0]
+        try:
+            parent = self.person_set.filter(membertype__in=(Person.PARENT, Person.GUARDIAN))[0]
+        except IndexError:
+            return None
+        return parent;
 
 class Person(models.Model):
     class Meta:
@@ -94,8 +98,6 @@ class Person(models.Model):
     door = models.CharField('Dør',max_length=5, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
-    def address(self):
-        return format_address(self.streetname, self.housenumber, self.floor, self.door)
     placename = models.CharField('Stednavn',max_length=200, blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField('Telefon', max_length=50, blank=True)
@@ -107,6 +109,9 @@ class Person(models.Model):
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
     def __str__(self):
         return self.name
+
+    def address(self):
+        return format_address(self.streetname, self.housenumber, self.floor, self.door)
 
     def age_years(self):
         if(self.birthday != None):
