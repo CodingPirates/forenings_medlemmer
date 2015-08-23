@@ -206,7 +206,7 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        departments = []
+        departments = [('any', 'Alle opskrevne samlet'), ('none', 'Ikke skrevet på venteliste')]
         for department in Department.objects.filter(has_waiting_list=True).order_by('zipcode'):
             departments.append(( str(department.pk), department.name))
 
@@ -221,7 +221,11 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         # Compare the requested value (either '80s' or '90s')
         # to decide how to filter the queryset.
 
-        if(self.value() == None):
+        if self.value() == 'any':
+            return queryset.exclude(waitinglist__isnull=True)
+        elif self.value() == 'none':
+            return queryset.filter(waitinglist__isnull=True)
+        elif self.value() == None:
             return queryset
         else:
             return queryset.filter(waitinglist__department__pk=self.value())
