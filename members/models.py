@@ -505,6 +505,7 @@ class Payment(models.Model):
     amount_ore = models.IntegerField('Beløb i øre', blank=False, null=False, default=0) # payments to us is positive
     confirmed_dtm = models.DateTimeField('Bekræftet', blank=True, null=True) # Set when paid (and checked)
     cancelled_dtm = models.DateTimeField('Annulleret', blank=True, null=True) # Set when transaction is cancelled
+    refunded_dtm = models.DateTimeField('Refunderet', blank=True, null=True) # Set when transaction is cancelled
     rejected_dtm = models.DateTimeField('Afvist', blank=True, null=True) # Set if paiment failed
     rejected_message = models.TextField('Afvist årsag', blank=True, null=True) # message describing failure
 
