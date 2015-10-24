@@ -1,4 +1,5 @@
 from uuid import uuid4
+from django import forms
 from django.contrib import admin
 from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
 from django.contrib.auth.admin import UserAdmin
@@ -29,7 +30,7 @@ class MemberAdmin(admin.ModelAdmin):
 admin.site.register(Member, MemberAdmin)
 
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'department', 'start_date', 'open_invite', 'price', 'max_participants')
+    list_display = ('name', 'department', 'start_date', 'open_invite', 'price_in_dkk', 'max_participants')
     date_hierarchy = 'start_date'
     list_filter = ('department','open_invite')
 
@@ -45,7 +46,7 @@ class ActivityAdmin(admin.ModelAdmin):
             'description',
             'instructions',
             'open_invite',
-            'price',
+            'price_in_dkk',
             'start_date',
             'end_date',
             'signup_closing',

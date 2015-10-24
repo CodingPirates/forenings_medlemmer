@@ -211,7 +211,7 @@ class Activity(models.Model):
     signup_closing = models.DateField('Tilmelding lukker', null=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
-    price = models.IntegerField('Pris (øre)', default=0)
+    price_in_dkk = models.DecimalField('Pris',max_digits=10, decimal_places=2, default=300)
     max_participants = models.PositiveIntegerField('Max deltagere', default=30)
     max_age = models.PositiveIntegerField('Maximum Alder', default=17)
     min_age = models.PositiveIntegerField('Minimum Alder', default=7)
@@ -224,12 +224,6 @@ class Activity(models.Model):
         return (self.end_date - self.start_date).days > 30
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
-    def clean(self):
-        ''' Validate price is not between 999 and 1
-        (would be 0,01 to 9,99 kr and probaly forgot to specify in øre'''
-        if self.price is not None and self.price < 999 and self.price > 1:
-            raise forms.ValidationError("Seems like price was specified in Kroner, not Øre")
-
 
 class ActivityInvite(models.Model):
     class Meta:
