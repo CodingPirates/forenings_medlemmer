@@ -115,7 +115,8 @@ class Person(models.Model):
 
     def age_years(self):
         if(self.birthday != None):
-            return (timezone.now().date() - self.birthday).days // 365
+            today = timezone.now().date()
+            return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))            
         else:
             return 0
     age_years.admin_order_field = '-birthday'
@@ -211,7 +212,7 @@ class Activity(models.Model):
     signup_closing = models.DateField('Tilmelding lukker', null=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
-    price_in_dkk = models.DecimalField('Pris',max_digits=10, decimal_places=2, default=300)
+    price_in_dkk = models.DecimalField('Pris',max_digits=10, decimal_places=2, default=500)
     max_participants = models.PositiveIntegerField('Max deltagere', default=30)
     max_age = models.PositiveIntegerField('Maximum Alder', default=17)
     min_age = models.PositiveIntegerField('Minimum Alder', default=7)
