@@ -359,7 +359,7 @@ def EntryPage(request):
             if signup.is_valid():
                 # check if family already exists
                 try:
-                    family = Family.objects.get(email=request.POST['parent_email'])
+                    family = Family.objects.get(email__iexact=request.POST['parent_email'])
                     # family was already created - we can't create this family again
                     signup.add_error('parent_email', 'Denne email adresse er allerede oprettet. Du kan tilføje flere børn på samme forælder, når du er kommet videre! - Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
                     return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
