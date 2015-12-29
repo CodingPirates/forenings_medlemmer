@@ -232,7 +232,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                         person=person,
                         family=family,
                         body_text=timezone.now().strftime("%Y-%m-%d") + ' Betaling for ' + activity.name + ' på ' + activity.department.name,
-                        amount_ore = activity.price_in_dkk * 100,
+                        amount_ore = int(activity.price_in_dkk * 100),
                     )
                     payment.save()
 
