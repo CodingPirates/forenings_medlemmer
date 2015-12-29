@@ -1,7 +1,11 @@
 Django==1.8.3
-django-bootstrap3
-django_extensions
+django-bootstrap3==6.2.0
+django-extensions==1.5.5
 django-crispy-forms==1.4.0
-django_cron
 sqlparse
-git+https://github.com/QuickPay/quickpay-python-client.git
+django-cron==0.4.3
+git+https://github.com/QuickPay/quickpay-python-client.git@79e52fc
+
+# useful non-production packages
+#django-debug-toolbar
+#pylint

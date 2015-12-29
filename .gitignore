@@ -2,4 +2,7 @@
 /db.sqlite3
 *~
 virtualenv/
-.idea
+.idea/
+experiments.py
+forenings_medlemmer/settings_local.py
+*_old
