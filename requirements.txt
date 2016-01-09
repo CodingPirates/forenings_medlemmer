@@ -4,7 +4,7 @@ django-extensions==1.5.5
 django-crispy-forms==1.4.0
 sqlparse
 django-cron==0.4.3
-git+https://github.com/QuickPay/quickpay-python-client.git@79e52fc
+git+https://github.com/QuickPay/quickpay-python-client.git
 
 # useful non-production packages
 #django-debug-toolbar
