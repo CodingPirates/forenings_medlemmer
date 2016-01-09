@@ -62,7 +62,7 @@ class Family(models.Model):
             parent = self.person_set.filter(membertype__in=(Person.PARENT, Person.GUARDIAN))[0]
         except IndexError:
             return None
-        return parent;
+        return parent
 
 class Person(models.Model):
     class Meta:
@@ -116,7 +116,7 @@ class Person(models.Model):
     def age_years(self):
         if(self.birthday != None):
             today = timezone.now().date()
-            return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))            
+            return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
         else:
             return 0
     age_years.admin_order_field = '-birthday'
@@ -148,6 +148,7 @@ class Department(models.Model):
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     has_waiting_list = models.BooleanField('Venteliste',default=False)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
+    created = models.DateField('Oprettet', blank=False, default=timezone.now)
     def no_members(self):
         return self.member_set.count()
     no_members.short_description = 'Antal medlemmer'
@@ -312,7 +313,7 @@ class EmailTemplate(models.Model):
     name = models.CharField('Skabelon navn',max_length=200, blank=False)
     description = models.CharField('Skabelon beskrivelse',max_length=200, blank=False)
     template_help = models.TextField('Hjælp omkring template variable', blank=True)
-    from_address = models.EmailField();
+    from_address = models.EmailField()
     subject = models.CharField('Emne',max_length=200, blank=False)
     body_html = models.TextField('HTML Indhold', blank=True)
     body_text = models.TextField('Text Indhold', blank=True)
@@ -344,13 +345,13 @@ class EmailTemplate(models.Model):
 
             # figure out reciever
             if(type(reciever) is str):
-                destination_address = reciever;
+                destination_address = reciever
             elif(type(reciever) is Person):
                 context['person'] = reciever
-                destination_address = reciever.email;
+                destination_address = reciever.email
             elif(type(reciever) is Family):
                 context['family'] = reciever
-                destination_address = reciever.email;
+                destination_address = reciever.email
 
             # figure out Person and Family is applicable
             if(type(reciever) is Person):
