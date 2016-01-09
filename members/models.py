@@ -576,22 +576,27 @@ class QuickpayTransaction(models.Model):
                 variables['activity_department'] = self.payment.activity.department.name
                 variables['activity_name'] = self.payment.activity.name
 
-            activity = client.post('/payments', currency='DKK', order_id=self.order_id, variables=variables, invoice_address=address, shipping_address=address)
-            self.transaction_id = activity['id']
-            self.save()
+            try:
+                if(self.transaction_id == ''):
+                    activity = client.post('/payments', currency='DKK', order_id=self.order_id, variables=variables, invoice_address=address, shipping_address=address)
+                    self.transaction_id = activity['id']
+                    self.save()
 
-            link = client.put(
-                '/payments/{0}/link'.format(self.transaction_id),
-                amount=self.payment.amount_ore,
-                id=self.transaction_id,
-                continueurl=return_url,
-                cancelurl=return_url,
-                customer_email=self.payment.family.email,
-                autocapture=True
-                )
+                link = client.put(
+                    '/payments/{0}/link'.format(self.transaction_id),
+                    amount=self.payment.amount_ore,
+                    id=self.transaction_id,
+                    continueurl=return_url,
+                    cancelurl=return_url,
+                    customer_email=self.payment.family.email,
+                    autocapture=True
+                    )
 
-            self.link_url = link['url']
-            self.save()
+                self.link_url = link['url']
+                self.save()
+            except:
+                # Something went wrong talking to quickpay - ask people to come back later
+                return reverse('payment_gateway_error_view', kwargs={'unique':self.payment.family.unique})
 
         return self.link_url
 

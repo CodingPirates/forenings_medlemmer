@@ -175,7 +175,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
     # check if activity is full
     if activity.seats_left() <= 0:
-         view_only_mode = True # activity full
+        view_only_mode = True # activity full
 
     if(request.method == "POST"):
         if view_only_mode:
@@ -443,7 +443,7 @@ def loginEmailSent(request):
     return render(request, 'members/login_email_sent.html')
 
 def signQuickpay(base, private_key):
-   return hmac.new(private_key, base, hashlib.sha256).hexdigest()
+    return hmac.new(private_key, base, hashlib.sha256).hexdigest()
 
 @csrf_exempt
 def QuickpayCallback(request):
@@ -505,3 +505,6 @@ def waitinglistView(request, unique=None):
 
 
     return render(request, 'members/waitinglist.html', {'department_children_waiting': department_children_waiting, 'unique': unique})
+
+def paymentGatewayErrorView(request, unique=None):
+    return render(request, 'members/payment_gateway_error.html', {'unique': unique})
