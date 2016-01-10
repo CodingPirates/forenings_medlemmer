@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from members.models import Person, Payment, ActivityParticipant
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, MultiField, Field, Hidden, HTML, Div, Button
+from crispy_forms.layout import Layout, Fieldset, Submit, MultiField, Field, Hidden, HTML, Div, Button
 from crispy_forms.bootstrap import FormActions
 
 class PersonForm(forms.ModelForm):
@@ -64,10 +64,8 @@ class PersonForm(forms.ModelForm):
                             css_class="row"
                            )
                      ),
-            ButtonHolder(
-                Submit('submit', 'Opret' if self.instance.id == None else 'Ret', css_class="btn-success"),
-                HTML("""<a class="btn btn-link" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>""")
-            )
+            Submit('submit', 'Opret' if self.instance.id == None else 'Ret', css_class="btn-success"),
+            HTML("""<a class="btn btn-link" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>""")
         )
         self.helper.render_unmentioned_fields = False
         self.fields['birthday'].input_formats=(settings.DATE_INPUT_FORMATS)
@@ -145,9 +143,7 @@ class signupForm(forms.Form):
                             css_class="row"
                            )
                      ),
-            ButtonHolder(
-                Submit('submit', 'Opret', css_class="btn-success")
-            )
+            Submit('submit', 'Opret', css_class="btn-success")
 
         )
 

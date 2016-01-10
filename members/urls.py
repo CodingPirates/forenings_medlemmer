@@ -2,8 +2,8 @@ from django.conf.urls import patterns,  url
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
     waitinglistView, paymentGatewayErrorView
 
-urlpatterns = patterns('',
-    url(r'^/{0,1}$', EntryPage, name='entry_page'),
+urlpatterns = [
+    url(r'^', EntryPage, name='entry_page'),
     url(r'login_email_sent/$', loginEmailSent, name='login_email_sent'),
     url(r'family/(?P<unique>[\w-]+)/$', FamilyDetails, name='family_detail'),
     url(r'family/(?P<unique>[\w-]+)/Person/(?P<id>[\d]+)/$', PersonUpdate, name='person_update'),
@@ -18,4 +18,4 @@ urlpatterns = patterns('',
     url(r'^activity/(?P<activity_id>[\d]+)/$', ActivitySignup, name='activity_view'),
     url(r'quickpay_callback$', QuickpayCallback, name='quickpay_callback'),
     url(r'waitinglist$', waitinglistView, name='waitinglist_view'),
-)
+]
