@@ -3,7 +3,7 @@ from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingList
     waitinglistView, paymentGatewayErrorView
 
 urlpatterns = [
-    url(r'^', EntryPage, name='entry_page'),
+    url(r'^$', EntryPage, name='entry_page'),
     url(r'login_email_sent/$', loginEmailSent, name='login_email_sent'),
     url(r'family/(?P<unique>[\w-]+)/$', FamilyDetails, name='family_detail'),
     url(r'family/(?P<unique>[\w-]+)/Person/(?P<id>[\d]+)/$', PersonUpdate, name='person_update'),

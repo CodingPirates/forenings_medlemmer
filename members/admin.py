@@ -6,6 +6,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 
+admin.site.site_header="Coding Pirates Medlemsdatabase"
+admin.site.index_title="Site Admin"
+
 class EmailItemInline(admin.TabularInline):
     model = EmailItem
     fields = ['reciever', 'subject', 'sent_dtm']
@@ -370,7 +373,7 @@ class PersonAdmin(admin.ModelAdmin):
     def export_csv(self,request, queryset):
         result_string = '"Navn";"Alder";"Opskrevet";"Tlf (barn)";"Email (barn)";"Tlf (forælder)";"Email (familie)"\n'
         for person in queryset:
-            parent = person.family.get_first_parent();
+            parent = person.family.get_first_parent()
             if parent:
                 parent_phone=parent.phone
             else:
