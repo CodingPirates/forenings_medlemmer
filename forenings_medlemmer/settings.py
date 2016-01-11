@@ -113,6 +113,7 @@ DATE_INPUT_FORMATS = (
 REQUEST_FAMILY_VALIDATION_PERIOD = 180
 
 STATIC_URL = '/static/'
+ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 ADMINS = (('Administrator', 'admin@example.org'),)
 MANAGERS = ADMINS
