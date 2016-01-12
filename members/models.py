@@ -577,10 +577,13 @@ class QuickpayTransaction(models.Model):
                 variables['activity_name'] = self.payment.activity.name
 
             try:
-                if(self.transaction_id == ''):
+                if(self.transaction_id == None):
                     activity = client.post('/payments', currency='DKK', order_id=self.order_id, variables=variables, invoice_address=address, shipping_address=address)
                     self.transaction_id = activity['id']
                     self.save()
+
+                if(self.transaction_id == None):
+                    raise Exception('we did not get a transaction_id')
 
                 link = client.put(
                     '/payments/{0}/link'.format(self.transaction_id),
@@ -605,12 +608,15 @@ class QuickpayTransaction(models.Model):
         client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
 
         # get payment id from order id
-        transaction = client.get('/payments', order_id=self.order_id)[0]
+        transactions = client.get('/payments', order_id=self.order_id)
 
-        if transaction['state'] == 'processed' and transaction['accepted']:
-            self.payment.set_confirmed()
-        if transaction['state'] == 'rejected' and not transaction['accepted']:
-            self.payment.set_rejected(repr(transaction))
+        if(len(transactions) > 0):
+            transaction = transactions[0]
+
+            if transaction['state'] == 'processed' and transaction['accepted']:
+                self.payment.set_confirmed()
+            if transaction['state'] == 'rejected' and not transaction['accepted']:
+                self.payment.set_rejected(repr(transaction))
 
     def __str__(self):
         return str(self.payment.family.email) + " - QuickPay orderid: '" + str(self.order_id) + "' confirmed: '" + str(self.payment.confirmed_dtm) + "'"
