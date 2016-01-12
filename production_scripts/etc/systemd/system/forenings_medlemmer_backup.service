@@ -1,0 +1,12 @@
+[Unit]
+Description=Forenings Medlemmer backup database
+After=auditd.service nss-user-lookup.target systemd-user-sessions.service time-sync.target ypbind.service
+
+[Service]
+User=root
+ExecStart=/opt/backup_django_db.sh
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,9 @@
+[Unit]
+Description=Run django backup timer 
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1hour
+
+[Install]
+WantedBy=basic.target
