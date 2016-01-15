@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django_extensions.db.fields import UUIDField
 import uuid
-import datetime
+from datetime import datetime, timedelta
 from django.template import Engine, Context
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -228,6 +228,10 @@ class Activity(models.Model):
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
 
+# Calculate a day 3 months in future
+def defaultInviteExpiretime():
+    now = timezone.now()
+    return now + timedelta(days=30*3)
 class ActivityInvite(models.Model):
     class Meta:
         verbose_name='invitation'
@@ -236,7 +240,7 @@ class ActivityInvite(models.Model):
     activity = models.ForeignKey(Activity)
     person = models.ForeignKey(Person)
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
-    expire_dtm = models.DateField('Udløber')
+    expire_dtm = models.DateField('Udløber', default=defaultInviteExpiretime)
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
     def save(self, *args, **kwargs):
         if not self.id:
