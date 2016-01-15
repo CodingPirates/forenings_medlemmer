@@ -116,7 +116,7 @@ class FamilyAdmin(admin.ModelAdmin):
     #actions = ['create_new_uuid', 'resend_link_email'] # new UUID gets used accidentially
     actions = ['resend_link_email']
 
-    fields = ('email', 'confirmed_dtm')
+    fields = ('email', 'dont_send_mails', 'confirmed_dtm')
     readonly_fields = ('confirmed_dtm',)
 
     def create_new_uuid(self,request, queryset):

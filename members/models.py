@@ -40,6 +40,7 @@ class Family(models.Model):
 
     unique = UUIDField()
     email = models.EmailField(unique=True)
+    dont_send_mails = models.BooleanField('Vil ikke kontaktes', default=False)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     confirmed_dtm = models.DateTimeField('Bekræftet', null=True, blank=True)
     last_visit_dtm = models.DateTimeField('Sidst besøgt', null=True, blank=True)
@@ -340,16 +341,27 @@ class EmailTemplate(models.Model):
 
         for reciever in recievers:
             # each reciever must be Person, Family or string (email)
-            if type(reciever) not in (Person, Family, str):
-                raise Exception("Reciever must be of type Person, Family or string, not " + str(type(reciever)))
+
+            # Note - string specifically removed. We use family.dont_send_mails to make sure
+            # we dont send unwanted mails.
+
+            if type(reciever) not in (Person, Family):
+                raise Exception("Reciever must be of type Person or Family not " + str(type(reciever)))
 
             # figure out reciever
             if(type(reciever) is str):
+                #check if family blacklisted. (TODO)
                 destination_address = reciever
             elif(type(reciever) is Person):
+                #skip if family does not want email
+                if reciever.family.dont_send_mails:
+                    continue
                 context['person'] = reciever
                 destination_address = reciever.email
             elif(type(reciever) is Family):
+                #skip if family does not want email
+                if reciever.dont_send_mails:
+                    continue
                 context['family'] = reciever
                 destination_address = reciever.email
 

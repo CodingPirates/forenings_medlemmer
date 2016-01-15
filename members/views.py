@@ -424,9 +424,13 @@ def EntryPage(request):
                 # find family
                 try:
                     family = Family.objects.get(email=getLogin.cleaned_data['email'])
-                    # send email to user
-                    family.send_link_email()
-                    return HttpResponseRedirect(reverse('login_email_sent'))
+
+                    if family.dont_send_mails:
+                        getLogin.add_error('email', 'Du har frabedt dig emails fra systemet. Kontakt Coding Pirates direkte.')
+                    else:
+                        # send email to user
+                        family.send_link_email()
+                        return HttpResponseRedirect(reverse('login_email_sent'))
 
                 except Family.DoesNotExist:
                     getLogin.add_error('email', 'Denne addresse er ikke kendt i systemet. Hvis du er sikker på du er oprettet, så check adressen, eller opret dig via tilmeldings formularen først.')
