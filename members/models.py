@@ -491,7 +491,7 @@ class Journal(models.Model):
 
 class AdminUserInformation(models.Model):
     user = models.OneToOneField(User)
-    department = models.ForeignKey(Department, on_delete=models.PROTECT)
+    departments = models.ManyToManyField(Department)
 
 class Payment(models.Model):
     CASH = 'CA'

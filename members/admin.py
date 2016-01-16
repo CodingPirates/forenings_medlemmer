@@ -396,6 +396,7 @@ admin.site.register(EmailTemplate)
 
 class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
+    filter_horizontal = ('departments',)
     can_delete = False
 
 # Define a new User admin
