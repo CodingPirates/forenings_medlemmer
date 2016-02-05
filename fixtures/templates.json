@@ -28,5 +28,35 @@
   },
   "model": "members.emailtemplate",
   "pk": 2
+},
+{
+  "fields": {
+    "name": "Aktivitets invitation",
+    "template_help": "Modellerne: activity, activity_invite, person og family er tilg\u00e6ngelige.",
+    "body_html": "<h1>Hej {{person.name}}!</h1>\r\n<p>Du er blevet inviteret til vores kommende aktivitet: &quot;{{activity.name}}&quot; p&aring; {{activity.department.name}}.&nbsp;</p>\r\n<p>For at komme med, skal dine for&aelig;ldre g&aring; ind p&aring; <a href=\"{{site}}{%url 'family_detail' family.unique %}\">medlemssiden</a></p>\r\n\r\n<p>P&aring; medlemssiden, kan I se pris, sted og tidspunkt og endeligt bekr&aelig;fte og betale.</p>\r\n\r\n<p>Men skynd jer ! - vi lukker flere ind fra ventelisten hver dag, s&aring; derfor er det vigtigt, hvis I vil med, at I melder jer til s&aring; hurtigt som muligt. Tilmeldingen lukker, n&aring;r holdet er fyldt ud.</p>\r\n\r\n<p>Hvis I alligevel ikke er interesserede, s&aring; kan I direkte sige nej tak p&aring; <a href=\"{{site}}{%url 'invitation_decline' family.unique activity_invite.id %}\">dette link</a></p>\r\n\r\n<p>S&aring; kan andre p&aring; ventelisten f&aring; jeres plads!</p>\r\n\r\n<p>Med venlig hilsen Coding Pirates</p>",
+    "idname": "ACT_INVITE",
+    "from_address": "kontakt@codingpirates.dk",
+    "subject": "Coding Pirates har inviteret dig med til {{activity.name}} p\u00e5 {{activity.department.name}}",
+    "updated_dtm": "2015-06-21T15:12:45.584Z",
+    "description": "Sendes ved hver invitation til en aktivitet, sendes til b\u00e5de familie og barnet selv, hvis det har en email adresse.",
+    "body_text": "Hej {{person.name}}!\r\n\r\nDu er blevet inviteret til vores kommende aktivitet: \"{{activity.name}}\" p\u00e5 {{activity.department.name}}.\r\n\r\nFor at komme med, skal dine for\u00e6ldre g\u00e5 ind p\u00e5 medlemssiden:\r\n{{site}}{%url 'family_detail' family.unique  %}\r\n\r\nP\u00e5 medlemssiden, kan I se pris, sted og tidspunkt og endeligt bekr\u00e6fte og betale.\r\n\r\nMen skynd jer ! - vi lukker flere flere ind fra ventelisten hver dag, s\u00e5 derfor er det vigtigt, hvis I vil med, at I melder jer til s\u00e5 hurtigt som muligt. Tilmeldingen lukker, n\u00e5r holdet er fyldt ud.\r\n\r\nHvis I alligevel ikke er interesserede, s\u00e5 kan I direkte sige nej tak p\u00e5 dette link:\r\n{{site}}{%url 'invitation_decline' family.unique activity_invite.id %}\r\nS\u00e5 kan andre p\u00e5 ventelisten f\u00e5 jeres plads!\r\nMed venlig hilsen Coding Pirates"
+  },
+  "model": "members.emailtemplate",
+  "pk": 3
+},
+{
+  "fields": {
+    "name": "Bekr\u00e6ftelse af tilmelding",
+    "template_help": "person, family, activivty er tilg\u00e6ngelig",
+    "body_html": "<h1>Hej {{person.name}},</h1>\r\n\r\n<p>Du er nu tilmeldt aktiviteten {{activity.name}}!</p>\r\n\r\n<p>For at se hvem der ellers har tilmeldt sig, start tidspunkt, adresse og andre informationer, kan du se <a href=\"{{site}}{%url 'activity_view_person' family.unique activity.id person.id %}\">aktivitets infosiden</a></p>\r\n\r\n<p>Tilmeldingen er bindende, men har du betalt via internettet, har du 14 dages fortrydelsesret. Hvis du &oslash;nsker at benytte dig af fortrydelses retten, kontakt da kasserer@codingpirates.dk.</p>\r\n\r\n<p>Hvis du ellers har sp&oslash;rgsm&aring;l omkring Coding Pirates, eller tilmeldingen, s&aring; kontakt gerne <a href=\"mailto:kontakt@codingpirates.dk\">kontakt@codingpirates.dk</a>, eller direkte til den ansvarlige for aktiviteten p&aring; <a href=\"mailto:{{activity.responsible_contact}}\">{{activity.responsible_contact}}</a>.</p>\r\n\r\n<p><em>Vi gl&aelig;der os meget til at se dig! </em></p>\r\n\r\n<p>Med venlig hilsen Coding Pirates</p>",
+    "idname": "ACT_CONFIRM",
+    "from_address": "kontakt@codingpirates.dk",
+    "subject": "Bekr\u00e6ftelse p\u00e5 tilmelding: {{activity.name}}",
+    "updated_dtm": "2015-06-21T18:17:45.584Z",
+    "description": "Sendes n\u00e5r en person har tilmeldt sig en aktivitet",
+    "body_text": "Hej {{person.name}},\r\n\r\nDu er nu tilmeldt aktiviteten {{activity.name}}!\r\n\r\nFor at se hvem der ellers har tilmeldt sig, start tidspunkt, adresse og andre informationer, kan du klikke her:\r\n\r\n{{site}}{%url 'activity_view_person' family.unique activity.id person.id %}\r\n\r\nTilmeldingen er bindende, men har du betalt via internettet, har du 14 dages fortrydelsesret. Hvis du \u00f8nsker at benytte dig af fortrydelses retten, kontakt da kasserer@codingpirates.dk.\r\n\r\nHvis du ellers har sp\u00f8rgsm\u00e5l omkring Coding Pirates, eller tilmeldingen, s\u00e5 kontakt gerne kontakt@codingpirates.dk, eller direkte til den ansvarlige for aktiviteten p\u00e5 {{activity.responsible_contact}}\r\n\r\nVi gl\u00e6der os meget til at se dig!\r\n\r\nMed venlig hilsen Coding Pirates"
+  },
+  "model": "members.emailtemplate",
+  "pk": 4
 }
 ]
