@@ -187,9 +187,17 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
 
 class ActivityInviteAdmin(admin.ModelAdmin):
-    list_display = ('person', 'invite_dtm', 'rejected_dtm')
+    list_display = ('person', 'person_age_years', 'person_zipcode', 'invite_dtm', 'rejected_dtm')
     list_filter = ('activity',)
     list_display_links = None
+
+    def person_age_years(self, item):
+        return item.person.age_years()
+    person_age_years.short_description = 'Alder'
+
+    def person_zipcode(self, item):
+        return item.person.zipcode
+    person_zipcode.short_description = 'Postnummer'
 
 admin.site.register(ActivityInvite, ActivityInviteAdmin)
 
