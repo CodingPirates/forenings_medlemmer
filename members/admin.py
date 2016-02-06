@@ -1,10 +1,15 @@
 from uuid import uuid4
 from django import forms
 from django.contrib import admin
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, Journal, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
+from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.db.models.functions import Lower
 from django.http import HttpResponse
+from django.utils import timezone
+from datetime import timedelta
+from django.core.urlresolvers import reverse
+from django.utils.html import format_html
 
 admin.site.site_header="Coding Pirates Medlemsdatabase"
 admin.site.index_title="Site Admin"
@@ -24,7 +29,8 @@ class DepartmentAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename', 'has_waiting_list']})
     ]
-    list_display = ('name','no_members')
+
+    list_display = ('name', )
 admin.site.register(Department,DepartmentAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
@@ -35,7 +41,21 @@ admin.site.register(Member, MemberAdmin)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'department', 'start_date', 'open_invite', 'price_in_dkk', 'max_participants')
     date_hierarchy = 'start_date'
-    list_filter = ('department','open_invite')
+    #list_filter = ('department','open_invite')
+
+    # Only view activities on own department
+    def get_queryset(self, request):
+        qs = super(ActivityAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        departments = Department.objects.filter(adminuserinformation__user=request.user)
+        return qs.filter(department__in=departments)
+
+    # Only show own departments when creating new activity
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if(db_field.name == 'department' and not request.user.is_superuser):
+            kwargs["queryset"] = Department.objects.filter(adminuserinformation__user=request.user)
+        return super(ActivityAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     fieldsets = (
         ('Afdeling', {'fields': (
@@ -79,8 +99,14 @@ class ActivityAdmin(admin.ModelAdmin):
 admin.site.register(Activity, ActivityAdmin)
 
 class PersonInline(admin.TabularInline):
+
+    def admin_link(self, instance):
+        url = reverse('admin:%s_%s_change' % (instance._meta.app_label, instance._meta.model_name), args=(instance.id,))
+        return format_html(u'<a href="{}">{}</a>', url, instance.name)
+    admin_link.short_description = 'Navn'
+
     model = Person
-    fields = ('membertype', 'name', 'zipcode', 'added')
+    fields = ('admin_link', 'membertype', 'zipcode', 'added')
     readonly_fields = fields
     extra = 0
 
@@ -97,11 +123,29 @@ class ActivityParticipantInline(admin.TabularInline):
     def get_queryset(self, request):
         return ActivityParticipant.objects.all()
 
+
 class ActivityInviteInline(admin.TabularInline):
     model = ActivityInvite
     extra = 0
 
+    # Limit the activity possible to invite to: Not finished and belonging to user
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if(db_field.name == 'activity' and not request.user.is_superuser):
+            departments = Department.objects.filter(adminuserinformation__user=request.user)
+            kwargs["queryset"] = Activity.objects.filter(end_date__gt=timezone.now(), department__in=departments)
+        return super(ActivityInviteInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    # Only view invites it would be possible for user to give out
+    def get_queryset(self, request):
+        qs = super(ActivityInviteInline, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        departments = Department.objects.filter(adminuserinformation__user=request.user)
+        return qs.filter(activity__end_date__gt=timezone.now(), activity__department__in=departments)
+
 class MemberInline(admin.TabularInline):
+    fields = ['department', 'member_since', 'member_until']
+    readonly_fields = fields
     model = Member
     extra = 0
 
@@ -179,17 +223,102 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         elif self.value() == 'rejected':
             return queryset.filter(payment__isnull=False, payment__rejected_dtm__isnull=False)
 
+class ActivityParticipantListFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = 'Efter aktivitet'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name='activity'
+
+    def lookups(self, request, model_admin):
+        activitys = []
+        if request.user.is_superuser:
+            departments = Department.objects.filter()
+        else:
+            departments = Department.objects.filter(adminuserinformation__user=request.user)
+
+        for activity in Activity.objects.filter(department__in=departments).order_by('start_date').order_by('zipcode'):
+            activitys.append(( str(activity.pk), str(activity)))
+        return activitys
+
+    def queryset(self, request, queryset):
+        if(self.value() == None):
+            return queryset
+        else:
+            return queryset.filter(activity=self.value())
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = ['added_dtm', 'member', 'activity', 'note']
-    list_filter = ('activity',ParticipantPaymentListFilter)
+    list_filter = (ActivityParticipantListFilter,ParticipantPaymentListFilter)
     list_display_links = ('member',)
+    search_fields = ('member__person__name', )
+
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
 
+
+class ActivityInviteAdminForm(forms.ModelForm):
+    class Meta:
+        model = ActivityInvite
+        exclude = []
+
+    def __init__(self, *args, **kwds):
+        super(ActivityInviteAdminForm, self).__init__(*args, **kwds)
+        self.fields['person'].queryset = Person.objects.order_by(Lower('name'))
+
+class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = 'Aktiviteter'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'activity'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+
+        if request.user.is_superuser:
+            departments = Department.objects.filter()
+        else:
+            departments = Department.objects.filter(adminuserinformation__user=request.user)
+
+        activitys = []
+        for activity in Activity.objects.filter(department__in=departments).order_by('zipcode'):
+            activitys.append(( str(activity.pk), activity))
+
+        return activitys
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+
+        if self.value() == None:
+            return queryset
+        else:
+            return queryset.filter(activity__pk=self.value())
+
 class ActivityInviteAdmin(admin.ModelAdmin):
-    list_display = ('person', 'invite_dtm', 'rejected_dtm')
-    list_filter = ('activity',)
+    list_display = ('person', 'activity', 'invite_dtm', 'rejected_dtm')
+    list_filter = (ActivivtyInviteActivityListFilter,)
+    search_fields = ('person__name', )
     list_display_links = None
+    form = ActivityInviteAdminForm
+
+    # Limit the activity possible to invite to: Not finished and belonging to user
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if(db_field.name == 'activity' and not request.user.is_superuser):
+            departments = Department.objects.filter(adminuserinformation__user=request.user)
+            kwargs["queryset"] = Activity.objects.filter(end_date__gt=timezone.now(), department__in=departments)
+        return super(ActivityInviteAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(ActivityInvite, ActivityInviteAdmin)
 
@@ -210,8 +339,13 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
+        if request.user.is_superuser:
+            department_queryset = Department.objects.filter(has_waiting_list=True).order_by('zipcode')
+        else:
+            department_queryset = Department.objects.filter(has_waiting_list=True, adminuserinformation__user=request.user).order_by('zipcode')
+
         departments = [('any', 'Alle opskrevne samlet'), ('none', 'Ikke skrevet på venteliste')]
-        for department in Department.objects.filter(has_waiting_list=True).order_by('zipcode'):
+        for department in department_queryset:
             departments.append(( str(department.pk), department.name))
 
         return departments
@@ -250,8 +384,13 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        activitys = [('none', 'Deltager ikke')]
-        for activity in Activity.objects.filter().order_by('zipcode'):
+        if request.user.is_superuser:
+            my_departments = Department.objects.filter()
+        else:
+            my_departments = Department.objects.filter(adminuserinformation__user=request.user)
+
+        activitys = [('none', 'Deltager ikke'), ('any', 'Alle deltagere samlet')]
+        for activity in Activity.objects.filter(department__in=my_departments).order_by('start_date').order_by('zipcode'):
             activitys.append(( str(activity.pk), str(activity)))
 
         return activitys
@@ -267,17 +406,19 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
 
         if(self.value() == 'none'):
             return queryset.filter(member__activityparticipant__isnull=True)
+        elif(self.value() == 'any'):
+            return queryset.exclude(member__activityparticipant__isnull=True)
         elif(self.value() == None):
             return queryset
         else:
             return queryset.filter(member__activityparticipant__activity=self.value())
 
-class PersonFamilyConfirmedListFilter(admin.SimpleListFilter):
+class PersonInvitedListFilter(admin.SimpleListFilter):
     # Title shown in filter view
-    title = 'Familie bekræftet'
+    title = 'Inviteret til'
 
     # Parameter for the filter that will be used in the URL query.
-    parameter_name = 'fam_confirmed_list'
+    parameter_name = 'activity_invited_list'
 
     def lookups(self, request, model_admin):
         """
@@ -288,7 +429,14 @@ class PersonFamilyConfirmedListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        activitys = [('unconfirmed', 'Ikke bekræftet'), ('confirmed', 'Bekræftet')]
+        if request.user.is_superuser:
+            my_departments = Department.objects.filter()
+        else:
+            my_departments = Department.objects.filter(adminuserinformation__user=request.user)
+
+        activitys = [('none', 'Ikke inviteret til noget'), ('any', 'Alle inviterede')]
+        for activity in Activity.objects.filter(department__in=my_departments).order_by('start_date').order_by('zipcode'):
+            activitys.append(( str(activity.pk), str(activity)))
 
         return activitys
 
@@ -301,24 +449,34 @@ class PersonFamilyConfirmedListFilter(admin.SimpleListFilter):
         # Compare the requested value (either '80s' or '90s')
         # to decide how to filter the queryset.
 
-        if(self.value() == 'unconfirmed'):
-            return queryset.filter(family__confirmed_dtm=None)
-        elif(self.value() == 'confirmed'):
-            return queryset.filter(family__confirmed_dtm__isnull=False)
-        else:
+        if(self.value() == 'none'):
+            return queryset.filter(activityinvite__isnull=True)
+        elif(self.value() == 'any'):
+            return queryset.exclude(activityinvite__isnull=True)
+        elif(self.value() == None):
             return queryset
+        else:
+            return queryset.filter(activityinvite__activity=self.value())
+
 
 class WaitingListInline(admin.TabularInline):
     model = WaitingList
+    fields = ['on_waiting_list_since', 'department', 'number_on_waiting_list']
+    readonly_fields = fields
     extra = 0
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
-    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter, PersonParticipantListFilter, PersonFamilyConfirmedListFilter)
+    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
     search_fields = ('name', 'family__email',)
     actions = ['invite_to_own_activity', 'export_emaillist', 'export_csv']
 
     inlines = [PaymentInline, ActivityInviteInline, MemberInline, WaitingListInline]
+
+    def family_url(self, item):
+        return format_html(u'<a href="../family/%d">%s</a>' % (item.family.id, item.family.email))
+    family_url.allow_tags = True
+    family_url.short_description = 'Familie'
 
     # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
@@ -347,11 +505,6 @@ class PersonAdmin(admin.ModelAdmin):
         else:
             return []
 
-    def family_url(self, item):
-        return '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
-    family_url.allow_tags = True
-    family_url.short_description = 'Familie'
-
     def unique(self, item):
         return item.family.unique if item.family != None else ''
 
@@ -364,7 +517,7 @@ class PersonAdmin(admin.ModelAdmin):
         family_email = []
         for person in queryset:
             family_email.append(person.family.email)
-        result_string = result_string + ',\n'.join(list(set(family_email)))
+        result_string = result_string + ';\n'.join(list(set(family_email)))
         result_string = result_string + "\n\n\nHusk nu at bruge Bcc! ... IKKE TO: og heller IKKE CC: felterne\n\n"
 
         return HttpResponse(result_string, content_type="text/plain")
@@ -386,11 +539,6 @@ class PersonAdmin(admin.ModelAdmin):
     export_csv.short_description = "Exporter CSV"
 
 admin.site.register(Person,PersonAdmin)
-
-class JournalAdmin(admin.ModelAdmin):
-    readonly_fields = ['family', 'person']
-
-admin.site.register(Journal, JournalAdmin)
 
 admin.site.register(EmailTemplate)
 
