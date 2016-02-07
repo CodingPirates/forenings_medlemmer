@@ -518,6 +518,8 @@ class PersonAdmin(admin.ModelAdmin):
     family_url.allow_tags = True
     family_url.short_description = 'Familie'
 
+
+
     # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
     def get_fieldsets(self, request, person=None):
@@ -525,17 +527,19 @@ class PersonAdmin(admin.ModelAdmin):
             contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone')
         else:
             if(person.membertype == Person.CHILD):
-                contact_fields = ('name', 'city', 'zipcode')
+                contact_fields = ('name', 'city', 'zipcode', 'family')
             else:
-                contact_fields = ('name', 'city', 'zipcode', 'email', 'phone')
+                contact_fields = ('name', 'city', 'zipcode', 'email', 'phone', 'family')
 
         fieldsets = (
-            ('Informationer' , {
-                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'family'),
-            }),
             ('Kontakt Oplysninger', {
                 'fields' : contact_fields
-            }))
+            }),
+            ('Yderlige informationer' , {
+                'classes' : ('collapse', ),
+                'fields' : ('membertype', 'birthday', 'has_certificate', 'added'),
+                        }),
+)
 
         return fieldsets
 
