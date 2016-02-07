@@ -73,26 +73,22 @@ class ActivityAdmin(admin.ModelAdmin):
         )
         }
          ),
-        ('Aktivitet', {'fields': (
+        ('Aktivitet',
+            {'description' : '<p>Aktivitets navnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårs sæson 2016</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>',
+            'fields': (
             'name',
             'open_hours',
             'description',
-            'instructions',
-            'open_invite',
-            'price_in_dkk',
             'start_date',
             'end_date',
-            'signup_closing',
-            'max_participants',
-            'min_age',
-            'max_age',
-            'responsible_name',
-            'responsible_contact',
-
         )
         }
          ),
-        ('Lokation', {'fields': (
+        ('Lokation og ansvarlig', {
+            'description': '<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer. (f.eks. et gamejam der foregår et andet sted)</p>',
+            'fields': (
+            'responsible_name',
+            'responsible_contact',
             'streetname',
             'housenumber',
             'floor',
@@ -102,7 +98,20 @@ class ActivityAdmin(admin.ModelAdmin):
             'placename'
         )
         }
+         ),
+
+         ('Tilmeldings detaljer', {
+         'description' : '<p>Tilmeldings instruktioner er tekst der kommer til at stå på betalings forularen på tilmeldings siden. Den skal bruges til at stille spørgsmål som den der tilmelder sig kan besvare ved tilmelding.</p><p>Fri tilmelding, betyder at alle kan når som helst tilmelde sig denne aktivitet - først til mølle. Dette er kun til arrangementer og klubaften-sæsoner i områder hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlems siden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+         'fields' : (
+            'instructions',
+            'open_invite',
+            'price_in_dkk',
+            'signup_closing',
+            'max_participants',
+            'min_age',
+            'max_age',
          )
+         })
     )
 
     #inlines = [ActivityParticipantInline, ActivityInviteInline]
