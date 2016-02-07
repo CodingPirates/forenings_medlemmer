@@ -307,7 +307,7 @@ class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
             return queryset.filter(activity__pk=self.value())
 
 class ActivityInviteAdmin(admin.ModelAdmin):
-    list_display = ('person', 'activity', 'invite_dtm', 'rejected_dtm')
+    list_display = ('person', 'activity', 'invite_dtm', 'person_age_years', 'person_zipcode', 'rejected_dtm')
     list_filter = (ActivivtyInviteActivityListFilter,)
     search_fields = ('person__name', )
     list_display_links = None
@@ -319,6 +319,14 @@ class ActivityInviteAdmin(admin.ModelAdmin):
             departments = Department.objects.filter(adminuserinformation__user=request.user)
             kwargs["queryset"] = Activity.objects.filter(end_date__gt=timezone.now(), department__in=departments)
         return super(ActivityInviteAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def person_age_years(self, item):
+        return item.person.age_years()
+    person_age_years.short_description = 'Alder'
+
+    def person_zipcode(self, item):
+        return item.person.zipcode
+    person_zipcode.short_description = 'Postnummer'
 
 admin.site.register(ActivityInvite, ActivityInviteAdmin)
 
