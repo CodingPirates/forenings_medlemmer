@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Backup Database before updating
+/opt/backup_django_db.sh
+
+# Update project source
+git --work-tree=/opt/forenings_medlemmer --git-dir=/root/forenings_medlemmer.git checkout -f
+
+# Use production config file
+export DJANGO_SETTINGS_MODULE=forenings_medlemmer.settings_production
+
+# Enter virtual environment
+cd /opt/forenings_medlemmer
+
+. /opt/virtualenv/forenings_medlemmer/bin/activate
+
+
+# Update dependencys
+
+pip install -I -r requirements.txt
+
+# Migrate DB
+./manage.py migrate --noinput
+
+# Build static file library
+./manage.py collectstatic --noinput --clear
+
+# Restart gunicorn & nginx
+systemctl restart forenings_medlemmer_gunicorn
+systemctl restart nginx

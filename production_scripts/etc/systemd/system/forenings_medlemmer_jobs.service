@@ -1,0 +1,12 @@
+[Unit]
+Description=Forenings Medlemmer baggrundsjobs
+After=auditd.service nss-user-lookup.target systemd-user-sessions.service time-sync.target ypbind.service
+
+[Service]
+User=nginx
+ExecStart=/opt/run_django_jobs.sh
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+

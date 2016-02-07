@@ -1,0 +1,12 @@
+[Unit]
+Description=Forenings Medlemmer Gunicorn Django server
+After=auditd.service nss-user-lookup.target systemd-user-sessions.service time-sync.target ypbind.service
+
+[Service]
+User=nginx
+ExecStart=/opt/start_django.sh
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target
+
