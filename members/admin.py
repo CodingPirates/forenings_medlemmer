@@ -27,7 +27,17 @@ class EmailItemInline(admin.TabularInline):
 
 class DepartmentAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields':['name', 'description', 'open_hours', 'responsible_name', 'responsible_contact', 'streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename', 'has_waiting_list']})
+        ('Beskrivelse',
+            {'fields':('name', 'description', 'open_hours'),
+            'description': '<p>Lav en beskrivelse af jeres aktiviteter, teknologier og tekniske niveau.</p><p>Åbningstid er ugedag samt tidspunkt<p>'}),
+        ('Ansvarlig',
+            {'fields':('responsible_name', 'responsible_contact')}),
+        ('Adresse',
+            {'fields':('streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename')}),
+        ('Yderlige data',
+            {'fields':('has_waiting_list', 'created', 'closed_dtm'),
+            'description' : '<p>Venteliste betyder at børn har mulighed for at skrive sig på ventelisten (tilkendegive interesse for denne afdeling). Den skal typisk altid være krydset af.</p>',
+            'classes': ('collapse',)}),
     ]
 
     list_display = ('name', )
