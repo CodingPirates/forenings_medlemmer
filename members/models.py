@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.models import User
 from quickpay import QPClient
+from django.core.exceptions import ValidationError
 
 
 def format_address(streetname, housenumber, floor=None, door=None):
@@ -245,6 +246,12 @@ class ActivityInvite(models.Model):
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
     expire_dtm = models.DateField('Udløber', default=defaultInviteExpiretime)
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
+
+    def clean(self):
+        # Make sure we are not inviting outside activivty age limit
+        if(self.person.age_years() < self.activity.min_age or self.person.age_years() > self.activity.max_age):
+            raise ValidationError('Aktiviteten er kun for personer mellem ' + str(self.activity.min_age) + ' og ' + str(self.activity.max_age) + ' år');
+
     def save(self, *args, **kwargs):
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
