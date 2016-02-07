@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.models import User
 from quickpay import QPClient
+from django.core.exceptions import ValidationError
 
 
 def format_address(streetname, housenumber, floor=None, door=None):
@@ -32,7 +33,7 @@ def format_address(streetname, housenumber, floor=None, door=None):
 
 class Family(models.Model):
     class Meta:
-        verbose_name = 'familie'
+        verbose_name = 'Familie'
         verbose_name_plural = 'Familier'
         permissions = (
             ("view_family_unique", "Can view family UUID field (password) - gives access to address"),
@@ -67,6 +68,7 @@ class Family(models.Model):
 
 class Person(models.Model):
     class Meta:
+        verbose_name = "Person"
         verbose_name_plural='Personer'
         ordering=['added']
         permissions = (
@@ -132,8 +134,8 @@ class Person(models.Model):
 class Department(models.Model):
     class Meta:
         verbose_name_plural='Afdelinger'
-        verbose_name='afdeling'
-        ordering=['name']
+        verbose_name='Afdeling'
+        ordering=['zipcode']
     name = models.CharField('Navn',max_length=200)
     description = models.TextField('Beskrivelse af afdeling', blank=True)
     open_hours = models.CharField('Åbningstid',max_length=200, blank=True)
@@ -147,9 +149,10 @@ class Department(models.Model):
     floor = models.CharField('Etage',max_length=10, blank=True)
     door = models.CharField('Dør',max_length=10, blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
-    has_waiting_list = models.BooleanField('Venteliste',default=False)
+    has_waiting_list = models.BooleanField('Venteliste',default=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     created = models.DateField('Oprettet', blank=False, default=timezone.now)
+    closed_dtm = models.DateField('Lukket', blank=True, null=True, default=None)
     def no_members(self):
         return self.member_set.count()
     no_members.short_description = 'Antal medlemmer'
@@ -160,13 +163,15 @@ class Department(models.Model):
 
 class WaitingList(models.Model):
     class Meta:
-        verbose_name_plural='På venteliste'
+        verbose_name="På venteliste"
+        verbose_name_plural='På ventelister'
         ordering=['on_waiting_list_since']
     person = models.ForeignKey(Person)
     department = models.ForeignKey(Department)
     on_waiting_list_since = models.DateField('Tilføjet', blank=True, null=True)
     def number_on_waiting_list(self):
-        return WaitingList.objects.filter(department = self.department,on_waiting_list_since__lt = self.on_waiting_list_since).count()+1
+        return WaitingList.objects.filter(department = self.department, on_waiting_list_since__lt = self.on_waiting_list_since).count()+1
+    number_on_waiting_list.short_description = 'Position på venteliste'
     def save(self, *args,**kwargs):
         ''' On creation set on_waiting_list '''
         if not self.id:
@@ -175,7 +180,7 @@ class WaitingList(models.Model):
 
 class Member(models.Model):
     class Meta:
-        verbose_name = 'medlem'
+        verbose_name = 'Medlem'
         verbose_name_plural = 'Medlemmer'
         ordering = ['is_active','member_since']
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
@@ -191,9 +196,9 @@ class Member(models.Model):
 
 class Activity(models.Model):
     class Meta:
-        verbose_name='aktivitet'
+        verbose_name='Aktivitet'
         verbose_name_plural = 'Aktiviteter'
-        ordering =['start_date']
+        ordering = ['department__zipcode','start_date']
     department = models.ForeignKey(Department)
     name = models.CharField('Navn',max_length=200)
     open_hours = models.CharField('Tidspunkt',max_length=200)
@@ -234,7 +239,7 @@ def defaultInviteExpiretime():
     return now + timedelta(days=30*3)
 class ActivityInvite(models.Model):
     class Meta:
-        verbose_name='invitation'
+        verbose_name='Invitation'
         verbose_name_plural = 'Invitationer'
         unique_together = ('activity', 'person')
     activity = models.ForeignKey(Activity)
@@ -242,6 +247,12 @@ class ActivityInvite(models.Model):
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
     expire_dtm = models.DateField('Udløber', default=defaultInviteExpiretime)
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
+
+    def clean(self):
+        # Make sure we are not inviting outside activivty age limit
+        if(self.person.age_years() < self.activity.min_age or self.person.age_years() > self.activity.max_age):
+            raise ValidationError('Aktiviteten er kun for personer mellem ' + str(self.activity.min_age) + ' og ' + str(self.activity.max_age) + ' år');
+
     def save(self, *args, **kwargs):
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
@@ -266,7 +277,7 @@ class ActivityInvite(models.Model):
 
 class ActivityParticipant(models.Model):
     class Meta:
-        verbose_name = 'deltager'
+        verbose_name = 'Deltager'
         verbose_name_plural = 'Deltagere'
         unique_together = ('activity', 'member')
     added_dtm = models.DateField('Tilmeldt', default=timezone.now)
@@ -478,20 +489,9 @@ class Notification(models.Model):
     anounced_activity = models.ForeignKey(Activity, null=True)
     anounced_activity_participant = models.ForeignKey(ActivityParticipant, null=True)
 
-class Journal(models.Model):
-    class Meta:
-        verbose_name = 'Journal'
-        verbose_name_plural = 'Journaler'
-    family = models.ForeignKey(Family)
-    person = models.ForeignKey(Person, null=True)
-    created_dtm = models.DateTimeField('Oprettet',auto_now_add=True)
-    body = models.TextField('Indhold')
-    def __str__(self):
-        return self.family.email
-
 class AdminUserInformation(models.Model):
     user = models.OneToOneField(User)
-    department = models.ForeignKey(Department, on_delete=models.PROTECT)
+    departments = models.ManyToManyField(Department)
 
 class Payment(models.Model):
     CASH = 'CA'

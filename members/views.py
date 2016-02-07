@@ -29,7 +29,7 @@ def FamilyDetails(request,unique):
 
     department_children_waiting = {'departments': {}}
     loop_counter=0
-    for department in Department.objects.filter(has_waiting_list = True).order_by('zipcode'):
+    for department in Department.objects.filter(has_waiting_list = True, closed_dtm=None).order_by('zipcode'):
         department_children_waiting['departments'][loop_counter] = {}
         department_children_waiting['departments'][loop_counter]['object'] = department
         department_children_waiting['departments'][loop_counter]['children_status'] = {}
@@ -482,7 +482,7 @@ def waitinglistView(request, unique=None):
     department_children_waiting = {'departments': {}}
     department_loop_counter=0
     #deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)
-    deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode')
+    deparments_query = Department.objects.filter(has_waiting_list = True, closed_dtm=None).order_by('zipcode')
 
     for department in deparments_query:
         department_children_waiting['departments'][department_loop_counter] = {}
