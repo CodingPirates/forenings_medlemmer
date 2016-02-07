@@ -332,6 +332,19 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     list_display_links = None
     form = ActivityInviteAdminForm
 
+    fieldsets = (
+        (None, {
+        'description' : '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson.</p>',
+
+        'fields' : (
+        'person',
+        'activity',
+        'invite_dtm',
+        'expire_dtm',
+        'rejected_dtm'
+        )
+    }),)
+
     # Limit the activity possible to invite to: Not finished and belonging to user
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if(db_field.name == 'activity' and not request.user.is_superuser):
