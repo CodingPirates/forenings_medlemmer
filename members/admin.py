@@ -26,6 +26,14 @@ class EmailItemInline(admin.TabularInline):
     extra = 0
 
 class DepartmentAdmin(admin.ModelAdmin):
+
+    # Only show own departments
+    def get_queryset(self, request):
+        qs = super(DepartmentAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(adminuserinformation__user=request.user)
+
     fieldsets = [
         ('Beskrivelse',
             {'fields':('name', 'description', 'open_hours'),
@@ -272,6 +280,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display_links = ('member',)
     search_fields = ('member__person__name', )
 
+    # Only show participants to own departments
+    def get_queryset(self, request):
+        qs = super(ActivityParticipantAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(activity__department__adminuserinformation__user=request.user)
+
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
 
 
@@ -332,9 +347,16 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     list_display_links = None
     form = ActivityInviteAdminForm
 
+    # Only show invitation to own activities
+    def get_queryset(self, request):
+        qs = super(ActivityInviteAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(activity__department__adminuserinformation__user=request.user)
+
     fieldsets = (
         (None, {
-        'description' : '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson.</p>',
+        'description' : '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson. Herefter kan du trykke på personen og tilføje invitationer til personens invitations liste.</p>',
 
         'fields' : (
         'person',
