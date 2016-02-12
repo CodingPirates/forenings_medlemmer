@@ -1,6 +1,7 @@
 from uuid import uuid4
 from django import forms
 from django.contrib import admin
+from django.db.models import Q
 from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -54,6 +55,15 @@ admin.site.register(Department,DepartmentAdmin)
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name','department', 'member_since','is_active')
     list_filter = ['department']
+
+    # Only view mebers related to users department
+    def get_queryset(self, request):
+        qs = super(MemberAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        departments = Department.objects.filter(adminuserinformation__user=request.user).values('id')
+        return qs.filter(activityparticipant__activity__department__in=departments).distinct()
+
 admin.site.register(Member, MemberAdmin)
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -210,6 +220,15 @@ class FamilyAdmin(admin.ModelAdmin):
             message_bit = "%s familier" % queryset.count()
         self.message_user(request, "%s fik fik tilsendt link e-mail." % message_bit)
     resend_link_email.short_description = "Gensend link e-mail"
+
+    # Only view familys related to users department (via participant, waitinglist & invites)
+    def get_queryset(self, request):
+        qs = super(FamilyAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        departments = Department.objects.filter(adminuserinformation__user=request.user).values('id')
+        return qs.filter(Q(person__member__activityparticipant__activity__department__in=departments) | Q(person__waitinglist__department__in=departments) | Q(person__activityinvite__activity__department__in=departments)).distinct()
+
 
 admin.site.register(Family, FamilyAdmin)
 
@@ -603,6 +622,14 @@ class PersonAdmin(admin.ModelAdmin):
             response['Content-Disposition'] = 'attachment; filename="personer.csv"'
         return response
     export_csv.short_description = "Exporter CSV"
+
+    # Only view persons related to users department (all family, via participant, waitinglist & invites)
+    def get_queryset(self, request):
+        qs = super(PersonAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        departments = Department.objects.filter(adminuserinformation__user=request.user).values('id')
+        return qs.filter(Q(family__person__member__activityparticipant__activity__department__in=departments) | Q(family__person__waitinglist__department__in=departments) | Q(family__person__activityinvite__activity__department__in=departments)).distinct()
 
 admin.site.register(Person,PersonAdmin)
 
