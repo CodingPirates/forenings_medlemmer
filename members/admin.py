@@ -601,7 +601,8 @@ class PersonAdmin(admin.ModelAdmin):
         result_string = "kopier denne liste direkte ind i dit email program (Husk at bruge Bcc!)\n\n"
         family_email = []
         for person in queryset:
-            family_email.append(person.family.email)
+            if not person.family.dont_send_mails:
+                family_email.append(person.family.email)
         result_string = result_string + ';\n'.join(list(set(family_email)))
         result_string = result_string + "\n\n\nHusk nu at bruge Bcc! ... IKKE TO: og heller IKKE CC: felterne\n\n"
 
@@ -617,7 +618,14 @@ class PersonAdmin(admin.ModelAdmin):
             else:
                 parent_phone=""
 
-            result_string = result_string + person.name + ";" + str(person.age_years()) + ";" + str(person.added) + ";" + person.phone + ";" + person.email + ";" + parent_phone + ";" + person.family.email + "\n"
+            if not person.family.dont_send_mails:
+                person_email = person.email
+                family_email = person.family.email
+            else:
+                person_email = ""
+                family_email = ""
+
+            result_string = result_string + person.name + ";" + str(person.age_years()) + ";" + str(person.added) + ";" + person.phone + ";" + person_email + ";" + parent_phone + ";" + family_email + "\n"
             response = HttpResponse(result_string, content_type="text/csv")
             response['Content-Disposition'] = 'attachment; filename="personer.csv"'
         return response
