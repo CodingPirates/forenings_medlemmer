@@ -73,6 +73,7 @@ class Person(models.Model):
         ordering=['added']
         permissions = (
             ("view_full_address", "Can view persons full address + phonenumber + email"),
+            ("view_all_persons", "Can view persons not related to department"),
         )
 
     PARENT = 'PA'

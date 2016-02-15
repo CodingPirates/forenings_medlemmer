@@ -580,7 +580,7 @@ class PersonAdmin(admin.ModelAdmin):
                 'classes' : ('collapse', ),
                 'fields' : ('membertype', 'birthday', 'has_certificate', 'added'),
                         }),
-)
+                        )
 
         return fieldsets
 
@@ -634,10 +634,11 @@ class PersonAdmin(admin.ModelAdmin):
     # Only view persons related to users department (all family, via participant, waitinglist & invites)
     def get_queryset(self, request):
         qs = super(PersonAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm('members.view_all_persons'):
             return qs
-        departments = Department.objects.filter(adminuserinformation__user=request.user).values('id')
-        return qs.filter(Q(family__person__member__activityparticipant__activity__department__in=departments) | Q(family__person__waitinglist__department__in=departments) | Q(family__person__activityinvite__activity__department__in=departments)).distinct()
+        else:
+            departments = Department.objects.filter(adminuserinformation__user=request.user).values('id')
+            return qs.filter(Q(family__person__member__activityparticipant__activity__department__in=departments) | Q(family__person__waitinglist__department__in=departments) | Q(family__person__activityinvite__activity__department__in=departments)).distinct()
 
 admin.site.register(Person,PersonAdmin)
 
