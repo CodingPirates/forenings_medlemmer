@@ -1,9 +1,10 @@
 from django.conf.urls import patterns,  url
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
-    waitinglistView, paymentGatewayErrorView
+    waitinglistView, paymentGatewayErrorView, volunteerSignup
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
+    url(r'volunteer$', volunteerSignup, name='volunteer_signup'),
     url(r'login_email_sent/$', loginEmailSent, name='login_email_sent'),
     url(r'family/(?P<unique>[\w-]+)/$', FamilyDetails, name='family_detail'),
     url(r'family/(?P<unique>[\w-]+)/Person/(?P<id>[\d]+)/$', PersonUpdate, name='person_update'),
