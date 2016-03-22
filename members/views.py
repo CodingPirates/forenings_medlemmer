@@ -450,12 +450,12 @@ def volunteerSignup(request):
                 # signup has been filled
                 getLogin = getLoginForm()
                 vol_signup = vol_signupForm(request.POST)
-                if signup.is_valid():
+                if vol_signup.is_valid():
                     # check if family already exists
                     try:
                         family = Family.objects.get(email__iexact=request.POST['volunteer_email'])
                         # family was already created - we can't create this family again
-                        signup.add_error('volunteer_email', 'Denne email adresse er allerede oprettet. Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
+                        vol_signup.add_error('volunteer_email', 'Denne email adresse er allerede oprettet. Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
                         return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
                     except:
                         # all is fine - we did not expect any
@@ -467,17 +467,17 @@ def volunteerSignup(request):
 
                     #create volunteer
                     volunteer = Person.objects.create(membertype = Person.VOLUNTEER,
-                        name = signup.cleaned_data['volunteer_name'],
-                        zipcode = signup.cleaned_data['zipcode'],
-                        city = signup.cleaned_data['city'],
-                        streetname = signup.cleaned_data['streetname'],
-                        housenumber = signup.cleaned_data['housenumber'],
-                        floor = signup.cleaned_data['floor'],
-                        door = signup.cleaned_data['door'],
-                        dawa_id = signup.cleaned_data['dawa_id'],
-                        placename = signup.cleaned_data['placename'],
-                        email = signup.cleaned_data['volunteer_email'],
-                        phone = signup.cleaned_data['volunteer_phone'],
+                        name = vol_signup.cleaned_data['volunteer_name'],
+                        zipcode = vol_signup.cleaned_data['zipcode'],
+                        city = vol_signup.cleaned_data['city'],
+                        streetname = vol_signup.cleaned_data['streetname'],
+                        housenumber = vol_signup.cleaned_data['housenumber'],
+                        floor = vol_signup.cleaned_data['floor'],
+                        door = vol_signup.cleaned_data['door'],
+                        dawa_id = vol_signup.cleaned_data['dawa_id'],
+                        placename = vol_signup.cleaned_data['placename'],
+                        email = vol_signup.cleaned_data['volunteer_email'],
+                        phone = vol_signup.cleaned_data['volunteer_phone'],
                         family = family
                         )
                     volunteer.save()
