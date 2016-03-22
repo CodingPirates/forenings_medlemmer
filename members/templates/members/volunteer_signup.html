@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="da">
+  <head>
+    {% load staticfiles %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    {% load bootstrap3 %}
+    {% load crispy_forms_tags %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
+    <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
+    <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
+    <script>
+     $(function() {
+      $( ".datepicker" ).datepicker({
+        format: "dd-mm-yyyy",
+        autoclose: true,
+        weekStart: 1,
+        language: 'da'
+      });
+      $('#search-address').dawaautocomplete({
+      select: function(event, adresse) {
+        // denne funktion bliver kaldt når brugeren vælger en adresse.
+        // Udfyld adressefelterne
+        $("#id_streetname").val(adresse.adresse.vejnavn);
+        $("#id_housenumber").val(adresse.adresse.husnr);
+        $("#id_floor").val(adresse.adresse.etage);
+        $("#id_door").val(adresse.adresse.dør);
+        $("#id_placename").val(adresse.adresse.supplerendebynavn);
+        $("#id_zipcode").val(adresse.adresse.postnr);
+        $("#id_city").val(adresse.adresse.postnrnavn);
+        $("#id_dawa_id").val(adresse.adresse.id);
+      }});
+      $("#manual-entry").click(function() {
+        $("#id_streetname").val('');
+        $("#id_housenumber").val('');
+        $("#id_floor").val('');
+        $("#id_door").val('');
+        $("#id_placename").val('');
+        $("#id_zipcode").val('');
+        $("#id_city").val('');
+        $("#id_dawa_id").val(null);
+        $("#search-address").val(null);
+
+        var checked = $("#manual-entry").get(0).checked;
+        $(".autofilled-address").attr("readonly", !checked);
+        $("#search-address").attr("readonly", checked);
+      });
+    });
+    </script>
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Gå til min side</h1>
+          <p>Hvis du allerede har tilmeldt dig, så kan du ved at skrive din emailadresse her, få et nyt link til at ændre dine data.</p>
+        </div>
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              {% crispy loginform %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Tilmelding til Coding Pirates (for frivillige)</h1>
+          <p>Indtast dine oplysninger, for at tilmelde dig som frivillig i en Coding Pirates afdeling.</p>
+        </div>
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+            {% crispy signupform %}
+            </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>

@@ -25,6 +25,19 @@ class PersonForm(forms.ModelForm):
                        )
                 )
             self.fields['birthday'].required = True
+        elif self.instance != None and self.instance.membertype == Person.VOLUNTEER:
+            nameFieldSet = Fieldset('Frivilliges oplysninger',
+                    Div(
+                        Div(Field('gender'), css_class="col-md-2"),
+                        Div(Field('name'), css_class="col-md-10"),
+                        Div(Field('birthday'), css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
+                        Div(Field('email'), css_class="col-md-4"),
+                        Div(Field('phone'), css_class="col-md-4"),
+                        css_class="row"
+                    )
+            )
+            self.fields['email'].required = True
+            self.fields['phone'].required = True
         else:
             nameFieldSet = Fieldset('Forældres / Værges oplysninger',
                         Div(
