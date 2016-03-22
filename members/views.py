@@ -510,7 +510,7 @@ def volunteerSignup(request):
                     except Family.DoesNotExist:
                         getLogin.add_error('email', 'Denne addresse er ikke kendt i systemet. Hvis du er sikker på du er oprettet, så check adressen, eller opret dig via tilmeldings formularen først.')
 
-                return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
+                return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
 
         # initial load (if we did not return above)
         getLogin = getLoginForm()
