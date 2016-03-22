@@ -515,7 +515,7 @@ def volunteerSignup(request):
         # initial load (if we did not return above)
         getLogin = getLoginForm()
         signup = signupForm()
-        return render(request, 'members/volunteer_signupe.html', {'loginform' : getLogin, 'signupform' : signup})
+        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'signupform' : signup})
 
 @xframe_options_exempt
 def loginEmailSent(request):
