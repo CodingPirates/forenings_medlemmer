@@ -446,7 +446,7 @@ def EntryPage(request):
 def volunteerSignup(request):
         if request.method == 'POST':
             # figure out which form was filled out.
-            if request.POST['form_id'] == 'signup':
+            if request.POST['form_id'] == 'vol_signup':
                 # signup has been filled
                 getLogin = getLoginForm()
                 vol_signup = vol_signupForm(request.POST)
