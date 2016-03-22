@@ -461,7 +461,7 @@ def volunteerSignup(request):
                         # all is fine - we did not expect any
                         pass
                     #create new family.
-                    family = Family.objects.create(email = signup.cleaned_data['volunteer_email'])
+                    family = Family.objects.create(email = vol_signup.cleaned_data['volunteer_email'])
                     family.confirmed_dtm = timezone.now()
                     family.save()
 
