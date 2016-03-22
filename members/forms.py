@@ -184,7 +184,7 @@ class signupForm(forms.Form):
 
 class vol_signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(signupForm, self).__init__(*args, **kwargs)
+        super(vol_signupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.form_action = 'volunteer_signup'
