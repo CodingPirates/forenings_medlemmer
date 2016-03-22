@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
-from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm
+from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm, vol_signupForm
 from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -449,7 +449,7 @@ def volunteerSignup(request):
             if request.POST['form_id'] == 'signup':
                 # signup has been filled
                 getLogin = getLoginForm()
-                signup = signupForm(request.POST)
+                vol_signup = vol_signupForm(request.POST)
                 if signup.is_valid():
                     # check if family already exists
                     try:
@@ -493,7 +493,7 @@ def volunteerSignup(request):
 
             elif request.POST['form_id'] == 'getlogin':
                 # just resend email
-                signup = signupForm()
+                vol_signup = vol_signupForm()
                 getLogin = getLoginForm(request.POST)
                 if getLogin.is_valid():
                     # find family
@@ -514,8 +514,8 @@ def volunteerSignup(request):
 
         # initial load (if we did not return above)
         getLogin = getLoginForm()
-        signup = signupForm()
-        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
+        vol_signup = vol_signupForm()
+        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
 
 @xframe_options_exempt
 def loginEmailSent(request):
