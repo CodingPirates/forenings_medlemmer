@@ -30,7 +30,7 @@ class PersonForm(forms.ModelForm):
                     Div(
                         Div(Field('gender'), css_class="col-md-2"),
                         Div(Field('name'), css_class="col-md-10"),
-                        Div(Field('birthday'), css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
+                        Div(Field('birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
                         Div(Field('email'), css_class="col-md-4"),
                         Div(Field('phone'), css_class="col-md-4"),
                         css_class="row"
