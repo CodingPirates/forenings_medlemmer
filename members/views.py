@@ -478,6 +478,8 @@ def volunteerSignup(request):
                         placename = vol_signup.cleaned_data['placename'],
                         email = vol_signup.cleaned_data['volunteer_email'],
                         phone = vol_signup.cleaned_data['volunteer_phone'],
+                        birthday = vol_signup.cleaned_data['child_birthday'],
+                        gender = vol_signup.cleaned_data['child_gender'],
                         family = family
                         )
                     volunteer.save()
