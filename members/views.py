@@ -456,7 +456,7 @@ def volunteerSignup(request):
                         family = Family.objects.get(email__iexact=request.POST['volunteer_email'])
                         # family was already created - we can't create this family again
                         signup.add_error('volunteer_email', 'Denne email adresse er allerede oprettet. Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
-                        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'signupform' : signup})
+                        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
                     except:
                         # all is fine - we did not expect any
                         pass
@@ -489,7 +489,7 @@ def volunteerSignup(request):
                     return HttpResponseRedirect(reverse('login_email_sent'))
                 else:
                     getLogin = getLoginForm()
-                    return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'signupform' : signup})
+                    return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
 
             elif request.POST['form_id'] == 'getlogin':
                 # just resend email
@@ -510,12 +510,12 @@ def volunteerSignup(request):
                     except Family.DoesNotExist:
                         getLogin.add_error('email', 'Denne addresse er ikke kendt i systemet. Hvis du er sikker på du er oprettet, så check adressen, eller opret dig via tilmeldings formularen først.')
 
-                return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'signupform' : signup})
+                return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
 
         # initial load (if we did not return above)
         getLogin = getLoginForm()
         signup = signupForm()
-        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'signupform' : signup})
+        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
 
 @xframe_options_exempt
 def loginEmailSent(request):
