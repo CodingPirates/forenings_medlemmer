@@ -456,7 +456,7 @@ def volunteerSignup(request):
                         family = Family.objects.get(email__iexact=request.POST['volunteer_email'])
                         # family was already created - we can't create this family again
                         signup.add_error('volunteer_email', 'Denne email adresse er allerede oprettet. Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
-                        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
+                        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
                     except:
                         # all is fine - we did not expect any
                         pass
@@ -489,7 +489,7 @@ def volunteerSignup(request):
                     return HttpResponseRedirect(reverse('login_email_sent'))
                 else:
                     getLogin = getLoginForm()
-                    return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : signup})
+                    return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
 
             elif request.POST['form_id'] == 'getlogin':
                 # just resend email
