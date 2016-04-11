@@ -79,11 +79,13 @@ class Person(models.Model):
     PARENT = 'PA'
     GUARDIAN = 'GU'
     CHILD = 'CH'
+    VOLUNTEER = 'VO'
     OTHER = 'NA'
     MEMBER_TYPE_CHOICES = (
         (PARENT,'Forælder'),
         (GUARDIAN, 'Værge'),
         (CHILD, 'Barn'),
+        (VOLUNTEER, 'Frivillig'),
         (OTHER, 'Anden')
     )
     MALE = 'MA'
