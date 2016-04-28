@@ -466,7 +466,7 @@ def volunteerSignup(request):
                     family.save()
 
                     #create volunteer
-                    volunteer = Person.objects.create(membertype = Person.VOLUNTEER,
+                    volunteer = Person.objects.create(membertype = Person.PARENT,
                         name = vol_signup.cleaned_data['volunteer_name'],
                         zipcode = vol_signup.cleaned_data['zipcode'],
                         city = vol_signup.cleaned_data['city'],

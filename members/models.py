@@ -79,13 +79,11 @@ class Person(models.Model):
     PARENT = 'PA'
     GUARDIAN = 'GU'
     CHILD = 'CH'
-    VOLUNTEER = 'VO'
     OTHER = 'NA'
     MEMBER_TYPE_CHOICES = (
         (PARENT,'Forælder'),
         (GUARDIAN, 'Værge'),
         (CHILD, 'Barn'),
-        (VOLUNTEER, 'Frivillig'),
         (OTHER, 'Anden')
     )
     MALE = 'MA'
@@ -319,7 +317,8 @@ class Volunteer(models.Model):
     department = models.ForeignKey(Department)
     def has_certificate(self):
         return self.person.has_certificate
-    added = models.DateTimeField(auto_now_add=True, blank=True, editable=False)
+    added = models.DateTimeField('Start',auto_now_add=True, blank=True, editable=False)
+    removed = models.DateTimeField('Slut',blank=True,null=True,default=None)
     def __str__(self):
         return self.member.__str__()
 
