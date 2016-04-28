@@ -313,12 +313,15 @@ class ActivityParticipant(models.Model):
         return super(ActivityParticipant, self).save(*args, **kwargs)
 
 class Volunteer(models.Model):
+    class Meta:
+        verbose_name = "Frivillig"
+        verbose_name_plural = "Frivillige"
     member = models.ForeignKey(Person)
     department = models.ForeignKey(Department)
     def has_certificate(self):
         return self.person.has_certificate
-    added = models.DateTimeField('Start',auto_now_add=True, blank=True, editable=False)
-    removed = models.DateTimeField('Slut',blank=True,null=True,default=None)
+    added = models.DateTimeField('Start', auto_now_add=True, blank=True, editable=False)
+    removed = models.DateTimeField('Slut', blank=True, null=True, default=None)
     approved = models.BooleanField('Godkendt af afdelingsleder',default=True)
     def __str__(self):
         return self.member.__str__()
