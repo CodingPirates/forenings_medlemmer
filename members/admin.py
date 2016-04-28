@@ -153,6 +153,11 @@ class PaymentInline(admin.TabularInline):
     readonly_fields = ('family',)
     extra = 0
 
+class VolunteerInline(admin.TabularInline):
+    model = Volunteer
+    fields = ('department','has_certificate','added','removed','approved')
+    extra = 0
+
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
@@ -552,7 +557,7 @@ class PersonAdmin(admin.ModelAdmin):
     search_fields = ('name', 'family__email',)
     actions = ['invite_to_own_activity', 'export_emaillist', 'export_csv']
 
-    inlines = [PaymentInline, ActivityInviteInline, MemberInline, WaitingListInline]
+    inlines = [PaymentInline, VolunteerInline, ActivityInviteInline, MemberInline, WaitingListInline]
 
     def family_url(self, item):
         return format_html(u'<a href="../family/%d">%s</a>' % (item.family.id, item.family.email))
