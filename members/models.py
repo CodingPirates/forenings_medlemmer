@@ -313,7 +313,7 @@ class ActivityParticipant(models.Model):
         return super(ActivityParticipant, self).save(*args, **kwargs)
 
 class Volunteer(models.Model):
-    member = models.ForeignKey(Member)
+    member = models.ForeignKey(Person)
     department = models.ForeignKey(Department)
     def has_certificate(self):
         return self.person.has_certificate
