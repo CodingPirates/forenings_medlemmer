@@ -155,7 +155,7 @@ class PaymentInline(admin.TabularInline):
 
 class VolunteerInline(admin.TabularInline):
     model = Volunteer
-    fields = ('department', 'removed', 'approved')
+    fields = ('department', 'added', 'removed', 'approved')
     extra = 0
 
 class ActivityParticipantInline(admin.TabularInline):

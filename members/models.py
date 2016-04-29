@@ -319,8 +319,8 @@ class Volunteer(models.Model):
     member = models.ForeignKey(Person)
     department = models.ForeignKey(Department)
     def has_certificate(self):
-        return self.person.has_certificate
-    added = models.DateTimeField('Start', auto_now_add=True, blank=True, editable=False)
+        return self.member.has_certificate
+    added = models.DateTimeField('Start', default=timezone.now)
     removed = models.DateTimeField('Slut', blank=True, null=True, default=None)
     approved = models.BooleanField('Godkendt af afdelingsleder',default=True)
     def __str__(self):
