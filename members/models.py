@@ -12,7 +12,7 @@ from django.template import Engine, Context
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.models import User
-from quickpay import QPClient
+from quickpay_api_client import QPClient
 from django.core.exceptions import ValidationError
 
 
