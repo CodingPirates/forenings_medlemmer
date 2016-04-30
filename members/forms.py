@@ -210,9 +210,9 @@ class vol_signupForm(forms.Form):
 
     volunteer_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_GENDER_CHOICES)
     volunteer_name = forms.CharField(label='Fulde navn', required=True, max_length=200)
-    volunteer_email = forms.EmailField(label='Email', required=False)
-    volunteer_phone = forms.CharField(label='Telefon', required=False, max_length=50)
-    volunteer_birthday = forms.DateField(label='Fødselsdato (dd-mm-åååå)', input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
+    volunteer_email = forms.EmailField(label='Email', required=True)
+    volunteer_phone = forms.CharField(label='Telefon', required=True, max_length=50)
+    volunteer_birthday = forms.DateField(label='Fødselsdato (dd-mm-åååå)', required=True, input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     streetname = forms.CharField(label='Vejnavn', required=True, max_length=200)
