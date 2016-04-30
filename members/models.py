@@ -322,7 +322,7 @@ class Volunteer(models.Model):
         return self.member.has_certificate
     added = models.DateTimeField('Start', default=timezone.now)
     removed = models.DateTimeField('Slut', blank=True, null=True, default=None)
-    approved = models.BooleanField('Godkendt af afdelingsleder',default=True)
+    approved = models.DateTimeField('Godkendt af afdelingsleder',default=timezone.now)
     def __str__(self):
         return self.member.__str__()
 
