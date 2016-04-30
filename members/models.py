@@ -316,15 +316,15 @@ class Volunteer(models.Model):
     class Meta:
         verbose_name = "Frivillig"
         verbose_name_plural = "Frivillige"
-    member = models.ForeignKey(Person)
+    person = models.ForeignKey(Person)
     department = models.ForeignKey(Department)
     def has_certificate(self):
-        return self.member.has_certificate
+        return self.person.has_certificate
     added = models.DateTimeField('Start', default=timezone.now)
     removed = models.DateTimeField('Slut', blank=True, null=True, default=None)
     approved = models.DateTimeField('Godkendt af afdelingsleder',default=timezone.now)
     def __str__(self):
-        return self.member.__str__()
+        return self.person.__str__()
 
 class EmailTemplate(models.Model):
     class Meta:
