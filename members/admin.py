@@ -475,6 +475,7 @@ class VolunteerListFilter(admin.SimpleListFilter):
         else:
             department_queryset = Department.objects.filter(adminuserinformation__user=request.user).order_by('zipcode')
 
+        departments = [('any', 'Alle frivillige samlet'), ('none', 'Ikke frivillig')]
         for department in department_queryset:
             departments.append(( str(department.pk), department.name))
 
@@ -490,10 +491,13 @@ class VolunteerListFilter(admin.SimpleListFilter):
         # to decide how to filter the queryset.
 
         if self.value() == 'any':
+            return queryset.exclude(volunteer__isnull=True)
         elif self.value() == 'none':
+            return queryset.filter(volunteer__isnull=True)
         elif self.value() == None:
             return queryset
         else:
+            return queryset.filter(volunteer__department__pk=self.value())
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
     # Title shown in filter view
