@@ -491,13 +491,13 @@ class VolunteerListFilter(admin.SimpleListFilter):
         # to decide how to filter the queryset.
 
         if self.value() == 'any':
-            return queryset.exclude(volunteer__isnull=True)
+            return queryset.exclude(volunteer__isnull=True,volunteer__removed__isnull=False)
         elif self.value() == 'none':
-            return queryset.filter(volunteer__isnull=True)
+            return queryset.filter(volunteer__isnull=True,volunteer__removed__isnull=False)
         elif self.value() == None:
             return queryset
         else:
-            return queryset.filter(volunteer__department__pk=self.value())
+            return queryset.filter(volunteer__department__pk=self.value(),volunteer__removed__isnull=False)
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
     # Title shown in filter view
