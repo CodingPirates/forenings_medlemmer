@@ -491,7 +491,14 @@ class VolunteerListFilter(admin.SimpleListFilter):
         # to decide how to filter the queryset.
 
         if self.value() == 'any':
-            return queryset.exclude(volunteer__isnull=True).exclude(volunteer__removed__isnull=False)
+            volunteers[]
+            for i in range(Person.objects.count()):
+                p = Person.objects.get(id=i)
+                if(p.volunteer_set.filter(removed__isnull=False).exists()):
+                    volunteers.append(p)
+            return volunteers
+            #return queryset.exclude(volunteer__isnull=True).exclude(volunteer__removed__isnull=False)
+
         elif self.value() == 'none':
             return queryset.filter(volunteer__isnull=True).filter(volunteer__removed__isnull=False)
         elif self.value() == None:
