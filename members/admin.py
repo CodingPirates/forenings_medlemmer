@@ -493,7 +493,7 @@ class VolunteerListFilter(admin.SimpleListFilter):
         if self.value() == 'any':
             volunteers = []
             for i in range(Person.objects.count()):
-                p = Person.objects.get(id=i)
+                p = Person.objects.get(**{id: i})
                 if(p.volunteer_set.filter(removed__isnull=False).exists()):
                     volunteers.append(p)
             return volunteers
