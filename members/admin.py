@@ -491,9 +491,19 @@ class VolunteerListFilter(admin.SimpleListFilter):
         # to decide how to filter the queryset.
 
         if self.value() == 'any':
-            return queryset.exclude(Q(volunteer__isnull=True) | Q(volunteer__removed__isnull=False)).distinct()
+            volunteers = []
+            for volunteer in queryset.exclude(volunteer__isnull=True):
+                if(volunteer__removed__isnull=True):
+                    if volunteer not in volunteers:
+                        volunteers.append(volunteer)
+            #return queryset.exclude(volunteer__isnull=True).exclude(volunteer__removed__isnull=True)
         elif self.value() == 'none':
-            return queryset.filter(Q(volunteer__isnull=True) | Q(volunteer__removed__isnull=False)).distinct()
+            volunteers = []
+            for volunteer in queryset.filter(volunteer__isnull=True):
+                if(volunteer__removed__isnull=False):
+                    if volunteer not in volunteers:
+                        volunteers.append(volunteer)
+            #return queryset.filter(volunteer__isnull=True).exclude(volunteer__removed__isnull=True)
         elif self.value() == None:
             return queryset
         else:
