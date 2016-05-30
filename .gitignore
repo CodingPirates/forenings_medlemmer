@@ -7,4 +7,4 @@ experiments.py
 forenings_medlemmer/settings_local.py
 *_old
 /backup-*
-
+.DS_Store
