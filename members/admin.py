@@ -660,7 +660,7 @@ class PersonAdmin(admin.ModelAdmin):
     export_emaillist.short_description = "Exporter e-mail liste"
 
     def export_csv(self,request, queryset):
-        result_string = '"Navn";"Alder";"Opskrevet";"Tlf (barn)";"Email (barn)";"Tlf (forælder)";"Email (familie)"\n'
+        result_string = '"Navn";"Alder";"Opskrevet";"Tlf (barn)";"Email (barn)";"Tlf (forælder)";"Email (familie)";"Postnummer"\n'
         for person in queryset:
             parent = person.family.get_first_parent()
             if parent:
@@ -675,7 +675,7 @@ class PersonAdmin(admin.ModelAdmin):
                 person_email = ""
                 family_email = ""
 
-            result_string = result_string + person.name + ";" + str(person.age_years()) + ";" + str(person.added) + ";" + person.phone + ";" + person_email + ";" + parent_phone + ";" + family_email + "\n"
+            result_string = result_string + person.name + ";" + str(person.age_years()) + ";" + str(person.added) + ";" + person.phone + ";" + person_email + ";" + parent_phone + ";" + family_email + ";" + person.zipcode + "\n"
             response = HttpResponse(result_string, content_type="text/csv")
             response['Content-Disposition'] = 'attachment; filename="personer.csv"'
         return response
