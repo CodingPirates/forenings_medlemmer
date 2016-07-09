@@ -2,7 +2,7 @@ from uuid import uuid4
 from django import forms
 from django.contrib import admin
 from django.db.models import Q
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
+from members.models import Person, Department, Union, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
@@ -26,6 +26,28 @@ class EmailItemInline(admin.TabularInline):
         return False
     extra = 0
 
+class UnionAdmin(admin.ModelAdmin):
+    # TODO add permission controls 
+
+    fieldsets = [
+        ('Navn og Adresse',
+            {'fields':('name', 'union_email', 'region','streetname',
+            'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename'),
+            'description': '<p>Udfyld navnet på foreningen (f.eks København, \
+            vestjylland) og adressen<p>'}),
+
+        ('Bestyrelsen',
+            {'fields':('chairman', 'chairman_email','second_chair',
+            'second_chair_email', 'cashier', 'cashier_email', 'boardMembers')}),
+
+        ('Info',
+            {'fields':('statues', 'founded'), 'description':
+            'Indsæt et link til jeres vedtægter og hvornår i er stiftet'})
+    ]
+
+    list_display = ('name', )
+admin.site.register(Union, UnionAdmin)
+
 class DepartmentAdmin(admin.ModelAdmin):
 
     # Only show own departments
@@ -37,7 +59,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     fieldsets = [
         ('Beskrivelse',
-            {'fields':('name', 'description', 'open_hours'),
+            {'fields':('name', 'union', 'description', 'open_hours'),
             'description': '<p>Lav en beskrivelse af jeres aktiviteter, teknologier og tekniske niveau.</p><p>Åbningstid er ugedag samt tidspunkt<p>'}),
         ('Ansvarlig',
             {'fields':('responsible_name', 'responsible_contact')}),
