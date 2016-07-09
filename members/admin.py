@@ -43,6 +43,11 @@ class DepartmentAdmin(admin.ModelAdmin):
             {'fields':('responsible_name', 'responsible_contact')}),
         ('Adresse',
             {'fields':('streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename')}),
+
+        ('Afdelingssiden',
+                {'fields':('website', 'isVisible'),
+                'description' : '<p>Har kan du vælge om afdeling skal vises på codingpirates.dk/afdelinger og om der skal være et link til en underside</p>',
+                }),
         ('Yderlige data',
             {'fields':('has_waiting_list', 'created', 'closed_dtm'),
             'description' : '<p>Venteliste betyder at børn har mulighed for at skrive sig på ventelisten (tilkendegive interesse for denne afdeling). Den skal typisk altid være krydset af.</p>',

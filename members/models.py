@@ -154,6 +154,9 @@ class Department(models.Model):
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     created = models.DateField('Oprettet', blank=False, default=timezone.now)
     closed_dtm = models.DateField('Lukket', blank=True, null=True, default=None)
+    isVisible  = models.BooleanField('Kan ses på afdelingssiden', default=False)
+    website    = models.URLField('Hjemmeside', blank=True)
+
     def no_members(self):
         return self.member_set.count()
     no_members.short_description = 'Antal medlemmer'
