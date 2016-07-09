@@ -131,6 +131,43 @@ class Person(models.Model):
     firstname.admin_order_field = 'name'
     firstname.short_description = 'Fornavn'
 
+class Union(models.Model):
+    class Meta:
+        verbose_name_plural='Foreninger'
+        verbose_name='Forening'
+        ordering=['name']
+    name = models.CharField('Foreningens navn',max_length=200)
+    chairman = models.CharField('Formand',max_length=200, blank=True)
+    chairman_email = models.EmailField('Formandens email', blank=True)
+    second_chair = models.CharField('Næstformand',max_length=200, blank=True)
+    second_chair_email = models.EmailField('Næstformandens email', blank=True)
+    cashier = models.CharField('Kassere',max_length=200, blank=True)
+    cashier_email = models.EmailField('Kasserens email', blank=True)
+    union_email = models.EmailField('Foreningens email', blank=True)
+    statues = models.URLField('Link til gældende vedtægter', blank=True)
+    founded = models.DateField('Stiftet', blank=True)
+    regions = (
+      ('S', 'Sjælland'),
+      ('J', 'Jylland'),
+      ('F', 'Fyn'),
+      ('Ø', 'Øer'),
+    )
+    region = models.CharField('region', max_length=1, choices=regions)
+
+    placename = models.CharField('Stednavn',max_length=200, blank=True)
+    zipcode = models.CharField('Postnummer',max_length=10)
+    city = models.CharField('By', max_length=200)
+    streetname = models.CharField('Vejnavn',max_length=200)
+    housenumber = models.CharField('Husnummer',max_length=10)
+    floor = models.CharField('Etage',max_length=10, blank=True)
+    door = models.CharField('Dør',max_length=10, blank=True)
+
+    # TODO add boardmembers as foreignKey to voluenteer
+    # Indtil vi har fået de frivillige ind i systemet så vi kan sikre at
+    # alle bestyrelsesmedlemmer er "voulenters", er her et plain text hack.
+    boardMembers = models.TextField('Meninge medlemmer', blank=True)
+    def __str__(self):
+        return "Foreningen for " + self.name
 
 class Department(models.Model):
     class Meta:
@@ -156,6 +193,7 @@ class Department(models.Model):
     closed_dtm = models.DateField('Lukket', blank=True, null=True, default=None)
     isVisible  = models.BooleanField('Kan ses på afdelingssiden', default=False)
     website    = models.URLField('Hjemmeside', blank=True)
+    union      = models.ForeignKey(Union, verbose_name="Lokalforening")
 
     def no_members(self):
         return self.member_set.count()
