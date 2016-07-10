@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
+from members.models import Person, Union, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
 from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm
 from django.utils import timezone
 from django.conf import settings
@@ -512,3 +512,29 @@ def waitinglistView(request, unique=None):
 
 def paymentGatewayErrorView(request, unique=None):
     return render(request, 'members/payment_gateway_error.html', {'unique': unique})
+
+
+def departmentView(request, unique=None):
+        depQuery = Department.objects.filter(isVisible=True)
+        deps = {'Sjælland': [], 'Jylland': [], 'Fyn' : [], 'Øer' : []}
+        for department in depQuery:
+            dep = {
+                'name' : department.name,
+                'website' : department.website,
+                'placename' : department.placename,
+                'address' : department.address(),
+                'zipcode': department.zipcode,
+                'city': department.city,
+                'leader': department.responsible_name,
+                'mail': department.responsible_contact,
+                'open_hours' : department.open_hours
+            }
+            if department.union.region == 'S':
+                deps['Sjælland'].append(dep)
+            elif department.union.region == 'F':
+                deps['Fyn'].append(dep)
+            elif department.union.region == 'J':
+                deps['Jylland'].append(dep)
+            else:
+                deps['Øer'].append(dep)
+        return render(request, "members/department_list.html", {'departments' : deps})

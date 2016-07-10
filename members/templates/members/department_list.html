@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="da">
+  <head>
+    {% load staticfiles %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    {% load bootstrap3 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+  </head>
+
+  <body>
+    <ul class="nav nav-tabs nav-justified">
+      <li class="active"><a data-toggle="pill" href="#Sjælland">Sjælland</a></li>
+      <li><a data-toggle="pill" href="#Jylland">Jylland</a></li>
+      <li><a data-toggle="pill" href="#Fyn">Fyn</a></li>
+      <li><a data-toggle="pill" href="#Øer">Øer</a></li>
+    </ul>
+    <div class="container">
+      <div class="tab-content">
+        {% for region, depList in departments.items %}
+          {% if region == 'Sjælland' %}
+            <div id="{{region}}" class="tab-pane fade in active">
+          {% else %}
+            <div id="{{region}}" class="tab-pane fade in">
+          {% endif %}
+          <div class="row">
+            {% for dep in depList %}
+              <div class="col-sm-4 col-centered">
+                {% if dep.website != "" %}
+                  <a href="{{dep.website}}">
+                      <strong>Coding Pirates {{dep.name}}</strong>
+                  </a>
+                {% else %}
+                  <strong>Coding Pirates {{dep.name}} </strong>
+                {% endif %}
+                <br>
+                {% if dep.placename != "" %}
+                  {{dep.placename}}<br>
+                {% endif %}
+                {{dep.address}}
+                <br>
+                {{dep.zipcode}}, {{dep.city}}
+                <br>
+                Afdelingsleder: {{dep.leader}}
+                <br>
+                E-mail: <a href="mailto:{{dep.mail}}">{{dep.mail}}</a>
+                <br>
+                Åbningstid: {{dep.open_hours}}
+              </div>
+              {% if forloop.counter|divisibleby:"3" %}
+                </div>
+                <br>
+                <div class="row">
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>
