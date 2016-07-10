@@ -17,7 +17,8 @@
         "streetname" : "Gullandsgade",
         "housenumber" : " 14",
         "floor" : "2",
-        "door" : "tv"
+        "door" : "tv",
+        "region" : "S"
     },
     "model" : "members.union",
     "pk" : 1
@@ -39,7 +40,8 @@
         "streetname" : "Gullandsgade",
         "housenumber" : " 14",
         "floor" : "2",
-        "door" : "tv"
+        "door" : "tv",
+        "region" : "J"
     },
     "model" : "members.union",
     "pk" : 2
@@ -61,7 +63,8 @@
         "streetname" : "Thistedvej",
         "housenumber" : "115",
         "floor" : "",
-        "door" : ""
+        "door" : "",
+        "region" : "J"
     },
     "model" : "members.union",
     "pk" : 3

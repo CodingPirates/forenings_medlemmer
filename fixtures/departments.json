@@ -16,29 +16,32 @@
     "responsible_name": "Martin Exner",
     "streetname": "H\u00f8rk\u00e6r ",
     "zipcode": "2730",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 5
 },
 {
   "fields": {
-    "name": "IT Universitetet",
+    "name": "ITU",
     "responsible_contact": "per@codingpirates.dk",
     "housenumber": "7",
     "has_waiting_list": true,
     "description": "",
-    "open_hours": "onsdage 17: - 19:00",
+    "open_hours": "onsdage 17:00 - 19:00",
     "door": "",
     "dawa_id": "",
     "floor": "",
-    "placename": "ITU",
+    "placename": "IT Universitetet",
     "updated_dtm": "2015-07-14T18:38:59.613Z",
     "city": "K\u00f8benhavn S",
     "responsible_name": "Per Kofod Hansen",
     "streetname": "Rued Langgaards Vej",
     "zipcode": "2300",
-    "union": 1
+    "union": 1,
+    "isVisible": true,
+    "website" : "itu.codingpirates.dk"
   },
   "model": "members.department",
   "pk": 6
@@ -60,14 +63,15 @@
     "responsible_name": "Ragnar Reynisson",
     "streetname": "Trong\u00e5rdsvej ",
     "zipcode": "2800",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 7
 },
 {
   "fields": {
-    "name": "Datalogisk Institut ved K\u00f8benhavns Universitet",
+    "name": "DIKU",
     "responsible_contact": "diku@codingpirates.dk",
     "housenumber": "1 ",
     "has_waiting_list": true,
@@ -76,13 +80,15 @@
     "door": "",
     "dawa_id": "",
     "floor": "",
-    "placename": "",
+    "placename": "Datalogisk Institut ved K\u00f8benhavns Universitet",
     "updated_dtm": "2015-07-14T18:48:30.100Z",
     "city": "K\u00f8benhavn \u00d8",
     "responsible_name": "Martin Dybdal",
     "streetname": "Universitetsparken ",
     "zipcode": "2100",
-    "union": 1
+    "union": 1,
+    "isVisible": true,
+    "website" : "diku.codingpirates.dk"
   },
   "model": "members.department",
   "pk": 8
@@ -104,7 +110,8 @@
     "responsible_name": "Magnus Toftdal Lund",
     "streetname": "Thistedvej",
     "zipcode": "9400",
-    "union": 3
+    "union": 3,
+    "isVisible": true
 
   },
   "model": "members.department",
@@ -127,7 +134,8 @@
     "responsible_name": "Rikke Toft N\u00f8rgaard",
     "streetname": "Paludan-M\u00fcllers Vej",
     "zipcode": "8200",
-    "union": 2
+    "union": 2,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 10
@@ -149,7 +157,10 @@
     "responsible_name": "Rikke Berggren",
     "streetname": "Hack Kampmanns Plads",
     "zipcode": "8000",
-    "union": 2
+    "union": 2,
+    "isVisible": true,
+    "website" : "codingpirates.dk/aarhus"
+
   },
   "model": "members.department",
   "pk": 11
@@ -171,7 +182,8 @@
     "responsible_name": "Kristina Hobbs",
     "streetname": "Skolegade",
     "zipcode": "3200",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 12
@@ -193,7 +205,8 @@
     "responsible_name": "Morten Holmstrup Gerdsen",
     "streetname": "Allegade",
     "zipcode": "3000",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 13
@@ -215,7 +228,8 @@
     "responsible_name": "John Andrew Carty",
     "streetname": "Islands Brygge",
     "zipcode": "2300",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 14
@@ -237,7 +251,8 @@
     "responsible_name": "Allan Thomsen Volh\u00f8j",
     "streetname": "Dronning Margrethes Vej ",
     "zipcode": "4000",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 15
@@ -259,7 +274,8 @@
     "responsible_name": "Rasmus M\u00f8ller Selsmark",
     "streetname": "Smedeparken",
     "zipcode": "4180",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 16
@@ -303,7 +319,8 @@
     "responsible_name": "John Rohde Jensen",
     "streetname": "Grundtvigs All\u00e9",
     "zipcode": "6400",
-    "union": 2
+    "union": 2,
+    "isVisible": true
 
   },
   "model": "members.department",
@@ -326,7 +343,8 @@
     "responsible_name": "Lis Zacho",
     "streetname": "Niels Ebbesens Vej",
     "zipcode": "1911",
-    "union": 1
+    "union": 1,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 19
@@ -348,7 +366,8 @@
     "responsible_name": "",
     "streetname": "Spinderigade",
     "zipcode": "7100",
-    "union": 2
+    "union": 2,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 20
@@ -392,7 +411,8 @@
     "responsible_name": "",
     "streetname": "N/A",
     "zipcode": "8660",
-    "union": 2
+    "union": 2,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 22
@@ -414,7 +434,8 @@
     "responsible_name": "Sonny Hansen",
     "streetname": "Kirseb\u00e6rhaven",
     "zipcode": "2500",
-    "union": 3
+    "union": 3,
+    "isVisible": true
   },
   "model": "members.department",
   "pk": 23
