@@ -27,8 +27,6 @@ class EmailItemInline(admin.TabularInline):
     extra = 0
 
 class UnionAdmin(admin.ModelAdmin):
-    # TODO add permission controls 
-
     fieldsets = [
         ('Navn og Adresse',
             {'fields':('name', 'union_email', 'region','streetname',
