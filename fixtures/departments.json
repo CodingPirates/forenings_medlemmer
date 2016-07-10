@@ -15,7 +15,8 @@
     "city": "Herlev",
     "responsible_name": "Martin Exner",
     "streetname": "H\u00f8rk\u00e6r ",
-    "zipcode": "2730"
+    "zipcode": "2730",
+    "union": 1
   },
   "model": "members.department",
   "pk": 5
@@ -36,7 +37,8 @@
     "city": "K\u00f8benhavn S",
     "responsible_name": "Per Kofod Hansen",
     "streetname": "Rued Langgaards Vej",
-    "zipcode": "2300"
+    "zipcode": "2300",
+    "union": 1
   },
   "model": "members.department",
   "pk": 6
@@ -57,7 +59,8 @@
     "city": "Kgs. Lyngby",
     "responsible_name": "Ragnar Reynisson",
     "streetname": "Trong\u00e5rdsvej ",
-    "zipcode": "2800"
+    "zipcode": "2800",
+    "union": 1
   },
   "model": "members.department",
   "pk": 7
@@ -78,7 +81,8 @@
     "city": "K\u00f8benhavn \u00d8",
     "responsible_name": "Martin Dybdal",
     "streetname": "Universitetsparken ",
-    "zipcode": "2100"
+    "zipcode": "2100",
+    "union": 1
   },
   "model": "members.department",
   "pk": 8
@@ -99,7 +103,9 @@
     "city": "N\u00f8rresundby",
     "responsible_name": "Magnus Toftdal Lund",
     "streetname": "Thistedvej",
-    "zipcode": "9400"
+    "zipcode": "9400",
+    "union": 3
+
   },
   "model": "members.department",
   "pk": 9
@@ -120,7 +126,8 @@
     "city": "Aarhus N",
     "responsible_name": "Rikke Toft N\u00f8rgaard",
     "streetname": "Paludan-M\u00fcllers Vej",
-    "zipcode": "8200"
+    "zipcode": "8200",
+    "union": 2
   },
   "model": "members.department",
   "pk": 10
@@ -141,7 +148,8 @@
     "city": "Aarhus C",
     "responsible_name": "Rikke Berggren",
     "streetname": "Hack Kampmanns Plads",
-    "zipcode": "8000"
+    "zipcode": "8000",
+    "union": 2
   },
   "model": "members.department",
   "pk": 11
@@ -162,7 +170,8 @@
     "city": "Helsinge",
     "responsible_name": "Kristina Hobbs",
     "streetname": "Skolegade",
-    "zipcode": "3200"
+    "zipcode": "3200",
+    "union": 1
   },
   "model": "members.department",
   "pk": 12
@@ -183,7 +192,8 @@
     "city": "Helsing\u00f8r",
     "responsible_name": "Morten Holmstrup Gerdsen",
     "streetname": "Allegade",
-    "zipcode": "3000"
+    "zipcode": "3000",
+    "union": 1
   },
   "model": "members.department",
   "pk": 13
@@ -204,7 +214,8 @@
     "city": "K\u00f8benhavn S ",
     "responsible_name": "John Andrew Carty",
     "streetname": "Islands Brygge",
-    "zipcode": "2300"
+    "zipcode": "2300",
+    "union": 1
   },
   "model": "members.department",
   "pk": 14
@@ -225,7 +236,8 @@
     "city": "Roskilde",
     "responsible_name": "Allan Thomsen Volh\u00f8j",
     "streetname": "Dronning Margrethes Vej ",
-    "zipcode": "4000"
+    "zipcode": "4000",
+    "union": 1
   },
   "model": "members.department",
   "pk": 15
@@ -246,7 +258,8 @@
     "city": "Sor\u00f8",
     "responsible_name": "Rasmus M\u00f8ller Selsmark",
     "streetname": "Smedeparken",
-    "zipcode": "4180"
+    "zipcode": "4180",
+    "union": 1
   },
   "model": "members.department",
   "pk": 16
@@ -267,7 +280,8 @@
     "city": "Kastrup",
     "responsible_name": "Marianne Pedersen",
     "streetname": "Kamillevej",
-    "zipcode": "2770 "
+    "zipcode": "2770 ",
+    "union": 1
   },
   "model": "members.department",
   "pk": 17
@@ -288,7 +302,9 @@
     "city": "S\u00f8nderborg",
     "responsible_name": "John Rohde Jensen",
     "streetname": "Grundtvigs All\u00e9",
-    "zipcode": "6400"
+    "zipcode": "6400",
+    "union": 2
+
   },
   "model": "members.department",
   "pk": 18
@@ -309,7 +325,8 @@
     "city": "Frederiksberg",
     "responsible_name": "Lis Zacho",
     "streetname": "Niels Ebbesens Vej",
-    "zipcode": "1911"
+    "zipcode": "1911",
+    "union": 1
   },
   "model": "members.department",
   "pk": 19
@@ -330,7 +347,8 @@
     "city": "Vejle",
     "responsible_name": "",
     "streetname": "Spinderigade",
-    "zipcode": "7100"
+    "zipcode": "7100",
+    "union": 2
   },
   "model": "members.department",
   "pk": 20
@@ -351,7 +369,8 @@
     "city": "Silkeborg",
     "responsible_name": "",
     "streetname": "N/A",
-    "zipcode": "8600"
+    "zipcode": "8600",
+    "union": 2
   },
   "model": "members.department",
   "pk": 21
@@ -372,7 +391,8 @@
     "city": "Skanderborg",
     "responsible_name": "",
     "streetname": "N/A",
-    "zipcode": "8660"
+    "zipcode": "8660",
+    "union": 2
   },
   "model": "members.department",
   "pk": 22
@@ -393,7 +413,8 @@
     "city": "Valby",
     "responsible_name": "Sonny Hansen",
     "streetname": "Kirseb\u00e6rhaven",
-    "zipcode": "2500"
+    "zipcode": "2500",
+    "union": 3
   },
   "model": "members.department",
   "pk": 23
