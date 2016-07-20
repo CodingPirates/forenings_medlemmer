@@ -4,7 +4,7 @@
 virtualenv/
 .idea/
 experiments.py
-forenings_medlemmer/settings_local.py
+forenings_medlemmer/settings*
 *_old
 /backup-*
 
