@@ -118,8 +118,8 @@ class ActivityAdmin(admin.ModelAdmin):
         }
          ),
 
-         ('Tilmeldings detaljer', {
-         'description' : '<p>Tilmeldings instruktioner er tekst der kommer til at stå på betalings forularen på tilmeldings siden. Den skal bruges til at stille spørgsmål som den der tilmelder sig kan besvare ved tilmelding.</p><p>Fri tilmelding, betyder at alle kan når som helst tilmelde sig denne aktivitet - først til mølle. Dette er kun til arrangementer og klubaften-sæsoner i områder hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlems siden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+         ('Tilmeldingsdetaljer', {
+         'description' : '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-sæsoner i områder, hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
          'fields' : (
             'instructions',
             'open_invite',
