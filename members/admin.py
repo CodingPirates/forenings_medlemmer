@@ -103,7 +103,7 @@ class ActivityAdmin(admin.ModelAdmin):
         }
          ),
         ('Lokation og ansvarlig', {
-            'description': '<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer. (f.eks. et gamejam der foregår et andet sted)</p>',
+            'description': '<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer (f.eks. et gamejam der foregår et andet sted).</p>',
             'fields': (
             'responsible_name',
             'responsible_contact',
