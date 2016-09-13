@@ -103,7 +103,7 @@ class ActivityAdmin(admin.ModelAdmin):
         }
          ),
         ('Lokation og ansvarlig', {
-            'description': '<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer. (f.eks. et gamejam der foregår et andet sted)</p>',
+            'description': '<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer (f.eks. et gamejam der foregår et andet sted).</p>',
             'fields': (
             'responsible_name',
             'responsible_contact',
@@ -118,8 +118,8 @@ class ActivityAdmin(admin.ModelAdmin):
         }
          ),
 
-         ('Tilmeldings detaljer', {
-         'description' : '<p>Tilmeldings instruktioner er tekst der kommer til at stå på betalings forularen på tilmeldings siden. Den skal bruges til at stille spørgsmål som den der tilmelder sig kan besvare ved tilmelding.</p><p>Fri tilmelding, betyder at alle kan når som helst tilmelde sig denne aktivitet - først til mølle. Dette er kun til arrangementer og klubaften-sæsoner i områder hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlems siden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+         ('Tilmeldingsdetaljer', {
+         'description' : '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-sæsoner i områder, hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
          'fields' : (
             'instructions',
             'open_invite',
@@ -151,6 +151,11 @@ class PaymentInline(admin.TabularInline):
     model = Payment
     fields = ('added', 'payment_type', 'confirmed_dtm', 'rejected_dtm', 'amount_ore')
     readonly_fields = ('family',)
+    extra = 0
+
+class VolunteerInline(admin.TabularInline):
+    model = Volunteer
+    fields = ('department', 'added', 'removed', 'approved')
     extra = 0
 
 class ActivityParticipantInline(admin.TabularInline):
@@ -449,6 +454,51 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(waitinglist__department__pk=self.value())
 
+class VolunteerListFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = 'frivillig i'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'volunteer'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+
+        if request.user.is_superuser:
+            department_queryset = Department.objects.filter().order_by('zipcode')
+        else:
+            department_queryset = Department.objects.filter(adminuserinformation__user=request.user).order_by('zipcode')
+
+        departments = [('any', 'Alle frivillige samlet'), ('none', 'Ikke frivillig')]
+        for department in department_queryset:
+            departments.append(( str(department.pk), department.name))
+
+        return departments
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+
+        if self.value() == 'any':
+            return queryset.filter(volunteer__isnull=False).filter(volunteer__removed__isnull=True).distinct()
+        elif self.value() == 'none':
+            return queryset.filter(volunteer__isnull=True) | queryset.exclude(volunteer__removed__isnull=True).distinct()
+        elif self.value() == None:
+            return queryset
+        else:
+            return queryset.filter(volunteer__department__pk=self.value(),volunteer__removed__isnull=True)
+
 class PersonParticipantListFilter(admin.SimpleListFilter):
     # Title shown in filter view
     title = 'Deltager på'
@@ -548,11 +598,11 @@ class WaitingListInline(admin.TabularInline):
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
-    list_filter = ('membertype', 'gender', PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
+    list_filter = ('membertype', 'gender', VolunteerListFilter, PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
     search_fields = ('name', 'family__email',)
     actions = ['invite_to_own_activity', 'export_emaillist', 'export_csv']
 
-    inlines = [PaymentInline, ActivityInviteInline, MemberInline, WaitingListInline]
+    inlines = [PaymentInline, VolunteerInline, ActivityInviteInline, MemberInline, WaitingListInline]
 
     def family_url(self, item):
         return format_html(u'<a href="../family/%d">%s</a>' % (item.family.id, item.family.email))

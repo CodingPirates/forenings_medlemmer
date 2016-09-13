@@ -12,7 +12,7 @@ from django.template import Engine, Context
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.models import User
-from quickpay import QPClient
+from quickpay_api_client import QPClient
 from django.core.exceptions import ValidationError
 
 
@@ -313,13 +313,18 @@ class ActivityParticipant(models.Model):
         return super(ActivityParticipant, self).save(*args, **kwargs)
 
 class Volunteer(models.Model):
-    member = models.ForeignKey(Member)
+    class Meta:
+        verbose_name = "Frivillig"
+        verbose_name_plural = "Frivillige"
+    person = models.ForeignKey(Person)
     department = models.ForeignKey(Department)
     def has_certificate(self):
         return self.person.has_certificate
-    added = models.DateTimeField(auto_now_add=True, blank=True, editable=False)
+    added = models.DateTimeField('Start', default=timezone.now)
+    removed = models.DateTimeField('Slut', blank=True, null=True, default=None)
+    approved = models.DateTimeField('Godkendt af afdelingsleder',default=timezone.now, null=True, blank=True)
     def __str__(self):
-        return self.member.__str__()
+        return self.person.__str__()
 
 class EmailTemplate(models.Model):
     class Meta:
