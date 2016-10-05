@@ -6,8 +6,7 @@ install Python 3.4
 install pip
 
 pip install virtualenv
-virtualenv -p /usr/bin/python3.4 virtualenv
-(måske skal stien til python rettes)
+virtualenv -p $(which python) virtualenv
 
 source virtualenv/bin/activate
 
