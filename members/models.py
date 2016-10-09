@@ -110,7 +110,7 @@ class Person(models.Model):
     birthday = models.DateField('Fødselsdag', blank=True, null=True)
     has_certificate = models.DateField('Børneattest',blank=True, null=True)
     family = models.ForeignKey(Family)
-    notes = models.TextField('Noter',blank=True,null=True)
+    notes = models.TextField('Noter', blank=True, null=False, default ="")
     added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
     def __str__(self):

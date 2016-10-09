@@ -655,6 +655,9 @@ class PersonAdmin(admin.ModelAdmin):
             ('Kontakt Oplysninger', {
                 'fields' : contact_fields
             }),
+            ('Noter', {
+                'fields' : ('notes',)
+            }),
             ('Yderlige informationer' , {
                 'classes' : ('collapse', ),
                 'fields' : ('membertype', 'birthday', 'has_certificate', 'added'),
