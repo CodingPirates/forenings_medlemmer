@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="da">
+  <head>
+    {% load staticfiles %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+     <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    {% load bootstrap3 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <style>
+        #kort { height: 480px; }
+    </style>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        var southEast = L.latLng(54.91711327768886, 8.76734733581543);
+        var northEast = L.latLng(58.038693522227945, 14.979954628418003);
+        var kort = L.map('kort').fitBounds([southEast, northEast]);
+        L.tileLayer('https://api.mapbox.com/styles/v1/rotendahl/cityqsxvn00di2iqitm30etk0/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoicm90ZW5kYWhsIiwiYSI6ImNpdHlxM3JyNzAwNGQzbm9hZ3Nnejg2eHgifQ.mBUIWh1isweb_NQ5QqUnvA', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 18,
+            id: 'rotendahl.1j7iggdo',
+            accessToken: 'pk.eyJ1Ijoicm90ZW5kYWhsIiwiYSI6ImNpdHlxM3JyNzAwNGQzbm9hZ3Nnejg2eHgifQ.mBUIWh1isweb_NQ5QqUnvA'
+        }).addTo(kort);
+        {% for region, depList in departments.items %}
+            {% for dep in depList %}
+                {% if dep.onMap == True %}
+            var marker{{forloop.counter}} = L.marker([{{dep.longtitude}},{{dep.latitude}}]).addTo(kort);
+            marker{{forloop.counter}}.bindPopup('{{dep.html | safe}}');
+                {% endif %}
+             {% endfor %}
+        {% endfor %}
+    });
+    </script>
+  </head>
+
+  <body>
+      <div id="kort"></div>
+    <ul class="nav nav-tabs nav-justified">
+    {% for region, depList in departments.items %}
+        {% if region == 'Sjælland' %}
+         <li class="active"><a data-toggle="pill" href="#{{region}}">{{region}}
+         </a></li>
+        {% else %}
+            <li><a data-toggle="pill" href="#{{region}}">{{region}}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+    <br>
+    <div class="container">
+      <div class="tab-content">
+        {% for region, depList in departments.items %}
+          {% if region == 'Sjælland'%}
+            <div id="{{region}}" class="tab-pane fade in active">
+          {% else %}
+            <div id="{{region}}" class="tab-pane fade in">
+          {% endif %}
+          <div class="row">
+            {% for dep in depList %}
+              <div class="col-sm-4 col-centered">
+                  {{dep.html | safe}}
+              </div>
+              {% if forloop.counter|divisibleby:"3" %}
+                </div>
+                <br>
+                <div class="row">
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>

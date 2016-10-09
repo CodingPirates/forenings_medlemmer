@@ -1,0 +1,96 @@
+[
+{
+    "fields" : {
+        "name" :  "Hovedforeningen",
+        "chairman" : "Martin Exner",
+        "chairman_email" : "martin@codingpirates.dk",
+        "second_chair" : "Louise Overgaard",
+        "second_chair_email" : "louise@codingpirates.dk",
+        "cashier" : "Magnus Toftdal Lund",
+        "cashier_email" : "magnus@codingpirats.dk",
+        "union_email" : "bestyrelsen@codingpirates.dk",
+        "statues" : "https://codingpirates.dk/wp-content/uploads/2016/03/Foreningsvedtægter-for-Coding-Pirates-København-gældende.pdf",
+        "founded" : "2014-02-14",
+        "placename" : "",
+        "zipcode" : "2730",
+        "city" : "Herlev",
+        "streetname" : "Hækmosen",
+        "housenumber" : "10",
+        "floor" : "",
+        "door" : "A",
+        "region" : "S"
+    },
+    "model" : "members.union",
+    "pk" : 0
+},
+{
+    "fields" : {
+        "name" :  "København",
+        "chairman" : "Marianne Pedersen",
+        "chairman_email" : "marianne@codingpirates.dk",
+        "second_chair" : "Martin Dybdahl",
+        "second_chair_email" : "dybber@dybber.dk",
+        "cashier" : "Ragnar Reynisson",
+        "cashier_email" : "ragnar@codingpirats.dk",
+        "union_email" : "kobenhavn@codingpirates.dk",
+        "statues" : "https://codingpirates.dk/wp-content/uploads/2016/03/Foreningsvedtægter-for-Coding-Pirates-København-gældende.pdf",
+        "founded" : "2015-07-14",
+        "placename" : "",
+        "zipcode" : "2300",
+        "city" : "København S",
+        "streetname" : "Gullandsgade",
+        "housenumber" : " 14",
+        "floor" : "2",
+        "door" : "tv",
+        "region" : "S"
+    },
+    "model" : "members.union",
+    "pk" : 1
+},
+{
+    "fields" : {
+        "name" :  "Aarhus",
+        "chairman" : "Louise Overgaard",
+        "chairman_email" : "louise@cdoingpirates.dk",
+        "second_chair" : "Rikke Toft",
+        "second_chair_email" : "rikke@codingpirates.dk",
+        "cashier" : " Rasmus Dahl Møller",
+        "cashier_email" : "rasmus.moeller@gmail.com",
+        "union_email" : "aarhus@codingpirates.dk",
+        "statues" : "https://codingpirates.dk/wp-content/uploads/2016/03/Foreningsvedtægter-for-Coding-Pirates-København-gældende.pdf",
+        "founded" : "2015-08-14",
+        "zipcode" : "2300",
+        "city" : "København S",
+        "streetname" : "Gullandsgade",
+        "housenumber" : " 14",
+        "floor" : "2",
+        "door" : "tv",
+        "region" : "J"
+    },
+    "model" : "members.union",
+    "pk" : 2
+},
+{
+    "fields" : {
+        "name" :  "Aalborg",
+        "chairman" : "Magnus Toft Lund",
+        "chairman_email" : "magnus@cdoingpirates.dk",
+        "second_chair" : "Stefans Bols",
+        "second_chair_email" : "stefan@codingpirates.dk",
+        "cashier" : "Jeppe Bruntse Jacobsen",
+        "cashier_email" : "jeppebruntse@gmail.com",
+        "union_email" : "aalborg@codingpirates.dk",
+        "statues" : "http://codingpirates.dk/wp-content/uploads/2016/07/Vedtægter_Aalborg_2016.pdf",
+        "founded" : "2015-09-14",
+        "zipcode" : "9400",
+        "city" : "Nørresundby",
+        "streetname" : "Thistedvej",
+        "housenumber" : "115",
+        "floor" : "",
+        "door" : "",
+        "region" : "J"
+    },
+    "model" : "members.union",
+    "pk" : 3
+}
+]

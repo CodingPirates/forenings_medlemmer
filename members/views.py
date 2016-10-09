@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
-from members.models import Person, Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
+from members.models import Person, Union,  Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
 from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm, vol_signupForm
 from django.utils import timezone
 from django.conf import settings
@@ -589,3 +589,27 @@ def waitinglistView(request, unique=None):
 
 def paymentGatewayErrorView(request, unique=None):
     return render(request, 'members/payment_gateway_error.html', {'unique': unique})
+
+
+def departmentView(request, unique=None):
+        depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
+        deps = {}
+        for region in Union.regions:
+            deps[region[1]] = []
+
+        for department in depQuery:
+            coordinates = department.getLongLat()
+            if coordinates == None:
+                print(department.name)
+            dep = {
+                'html'       : department.toHTML(),
+                'onMap'      : department.onMap
+            }
+            if not(coordinates == None):
+                dep['latitude'] = str(coordinates[0])
+                dep['longtitude'] = str(coordinates[1])
+            else:
+                dep['onMap'] = False
+
+            deps[department.union.get_region_display()].append(dep)
+        return render(request, "members/department_list.html", {'departments' : deps})

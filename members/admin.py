@@ -2,7 +2,7 @@ from uuid import uuid4
 from django import forms
 from django.contrib import admin
 from django.db.models import Q
-from members.models import Person, Department, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
+from members.models import Person, Department, Union, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
@@ -26,6 +26,26 @@ class EmailItemInline(admin.TabularInline):
         return False
     extra = 0
 
+class UnionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Navn og Adresse',
+            {'fields':('name', 'union_email', 'region','streetname',
+            'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename'),
+            'description': '<p>Udfyld navnet på foreningen (f.eks København, \
+            vestjylland) og adressen<p>'}),
+
+        ('Bestyrelsen',
+            {'fields':('chairman', 'chairman_email','second_chair',
+            'second_chair_email', 'cashier', 'cashier_email', 'boardMembers')}),
+
+        ('Info',
+            {'fields':('statues', 'founded'), 'description':
+            'Indsæt et link til jeres vedtægter og hvornår i er stiftet'})
+    ]
+
+    list_display = ('name', )
+admin.site.register(Union, UnionAdmin)
+
 class DepartmentAdmin(admin.ModelAdmin):
 
     # Only show own departments
@@ -37,12 +57,21 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     fieldsets = [
         ('Beskrivelse',
-            {'fields':('name', 'description', 'open_hours'),
+            {'fields':('name', 'union', 'description', 'open_hours'),
             'description': '<p>Lav en beskrivelse af jeres aktiviteter, teknologier og tekniske niveau.</p><p>Åbningstid er ugedag samt tidspunkt<p>'}),
         ('Ansvarlig',
             {'fields':('responsible_name', 'responsible_contact')}),
         ('Adresse',
             {'fields':('streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename')}),
+
+        ('Længde og Breddegrad',
+            {'fields':('longtitude', 'latitude'),
+            'description' : '<p>Hvis de ikke er sat opdateres de automatisk på et tidspunkt'}),
+
+        ('Afdelingssiden',
+                {'fields':('website', 'isOpening','isVisible'),
+                'description' : '<p>Har kan du vælge om afdeling skal vises på codingpirates.dk/afdelinger og om der skal være et link til en underside</p>',
+                }),
         ('Yderlige data',
             {'fields':('has_waiting_list', 'created', 'closed_dtm'),
             'description' : '<p>Venteliste betyder at børn har mulighed for at skrive sig på ventelisten (tilkendegive interesse for denne afdeling). Den skal typisk altid være krydset af.</p>',
@@ -143,7 +172,7 @@ class PersonInline(admin.TabularInline):
     admin_link.short_description = 'Navn'
 
     model = Person
-    fields = ('admin_link', 'membertype', 'zipcode', 'added')
+    fields = ('admin_link', 'membertype', 'zipcode', 'added', 'notes')
     readonly_fields = fields
     extra = 0
 
@@ -660,7 +689,7 @@ class PersonAdmin(admin.ModelAdmin):
     export_emaillist.short_description = "Exporter e-mail liste"
 
     def export_csv(self,request, queryset):
-        result_string = '"Navn";"Alder";"Opskrevet";"Tlf (barn)";"Email (barn)";"Tlf (forælder)";"Email (familie)"\n'
+        result_string = '"Navn";"Alder";"Opskrevet";"Tlf (barn)";"Email (barn)";"Tlf (forælder)";"Email (familie)";"Postnummer"\n'
         for person in queryset:
             parent = person.family.get_first_parent()
             if parent:
@@ -675,7 +704,7 @@ class PersonAdmin(admin.ModelAdmin):
                 person_email = ""
                 family_email = ""
 
-            result_string = result_string + person.name + ";" + str(person.age_years()) + ";" + str(person.added) + ";" + person.phone + ";" + person_email + ";" + parent_phone + ";" + family_email + "\n"
+            result_string = result_string + person.name + ";" + str(person.age_years()) + ";" + str(person.added) + ";" + person.phone + ";" + person_email + ";" + parent_phone + ";" + family_email + ";" + person.zipcode + "\n"
             response = HttpResponse(result_string, content_type="text/csv")
             response['Content-Disposition'] = 'attachment; filename="personer.csv"'
         return response
