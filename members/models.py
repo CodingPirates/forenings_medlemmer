@@ -10,10 +10,11 @@ import uuid
 from datetime import datetime, timedelta
 from django.template import Engine, Context
 from django.core.mail import send_mail
-from django.utils import timezone
+from django.utils import timezone, html
 from django.contrib.auth.models import User
 from quickpay_api_client import QPClient
 from django.core.exceptions import ValidationError
+import requests, json
 
 
 def format_address(streetname, housenumber, floor=None, door=None):
@@ -147,10 +148,10 @@ class Union(models.Model):
     statues = models.URLField('Link til gældende vedtægter', blank=True)
     founded = models.DateField('Stiftet', blank=True)
     regions = (
-      ('S', 'Sjælland'),
-      ('J', 'Jylland'),
-      ('F', 'Fyn'),
-      ('Ø', 'Øer'),
+        ('S' , 'Sjælland'),
+        ('J' , 'Jylland'),
+        ('F' , 'Fyn'),
+        ('Ø' , 'Øer')
     )
     region = models.CharField('region', max_length=1, choices=regions)
 
@@ -192,8 +193,12 @@ class Department(models.Model):
     created = models.DateField('Oprettet', blank=False, default=timezone.now)
     closed_dtm = models.DateField('Lukket', blank=True, null=True, default=None)
     isVisible  = models.BooleanField('Kan ses på afdelingssiden', default=False)
+    isOpening  = models.BooleanField('Er afdelingen under opstart', default=False)
     website    = models.URLField('Hjemmeside', blank=True)
     union      = models.ForeignKey(Union, verbose_name="Lokalforening")
+    longtitude = models.DecimalField("Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6)
+    latitude   = models.DecimalField("Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6)
+    onMap      = models.BooleanField("Skal den være på kortet?", default=True)
 
     def no_members(self):
         return self.member_set.count()
@@ -202,6 +207,51 @@ class Department(models.Model):
         return self.name
     def address(self):
         return format_address(self.streetname, self.housenumber, self.floor, self.door)
+    def addressWithZip(self):
+        return self.address() + ", " + self.zipcode + " " + self.city
+    def toHTML(self):
+        myHTML = ''
+        if(self.website == ''):
+            myHTML += '<strong>Coding Pirates ' + html.escape(self.name) + '</strong><br>'
+        else:
+            myHTML += '<a href="' + html.escape(self.website) + '">' + \
+            '<strong>Coding Pirates ' + html.escape(self.name) + '</strong></a><br>'
+        if self.placename != '':
+            myHTML += html.escape(self.placename) + '<br>'
+        myHTML += html.escape(self.address()) + '<br>' + html.escape(self.zipcode) + ", " + html.escape(self.city) + '<br>'
+        myHTML += 'Afdelingsleder: ' + html.escape(self.responsible_name) + '<br>'
+        myHTML += 'E-mail:<a href="mailto:' +html.escape(self.responsible_contact) + '">'+ html.escape(self.responsible_contact) + '</a><br>'
+        myHTML +=  'Åbningstid: ' + html.escape(self.open_hours)
+        if self.isOpening:
+            myHTML += "<br><strong>Afdelingen slår snart dørene op!</strong>"
+        return myHTML
+    def getLongLat(self):
+        if (self.latitude == None or self.longtitude == None):
+            addressID = 0
+            dist = 0
+            req = 'https://dawa.aws.dk/datavask/adresser?betegnelse=' + self.addressWithZip().replace(" ", "%20")
+            try:
+                washed = json.loads(requests.get(req).text)
+                addressID = washed['resultater'][0]['adresse']['id']
+                dist = washed['resultater'][0]['vaskeresultat']['afstand']
+            except Exception as error:
+                print("Couldn't find addressID for " + self.name)
+                print("Error " +  str(error))
+            if (addressID != 0 and dist < 5):
+                try:
+                    req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
+                    address = json.loads(requests.get(req).text)
+                    self.latitude   =  address['geometry']['coordinates'][0]
+                    self.longtitude =  address['geometry']['coordinates'][1]
+                    self.save()
+                    print("Opdateret for " + self.name)
+                    print("Updated coordinates for " + self.name)
+                    return(self.latitude, self.longtitude)
+                except Exception as error:
+                    print("Couldn't find coordinates for " + self.name)
+                    print("Error " +  str(error))
+        else:
+            return(self.latitude, self.longtitude)
 
 class WaitingList(models.Model):
     class Meta:

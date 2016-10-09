@@ -64,8 +64,12 @@ class DepartmentAdmin(admin.ModelAdmin):
         ('Adresse',
             {'fields':('streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename')}),
 
+        ('Længde og Breddegrad',
+            {'fields':('longtitude', 'latitude'),
+            'description' : '<p>Hvis de ikke er sat opdateres de automatisk på et tidspunkt'}),
+
         ('Afdelingssiden',
-                {'fields':('website', 'isVisible'),
+                {'fields':('website', 'isOpening','isVisible'),
                 'description' : '<p>Har kan du vælge om afdeling skal vises på codingpirates.dk/afdelinger og om der skal være et link til en underside</p>',
                 }),
         ('Yderlige data',

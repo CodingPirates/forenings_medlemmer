@@ -592,26 +592,24 @@ def paymentGatewayErrorView(request, unique=None):
 
 
 def departmentView(request, unique=None):
-        depQuery = Department.objects.filter(isVisible=True)
-        deps = {'Sjælland': [], 'Jylland': [], 'Fyn' : [], 'Øer' : []}
+        depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
+        deps = {}
+        for region in Union.regions:
+            deps[region[1]] = []
+
         for department in depQuery:
+            coordinates = department.getLongLat()
+            if coordinates == None:
+                print(department.name)
             dep = {
-                'name' : department.name,
-                'website' : department.website,
-                'placename' : department.placename,
-                'address' : department.address(),
-                'zipcode': department.zipcode,
-                'city': department.city,
-                'leader': department.responsible_name,
-                'mail': department.responsible_contact,
-                'open_hours' : department.open_hours
+                'html'       : department.toHTML(),
+                'onMap'      : department.onMap
             }
-            if department.union.region == 'S':
-                deps['Sjælland'].append(dep)
-            elif department.union.region == 'F':
-                deps['Fyn'].append(dep)
-            elif department.union.region == 'J':
-                deps['Jylland'].append(dep)
+            if not(coordinates == None):
+                dep['latitude'] = str(coordinates[0])
+                dep['longtitude'] = str(coordinates[1])
             else:
-                deps['Øer'].append(dep)
+                dep['onMap'] = False
+
+            deps[department.union.get_region_display()].append(dep)
         return render(request, "members/department_list.html", {'departments' : deps})

@@ -1,10 +1,6 @@
 from django.conf.urls import patterns,  url
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
-<<<<<<< HEAD
     waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView
-=======
-    waitinglistView, paymentGatewayErrorView, departmentView
->>>>>>> 96c6ac4658bef3c508231ecc9796b69c223fbdba
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
