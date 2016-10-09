@@ -192,10 +192,10 @@ class Department(models.Model):
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     created = models.DateField('Oprettet', blank=False, default=timezone.now)
     closed_dtm = models.DateField('Lukket', blank=True, null=True, default=None)
-    isVisible  = models.BooleanField('Kan ses på afdelingssiden', default=False)
+    isVisible  = models.BooleanField('Kan ses på afdelingssiden', default=True)
     isOpening  = models.BooleanField('Er afdelingen under opstart', default=False)
     website    = models.URLField('Hjemmeside', blank=True)
-    union      = models.ForeignKey(Union, verbose_name="Lokalforening")
+    union      = models.ForeignKey(Union, verbose_name="Lokalforening", blank=False, null=False)
     longtitude = models.DecimalField("Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6)
     latitude   = models.DecimalField("Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6)
     onMap      = models.BooleanField("Skal den være på kortet?", default=True)
@@ -237,7 +237,7 @@ class Department(models.Model):
             except Exception as error:
                 print("Couldn't find addressID for " + self.name)
                 print("Error " +  str(error))
-            if (addressID != 0 and dist < 5):
+            if (addressID != 0 and dist < 10):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
                     address = json.loads(requests.get(req).text)

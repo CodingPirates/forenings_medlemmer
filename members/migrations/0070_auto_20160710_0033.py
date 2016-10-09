@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='department',
             name='isVisible',
-            field=models.BooleanField(default=False, verbose_name='Kan ses på afdelingssiden'),
+            field=models.BooleanField(default=True, verbose_name='Kan ses på afdelingssiden'),
         ),
         migrations.AddField(
             model_name='department',
