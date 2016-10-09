@@ -172,7 +172,7 @@ class PersonInline(admin.TabularInline):
     admin_link.short_description = 'Navn'
 
     model = Person
-    fields = ('admin_link', 'membertype', 'zipcode', 'added')
+    fields = ('admin_link', 'membertype', 'zipcode', 'added', 'notes')
     readonly_fields = fields
     extra = 0
 
