@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/CodingPirates/forenings_medlemmer.png?label=ready&title=Ready)](https://waffle.io/CodingPirates/forenings_medlemmer)
 # Coding Pirates medlem og tilmeldings system
 
 ## Ved første installation køres:
