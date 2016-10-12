@@ -522,7 +522,7 @@ class VolunteerListFilter(admin.SimpleListFilter):
         if self.value() == 'any':
             return queryset.filter(volunteer__isnull=False).filter(volunteer__removed__isnull=True).distinct()
         elif self.value() == 'none':
-            return queryset.filter(volunteer__isnull=True) | queryset.exclude(volunteer__removed__isnull=True).distinct()
+            return queryset.filter(volunteer__isnull=True).distinct() | queryset.exclude(volunteer__removed__isnull=True).distinct()
         elif self.value() == None:
             return queryset
         else:
