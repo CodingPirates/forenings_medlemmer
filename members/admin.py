@@ -36,7 +36,8 @@ class UnionAdmin(admin.ModelAdmin):
 
         ('Bestyrelsen',
             {'fields':('chairman', 'chairman_email','second_chair',
-            'second_chair_email', 'cashier', 'cashier_email', 'boardMembers')}),
+            'second_chair_email', 'cashier', 'cashier_email', 'secretary',
+            'secratary_email', 'boardMembers')}),
 
         ('Info',
             {'fields':('statues', 'founded'), 'description':

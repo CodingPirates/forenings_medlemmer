@@ -146,7 +146,7 @@ class Union(models.Model):
     cashier = models.CharField('Kasserer', max_length=200, blank=True)
     cashier_email = models.EmailField('Kasserens email', blank=True)
     secretary = models.CharField('Sekratær', max_length=200, blank=True)
-    cashier_email = models.EmailField('Sekratærens email', blank=True)
+    secratary_email = models.EmailField('Sekratærens email', blank=True)
     union_email = models.EmailField('Foreningens email', blank=True)
     statues = models.URLField('Link til gældende vedtægter', blank=True)
     founded = models.DateField('Stiftet', blank=True)
