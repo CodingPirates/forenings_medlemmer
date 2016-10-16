@@ -143,8 +143,10 @@ class Union(models.Model):
     chairman_email = models.EmailField('Formandens email', blank=True)
     second_chair = models.CharField('Næstformand',max_length=200, blank=True)
     second_chair_email = models.EmailField('Næstformandens email', blank=True)
-    cashier = models.CharField('Kassere',max_length=200, blank=True)
+    cashier = models.CharField('Kasserer',max_length=200, blank=True)
     cashier_email = models.EmailField('Kasserens email', blank=True)
+    secretary _ models.Charfield('Sekratær')
+    cashier_email = models.EmailField('Sekratærens email', blank=True)
     union_email = models.EmailField('Foreningens email', blank=True)
     statues = models.URLField('Link til gældende vedtægter', blank=True)
     founded = models.DateField('Stiftet', blank=True)
@@ -163,10 +165,6 @@ class Union(models.Model):
     housenumber = models.CharField('Husnummer',max_length=10)
     floor = models.CharField('Etage',max_length=10, blank=True)
     door = models.CharField('Dør',max_length=10, blank=True)
-
-    # TODO add boardmembers as foreignKey to voluenteer
-    # Indtil vi har fået de frivillige ind i systemet så vi kan sikre at
-    # alle bestyrelsesmedlemmer er "voulenters", er her et plain text hack.
     boardMembers = models.TextField('Meninge medlemmer', blank=True)
     def __str__(self):
         return "Foreningen for " + self.name
@@ -217,14 +215,14 @@ class Department(models.Model):
         else:
             myHTML += '<a href="' + html.escape(self.website) + '">' + \
             '<strong>Coding Pirates ' + html.escape(self.name) + '</strong></a><br>'
+        if self.isOpening:
+            myHTML += "<br><strong>Afdelingen slår snart dørene op!</strong>"
         if self.placename != '':
             myHTML += html.escape(self.placename) + '<br>'
         myHTML += html.escape(self.address()) + '<br>' + html.escape(self.zipcode) + ", " + html.escape(self.city) + '<br>'
         myHTML += 'Afdelingsleder: ' + html.escape(self.responsible_name) + '<br>'
-        myHTML += 'E-mail:<a href="mailto:' +html.escape(self.responsible_contact) + '">'+ html.escape(self.responsible_contact) + '</a><br>'
-        myHTML +=  'Åbningstid: ' + html.escape(self.open_hours)
-        if self.isOpening:
-            myHTML += "<br><strong>Afdelingen slår snart dørene op!</strong>"
+        myHTML += 'E-mail: <a href="mailto:' +html.escape(self.responsible_contact) + '">'+ html.escape(self.responsible_contact) + '</a><br>'
+        myHTML +=  'Tidspunkt: ' + html.escape(self.open_hours)
         return myHTML
     def getLongLat(self):
         if (self.latitude == None or self.longtitude == None):
