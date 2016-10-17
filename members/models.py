@@ -149,7 +149,7 @@ class Union(models.Model):
     secratary_email = models.EmailField('Sekratærens email', blank=True)
     union_email = models.EmailField('Foreningens email', blank=True)
     statues = models.URLField('Link til gældende vedtægter', blank=True)
-    founded = models.DateField('Stiftet', blank=True)
+    founded = models.DateField('Stiftet', blank=True, null=True)
     regions = (
         ('S' , 'Sjælland'),
         ('J' , 'Jylland'),
@@ -732,3 +732,36 @@ class QuickpayTransaction(models.Model):
 
     def __str__(self):
         return str(self.payment.family.email) + " - QuickPay orderid: '" + str(self.order_id) + "' confirmed: '" + str(self.payment.confirmed_dtm) + "'"
+
+
+class Equipment(models.Model):
+    class Meta:
+        verbose_name = 'Udstyr'
+        verbose_name_plural = 'Udstyr'
+    created_dtm = models.DateTimeField('Oprettet', auto_now_add=True)
+    title = models.CharField('Titel', max_length=200, blank=False, null=False)
+    count = models.IntegerField('Antal enheder', default=1, blank=False, null=False)
+    link = models.URLField('Link til mere info', blank=True)
+    notes = models.TextField('Generelle noter', blank=True)
+    buy_price = models.DecimalField('Købs pris', max_digits=10, decimal_places=2, blank=True, null=True)
+    buy_place = models.TextField('Købs sted', null=True, blank=True)
+    buy_date = models.DateField('Købs dato', null=True, blank=True)
+    department = models.ForeignKey(Department, blank=True, null=True)
+    union = models.ForeignKey(Union, blank=True, null=True)
+    def __str__(self):
+        return self.title
+
+class EquipmentLoan(models.Model):
+    class Meta:
+        verbose_name = 'Udstyrs udlån'
+        verbose_name_plural = 'Udstyrs udlån'
+    equipment = models.ForeignKey(Equipment, blank=False, null=False)
+    count = models.IntegerField('Antal enheder udlånt', default=1, blank=False, null=False)
+    loaned_dtm = models.DateField('Udlånt', auto_now_add=True, null=False, blank=False)
+    expected_back_dtm = models.DateField('Forventet returneret', null=True, blank=True)
+    returned_dtm = models.DateField('Afleveret', null=True, blank=True)
+    person = models.ForeignKey(Person, blank=False, null=False)
+    department = models.ForeignKey(Department, blank=False, null=False)
+    note = models.TextField('Noter', null=True, blank=True)
+    def __str__(self):
+        return self.equipment.title + " er lånt ud til " + self.person.name + " - " + self.department.name

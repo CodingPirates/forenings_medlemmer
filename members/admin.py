@@ -1,8 +1,9 @@
 from uuid import uuid4
 from django import forms
 from django.contrib import admin
+from django.db import models
 from django.db.models import Q
-from members.models import Person, Department, Union, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment
+from members.models import Person, Department, Union, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment, Equipment, EquipmentLoan
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
@@ -11,6 +12,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.core.urlresolvers import reverse
 from django.utils.html import format_html
+from django.forms import Textarea
 
 admin.site.site_header="Coding Pirates Medlemsdatabase"
 admin.site.index_title="Site Admin"
@@ -749,3 +751,23 @@ class PaymentAdmin(admin.ModelAdmin):
 
 admin.site.register(Payment, PaymentAdmin)
 #admin.site.register(QuickpayTransaction)
+
+class EquipmentLoanInline(admin.TabularInline):
+    model = EquipmentLoan
+    fields = ('count', 'person', 'department', 'loaned_dtm', 'expected_back_dtm', 'returned_dtm', 'note')
+    readonly_fields = ('loaned_dtm',)
+    can_delete = False
+    raw_id_fields = ("person",)
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows':2, 'cols':40})},
+    }
+    extra=0
+
+class EquipmentAdmin(admin.ModelAdmin):
+    list_filter = ['department', 'union']
+    list_display = ['title', 'count', 'department']
+    search_fields = ('title', 'notes')
+    inlines = (EquipmentLoanInline ,)
+
+
+admin.site.register(Equipment, EquipmentAdmin)
