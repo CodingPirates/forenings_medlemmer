@@ -740,6 +740,10 @@ class Equipment(models.Model):
         verbose_name_plural = 'Udstyr'
     created_dtm = models.DateTimeField('Oprettet', auto_now_add=True)
     title = models.CharField('Titel', max_length=200, blank=False, null=False)
+    brand = models.CharField('Mærke', max_length=200, blank=True, null=True, default=None)
+    model = models.CharField('Model', max_length=200, blank=True, null=True, default=None)
+    serial = models.CharField('Serienummer', max_length=200, blank=True, null=True, default=None)
+
     count = models.IntegerField('Antal enheder', default=1, blank=False, null=False)
     link = models.URLField('Link til mere info', blank=True)
     notes = models.TextField('Generelle noter', blank=True)
@@ -750,6 +754,18 @@ class Equipment(models.Model):
     union = models.ForeignKey(Union, blank=True, null=True)
     def __str__(self):
         return self.title
+    def clean(self):
+        # Make sure equipment is owned by someone
+        if(self.department == None and self.union == None):
+            raise ValidationError('Udfyld ejer afdeling, forening eller begge');
+        if(self.department != None and self.union != None):
+            if(self.department.union != self.union):
+                raise ValidationError('Afdelingen der er valgt er ikke i den valgte forening');
+    def save(self, *args, **kwargs):
+        if(self.union == None):
+            self.union = self.department.union
+        return super(Equipment, self).save(*args, **kwargs)
+
 
 class EquipmentLoan(models.Model):
     class Meta:

@@ -201,6 +201,7 @@ class ActivityParticipantInline(admin.TabularInline):
 class ActivityInviteInline(admin.TabularInline):
     model = ActivityInvite
     extra = 0
+    can_delete = False
 
     # Limit the activity possible to invite to: Not finished and belonging to user
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -765,7 +766,7 @@ class EquipmentLoanInline(admin.TabularInline):
 
 class EquipmentAdmin(admin.ModelAdmin):
     list_filter = ['department', 'union']
-    list_display = ['title', 'count', 'department']
+    list_display = ['title', 'count', 'union', 'department']
     search_fields = ('title', 'notes')
     inlines = (EquipmentLoanInline ,)
 
