@@ -118,6 +118,8 @@
               </div>
             </div>
           </div>
+        {% else %}
+          <p>Aktiviteten er desværre udsolgt.</p>
         {% endif %}
         {% if family.unique %}
           <a class="btn btn-primary" href="{% url 'family_detail' family.unique %}">Tilbage</a>
