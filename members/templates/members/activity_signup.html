@@ -119,7 +119,11 @@
             </div>
           </div>
         {% else %}
-          <p>Aktiviteten er desværre udsolgt.</p>
+          <hr>
+            <blockquote class="bg-warning">
+              <p >Arrangementet er desværre udsolgt!</p>
+              <footer>Det er ikke længere muligt at tilmelde sig.</footer>
+            </blockquote>
         {% endif %}
         {% if family.unique %}
           <a class="btn btn-primary" href="{% url 'family_detail' family.unique %}">Tilbage</a>
