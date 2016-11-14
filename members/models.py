@@ -216,7 +216,7 @@ class Department(models.Model):
             myHTML += '<a href="' + html.escape(self.website) + '">' + \
             '<strong>Coding Pirates ' + html.escape(self.name) + '</strong></a><br>'
         if self.isOpening:
-            myHTML += "<br><strong>Afdelingen slår snart dørene op!</strong>"
+            myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
         if self.placename != '':
             myHTML += html.escape(self.placename) + '<br>'
         myHTML += html.escape(self.address()) + '<br>' + html.escape(self.zipcode) + ", " + html.escape(self.city) + '<br>'
