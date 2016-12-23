@@ -590,7 +590,7 @@ def waitinglistView(request, unique=None):
 def paymentGatewayErrorView(request, unique=None):
     return render(request, 'members/payment_gateway_error.html', {'unique': unique})
 
-
+@xframe_options_exempt
 def departmentView(request, unique=None):
         depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
         deps = {}

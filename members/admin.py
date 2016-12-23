@@ -29,6 +29,7 @@ class EmailItemInline(admin.TabularInline):
     extra = 0
 
 class UnionAdmin(admin.ModelAdmin):
+    list_filter = ('region',)
     fieldsets = [
         ('Navn og Adresse',
             {'fields':('name', 'union_email', 'region','streetname',
@@ -49,8 +50,26 @@ class UnionAdmin(admin.ModelAdmin):
     list_display = ('name', )
 admin.site.register(Union, UnionAdmin)
 
-class DepartmentAdmin(admin.ModelAdmin):
+class UnionDepartmentFilter(admin.SimpleListFilter):
+    title = ('Forening')
+    parameter_name = 'Union'
 
+    def lookups(self, request, model_admin):
+        unions = Union.objects.all()
+        union_list = []
+        for union in unions:
+            union_list.append((str(union.pk), str(union)))
+        return union_list
+
+    def queryset(self, request, queryset):
+        print(self.value())
+        if(self.value() == None):
+            return queryset
+        else:
+            return queryset.filter(union=self.value())
+
+class DepartmentAdmin(admin.ModelAdmin):
+    list_filter = (UnionDepartmentFilter, )
     # Only show own departments
     def get_queryset(self, request):
         qs = super(DepartmentAdmin, self).get_queryset(request)
