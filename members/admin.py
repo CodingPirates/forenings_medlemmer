@@ -87,6 +87,7 @@ admin.site.register(Department,DepartmentAdmin)
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name','department', 'member_since','is_active')
     list_filter = ['department']
+    list_per_page = 20
 
     # Only view mebers related to users department
     def get_queryset(self, request):
@@ -101,6 +102,7 @@ admin.site.register(Member, MemberAdmin)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'department', 'start_date', 'open_invite', 'price_in_dkk', 'max_participants')
     date_hierarchy = 'start_date'
+    list_per_page = 20
     #list_filter = ('department','open_invite')
 
     # Only view activities on own department
@@ -168,7 +170,6 @@ class ActivityAdmin(admin.ModelAdmin):
 admin.site.register(Activity, ActivityAdmin)
 
 class PersonInline(admin.TabularInline):
-
     def admin_link(self, instance):
         url = reverse('admin:%s_%s_change' % (instance._meta.app_label, instance._meta.model_name), args=(instance.id,))
         return format_html(u'<a href="{}">{}</a>', url, instance.name)
@@ -237,6 +238,7 @@ class FamilyAdmin(admin.ModelAdmin):
 
     fields = ('email', 'dont_send_mails', 'confirmed_dtm')
     readonly_fields = ('confirmed_dtm',)
+    list_per_page = 20
 
     def create_new_uuid(self,request, queryset):
         for family in queryset:
@@ -641,8 +643,7 @@ class PersonAdmin(admin.ModelAdmin):
         return format_html(u'<a href="../family/%d">%s</a>' % (item.family.id, item.family.email))
     family_url.allow_tags = True
     family_url.short_description = 'Familie'
-
-
+    list_per_page = 20
 
     # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
@@ -769,6 +770,7 @@ class EquipmentAdmin(admin.ModelAdmin):
     list_display = ['title', 'count', 'union', 'department']
     search_fields = ('title', 'notes')
     inlines = (EquipmentLoanInline ,)
+    list_per_page = 20
 
 
 admin.site.register(Equipment, EquipmentAdmin)

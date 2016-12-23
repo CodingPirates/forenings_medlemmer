@@ -50,7 +50,6 @@ BASE_URL = 'https://members.codingpirates.dk'
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -60,6 +59,8 @@ INSTALLED_APPS = (
     'members',
     'crispy_forms',
     'django_cron',
+    'flat_responsive',
+    'django.contrib.admin',
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
