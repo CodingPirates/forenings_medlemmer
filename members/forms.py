@@ -154,7 +154,7 @@ class signupForm(forms.Form):
     child_birthday = forms.DateField(label='Barns fødselsdato (dd-mm-åååå)', input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
 
     parent_name = forms.CharField(label='Forældres navn', required=True, max_length=200)
-    parent_email = forms.EmailField(label='Forældres email', required=True)
+    parent_email = forms.EmailField(label='Forældres private email', required=True)
     parent_phone = forms.CharField(label='Forældres telefon', required=True, max_length=50)
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
