@@ -651,9 +651,9 @@ class WaitingListInline(admin.TabularInline):
     extra = 0
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
+    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added', 'notes')
     list_filter = ('membertype', 'gender', VolunteerListFilter, PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
-    search_fields = ('name', 'family__email',)
+    search_fields = ('name', 'family__email', 'notes')
     actions = ['invite_to_own_activity', 'export_emaillist', 'export_csv']
 
     inlines = [PaymentInline, VolunteerInline, ActivityInviteInline, MemberInline, WaitingListInline]
@@ -668,7 +668,7 @@ class PersonAdmin(admin.ModelAdmin):
     # email and phonenumber only shown on adults.
     def get_fieldsets(self, request, person=None):
         if(request.user.has_perm('members.view_full_address')):
-            contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone')
+            contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone', 'family')
         else:
             if(person.membertype == Person.CHILD):
                 contact_fields = ('name', 'city', 'zipcode', 'family')
@@ -692,7 +692,7 @@ class PersonAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if type(obj) == Person and not request.user.is_superuser:
-            return tuple(obj._meta.get_all_field_names())
+            return ['name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone', 'family', 'membertype', 'birthday', 'has_certificate', 'added']
         else:
             return []
 
