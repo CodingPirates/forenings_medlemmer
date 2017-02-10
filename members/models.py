@@ -252,6 +252,15 @@ class Department(models.Model):
         else:
             return(self.latitude, self.longtitude)
 
+    def new_volunteer_email(self,volunteer_name):
+        # First fetch department leaders email
+        new_vol_email = EmailTemplate.objects.get(idname = 'VOL_NEW')
+        context = {
+            'department': self,
+            'volunteer_name': volunteer_name,
+        }
+        new_vol_email.makeEmail(self, context)
+
 class WaitingList(models.Model):
     class Meta:
         verbose_name="På venteliste"
@@ -455,7 +464,7 @@ class EmailTemplate(models.Model):
             # Note - string specifically removed. We use family.dont_send_mails to make sure
             # we dont send unwanted mails.
 
-            if type(reciever) not in (Person, Family):
+            if type(reciever) not in (Person, Family, Department):
                 raise Exception("Reciever must be of type Person or Family not " + str(type(reciever)))
 
             # figure out reciever
@@ -474,6 +483,9 @@ class EmailTemplate(models.Model):
                     continue
                 context['family'] = reciever
                 destination_address = reciever.email
+            elif(type(reciever) is Department):
+                context['department'] = reciever
+                destination_address = reciever.responsible_contact
 
             # figure out Person and Family is applicable
             if(type(reciever) is Person):
