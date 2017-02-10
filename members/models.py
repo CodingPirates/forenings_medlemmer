@@ -93,6 +93,10 @@ class Person(models.Model):
         (MALE, 'Dreng'),
         (FEMALE, 'Pige')
         )
+    MEMBER_ADULT_GENDER_CHOICES = (
+        (MALE, 'Mand'),
+        (FEMALE, 'Kvinde')
+        )
     membertype = models.CharField('Type',max_length=2,choices=MEMBER_TYPE_CHOICES,default=PARENT)
     name = models.CharField('Navn',max_length=200)
     zipcode = models.CharField('Postnummer',max_length=4, blank=True)

@@ -209,7 +209,7 @@ class vol_signupForm(forms.Form):
 
         )
 
-    volunteer_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_GENDER_CHOICES)
+    volunteer_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_ADULT_GENDER_CHOICES)
     volunteer_name = forms.CharField(label='Fulde navn', required=True, max_length=200)
     volunteer_email = forms.EmailField(label='Email', required=True)
     volunteer_phone = forms.CharField(label='Telefon', required=True, max_length=50)
