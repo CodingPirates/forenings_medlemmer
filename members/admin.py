@@ -750,6 +750,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 
         return render(request, 'admin/invite_many_to_activity.html', context)
+    invite_many_to_activity_action.short_description = 'Inviter alle valgte til en aktivitet'
 
     # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
