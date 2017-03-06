@@ -704,7 +704,7 @@ class PersonAdmin(admin.ModelAdmin):
 
         if request.method == 'POST' and 'department' in request.POST:
             # Post request with data
-            mass_invitation_form = MassInvitationForm(request.POST);
+            mass_invitation_form = MassInvitationForm(request.POST)
             context['mass_invitation_form'] = mass_invitation_form
 
             if mass_invitation_form.is_valid() and mass_invitation_form.cleaned_data['activity'] != '-' and mass_invitation_form.cleaned_data['department'] != '-':
@@ -713,18 +713,30 @@ class PersonAdmin(admin.ModelAdmin):
                 # validate activity belongs to user and matches selected department
                 if int(mass_invitation_form.cleaned_data['department']) in department_ids:
                     if activity.department.id == int(mass_invitation_form.cleaned_data['department']):
+                        invited_counter = 0
+
+                        # get list of already created invitations on selected persons
+                        already_invited = Person.objects.filter(activityinvite__activity=mass_invitation_form.cleaned_data['activity'], activityinvite__person__in=queryset).all();
+                        list(already_invited) # force lookup
+                        already_invited_ids = already_invited.values_list('id', flat=True);
+
                         # only save if all succeeds
                         try:
                             with transaction.atomic():
                                 for current_person in queryset:
-                                    invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
-                                    invitation.save()
+                                    if(current_person.id not in already_invited_ids):
+                                        invited_counter = invited_counter + 1
+                                        invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
+                                        invitation.save()
                         except Exception as e:
                             messages.error(request, "Fejl - ingen personer blev inviteret! Der var problemer med " + invitation.person.name +  ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.")
                             return
 
                         # return ok message
-                        messages.success(request, "Alle " + str(queryset.count()) + " valgte personer er inviteret til " + str(activity))
+                        already_invited_text=""
+                        if(already_invited.count()):
+                            already_invited_text = ". Dog var : " + str.join(', ', already_invited.values_list('name', flat=True)) + " allerede inviteret!"
+                        messages.success(request, str(invited_counter) + " af " + str(queryset.count()) + " valgte personer blev inviteret til " + str(activity) + already_invited_text)
                         return
 
                     else:
