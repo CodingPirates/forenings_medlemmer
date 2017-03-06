@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from members.models import Person, Payment, ActivityParticipant
+from members.models import Department, Person, Payment, ActivityParticipant
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, MultiField, Field, Hidden, HTML, Div, Button
 from crispy_forms.bootstrap import FormActions
@@ -154,7 +154,7 @@ class signupForm(forms.Form):
     child_birthday = forms.DateField(label='Barns fødselsdato (dd-mm-åååå)', input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
 
     parent_name = forms.CharField(label='Forældres navn', required=True, max_length=200)
-    parent_email = forms.EmailField(label='Forældres email', required=True)
+    parent_email = forms.EmailField(label='Forældres private email', required=True)
     parent_phone = forms.CharField(label='Forældres telefon', required=True, max_length=50)
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
@@ -183,9 +183,10 @@ class vol_signupForm(forms.Form):
                         Div(
                              Div(Field('volunteer_gender'), css_class="col-md-2"),
                              Div(Field('volunteer_name'), css_class="col-md-10"),
-                             Div(Field('volunteer_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
-                             Div(Field('volunteer_email'), css_class="col-md-4"),
-                             Div(Field('volunteer_phone'), css_class="col-md-4"),
+                             Div(Field('volunteer_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-3"),
+                             Div(Field('volunteer_email'), css_class="col-md-3"),
+                             Div(Field('volunteer_phone'), css_class="col-md-3"),
+                             Div(Field('volunteer_department'), css_class="col-md-3"),
                              css_class="row"
                            )
                     ),
@@ -208,11 +209,12 @@ class vol_signupForm(forms.Form):
 
         )
 
-    volunteer_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_GENDER_CHOICES)
+    volunteer_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_ADULT_GENDER_CHOICES)
     volunteer_name = forms.CharField(label='Fulde navn', required=True, max_length=200)
     volunteer_email = forms.EmailField(label='Email', required=True)
     volunteer_phone = forms.CharField(label='Telefon', required=True, max_length=50)
     volunteer_birthday = forms.DateField(label='Fødselsdato (dd-mm-åååå)', required=True, input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
+    volunteer_department = forms.ModelChoiceField(queryset=Department.objects.all(), required=True, label="Afdeling", empty_label="-")
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     streetname = forms.CharField(label='Vejnavn', required=True, max_length=200)

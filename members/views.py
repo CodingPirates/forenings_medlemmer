@@ -172,10 +172,12 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
     # if activity is closed for signup, only invited persons can still join
     if activity.signup_closing < timezone.now().date() and invitation==None:
         view_only_mode = True # Activivty closed for signup
+        signup_closed = True
 
     # check if activity is full
     if activity.seats_left() <= 0:
         view_only_mode = True # activity full
+        signup_closed = True
 
     if(request.method == "POST"):
         if view_only_mode:
@@ -486,6 +488,10 @@ def volunteerSignup(request):
 
                     # send email with login link
                     family.send_link_email()
+
+                    # send email to department leader
+                    department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
+                    department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                     #redirect to success
                     return HttpResponseRedirect(reverse('login_email_sent'))
