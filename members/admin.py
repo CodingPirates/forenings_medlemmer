@@ -2,23 +2,17 @@ from uuid import uuid4
 from django import forms
 from django.contrib import admin
 from django.db import models
-from django.db import transaction
 from django.db.models import Q
 from members.models import Person, Department, Union, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment, Equipment, EquipmentLoan
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.core.urlresolvers import reverse
 from django.utils.html import format_html
 from django.forms import Textarea
-from django.shortcuts import render
-from django.conf.urls import patterns, include, url
-from django.apps import apps
-from django.contrib.admin.widgets import AdminDateWidget
-from django.contrib import messages
 
 admin.site.site_header="Coding Pirates Medlemsdatabase"
 admin.site.index_title="Site Admin"
@@ -213,7 +207,7 @@ class PaymentInline(admin.TabularInline):
 
 class VolunteerInline(admin.TabularInline):
     model = Volunteer
-    fields = ('department', 'added', 'removed')
+    fields = ('department', 'added', 'removed', 'approved')
     extra = 0
 
 class ActivityParticipantInline(admin.TabularInline):
@@ -657,10 +651,10 @@ class WaitingListInline(admin.TabularInline):
     extra = 0
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added', 'notes')
+    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added')
     list_filter = ('membertype', 'gender', VolunteerListFilter, PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
-    search_fields = ('name', 'family__email', 'notes')
-    actions = ['invite_many_to_activity_action', 'export_emaillist', 'export_csv']
+    search_fields = ('name', 'family__email',)
+    actions = ['invite_to_own_activity', 'export_emaillist', 'export_csv']
 
     inlines = [PaymentInline, VolunteerInline, ActivityInviteInline, MemberInline, WaitingListInline]
 
@@ -670,93 +664,11 @@ class PersonAdmin(admin.ModelAdmin):
     family_url.short_description = 'Familie'
     list_per_page = 20
 
-    def invite_many_to_activity_action(self,request, queryset):
-        # Get list of available departments
-        if request.user.is_superuser or request.user.has_perm('members.view_all_persons'):
-            deparment_list_query = Department.objects.all()
-        else:
-            deparment_list_query = Department.objects.filter(adminuserinformation__user=request.user)
-        deparment_list=[('-', '-')]
-        for department in deparment_list_query:
-            deparment_list.append((department.id, department.name))
-
-        # Get list of active and future activities
-        department_ids = deparment_list_query.values_list('id', flat=True)
-        activity_list_query = Activity.objects.filter(end_date__gt=timezone.now())
-        if not request.user.is_superuser:
-            activity_list_query = activity_list_query.filter(department__in=department_ids)
-        activity_list=[('-', '-')]
-        for activity in activity_list_query:
-            activity_list.append((activity.id, activity.department.name + ", " + activity.name))
-
-        # Form used to select department and activity - redundant department is for double check
-        class MassInvitationForm(forms.Form):
-            department = forms.ChoiceField(label='Afdeling', choices=deparment_list)
-            activity = forms.ChoiceField(label='Aktivitet', choices=activity_list)
-            expire = forms.DateField(label='Udløber', widget=AdminDateWidget(), initial=timezone.now() + timedelta(days=30*3))
-
-        # Lookup all the selected persons - to show confirmation list
-        persons = queryset
-
-        context = admin.site.each_context(request)
-        context['persons'] = persons
-        context['queryset'] = queryset
-
-        if request.method == 'POST' and 'department' in request.POST:
-            # Post request with data
-            mass_invitation_form = MassInvitationForm(request.POST)
-            context['mass_invitation_form'] = mass_invitation_form
-
-            if mass_invitation_form.is_valid() and mass_invitation_form.cleaned_data['activity'] != '-' and mass_invitation_form.cleaned_data['department'] != '-':
-                activity = Activity.objects.get(pk=mass_invitation_form.cleaned_data['activity'])
-
-                # validate activity belongs to user and matches selected department
-                if int(mass_invitation_form.cleaned_data['department']) in department_ids:
-                    if activity.department.id == int(mass_invitation_form.cleaned_data['department']):
-                        invited_counter = 0
-
-                        # get list of already created invitations on selected persons
-                        already_invited = Person.objects.filter(activityinvite__activity=mass_invitation_form.cleaned_data['activity'], activityinvite__person__in=queryset).all();
-                        list(already_invited) # force lookup
-                        already_invited_ids = already_invited.values_list('id', flat=True);
-
-                        # only save if all succeeds
-                        try:
-                            with transaction.atomic():
-                                for current_person in queryset:
-                                    if(current_person.id not in already_invited_ids):
-                                        invited_counter = invited_counter + 1
-                                        invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
-                                        invitation.save()
-                        except Exception as e:
-                            messages.error(request, "Fejl - ingen personer blev inviteret! Der var problemer med " + invitation.person.name +  ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.")
-                            return
-
-                        # return ok message
-                        already_invited_text=""
-                        if(already_invited.count()):
-                            already_invited_text = ". Dog var : " + str.join(', ', already_invited.values_list('name', flat=True)) + " allerede inviteret!"
-                        messages.success(request, str(invited_counter) + " af " + str(queryset.count()) + " valgte personer blev inviteret til " + str(activity) + already_invited_text)
-                        return
-
-                    else:
-                        messages.error(request, "Valgt aktivitet stemmer ikke overens med valgt afdeling")
-                        return
-                else:
-                    messages.error(request, "Du kan kun invitere til egne afdelinger")
-                    return
-        else:
-            context['mass_invitation_form'] = MassInvitationForm();
-
-
-        return render(request, 'admin/invite_many_to_activity.html', context)
-    invite_many_to_activity_action.short_description = 'Inviter alle valgte til en aktivitet'
-
     # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
     def get_fieldsets(self, request, person=None):
         if(request.user.has_perm('members.view_full_address')):
-            contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone', 'family')
+            contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone')
         else:
             if(person.membertype == Person.CHILD):
                 contact_fields = ('name', 'city', 'zipcode', 'family')
@@ -780,12 +692,16 @@ class PersonAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if type(obj) == Person and not request.user.is_superuser:
-            return ['name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone', 'family', 'membertype', 'birthday', 'has_certificate', 'added']
+            return tuple(obj._meta.get_all_field_names())
         else:
             return []
 
     def unique(self, item):
         return item.family.unique if item.family != None else ''
+
+    def invite_to_own_activity(self,request, queryset):
+        return HttpResponse("Ikke klar endnu. Vi implementerer denne når vi får tid. Tryk på hver person for at invitere i stedet for.")
+    invite_to_own_activity.short_description = "Inviter valgte personer til en aktivitet"
 
     def export_emaillist(self,request, queryset):
         result_string = "kopier denne liste direkte ind i dit email program (Husk at bruge Bcc!)\n\n"
@@ -850,7 +766,6 @@ admin.site.register(User, UserAdmin)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ['pk', 'added', 'payment_type', 'amount_ore', 'family', 'confirmed_dtm', 'cancelled_dtm', 'rejected_dtm', 'activityparticipant']
     list_filter = ['payment_type', 'activity']
-    raw_id_fields = ('person', 'activityparticipant', 'family')
     date_hierarchy = 'added'
     search_fields = ('family__email',)
     select_related = ('activityparticipant')
