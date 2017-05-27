@@ -49,8 +49,8 @@ class UnionAdmin(admin.ModelAdmin):
             'secratary_email', 'boardMembers')}),
 
         ('Info',
-            {'fields':('statues', 'founded'), 'description':
-            'Indsæt et link til jeres vedtægter og hvornår i er stiftet'})
+            {'fields':('independent_accounting', 'bank_reg_number', 'bank_account', 'statues', 'founded'), 'description':
+            'Indsæt et link til jeres vedtægter, hvornår i er stiftet (har holdt stiftende generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.'})
     ]
 
     list_display = ('name', )
