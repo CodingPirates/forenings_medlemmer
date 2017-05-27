@@ -171,8 +171,8 @@ class Union(models.Model):
     door = models.CharField('Dør',max_length=10, blank=True)
     boardMembers = models.TextField('Menige medlemmer', blank=True)
     independent_accounting = models.BooleanField('Selvstændig bogføring (skal kontingenter overføres?):',default=False)
-    bank_reg_number = models.CharField('Registreringsnummer:',max_length=4)
-    bank_account = models.CharField('Kontonummer:',max_length=10)
+    bank_reg_number = models.CharField('Registreringsnummer:',max_length=4,blank=True)
+    bank_account = models.CharField('Kontonummer:',max_length=10,blank=True)
     def __str__(self):
         return "Foreningen for " + self.name
 
