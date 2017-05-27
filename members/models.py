@@ -148,9 +148,9 @@ class Union(models.Model):
     second_chair = models.CharField('Næstformand',max_length=200, blank=True)
     second_chair_email = models.EmailField('Næstformandens email', blank=True)
     cashier = models.CharField('Kasserer', max_length=200, blank=True)
-    cashier_email = models.EmailField('Kasserens email', blank=True)
-    secretary = models.CharField('Sekratær', max_length=200, blank=True)
-    secratary_email = models.EmailField('Sekratærens email', blank=True)
+    cashier_email = models.EmailField('Kassererens email', blank=True)
+    secretary = models.CharField('Sekretær', max_length=200, blank=True)
+    secratary_email = models.EmailField('Sekretærens email', blank=True)
     union_email = models.EmailField('Foreningens email', blank=True)
     statues = models.URLField('Link til gældende vedtægter', blank=True)
     founded = models.DateField('Stiftet', blank=True, null=True)
@@ -169,7 +169,10 @@ class Union(models.Model):
     housenumber = models.CharField('Husnummer',max_length=10)
     floor = models.CharField('Etage',max_length=10, blank=True)
     door = models.CharField('Dør',max_length=10, blank=True)
-    boardMembers = models.TextField('Meninge medlemmer', blank=True)
+    boardMembers = models.TextField('Menige medlemmer', blank=True)
+    independent_accounting = models.BooleanField('Selvstændig bogføring (skal kontingenter overføres?):',default=False)
+    bank_reg_number = models.CharField('Registreringsnummer:',max_length=4)
+    bank_account = models.CharField('Kontonummer:',max_length=10)
     def __str__(self):
         return "Foreningen for " + self.name
 
