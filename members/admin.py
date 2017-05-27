@@ -151,7 +151,7 @@ class ActivityAdmin(admin.ModelAdmin):
         }
          ),
         ('Aktivitet',
-            {'description' : '<p>Aktivitets navnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårs sæson 2016</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>',
+            {'description' : '<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårssæson 2018</em>.</p><p>Tidspunkt er f.eks. <em>onsdage 17:00-19:00</em></p>',
             'fields': (
             'name',
             'open_hours',
