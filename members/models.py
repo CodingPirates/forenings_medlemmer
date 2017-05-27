@@ -170,11 +170,15 @@ class Union(models.Model):
     floor = models.CharField('Etage',max_length=10, blank=True)
     door = models.CharField('Dør',max_length=10, blank=True)
     boardMembers = models.TextField('Menige medlemmer', blank=True)
-    independent_accounting = models.BooleanField('Selvstændig bogføring (skal kontingenter overføres?):',default=False)
+    bank_main_org = models.BooleanField('Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).',default=True)
     bank_reg_number = models.CharField('Registreringsnummer:',max_length=4,blank=True)
     bank_account = models.CharField('Kontonummer:',max_length=10,blank=True)
     def __str__(self):
         return "Foreningen for " + self.name
+
+    def clean(self):
+        if(self.bank_main_org==False and not self.bank_reg_number or not self.bank_account):
+            raise ValidationError('Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal registreringsnummer og kontonummer udfyldes.')
 
 class Department(models.Model):
     class Meta:
