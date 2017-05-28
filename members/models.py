@@ -14,6 +14,7 @@ from django.utils import timezone, html
 from django.contrib.auth.models import User
 from quickpay_api_client import QPClient
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 import requests, json
 
 
@@ -171,14 +172,13 @@ class Union(models.Model):
     door = models.CharField('Dør',max_length=10, blank=True)
     boardMembers = models.TextField('Menige medlemmer', blank=True)
     bank_main_org = models.BooleanField('Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).',default=True)
-    bank_reg_number = models.CharField('Registreringsnummer:',max_length=4,blank=True)
-    bank_account = models.CharField('Kontonummer:',max_length=10,blank=True)
+    bank_account = models.CharField('Bankkonto:',max_length=15,blank=True,help_text='Kontonummer i formatet 1234-1234567890',validators=[RegexValidator(regex="^[0-9]{4} *?-? *?[0-9]{6,10} *?$",message="Indtast kontonummer i det rigtige format.")])
     def __str__(self):
         return "Foreningen for " + self.name
 
     def clean(self):
-        if(self.bank_main_org==False and not self.bank_reg_number or not self.bank_account):
-            raise ValidationError('Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal registreringsnummer og kontonummer udfyldes.')
+        if(self.bank_main_org==False and not self.bank_account):
+            raise ValidationError('Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal bankkonto udfyldes.')
 
 class Department(models.Model):
     class Meta:
