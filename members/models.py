@@ -123,10 +123,13 @@ class Person(models.Model):
     def address(self):
         return format_address(self.streetname, self.housenumber, self.floor, self.door)
 
+    def age_from_birthdate(self, date):
+        today = timezone.now().date()
+        return today.year - date.year - ((today.month, today.day) < (date.month, date.day))
+
     def age_years(self):
         if(self.birthday != None):
-            today = timezone.now().date()
-            return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
+            return self.age_from_birthdate(self.birthday.year)
         else:
             return 0
     age_years.admin_order_field = '-birthday'
@@ -815,7 +818,7 @@ class ZipcodeRegion(models.Model):
 
 # more stat ideas: age, region distribution
 class DailyStatisticsDepartment(models.Model):
-    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now())
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
     department = models.ForeignKey(Department)
     active_activities = models.IntegerField('Aktiviteter der er igang', null=False, blank=False, default=0)
     activities = models.IntegerField('Aktiviteter i alt', null=False, blank=False, default=0)
@@ -836,7 +839,7 @@ class DailyStatisticsDepartment(models.Model):
     volunteers_age_max = models.FloatField('Frivillige ældste alder', null=False, blank=False, default=0)
 
 class DailyStatisticsUnion(models.Model):
-    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now())
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
     union = models.ForeignKey(Union)
     departments = models.IntegerField('Afdelinger', null=False, blank=False, default=0)
     active_activities = models.IntegerField('Aktiviteter der er igang', null=False, blank=False, default=0)
@@ -857,10 +860,9 @@ class DailyStatisticsUnion(models.Model):
     volunteers_age_max = models.FloatField('Frivillige ældste alder', null=False, blank=False, default=0)
 
 class DailyStatisticsRegion(models.Model):
-    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now())
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
     region = models.CharField('Region', blank=False, null=False, max_length=4, choices=ZipcodeRegion.REGION_CHOICES)
     departments = models.IntegerField('Afdelinger', null=False, blank=False, default=0)
-    unions = models.IntegerField('Lokalforeninger', null=False, blank=False, default=0)
     active_activities = models.IntegerField('Aktiviteter der er igang', null=False, blank=False, default=0)
     activities = models.IntegerField('Aktiviteter i alt', null=False, blank=False, default=0)
     current_activity_participants = models.IntegerField('Deltagere på aktiviteter', null=False, blank=False, default=0)
@@ -879,7 +881,7 @@ class DailyStatisticsRegion(models.Model):
     volunteers_age_max = models.FloatField('Frivillige ældste alder', null=False, blank=False, default=0)
 
 class DailyStatisticsGeneral(models.Model):
-    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now())
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
     persons = models.IntegerField('Personer', null=False, blank=False, default=0)
     children_male = models.IntegerField('Børn Drenge', null=False, blank=False, default=0)
     children_female = models.IntegerField('Børn Piger', null=False, blank=False, default=0)
