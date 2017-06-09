@@ -141,7 +141,8 @@ CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",
     'members.jobs.RequestConfirmationCronJob',
     'members.jobs.SendActivitySignupConfirmationsCronJob',
-    'members.jobs.PollQuickpayPaymentsCronJob'
+    'members.jobs.PollQuickpayPaymentsCronJob',
+    'members.jobs.GenerateStatisticsCronJob'
 ]
 
 # Dont keep job logs more than 7 days old

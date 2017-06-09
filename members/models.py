@@ -123,10 +123,13 @@ class Person(models.Model):
     def address(self):
         return format_address(self.streetname, self.housenumber, self.floor, self.door)
 
+    def age_from_birthdate(self, date):
+        today = timezone.now().date()
+        return today.year - date.year - ((today.month, today.day) < (date.month, date.day))
+
     def age_years(self):
         if(self.birthday != None):
-            today = timezone.now().date()
-            return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
+            return self.age_from_birthdate(self.birthday)
         else:
             return 0
     age_years.admin_order_field = '-birthday'
@@ -272,7 +275,8 @@ class WaitingList(models.Model):
         ordering=['on_waiting_list_since']
     person = models.ForeignKey(Person)
     department = models.ForeignKey(Department)
-    on_waiting_list_since = models.DateField('Tilføjet', blank=True, null=True)
+    on_waiting_list_since = models.DateField('Venteliste position', blank=False, null=False)
+    added_dtm = models.DateField('Tilføjet', blank=False, null=False, default=timezone.now)
     def number_on_waiting_list(self):
         return WaitingList.objects.filter(department = self.department, on_waiting_list_since__lt = self.on_waiting_list_since).count()+1
     number_on_waiting_list.short_description = 'Position på venteliste'
@@ -811,3 +815,72 @@ class ZipcodeRegion(models.Model):
     city = models.CharField('By', max_length=200)
     municipalcode = models.IntegerField('Kommunekode', blank=False, null=False)
     municipalname = models.TextField('Kommunenavn', null=False, blank=False)
+
+# more stat ideas: age, region distribution
+class DailyStatisticsDepartment(models.Model):
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
+    department = models.ForeignKey(Department)
+    active_activities = models.IntegerField('Aktiviteter der er igang', null=False, blank=False, default=0)
+    activities = models.IntegerField('Aktiviteter i alt', null=False, blank=False, default=0)
+    current_activity_participants = models.IntegerField('Deltagere på aktiviteter', null=False, blank=False, default=0)
+    activity_participants = models.IntegerField('Deltagere på aktiviteter over al tid', null=False, blank=False, default=0)
+    members = models.IntegerField('Medlemmer', null=False, blank=False, default=0)
+    waitinglist = models.IntegerField('Venteliste', null=False, blank=False, default=0)
+    waitingtime = models.DurationField('Ventetid', null=False, blank=False, default=0)
+    payments = models.IntegerField('Betalinger', null=False, blank=False, default=0)
+    volunteers_male = models.IntegerField('Frivillige Mænd', null=False, blank=False, default=0)
+    volunteers_female = models.IntegerField('Frivillige Kvinder', null=False, blank=False, default=0)
+    volunteers = models.IntegerField('Frivillige', null=False, blank=False, default=0)
+
+class DailyStatisticsUnion(models.Model):
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
+    union = models.ForeignKey(Union)
+    departments = models.IntegerField('Afdelinger', null=False, blank=False, default=0)
+    active_activities = models.IntegerField('Aktiviteter der er igang', null=False, blank=False, default=0)
+    activities = models.IntegerField('Aktiviteter i alt', null=False, blank=False, default=0)
+    current_activity_participants = models.IntegerField('Deltagere på aktiviteter', null=False, blank=False, default=0)
+    activity_participants = models.IntegerField('Deltagere på aktiviteter over al tid', null=False, blank=False, default=0)
+    members = models.IntegerField('Medlemmer', null=False, blank=False, default=0)
+    waitinglist = models.IntegerField('Venteliste', null=False, blank=False, default=0)
+    payments = models.IntegerField('Betalinger', null=False, blank=False, default=0)
+    volunteers_male = models.IntegerField('Frivillige Mænd', null=False, blank=False, default=0)
+    volunteers_female = models.IntegerField('Frivillige Kvinder', null=False, blank=False, default=0)
+    volunteers = models.IntegerField('Frivillige', null=False, blank=False, default=0)
+
+class DailyStatisticsRegion(models.Model):
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
+    region = models.CharField('Region', blank=False, null=False, max_length=4, choices=ZipcodeRegion.REGION_CHOICES)
+    departments = models.IntegerField('Afdelinger', null=False, blank=False, default=0)
+    active_activities = models.IntegerField('Aktiviteter der er igang', null=False, blank=False, default=0)
+    activities = models.IntegerField('Aktiviteter i alt', null=False, blank=False, default=0)
+    current_activity_participants = models.IntegerField('Deltagere på aktiviteter', null=False, blank=False, default=0)
+    activity_participants = models.IntegerField('Deltagere på aktiviteter over al tid', null=False, blank=False, default=0)
+    members = models.IntegerField('Medlemmer', null=False, blank=False, default=0)
+    waitinglist = models.IntegerField('Venteliste', null=False, blank=False, default=0)
+    payments = models.IntegerField('Betalinger', null=False, blank=False, default=0)
+    volunteers_male = models.IntegerField('Frivillige Mænd', null=False, blank=False, default=0)
+    volunteers_female = models.IntegerField('Frivillige Kvinder', null=False, blank=False, default=0)
+    volunteers = models.IntegerField('Frivillige', null=False, blank=False, default=0)
+
+class DailyStatisticsGeneral(models.Model):
+    timestamp = models.DateTimeField('Kørsels tidspunkt', null=False, blank=False, default=datetime.now)
+    persons = models.IntegerField('Personer', null=False, blank=False, default=0)
+    children_male = models.IntegerField('Børn Drenge', null=False, blank=False, default=0)
+    children_female = models.IntegerField('Børn Piger', null=False, blank=False, default=0)
+    children = models.IntegerField('Børn', null=False, blank=False, default=0)
+    volunteers_male = models.IntegerField('Frivillige Mænd', null=False, blank=False, default=0)
+    volunteers_female = models.IntegerField('Frivillige Kvinder', null=False, blank=False, default=0)
+    volunteers = models.IntegerField('Frivillige', null=False, blank=False, default=0)
+    departments = models.IntegerField('Afdelinger', null=False, blank=False, default=0)
+    unions = models.IntegerField('Lokalforeninger', null=False, blank=False, default=0)
+    waitinglist_male = models.IntegerField('Drenge på venteliste', null=False, blank=False, default=0)
+    waitinglist_female = models.IntegerField('Piger på venteliste', null=False, blank=False, default=0)
+    waitinglist = models.IntegerField('Personer på venteliste', null=False, blank=False, default=0)
+    family_visits = models.IntegerField('Profilsider besøgt foregående 24 timer', null=False, blank=False, default=0)
+    dead_profiles = models.IntegerField('Profilsider efterladt over et år', null=False, blank=False, default=0)
+    current_activity_participants = models.IntegerField('Deltagere på aktiviteter', null=False, blank=False, default=0)
+    activity_participants = models.IntegerField('Deltagere på aktiviteter over al tid', null=False, blank=False, default=0)
+    activity_participants_male = models.IntegerField('Deltagere på aktiviteter over al tid (drenge)', null=False, blank=False, default=0)
+    activity_participants_female = models.IntegerField('Deltagere på aktiviteter over al tid (piger)', null=False, blank=False, default=0)
+    payments = models.IntegerField('Betalinger sum', null=False, blank=False, default=0)
+    payments_transactions = models.IntegerField('Betalinger transaktioner', null=False, blank=False, default=0)
