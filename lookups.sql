@@ -70,13 +70,22 @@ JOIN members_family AS f ON p.family_id=f.id
 WHERE ap.activity_id IS 160;
 
 # Aktivitets deltagere i en region
-SELECT DISTINCT f.email FROM members_person AS p
+SELECT DISTINCT f.email, p.name FROM members_person AS p
   JOIN members_member AS m ON m.person_id=p.id
   JOIN members_activityparticipant AS ap ON ap.member_id=m.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
   JOIN members_activity AS a ON a.id=ap.activity_id
   JOIN members_family AS f ON f.id=p.family_id
-  WHERE zr.region is 'DK01' AND a.end_date > '2017-02-21';
+    WHERE zr.region IN ('DK01', 'DK02') AND a.end_date > '2017-02-21'
+    AND f.dont_send_mails=0;;
+
+# venteliste børn i en region
+SELECT DISTINCT f.email, p.name FROM members_person AS p
+  JOIN members_waitinglist AS w ON p.id=w.person_id 
+  JOIN members_family AS f ON f.id=p.family_id
+  JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
+    WHERE zr.region IN ('DK02')
+    AND f.dont_send_mails=0;;
 
 # medlemmer i en forening
 SELECT DISTINCT f.email FROM members_person AS p
@@ -89,3 +98,25 @@ SELECT DISTINCT f.email FROM members_person AS p
     WHERE d.union_id=2
     AND a.end_date > '2017-03-06'
     AND julianday(a.end_date) - julianday(a.start_date) > 5;
+
+(10, 11, 21, 27, 35, 39, 40, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 84)
+
+# Deltagere i bestemte afdelinger
+SELECT DISTINCT f.email FROM members_person AS p
+  JOIN members_member AS m ON m.person_id=p.id
+  JOIN members_activityparticipant AS ap ON ap.member_id=m.id
+  JOIN members_activity AS a ON a.id=ap.activity_id
+  JOIN members_family AS f ON f.id=p.family_id
+  JOIN members_department AS d ON d.id=a.department_id
+    WHERE d.id IN (34, 63, 9, 69, 38)
+    AND a.end_date > '2017-03-06'
+    AND f.dont_send_mails=0;
+
+# Deltagere på venteliste i bestemte afdelinger
+SELECT DISTINCT f.email FROM members_person AS p
+  JOIN members_family AS f ON f.id=p.family_id
+  JOIN members_waitinglist AS w ON p.id=w.person_id 
+    WHERE w.department_id IN (34, 63, 9, 69, 38)
+    AND f.dont_send_mails=0;
+
+

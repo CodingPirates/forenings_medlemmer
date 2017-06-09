@@ -49,8 +49,8 @@ class UnionAdmin(admin.ModelAdmin):
             'secratary_email', 'boardMembers')}),
 
         ('Info',
-            {'fields':('statues', 'founded'), 'description':
-            'Indsæt et link til jeres vedtægter og hvornår i er stiftet'})
+            {'fields':('bank_main_org', 'bank_account', 'statues', 'founded'), 'description':
+            'Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.'})
     ]
 
     list_display = ('name', )
@@ -151,7 +151,7 @@ class ActivityAdmin(admin.ModelAdmin):
         }
          ),
         ('Aktivitet',
-            {'description' : '<p>Aktivitets navnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårs sæson 2016</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>',
+            {'description' : '<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårssæson 2018</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>',
             'fields': (
             'name',
             'open_hours',
