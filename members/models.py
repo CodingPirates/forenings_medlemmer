@@ -129,7 +129,7 @@ class Person(models.Model):
 
     def age_years(self):
         if(self.birthday != None):
-            return self.age_from_birthdate(self.birthday.year)
+            return self.age_from_birthdate(self.birthday)
         else:
             return 0
     age_years.admin_order_field = '-birthday'
