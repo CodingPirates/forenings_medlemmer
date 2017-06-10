@@ -108,7 +108,8 @@ class GenerateStatisticsCronJob(CronJobBase):
         dailyStatisticsGeneral.waitinglist = dailyStatisticsGeneral.waitinglist_male + dailyStatisticsGeneral.waitinglist_female
         dailyStatisticsGeneral.family_visits = Family.objects.filter(last_visit_dtm__gt=(timestamp-datetime.timedelta(days=1))).count()
         dailyStatisticsGeneral.dead_profiles = Family.objects.filter(last_visit_dtm__lt=(timestamp-datetime.timedelta(days=365))).count()
-        dailyStatisticsGeneral.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__end_date__gt=timestamp).distinct().count()
+        dailyStatisticsGeneral.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__end_date__gte=timestamp,
+                                                                                     member__activityparticipant__activity__start_date__lte=timestamp ).distinct().count()
         dailyStatisticsGeneral.activity_participants_male = Person.objects.filter(member__activityparticipant__activity__isnull=False, gender=Person.MALE).distinct().count()
         dailyStatisticsGeneral.activity_participants_female = Person.objects.filter(member__activityparticipant__activity__isnull=False, gender=Person.FEMALE).distinct().count()
         dailyStatisticsGeneral.activity_participants = dailyStatisticsGeneral.activity_participants_male + dailyStatisticsGeneral.activity_participants_female
@@ -123,9 +124,12 @@ class GenerateStatisticsCronJob(CronJobBase):
 
             dailyStatisticsDepartment.timestamp = timestamp
             dailyStatisticsDepartment.department = department
-            dailyStatisticsDepartment.active_activities = Activity.objects.filter(department=department, end_date__gt=timestamp).count()
+            dailyStatisticsDepartment.active_activities = Activity.objects.filter(department=department,
+                                                                                  start_date__lte=timestamp,
+                                                                                  end_date__gte=timestamp).count()
             dailyStatisticsDepartment.activities = Activity.objects.filter(department=department).count()
-            dailyStatisticsDepartment.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__end_date__gt=timestamp,
+            dailyStatisticsDepartment.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__start_date__lte=timestamp,
+                                                                                            member__activityparticipant__activity__end_date__gte=timestamp,
                                                                                             member__activityparticipant__activity__department=department).distinct().count()
             dailyStatisticsDepartment.activity_participants = ActivityParticipant.objects.filter(activity__department=department).count()
             dailyStatisticsDepartment.members = 0 # TODO: to loosely defined now
@@ -152,9 +156,12 @@ class GenerateStatisticsCronJob(CronJobBase):
             dailyStatisticsUnion.timestamp = timestamp
             dailyStatisticsUnion.union = union
             dailyStatisticsUnion.departments = Department.objects.filter(union=union).count()
-            dailyStatisticsUnion.active_activities = Activity.objects.filter(department__union=union, end_date__gt=timestamp).count()
+            dailyStatisticsUnion.active_activities = Activity.objects.filter(department__union=union,
+                                                                             start_date__lte=timestamp,
+                                                                             end_date__gte=timestamp).count()
             dailyStatisticsUnion.activities = Activity.objects.filter(department__union=union).count()
-            dailyStatisticsUnion.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__end_date__gt=timestamp,
+            dailyStatisticsUnion.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__start_date__lte=timestamp,
+                                                                                       member__activityparticipant__activity__end_date__gte=timestamp,
                                                                                         member__activityparticipant__activity__department__union=union).distinct().count()
             dailyStatisticsUnion.activity_participants = ActivityParticipant.objects.filter(activity__department__union=union).count()
             dailyStatisticsUnion.members = 0 # TODO: to loosely defined now
@@ -179,9 +186,12 @@ class GenerateStatisticsCronJob(CronJobBase):
             dailyStatisticsRegion.region = region
             # No unions - since unions may span regions
             dailyStatisticsRegion.departments = Department.objects.annotate().filter(zipcode__in=zipsInRegion).count()
-            dailyStatisticsRegion.active_activities = Activity.objects.filter(department__zipcode__in=zipsInRegion, end_date__gt=timestamp).count()
+            dailyStatisticsRegion.active_activities = Activity.objects.filter(department__zipcode__in=zipsInRegion,
+                                                                              start_date__lte=timestamp,
+                                                                              end_date__gte=timestamp).count()
             dailyStatisticsRegion.activities = Activity.objects.filter(department__zipcode__in=zipsInRegion).count()
-            dailyStatisticsRegion.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__end_date__gt=timestamp,
+            dailyStatisticsRegion.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__start_date__lte=timestamp,
+                                                                                        member__activityparticipant__activity__end_date__gte=timestamp,
                                                                                         member__activityparticipant__activity__department__zipcode__in=zipsInRegion).distinct().count()
             dailyStatisticsRegion.activity_participants = ActivityParticipant.objects.filter(activity__department__zipcode__in=zipsInRegion).count()
             dailyStatisticsRegion.members = 0 # TODO: to loosely defined now
