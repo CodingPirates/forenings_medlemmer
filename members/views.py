@@ -1,20 +1,34 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.core.urlresolvers import reverse_lazy, reverse
-from django.template import RequestContext
-from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
-from members.models import Person, Union,  Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
-from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm, vol_signupForm
-from django.utils import timezone
+import datetime
+import hashlib
+import hmac
+import json
+import uuid
+
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-import datetime
-import hashlib, hmac
-import json
+
+from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm, \
+    vol_signupForm
+from members.models.activity import Activity
+from members.models.activityinvite import ActivityInvite
+from members.models.activityparticipant import ActivityParticipant
+from members.models.department import Department
+from members.models.family import Family
+from members.models.member import Member
+from members.models.payment import Payment
+from members.models.person import Person
+from members.models.quickpaytransaction import QuickpayTransaction
+from members.models.union import Union
+from members.models.waitinglist import WaitingList
+
 
 def FamilyDetails(request,unique):
-    family = get_object_or_404(Family, unique=unique)
+    family = get_object_or_404(Family, unique=uuid.UUID(unique))
     invites= ActivityInvite.objects.filter(person__family = family, expire_dtm__gte=timezone.now(), rejected_dtm=None)
     open_activities = Activity.objects.filter(open_invite = True, signup_closing__gte=timezone.now()).order_by('zipcode')
     participating = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
@@ -50,7 +64,7 @@ def FamilyDetails(request,unique):
         'invites': invites,
         'participating': participating,
         'open_activities': open_activities,
-        'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
+        'need_confirmation' : family.confirmed_dtm is None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
         'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 1,
         'department_children_waiting' : department_children_waiting,
         'departments_with_no_waiting_list' : departments_with_no_waiting_list,
@@ -170,7 +184,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         invitation = None
 
     # if activity is closed for signup, only invited persons can still join
-    if activity.signup_closing < timezone.now().date() and invitation==None:
+    if activity.signup_closing < timezone.now().date() and invitation is None:
         view_only_mode = True # Activivty closed for signup
         signup_closed = True
 
@@ -605,13 +619,13 @@ def departmentView(request, unique=None):
 
         for department in depQuery:
             coordinates = department.getLongLat()
-            if coordinates == None:
+            if coordinates is None:
                 print(department.name)
             dep = {
                 'html'       : department.toHTML(),
                 'onMap'      : department.onMap
             }
-            if not(coordinates == None):
+            if not(coordinates is None):
                 dep['latitude'] = str(coordinates[0])
                 dep['longtitude'] = str(coordinates[1])
             else:

@@ -1,9 +1,10 @@
 from django import forms
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from members.models import Department, Person, Payment, ActivityParticipant
+from members.models.department import Department
+from members.models.person import Person
+from members.models.payment import Payment
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, MultiField, Field, Hidden, HTML, Div, Button
+from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, HTML, Div
 from crispy_forms.bootstrap import FormActions
 
 class PersonForm(forms.ModelForm):
@@ -13,7 +14,7 @@ class PersonForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.html5_required = True
-        if self.instance != None and self.instance.membertype == Person.CHILD:
+        if self.instance is not None and self.instance.membertype == Person.CHILD:
             nameFieldSet = Fieldset('Barnets oplysninger',
                     Div(
                          Div(Field('gender'), css_class="col-md-2"),
@@ -64,7 +65,7 @@ class PersonForm(forms.ModelForm):
                             css_class="row"
                            )
                      ),
-            Submit('submit', 'Opret' if self.instance.id == None else 'Ret', css_class="btn-success"),
+            Submit('submit', 'Opret' if self.instance.id is None else 'Ret', css_class="btn-success"),
             HTML("""<a class="btn btn-link" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>""")
         )
         self.helper.render_unmentioned_fields = False

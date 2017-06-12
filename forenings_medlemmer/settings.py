@@ -135,7 +135,7 @@ EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 30
 
 if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend';
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",

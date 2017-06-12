@@ -4,19 +4,31 @@ from django.contrib import admin
 from django.db import models
 from django.db import transaction
 from django.db.models import Q
-from members.models import Person, Department, Union, Volunteer, Member, Activity, ActivityInvite, ActivityParticipant,Family, EmailItem, WaitingList, EmailTemplate, AdminUserInformation, QuickpayTransaction, Payment, Equipment, EquipmentLoan
+from members.models.person import Person
+from members.models.department import Department, AdminUserInformation
+from members.models.union import Union
+from members.models.volunteer import Volunteer
+from members.models.member import Member
+from members.models.activity import Activity
+from members.models.activityinvite import ActivityInvite
+from members.models.activityparticipant import ActivityParticipant
+from members.models.family import Family
+from members.models.emailitem import EmailItem
+from members.models.waitinglist import WaitingList
+from members.models.emailtemplate import EmailTemplate
+from members.models.payment import Payment
+from members.models.equipment import Equipment
+from members.models.equipmentloan import EquipmentLoan
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.core.urlresolvers import reverse
 from django.utils.html import format_html
 from django.forms import Textarea
 from django.shortcuts import render
-from django.conf.urls import patterns, include, url
-from django.apps import apps
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib import messages
 
@@ -69,7 +81,7 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         print(self.value())
-        if(self.value() == None):
+        if(self.value() is None):
             return queryset
         else:
             return queryset.filter(union=self.value())
@@ -353,7 +365,7 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
         return activitys
 
     def queryset(self, request, queryset):
-        if(self.value() == None):
+        if(self.value() is None):
             return queryset
         else:
             return queryset.filter(activity=self.value())
@@ -419,7 +431,7 @@ class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
         # Compare the requested value (either '80s' or '90s')
         # to decide how to filter the queryset.
 
-        if self.value() == None:
+        if self.value() is None:
             return queryset
         else:
             return queryset.filter(activity__pk=self.value())
@@ -509,7 +521,7 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
             return queryset.exclude(waitinglist__isnull=True)
         elif self.value() == 'none':
             return queryset.filter(waitinglist__isnull=True)
-        elif self.value() == None:
+        elif self.value() is None:
             return queryset
         else:
             return queryset.filter(waitinglist__department__pk=self.value())
@@ -554,7 +566,7 @@ class VolunteerListFilter(admin.SimpleListFilter):
             return queryset.filter(volunteer__isnull=False).filter(volunteer__removed__isnull=True).distinct()
         elif self.value() == 'none':
             return queryset.filter(volunteer__isnull=True).distinct() | queryset.exclude(volunteer__removed__isnull=True).distinct()
-        elif self.value() == None:
+        elif self.value() is None:
             return queryset
         else:
             return queryset.filter(volunteer__department__pk=self.value(),volunteer__removed__isnull=True)
@@ -599,7 +611,7 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
             return queryset.filter(member__activityparticipant__isnull=True)
         elif(self.value() == 'any'):
             return queryset.exclude(member__activityparticipant__isnull=True)
-        elif(self.value() == None):
+        elif(self.value() is None):
             return queryset
         else:
             return queryset.filter(member__activityparticipant__activity=self.value())
@@ -644,7 +656,7 @@ class PersonInvitedListFilter(admin.SimpleListFilter):
             return queryset.filter(activityinvite__isnull=True)
         elif(self.value() == 'any'):
             return queryset.exclude(activityinvite__isnull=True)
-        elif(self.value() == None):
+        elif(self.value() is None):
             return queryset
         else:
             return queryset.filter(activityinvite__activity=self.value())
@@ -716,9 +728,9 @@ class PersonAdmin(admin.ModelAdmin):
                         invited_counter = 0
 
                         # get list of already created invitations on selected persons
-                        already_invited = Person.objects.filter(activityinvite__activity=mass_invitation_form.cleaned_data['activity'], activityinvite__person__in=queryset).all();
+                        already_invited = Person.objects.filter(activityinvite__activity=mass_invitation_form.cleaned_data['activity'], activityinvite__person__in=queryset).all()
                         list(already_invited) # force lookup
-                        already_invited_ids = already_invited.values_list('id', flat=True);
+                        already_invited_ids = already_invited.values_list('id', flat=True)
 
                         # only save if all succeeds
                         try:
@@ -746,8 +758,7 @@ class PersonAdmin(admin.ModelAdmin):
                     messages.error(request, "Du kan kun invitere til egne afdelinger")
                     return
         else:
-            context['mass_invitation_form'] = MassInvitationForm();
-
+            context['mass_invitation_form'] = MassInvitationForm()
 
         return render(request, 'admin/invite_many_to_activity.html', context)
     invite_many_to_activity_action.short_description = 'Inviter alle valgte til en aktivitet'
@@ -785,7 +796,7 @@ class PersonAdmin(admin.ModelAdmin):
             return []
 
     def unique(self, item):
-        return item.family.unique if item.family != None else ''
+        return item.family.unique if item.family is not None else ''
 
     def export_emaillist(self,request, queryset):
         result_string = "kopier denne liste direkte ind i dit email program (Husk at bruge Bcc!)\n\n"

@@ -1,9 +1,23 @@
 from django.conf import settings
 from django_cron import CronJobBase, Schedule
-from members.models import EmailItem, Family, Notification, EmailTemplate, ActivityParticipant, Payment, \
-    DailyStatisticsDepartment, DailyStatisticsGeneral, Person, WaitingList, Department, Union, Activity, Volunteer, DailyStatisticsUnion, DailyStatisticsRegion, ZipcodeRegion
+from members.models.emailitem import EmailItem
+from members.models.notification import Notification
+from members.models.emailtemplate import EmailTemplate
+from members.models.activityparticipant import ActivityParticipant
+from members.models.payment import Payment
+from members.models.person import Person
+from members.models.waitinglist import WaitingList
+from members.models.department import Department
+from members.models.union import Union
+from members.models.activity import Activity
+from members.models.dailystatisticsgeneral import DailyStatisticsGeneral
+from members.models.dailystatisticsregion import DailyStatisticsRegion
+from members.models.dailystatisticsunion import DailyStatisticsUnion
+import members.models.dailystatisticsdepartment
+from members.models.zipcoderegion import ZipcodeRegion
+from members.models.family import Family
 from django.db.models import Q, F
-from django.db.models import Count, Avg, Sum
+from django.db.models import Sum
 from django.db.models.functions import Coalesce
 import datetime
 from django.utils import timezone
@@ -120,7 +134,7 @@ class GenerateStatisticsCronJob(CronJobBase):
         # generate daily department statistics
         departments = Department.objects.filter(closed_dtm=None)
         for department in departments:
-            dailyStatisticsDepartment = DailyStatisticsDepartment()
+            dailyStatisticsDepartment = members.models.dailystatisticsdepartment.DailyStatisticsDepartment()
 
             dailyStatisticsDepartment.timestamp = timestamp
             dailyStatisticsDepartment.department = department
