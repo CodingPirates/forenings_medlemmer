@@ -1,0 +1,10 @@
+[flake8]
+exclude =
+    # Ignore files in git repostory
+    .git,
+    # Don't check Python's cache directory
+    __pycache__,
+    # Don't check migrations because their mostly auto generated
+    members/migrations,
+    # Ignore virtualenv
+    virtualenv
