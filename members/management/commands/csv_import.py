@@ -105,4 +105,4 @@ class Command(BaseCommand):
                 pers = person.Person(name=name, membertype=person.Person.CHILD, family=fam, added=date)
                 pers.save()
             except person.MultipleObjectsReturned:
-                print("family " + family.email + " has duplicate members named " + name + " - signup date : " + str(date) + " not recorded")
+                print("family " + fam.email + " has duplicate members named " + name + " - signup date : " + str(date) + " not recorded")
