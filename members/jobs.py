@@ -22,9 +22,10 @@ from django.db.models.functions import Coalesce
 import datetime
 from django.utils import timezone
 
+
 # Send confirmations to Activity signups, which do not have failed payments
 class SendActivitySignupConfirmationsCronJob(CronJobBase):
-    RUN_EVERY_MINS = 5 # every minute
+    RUN_EVERY_MINS = 5  # every minute
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = 'members.send_activity_signup_confirmation_cronjob'    # a unique code
@@ -34,9 +35,9 @@ class SendActivitySignupConfirmationsCronJob(CronJobBase):
 
         for announcement in unannounced_signups:
             context = {
-                'activity' : announcement.activity,
-                'person' : announcement.member.person,
-                'family' : announcement.member.person.family
+                'activity': announcement.activity,
+                'person': announcement.member.person,
+                'family': announcement.member.person.family
             }
             emails = EmailTemplate.objects.get(idname='ACT_CONFIRM').makeEmail([announcement.member.person, announcement.member.person.family], context)
             for email in emails:
@@ -46,7 +47,7 @@ class SendActivitySignupConfirmationsCronJob(CronJobBase):
 
 # Send out all queued emails
 class EmailSendCronJob(CronJobBase):
-    RUN_EVERY_MINS = 1 # every minute
+    RUN_EVERY_MINS = 1  # every minute
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = 'members.email_send_cronjob'    # a unique code
@@ -55,14 +56,14 @@ class EmailSendCronJob(CronJobBase):
         for curEmail in EmailItem.objects.filter(sent_dtm=None):
             curEmail.send()
 
+
 # Find families, which needs to update their information
 class RequestConfirmationCronJob(CronJobBase):
-    RUN_AT_TIMES = ['15:00',]
+    RUN_AT_TIMES = ['15:00', ]
 
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
 
     code = 'members.request_confirmation_cronjob'    # a unique code
-
 
     def do(self):
         # Find all Families, which has an updated_dtm older than the specified time for updates from today.
@@ -78,15 +79,16 @@ class RequestConfirmationCronJob(CronJobBase):
             notification = Notification(family=family, email=email, update_info_dtm=timezone.now())
             notification.save()
 
+
 # Poll payments which did not recieve callback
 class PollQuickpayPaymentsCronJob(CronJobBase):
-    RUN_EVERY_MINS = 60 # every minute
+    RUN_EVERY_MINS = 60  # every minute
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = 'members.poll_quickpayPayments_cronjob'    # a unique code
 
     def do(self):
-        outdated_dtm = timezone.now() - datetime.timedelta(days=14) # Timeout checking payments after 14 days
+        outdated_dtm = timezone.now() - datetime.timedelta(days=14)  # Timeout checking payments after 14 days
         payments = Payment.objects.filter(rejected_dtm__isnull=True, confirmed_dtm__isnull=True, payment_type=Payment.CREDITCARD, added__gt=outdated_dtm)
 
         for payment in payments:
@@ -99,7 +101,6 @@ class GenerateStatisticsCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'members.generate_statistics_cronjob'  # a unique code
-
 
     def do(self):
         timestamp = timezone.now()  # make sure all entries share same timestamp
@@ -120,10 +121,10 @@ class GenerateStatisticsCronJob(CronJobBase):
         dailyStatisticsGeneral.waitinglist_male = Person.objects.filter(waitinglist__isnull=False, gender=Person.MALE).distinct().count()
         dailyStatisticsGeneral.waitinglist_female = Person.objects.filter(waitinglist__isnull=False, gender=Person.FEMALE).distinct().count()
         dailyStatisticsGeneral.waitinglist = dailyStatisticsGeneral.waitinglist_male + dailyStatisticsGeneral.waitinglist_female
-        dailyStatisticsGeneral.family_visits = Family.objects.filter(last_visit_dtm__gt=(timestamp-datetime.timedelta(days=1))).count()
-        dailyStatisticsGeneral.dead_profiles = Family.objects.filter(last_visit_dtm__lt=(timestamp-datetime.timedelta(days=365))).count()
+        dailyStatisticsGeneral.family_visits = Family.objects.filter(last_visit_dtm__gt=(timestamp - datetime.timedelta(days=1))).count()
+        dailyStatisticsGeneral.dead_profiles = Family.objects.filter(last_visit_dtm__lt=(timestamp - datetime.timedelta(days=365))).count()
         dailyStatisticsGeneral.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__end_date__gte=timestamp,
-                                                                                     member__activityparticipant__activity__start_date__lte=timestamp ).distinct().count()
+                                                                                     member__activityparticipant__activity__start_date__lte=timestamp).distinct().count()
         dailyStatisticsGeneral.activity_participants_male = Person.objects.filter(member__activityparticipant__activity__isnull=False, gender=Person.MALE).distinct().count()
         dailyStatisticsGeneral.activity_participants_female = Person.objects.filter(member__activityparticipant__activity__isnull=False, gender=Person.FEMALE).distinct().count()
         dailyStatisticsGeneral.activity_participants = dailyStatisticsGeneral.activity_participants_male + dailyStatisticsGeneral.activity_participants_female
@@ -146,7 +147,7 @@ class GenerateStatisticsCronJob(CronJobBase):
                                                                                             member__activityparticipant__activity__end_date__gte=timestamp,
                                                                                             member__activityparticipant__activity__department=department).distinct().count()
             dailyStatisticsDepartment.activity_participants = ActivityParticipant.objects.filter(activity__department=department).count()
-            dailyStatisticsDepartment.members = 0 # TODO: to loosely defined now
+            dailyStatisticsDepartment.members = 0  # TODO: to loosely defined now
             dailyStatisticsDepartment.waitinglist = Person.objects.filter(waitinglist__department=department).distinct().count()
             firstWaitingListItem = WaitingList.objects.filter(department=department).order_by('on_waiting_list_since').first()
             if firstWaitingListItem:
@@ -176,13 +177,13 @@ class GenerateStatisticsCronJob(CronJobBase):
             dailyStatisticsUnion.activities = Activity.objects.filter(department__union=union).count()
             dailyStatisticsUnion.current_activity_participants = Person.objects.filter(member__activityparticipant__activity__start_date__lte=timestamp,
                                                                                        member__activityparticipant__activity__end_date__gte=timestamp,
-                                                                                        member__activityparticipant__activity__department__union=union).distinct().count()
+                                                                                       member__activityparticipant__activity__department__union=union).distinct().count()
             dailyStatisticsUnion.activity_participants = ActivityParticipant.objects.filter(activity__department__union=union).count()
-            dailyStatisticsUnion.members = 0 # TODO: to loosely defined now
+            dailyStatisticsUnion.members = 0  # TODO: to loosely defined now
             dailyStatisticsUnion.waitinglist = Person.objects.filter(waitinglist__department__union=union).distinct().count()
             dailyStatisticsUnion.payments = Payment.objects.filter(activity__department__union=union,
-                                                                    refunded_dtm=None,
-                                                                    confirmed_dtm__isnull=False).aggregate(sum=Coalesce(Sum('amount_ore'), 0))['sum']
+                                                                   refunded_dtm=None,
+                                                                   confirmed_dtm__isnull=False).aggregate(sum=Coalesce(Sum('amount_ore'), 0))['sum']
             dailyStatisticsUnion.volunteers_male = Person.objects.filter(volunteer__department__union=union, gender=Person.MALE).distinct().count()
             dailyStatisticsUnion.volunteers_female = Person.objects.filter(volunteer__department__union=union, gender=Person.FEMALE).distinct().count()
             dailyStatisticsUnion.volunteers = dailyStatisticsUnion.volunteers_male + dailyStatisticsUnion.volunteers_female
@@ -194,7 +195,7 @@ class GenerateStatisticsCronJob(CronJobBase):
         for region in regions:
             dailyStatisticsRegion = DailyStatisticsRegion()
 
-            zipsInRegion = ZipcodeRegion.objects.filter(region=region).values_list('zipcode', flat=True) # There are no easy foreing key to identify region
+            zipsInRegion = ZipcodeRegion.objects.filter(region=region).values_list('zipcode', flat=True)  # There are no easy foreing key to identify region
 
             dailyStatisticsRegion.timestamp = timestamp
             dailyStatisticsRegion.region = region
@@ -208,7 +209,7 @@ class GenerateStatisticsCronJob(CronJobBase):
                                                                                         member__activityparticipant__activity__end_date__gte=timestamp,
                                                                                         member__activityparticipant__activity__department__zipcode__in=zipsInRegion).distinct().count()
             dailyStatisticsRegion.activity_participants = ActivityParticipant.objects.filter(activity__department__zipcode__in=zipsInRegion).count()
-            dailyStatisticsRegion.members = 0 # TODO: to loosely defined now
+            dailyStatisticsRegion.members = 0  # TODO: to loosely defined now
             dailyStatisticsRegion.waitinglist = Person.objects.filter(waitinglist__department__zipcode__in=zipsInRegion).distinct().count()
             dailyStatisticsRegion.payments = Payment.objects.filter(activity__department__zipcode__in=zipsInRegion,
                                                                     refunded_dtm=None,
@@ -224,5 +225,3 @@ class GenerateStatisticsCronJob(CronJobBase):
 # TODO:Find families which are about to get deleted from the list and send warning
 
 # TODO:Find Members which are active, but have expired memberships
-
-

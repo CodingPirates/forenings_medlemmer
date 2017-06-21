@@ -27,23 +27,24 @@ from members.models.union import Union
 from members.models.waitinglist import WaitingList
 
 
-def FamilyDetails(request,unique):
+
+def FamilyDetails(request, unique):
     family = get_object_or_404(Family, unique=uuid.UUID(unique))
-    invites= ActivityInvite.objects.filter(person__family = family, expire_dtm__gte=timezone.now(), rejected_dtm=None)
-    open_activities = Activity.objects.filter(open_invite = True, signup_closing__gte=timezone.now()).order_by('zipcode')
-    participating = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
-    departments_with_no_waiting_list = Department.objects.filter(has_waiting_list = False)
-    waiting_lists = WaitingList.objects.filter(person__family = family)
-    children = family.person_set.filter(membertype = Person.CHILD)
+    invites = ActivityInvite.objects.filter(person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None)
+    open_activities = Activity.objects.filter(open_invite=True, signup_closing__gte=timezone.now()).order_by('zipcode')
+    participating = ActivityParticipant.objects.filter(member__person__family=family).order_by('-activity__start_date')
+    departments_with_no_waiting_list = Department.objects.filter(has_waiting_list=False)
+    waiting_lists = WaitingList.objects.filter(person__family=family)
+    children = family.person_set.filter(membertype=Person.CHILD)
     ordered_persons = family.person_set.order_by('membertype').all()
 
-    #update visited field
+    # update visited field
     family.last_visit_dtm = timezone.now()
     family.save()
 
     department_children_waiting = {'departments': {}}
-    loop_counter=0
-    for department in Department.objects.filter(has_waiting_list = True, closed_dtm=None).order_by('zipcode'):
+    loop_counter = 0
+    for department in Department.objects.filter(has_waiting_list=True, closed_dtm=None).order_by('zipcode'):
         department_children_waiting['departments'][loop_counter] = {}
         department_children_waiting['departments'][loop_counter]['object'] = department
         department_children_waiting['departments'][loop_counter]['children_status'] = {}
@@ -51,10 +52,10 @@ def FamilyDetails(request,unique):
             department_children_waiting['departments'][loop_counter]['children_status'][child.pk] = {}
             department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['object'] = child
             department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['firstname'] = child.firstname()
-            department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['waiting'] = False # default not waiting
+            department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['waiting'] = False  # default not waiting
             for current_wait in waiting_lists:
                 if(current_wait.department == department and current_wait.person == child):
-                    #child is waiting on this department
+                    # child is waiting on this department
                     department_children_waiting['departments'][loop_counter]['children_status'][child.pk]['waiting'] = True
                     break
         loop_counter = loop_counter + 1
@@ -64,14 +65,15 @@ def FamilyDetails(request,unique):
         'invites': invites,
         'participating': participating,
         'open_activities': open_activities,
-        'need_confirmation' : family.confirmed_dtm is None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
+        'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
         'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 1,
         'department_children_waiting' : department_children_waiting,
         'departments_with_no_waiting_list' : departments_with_no_waiting_list,
         'children': children,
-        'ordered_persons' : ordered_persons,
+        'ordered_persons': ordered_persons,
     }
     return render(request, 'members/family_details.html', context)
+
 
 def ConfirmFamily(request, unique):
     family = get_object_or_404(Family, unique=unique)
@@ -85,22 +87,23 @@ def ConfirmFamily(request, unique):
         return HttpResponseRedirect(reverse('family_detail', args=[unique]))
     else:
         context = {
-            'family':family,
-            'persons':persons,
+            'family': family,
+            'persons': persons,
             'subscribed_waitinglists': subscribed_waiting_lists
         }
-        return render(request, 'members/family_confirm_details.html',context)
+        return render(request, 'members/family_confirm_details.html', context)
+
 
 def WaitingListSetSubscription(request, unique, id, departmentId, action):
     person = get_object_or_404(Person, pk=id)
     if person.family.unique != unique:
         raise Http404("Person eksisterer ikke")
-    department = get_object_or_404(Department,pk=departmentId)
+    department = get_object_or_404(Department, pk=departmentId)
 
     if action == 'subscribe':
         print('subscribing')
-        if WaitingList.objects.filter(person = person, department = department):
-            raise Http404("{} er allerede på {}s venteliste".format(person.name,department.name))
+        if WaitingList.objects.filter(person=person, department=department):
+            raise Http404("{} er allerede på {}s venteliste".format(person.name, department.name))
         waiting_list = WaitingList()
         waiting_list.person = person
         waiting_list.department = department
@@ -109,12 +112,13 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
     if action == 'unsubscribe':
         print('un-subscribing')
         try:
-            waiting_list = WaitingList.objects.get(person = person, department = department)
+            waiting_list = WaitingList.objects.get(person=person, department=department)
             waiting_list.delete()
         except:
-            raise Http404("{} er ikke på {}s venteliste".format(person.name,department.name))
+            raise Http404("{} er ikke på {}s venteliste".format(person.name, department.name))
 
     return HttpResponseRedirect(reverse('family_detail', args=[unique]))
+
 
 def DeclineInvitation(request, unique, invitation_id):
     activity_invite = get_object_or_404(ActivityInvite, pk=invitation_id, person__family__unique=unique)
@@ -122,16 +126,16 @@ def DeclineInvitation(request, unique, invitation_id):
     if(request.method == 'POST'):
         form = ActivivtyInviteDeclineForm(request.POST)
         if form.is_valid():
-            activity_invite.rejected_dtm=timezone.now()
+            activity_invite.rejected_dtm = timezone.now()
             activity_invite.save()
             return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
     else:
         form = ActivivtyInviteDeclineForm()
 
     context = {
-                'activity_invite' : activity_invite,
-                'form' : form
-              }
+        'activity_invite': activity_invite,
+        'form': form
+    }
     return render(request, 'members/decline_activivty_invite.html', context)
 
 
@@ -166,7 +170,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 participating = True
                 view_only_mode = True
             except ActivityParticipant.DoesNotExist:
-                participating = False # this was expected - if not signed up yet
+                participating = False  # this was expected - if not signed up yet
 
         except Person.DoesNotExist:
             raise Http404('Person not found on family')
@@ -178,19 +182,19 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         try:
             invitation = ActivityInvite.objects.get(activity=activity, person=person, expire_dtm__gte=timezone.now())
         except ActivityInvite.DoesNotExist:
-            view_only_mode = True # not invited - switch to view mode
+            view_only_mode = True  # not invited - switch to view mode
             invitation = None
     else:
         invitation = None
 
     # if activity is closed for signup, only invited persons can still join
     if activity.signup_closing < timezone.now().date() and invitation is None:
-        view_only_mode = True # Activivty closed for signup
+        view_only_mode = True  # Activivty closed for signup
         signup_closed = True
 
     # check if activity is full
     if activity.seats_left() <= 0:
-        view_only_mode = True # activity full
+        view_only_mode = True  # activity full
         signup_closed = True
 
     if(request.method == "POST"):
@@ -200,7 +204,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         if activity.max_age < person.age_years() or activity.min_age > person.age_years():
             return HttpResponse('Barnet skal være mellem ' + str(activity.min_age) + ' og ' + str(activity.max_age) + ' år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)')
 
-        if Person.objects.filter(family=family).exclude(membertype=Person.CHILD).count() <=0:
+        if Person.objects.filter(family=family).exclude(membertype=Person.CHILD).count() <= 0:
             return HttpResponse('Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.')
 
         signup_form = ActivitySignupForm(request.POST)
@@ -216,22 +220,22 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 member = Member.objects.get(person=person)
             except Member.DoesNotExist:
                 member = Member(
-                    department = activity.department,
+                    department=activity.department,
                     person=person,
                     member_since=membership_start,
                     member_until=membership_end,
-                    )
+                )
                 member.save()
 
             # update membership end date
-            member.member_until=membership_end
+            member.member_until = membership_end
             member.save()
 
             # Make ActivityParticipant
             participant = ActivityParticipant(member=member, activity=activity, note=signup_form.cleaned_data['note'])
 
             # update photo permission and contact open info
-            participant.photo_permission = True # signup_form.cleaned_data['photo_permission']
+            participant.photo_permission = True  # signup_form.cleaned_data['photo_permission']
             participant.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
             participant.save()
 
@@ -242,22 +246,21 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 # using creditcard ?
                 if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
                     payment = Payment(
-                        payment_type = Payment.CREDITCARD,
+                        payment_type=Payment.CREDITCARD,
                         activity=activity,
                         activityparticipant=participant,
                         person=person,
                         family=family,
                         body_text=timezone.now().strftime("%Y-%m-%d") + ' Betaling for ' + activity.name + ' på ' + activity.department.name,
-                        amount_ore = int(activity.price_in_dkk * 100),
+                        amount_ore=int(activity.price_in_dkk * 100),
                     )
                     payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('activity_view_person', args=[family.unique, activity.id, person.id]))
-
+                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url=settings.BASE_URL + reverse('activity_view_person', args=[family.unique, activity.id, person.id]))
 
             # expire invitation
             if invitation:
-                invitation.expire_dtm=timezone.now() - timezone.timedelta(days=1)
+                invitation.expire_dtm = timezone.now() - timezone.timedelta(days=1)
                 invitation.save()
 
             # reject all seasonal invitations on person if this was a seasonal invite
@@ -275,20 +278,20 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
         signup_form = ActivitySignupForm()
 
-
     context = {
-                'family' : family,
-                'activity' : activity,
-                'person' : person,
-                'invitation' : invitation,
-                'price' : activity.price_in_dkk,
-                'seats_left' : activity.seats_left(),
-                'signupform' : signup_form,
-                'view_only_mode' : view_only_mode,
-                'participating' : participating,
-                'participants': participants,
-              }
+        'family': family,
+        'activity': activity,
+        'person': person,
+        'invitation': invitation,
+        'price': activity.price_in_dkk,
+        'seats_left': activity.seats_left(),
+        'signupform': signup_form,
+        'view_only_mode': view_only_mode,
+        'participating': participating,
+        'participants': participants,
+    }
     return render(request, 'members/activity_signup.html', context)
+
 
 def UpdatePersonFromForm(person, form):
     # Update person and if selected - relatives
@@ -332,12 +335,12 @@ def PersonCreate(request, unique, membertype):
         person.family = family
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
-            UpdatePersonFromForm(person,form)
+            UpdatePersonFromForm(person, form)
             return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
     else:
         person = Person()
         person.membertype = membertype
-        if family.person_set.count() > 0 :
+        if family.person_set.count() > 0:
             first_person = family.person_set.first()
             person.family = family
             person.zipcode = first_person.zipcode
@@ -349,7 +352,8 @@ def PersonCreate(request, unique, membertype):
             person.placename = first_person.placename
             person.dawa_id = first_person.dawa_id
         form = PersonForm(instance=person)
-    return render(request, 'members/person_create_or_update.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
+    return render(request, 'members/person_create_or_update.html', {'form': form, 'person': person, 'family': family, 'membertype': membertype})
+
 
 def PersonUpdate(request, unique, id):
     person = get_object_or_404(Person, pk=id)
@@ -358,11 +362,12 @@ def PersonUpdate(request, unique, id):
     if request.method == 'POST':
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
-            UpdatePersonFromForm(person,form)
+            UpdatePersonFromForm(person, form)
             return HttpResponseRedirect(reverse('family_detail', args=[person.family.unique]))
     else:
         form = PersonForm(instance=person)
     return render(request, 'members/person_create_or_update.html', {'form': form, 'person': person})
+
 
 @xframe_options_exempt
 def EntryPage(request):
@@ -378,59 +383,61 @@ def EntryPage(request):
                     family = Family.objects.get(email__iexact=request.POST['parent_email'])
                     # family was already created - we can't create this family again
                     signup.add_error('parent_email', 'Denne email adresse er allerede oprettet. Du kan tilføje flere børn på samme forælder, når du er kommet videre! - Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
-                    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
+                    return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
                 except:
                     # all is fine - we did not expect any
                     pass
-                #create new family.
-                family = Family.objects.create(email = signup.cleaned_data['parent_email'])
+                # create new family.
+                family = Family.objects.create(email=signup.cleaned_data['parent_email'])
                 family.confirmed_dtm = timezone.now()
                 family.save()
 
-                #create parent
-                parent = Person.objects.create(membertype = Person.PARENT,
-                    name = signup.cleaned_data['parent_name'],
-                    zipcode = signup.cleaned_data['zipcode'],
-                    city = signup.cleaned_data['city'],
-                    streetname = signup.cleaned_data['streetname'],
-                    housenumber = signup.cleaned_data['housenumber'],
-                    floor = signup.cleaned_data['floor'],
-                    door = signup.cleaned_data['door'],
-                    dawa_id = signup.cleaned_data['dawa_id'],
-                    placename = signup.cleaned_data['placename'],
-                    email = signup.cleaned_data['parent_email'],
-                    phone = signup.cleaned_data['parent_phone'],
-                    family = family
-                    )
+                # create parent
+                parent = Person.objects.create(
+                    membertype=Person.PARENT,
+                    name=signup.cleaned_data['parent_name'],
+                    zipcode=signup.cleaned_data['zipcode'],
+                    city=signup.cleaned_data['city'],
+                    streetname=signup.cleaned_data['streetname'],
+                    housenumber=signup.cleaned_data['housenumber'],
+                    floor=signup.cleaned_data['floor'],
+                    door=signup.cleaned_data['door'],
+                    dawa_id=signup.cleaned_data['dawa_id'],
+                    placename=signup.cleaned_data['placename'],
+                    email=signup.cleaned_data['parent_email'],
+                    phone=signup.cleaned_data['parent_phone'],
+                    family=family
+                )
                 parent.save()
 
-                #create child
-                child = Person.objects.create(membertype = Person.CHILD,
-                    name = signup.cleaned_data['child_name'],
-                    zipcode = signup.cleaned_data['zipcode'],
-                    city = signup.cleaned_data['city'],
-                    streetname = signup.cleaned_data['streetname'],
-                    housenumber = signup.cleaned_data['housenumber'],
-                    floor = signup.cleaned_data['floor'],
-                    door = signup.cleaned_data['door'],
-                    dawa_id = signup.cleaned_data['dawa_id'],
-                    placename = signup.cleaned_data['placename'],
-                    email = signup.cleaned_data['child_email'],
-                    phone = signup.cleaned_data['child_phone'],
-                    birthday = signup.cleaned_data['child_birthday'],
-                    gender = signup.cleaned_data['child_gender'],
-                    family = family
-                    )
+                # create child
+                child = Person.objects.create(
+                    membertype=Person.CHILD,
+                    name=signup.cleaned_data['child_name'],
+                    zipcode=signup.cleaned_data['zipcode'],
+                    city=signup.cleaned_data['city'],
+                    streetname=signup.cleaned_data['streetname'],
+                    housenumber=signup.cleaned_data['housenumber'],
+                    floor=signup.cleaned_data['floor'],
+                    door=signup.cleaned_data['door'],
+                    dawa_id=signup.cleaned_data['dawa_id'],
+                    placename=signup.cleaned_data['placename'],
+                    email=signup.cleaned_data['child_email'],
+                    phone=signup.cleaned_data['child_phone'],
+                    birthday=signup.cleaned_data['child_birthday'],
+                    gender=signup.cleaned_data['child_gender'],
+                    family=family
+                )
                 child.save()
 
                 # send email with login link
                 family.send_link_email()
 
-                #redirect to success
+                # redirect to success
                 return HttpResponseRedirect(reverse('login_email_sent'))
             else:
                 getLogin = getLoginForm()
-                return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
+                return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
 
         elif request.POST['form_id'] == 'getlogin':
             # just resend email
@@ -451,12 +458,13 @@ def EntryPage(request):
                 except Family.DoesNotExist:
                     getLogin.add_error('email', 'Denne addresse er ikke kendt i systemet. Hvis du er sikker på du er oprettet, så check adressen, eller opret dig via tilmeldings formularen først.')
 
-            return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
+            return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
 
     # initial load (if we did not return above)
     getLogin = getLoginForm()
     signup = signupForm()
-    return render(request, 'members/entry_page.html', {'loginform' : getLogin, 'signupform' : signup})
+    return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
+
 
 @xframe_options_exempt
 def volunteerSignup(request):
@@ -472,32 +480,33 @@ def volunteerSignup(request):
                         family = Family.objects.get(email__iexact=request.POST['volunteer_email'])
                         # family was already created - we can't create this family again
                         vol_signup.add_error('volunteer_email', 'Denne email adresse er allerede oprettet. Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
-                        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
+                        return render(request, 'members/volunteer_signup.html', {'loginform': getLogin, 'vol_signupform': vol_signup})
                     except:
                         # all is fine - we did not expect any
                         pass
-                    #create new family.
-                    family = Family.objects.create(email = vol_signup.cleaned_data['volunteer_email'])
+                    # create new family.
+                    family = Family.objects.create(email=vol_signup.cleaned_data['volunteer_email'])
                     family.confirmed_dtm = timezone.now()
                     family.save()
 
-                    #create volunteer
-                    volunteer = Person.objects.create(membertype = Person.PARENT,
-                        name = vol_signup.cleaned_data['volunteer_name'],
-                        zipcode = vol_signup.cleaned_data['zipcode'],
-                        city = vol_signup.cleaned_data['city'],
-                        streetname = vol_signup.cleaned_data['streetname'],
-                        housenumber = vol_signup.cleaned_data['housenumber'],
-                        floor = vol_signup.cleaned_data['floor'],
-                        door = vol_signup.cleaned_data['door'],
-                        dawa_id = vol_signup.cleaned_data['dawa_id'],
-                        placename = vol_signup.cleaned_data['placename'],
-                        email = vol_signup.cleaned_data['volunteer_email'],
-                        phone = vol_signup.cleaned_data['volunteer_phone'],
-                        birthday = vol_signup.cleaned_data['volunteer_birthday'],
-                        gender = vol_signup.cleaned_data['volunteer_gender'],
-                        family = family
-                        )
+                    # create volunteer
+                    volunteer = Person.objects.create(
+                        membertype=Person.PARENT,
+                        name=vol_signup.cleaned_data['volunteer_name'],
+                        zipcode=vol_signup.cleaned_data['zipcode'],
+                        city=vol_signup.cleaned_data['city'],
+                        streetname=vol_signup.cleaned_data['streetname'],
+                        housenumber=vol_signup.cleaned_data['housenumber'],
+                        floor=vol_signup.cleaned_data['floor'],
+                        door=vol_signup.cleaned_data['door'],
+                        dawa_id=vol_signup.cleaned_data['dawa_id'],
+                        placename=vol_signup.cleaned_data['placename'],
+                        email=vol_signup.cleaned_data['volunteer_email'],
+                        phone=vol_signup.cleaned_data['volunteer_phone'],
+                        birthday=vol_signup.cleaned_data['volunteer_birthday'],
+                        gender=vol_signup.cleaned_data['volunteer_gender'],
+                        family=family
+                    )
                     volunteer.save()
 
                     # send email with login link
@@ -507,11 +516,11 @@ def volunteerSignup(request):
                     department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
                     department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
-                    #redirect to success
+                    # redirect to success
                     return HttpResponseRedirect(reverse('login_email_sent'))
                 else:
                     getLogin = getLoginForm()
-                    return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
+                    return render(request, 'members/volunteer_signup.html', {'loginform': getLogin, 'vol_signupform': vol_signup})
 
             elif request.POST['form_id'] == 'getlogin':
                 # just resend email
@@ -532,38 +541,40 @@ def volunteerSignup(request):
                     except Family.DoesNotExist:
                         getLogin.add_error('email', 'Denne addresse er ikke kendt i systemet. Hvis du er sikker på du er oprettet, så check adressen, eller opret dig via tilmeldings formularen først.')
 
-                return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
+                return render(request, 'members/volunteer_signup.html', {'loginform': getLogin, 'vol_signupform': vol_signup})
 
         # initial load (if we did not return above)
         getLogin = getLoginForm()
         vol_signup = vol_signupForm()
-        return render(request, 'members/volunteer_signup.html', {'loginform' : getLogin, 'vol_signupform' : vol_signup})
+        return render(request, 'members/volunteer_signup.html', {'loginform': getLogin, 'vol_signupform': vol_signup})
+
 
 @xframe_options_exempt
 def loginEmailSent(request):
     return render(request, 'members/login_email_sent.html')
 
+
 def signQuickpay(base, private_key):
     return hmac.new(private_key, base, hashlib.sha256).hexdigest()
+
 
 @csrf_exempt
 def QuickpayCallback(request):
     checksum = signQuickpay(request.body, bytearray(settings.QUICKPAY_PRIVATE_KEY, 'ascii'))
 
-    #print("comparing checksum: " + request.META['HTTP_QUICKPAY_CHECKSUM_SHA256'] + " (recieved) to: " + checksum + " (calculated)")
     if checksum == request.META['HTTP_QUICKPAY_CHECKSUM_SHA256']:
         # Request is authenticated
 
-        #JSON decode
+        # JSON decode
         callback = json.loads(str(request.body, 'utf8'))
 
         # We only care about state = processed
         if(callback['state'] != 'processed'):
-            HttpResponse('OK') # processing stops here - but tell QuickPay we are OK
+            HttpResponse('OK')  # processing stops here - but tell QuickPay we are OK
 
         quickpay_transaction = get_object_or_404(QuickpayTransaction, order_id=callback['order_id'])
 
-        if(callback['accepted'] == True):
+        if(callback['accepted'] is True):
             quickpay_transaction.payment.set_confirmed()
         else:
             quickpay_transaction.payment.set_rejected(request.body)
@@ -577,9 +588,8 @@ def QuickpayCallback(request):
 def waitinglistView(request, unique=None):
 
     department_children_waiting = {'departments': {}}
-    department_loop_counter=0
-    #deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)
-    deparments_query = Department.objects.filter(has_waiting_list = True, closed_dtm=None).order_by('zipcode')
+    department_loop_counter = 0
+    deparments_query = Department.objects.filter(has_waiting_list=True, closed_dtm=None).order_by('zipcode')
 
     for department in deparments_query:
         department_children_waiting['departments'][department_loop_counter] = {}
@@ -588,7 +598,7 @@ def waitinglistView(request, unique=None):
 
         waiting_in_department = WaitingList.objects.filter(department__pk=department.pk).select_related('person', 'person__family').order_by('on_waiting_list_since')
 
-        child_loop_counter=1
+        child_loop_counter = 1
         for waiting in waiting_in_department:
             department_children_waiting['departments'][department_loop_counter]['waiting'][child_loop_counter] = {}
             if(waiting.person.family.unique == unique):
@@ -604,11 +614,12 @@ def waitinglistView(request, unique=None):
             child_loop_counter = child_loop_counter + 1
         department_loop_counter = department_loop_counter + 1
 
-
     return render(request, 'members/waitinglist.html', {'department_children_waiting': department_children_waiting, 'unique': unique})
+
 
 def paymentGatewayErrorView(request, unique=None):
     return render(request, 'members/payment_gateway_error.html', {'unique': unique})
+
 
 @xframe_options_exempt
 def departmentView(request, unique=None):
@@ -622,8 +633,8 @@ def departmentView(request, unique=None):
             if coordinates is None:
                 print(department.name)
             dep = {
-                'html'       : department.toHTML(),
-                'onMap'      : department.onMap
+                'html': department.toHTML(),
+                'onMap': department.onMap
             }
             if not(coordinates is None):
                 dep['latitude'] = str(coordinates[0])
@@ -632,4 +643,4 @@ def departmentView(request, unique=None):
                 dep['onMap'] = False
 
             deps[department.union.get_region_display()].append(dep)
-        return render(request, "members/department_list.html", {'departments' : deps})
+        return render(request, "members/department_list.html", {'departments': deps})
