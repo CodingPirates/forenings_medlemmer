@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='activityinvite',
             name='expire_dtm',
-            field=models.DateField(default=members.models.activityinvite._defaultInviteExpiretime, verbose_name='Udløber'),
+            field=models.DateField(default=members.models.activityinvite._default_invite_expiretime, verbose_name='Udløber'),
         ),
     ]

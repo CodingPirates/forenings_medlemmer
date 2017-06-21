@@ -628,11 +628,11 @@ def departmentView(request, unique=None):
             deps[region[1]] = []
 
         for department in depQuery:
-            coordinates = department.getLongLat()
+            coordinates = department.get_long_lat()
             if coordinates is None:
                 print(department.name)
             dep = {
-                'html': department.toHTML(),
+                'html': department.to_html(),
                 'onMap': department.onMap
             }
             if not(coordinates is None):

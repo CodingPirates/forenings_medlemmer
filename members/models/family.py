@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from django.db import models
 import members.models.person
 import members.models.emailtemplate
@@ -24,13 +22,13 @@ class Family(models.Model):
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
 
     def get_abosolute_url(self):
-        return reverse('family_form', kwargs={'pk':self.unique})
+        return reverse('family_form', kwargs={'pk': self.unique})
 
     def __str__(self):
         return self.email
 
     def send_link_email(self,):
-        members.models.emailtemplate.EmailTemplate.objects.get(idname = 'LINK').makeEmail(self, {})
+        members.models.emailtemplate.EmailTemplate.objects.get(idname='LINK').makeEmail(self, {})
 
     def get_first_parent(self):
         try:
