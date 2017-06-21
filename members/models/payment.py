@@ -17,7 +17,7 @@ class Payment(models.Model):
         (REFUND, 'Refunderet'),
         (OTHER, 'Andet')
     )
-    models.DateTimeField('Tilføjet', default=timezone.now)
+    added = models.DateTimeField('Tilføjet', default=timezone.now)
     payment_type = models.CharField('Type', blank=False, null=False, max_length=2, choices=PAYMENT_METHODS, default=CASH)
     activity = models.ForeignKey('Activity', blank=True, null=True, on_delete=models.PROTECT)
     activityparticipant = models.ForeignKey('ActivityParticipant', blank=True, null=True, on_delete=models.PROTECT)  # unlink if failed and new try is made
