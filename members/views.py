@@ -6,7 +6,7 @@ import uuid
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -27,8 +27,13 @@ from members.models.union import Union
 from members.models.waitinglist import WaitingList
 
 
-def FamilyDetails(request,unique):
-    family = get_object_or_404(Family, unique=uuid.UUID(unique))
+def FamilyDetails(request, unique):
+    try:
+        unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
+
+    family = get_object_or_404(Family, unique=unique)
     invites= ActivityInvite.objects.filter(person__family = family, expire_dtm__gte=timezone.now(), rejected_dtm=None)
     open_activities = Activity.objects.filter(open_invite = True, signup_closing__gte=timezone.now()).order_by('zipcode')
     participating = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
@@ -74,6 +79,11 @@ def FamilyDetails(request,unique):
     return render(request, 'members/family_details.html', context)
 
 def ConfirmFamily(request, unique):
+    try:
+        unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
+
     family = get_object_or_404(Family, unique=unique)
     persons = Person.objects.filter(family=family)
     subscribed_waiting_lists = WaitingList.objects.filter(person__family=family)
@@ -92,6 +102,11 @@ def ConfirmFamily(request, unique):
         return render(request, 'members/family_confirm_details.html',context)
 
 def WaitingListSetSubscription(request, unique, id, departmentId, action):
+    try:
+        unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
+
     person = get_object_or_404(Person, pk=id)
     if person.family.unique != unique:
         raise Http404("Person eksisterer ikke")
@@ -117,6 +132,11 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
     return HttpResponseRedirect(reverse('family_detail', args=[unique]))
 
 def DeclineInvitation(request, unique, invitation_id):
+    try:
+        unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
+
     activity_invite = get_object_or_404(ActivityInvite, pk=invitation_id, person__family__unique=unique)
 
     if(request.method == 'POST'):
@@ -136,6 +156,12 @@ def DeclineInvitation(request, unique, invitation_id):
 
 
 def ActivitySignup(request, activity_id, unique=None, person_id=None):
+    try:
+        if unique is not None:
+            unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
+
     if(unique is None or person_id is None):
         # View only mode
         view_only_mode = True
@@ -325,6 +351,12 @@ def UpdatePersonFromForm(person, form):
 
 
 def PersonCreate(request, unique, membertype):
+    try:
+        if unique is not None:
+            unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
+
     family = get_object_or_404(Family, unique=unique)
     if request.method == 'POST':
         person = Person()
@@ -352,6 +384,11 @@ def PersonCreate(request, unique, membertype):
     return render(request, 'members/person_create_or_update.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
 
 def PersonUpdate(request, unique, id):
+    try:
+        unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
+
     person = get_object_or_404(Person, pk=id)
     if person.family.unique != unique:
         raise Http404("Person eksisterer ikke")
@@ -575,6 +612,10 @@ def QuickpayCallback(request):
 
 
 def waitinglistView(request, unique=None):
+    try:
+        unique = uuid.UUID(unique)
+    except ValueError:
+        return HttpResponseBadRequest("Familie id er ugyldigt")
 
     department_children_waiting = {'departments': {}}
     department_loop_counter=0
