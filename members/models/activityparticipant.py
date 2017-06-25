@@ -34,7 +34,7 @@ class ActivityParticipant(models.Model):
 
     def get_payment_link(self):
         payment = members.models.payment.Payment.objects.get(activityparticipant=self, confirmed_dtm=None)
-        if(payment.payment_type==payment.Payment.CREDITCARD):
+        if(payment.payment_type == members.models.payment.Payment.CREDITCARD):
             return payment.get_quickpaytransaction().get_link_url()
         else:
             return 'javascript:alert("Kan ikke betales her:  Kontakt Coding Pirates for hjælp");'
