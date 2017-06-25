@@ -19,11 +19,30 @@ class PersonForm(forms.ModelForm):
             nameFieldSet = Fieldset(
                 'Barnets oplysninger',
                 Div(
-                    Div(Field('gender'), css_class="col-md-2"),
-                    Div(Field('name'), css_class="col-md-10"),
-                    Div(Field('birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
-                    Div(Field('email'), css_class="col-md-4"),
-                    Div(Field('phone'), css_class="col-md-4"),
+                    Div(
+                        Field('gender'),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field('name'),
+                        css_class="col-md-10"
+                    ),
+                    Div(
+                        Field(
+                            'birthday',
+                            css_class="datepicker",
+                            input_formats=(settings.DATE_INPUT_FORMATS)
+                        ),
+                        css_class="col-md-4"
+                    ),
+                    Div(
+                        Field('email'),
+                        css_class="col-md-4"
+                    ),
+                    Div(
+                        Field('phone'),
+                        css_class="col-md-4"
+                    ),
                     css_class="row"
                 )
             )
@@ -32,11 +51,28 @@ class PersonForm(forms.ModelForm):
             nameFieldSet = Fieldset(
                 'Forældres / Værges oplysninger',
                 Div(
-                    Div(Field('gender'), css_class="col-md-2"),
-                    Div(Field('name'), css_class="col-md-10"),
-                    Div(Field('birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
-                    Div(Field('email'), css_class="col-md-4"),
-                    Div(Field('phone'), css_class="col-md-4"),
+                    Div(
+                        Field('gender'),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field('name'),
+                        css_class="col-md-10"
+                    ),
+                    Div(
+                        Field(
+                            'birthday',
+                            css_class="datepicker",
+                            input_formats=(settings.DATE_INPUT_FORMATS)
+                        ),
+                        css_class="col-md-4"
+                    ),
+                    Div(
+                        Field('email'),
+                        css_class="col-md-4"),
+                    Div(
+                        Field('phone'),
+                        css_class="col-md-4"),
                     css_class="row"
                 )
             )
@@ -54,22 +90,91 @@ class PersonForm(forms.ModelForm):
             Fieldset(
                 'Adresse oplysninger',
                 Div(
-                    Div(Field('search_address', id="search-address"), css_class="col-md-10"),
-                    Div(Field('manual_entry', id="manual-entry"),
-                        Field('address_global', id="address-global"),
-                        css_class="col-md-2"),
-                    Div(Field('streetname', readonly=True, css_class="autofilled-address"), css_class="col-md-9"),
-                    Div(Field('housenumber', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('floor', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('door', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
-                    Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                    Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                    Field('dawa_id', '', id="id_dawa_id"),
+                    Div(
+                        Field(
+                            'search_address',
+                            id="search-address"
+                        ),
+                        css_class="col-md-10"
+                    ),
+                    Div(
+                        Field(
+                            'manual_entry',
+                            id="manual-entry"),
+                        Field(
+                            'address_global',
+                            id="address-global"
+                        ),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field(
+                            'streetname',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-9"
+                    ),
+                    Div(
+                        Field(
+                            'housenumber',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'floor',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'door',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'zipcode',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field(
+                            'city',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-5"
+                    ),
+                    Div(
+                        Field(
+                            'placename',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-5"),
+                    Field(
+                        'dawa_id',
+                        '',
+                        id="id_dawa_id"
+                    ),
                     css_class="row"
                 )
             ),
-            Submit('submit', 'Opret' if self.instance.id is None else 'Ret', css_class="btn-success"),
+            Submit(
+                'submit',
+                'Opret' if self.instance.id is None else 'Ret',
+                css_class="btn-success"
+            ),
             HTML("""<a class="btn btn-link" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>""")
         )
         self.helper.render_unmentioned_fields = False
@@ -120,40 +225,137 @@ class signupForm(forms.Form):
             Fieldset(
                 'Barnets oplysninger',
                 Div(
-                    Div(Field('child_gender'), css_class="col-md-2"),
-                    Div(Field('child_name'), css_class="col-md-10"),
-                    Div(Field('child_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
-                    Div(Field('child_email'), css_class="col-md-4"),
-                    Div(Field('child_phone'), css_class="col-md-4"),
+                    Div(
+                        Field('child_gender'),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field('child_name'),
+                        css_class="col-md-10"
+                    ),
+                    Div(
+                        Field(
+                            'child_birthday',
+                            css_class="datepicker",
+                            input_formats=(settings.DATE_INPUT_FORMATS)
+                        ),
+                        css_class="col-md-4"
+                    ),
+                    Div(
+                        Field('child_email'),
+                        css_class="col-md-4"
+                    ),
+                    Div(
+                        Field('child_phone'),
+                        css_class="col-md-4"
+                    ),
                     css_class="row"
                 )
             ),
             Fieldset(
                 'Forældres oplysninger',
                 Div(
-                    Div(Field('parent_name'), css_class="col-md-12"),
-                    Div(Field('parent_email'), css_class="col-md-6"),
-                    Div(Field('parent_phone'), css_class="col-md-6"),
+                    Div(
+                        Field('parent_name'),
+                        css_class="col-md-12"
+                    ),
+                    Div(
+                        Field('parent_email'),
+                        css_class="col-md-6"
+                    ),
+                    Div(
+                        Field('parent_phone'),
+                        css_class="col-md-6"
+                    ),
                     css_class="row"
                 )
             ),
             Fieldset(
                 'Adresse oplysninger',
                 Div(
-                    Div(Field('search_address', id="search-address"), css_class="col-md-10"),
-                    Div(Field('manual_entry', id="manual-entry"), css_class="col-md-2"),
-                    Div(Field('streetname', readonly=True, css_class="autofilled-address"), css_class="col-md-9"),
-                    Div(Field('housenumber', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('floor', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('door', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
-                    Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                    Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                    Hidden('dawa_id', '', id="id_dawa_id"),
+                    Div(
+                        Field(
+                            'search_address',
+                            id="search-address"
+                        ),
+                        css_class="col-md-10"
+                    ),
+                    Div(
+                        Field(
+                            'manual_entry',
+                            id="manual-entry"
+                        ),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field(
+                            'streetname',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-9"
+                    ),
+                    Div(
+                        Field(
+                            'housenumber',
+                            readonly=True,
+                            css_class="autofilled-address"
+                            ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'floor',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'door',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'zipcode',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field(
+                            'city',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-5"
+                    ),
+                    Div(
+                        Field(
+                            'placename',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-5"
+                    ),
+                    Hidden(
+                        'dawa_id',
+                        '',
+                        id="id_dawa_id"
+                    ),
                     css_class="row"
                 )
             ),
-            Submit('submit', 'Opret', css_class="btn-success")
+            Submit(
+                'submit',
+                'Opret',
+                css_class="btn-success"
+            )
         )
 
     child_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_GENDER_CHOICES)
@@ -192,32 +394,121 @@ class vol_signupForm(forms.Form):
             Fieldset(
                 'Frivilliges oplysninger',
                 Div(
-                    Div(Field('volunteer_gender'), css_class="col-md-2"),
-                    Div(Field('volunteer_name'), css_class="col-md-10"),
-                    Div(Field('volunteer_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-3"),
-                    Div(Field('volunteer_email'), css_class="col-md-3"),
-                    Div(Field('volunteer_phone'), css_class="col-md-3"),
-                    Div(Field('volunteer_department'), css_class="col-md-3"),
+                    Div(
+                        Field('volunteer_gender'),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field('volunteer_name'),
+                        css_class="col-md-10"
+                    ),
+                    Div(
+                        Field(
+                            'volunteer_birthday',
+                            css_class="datepicker",
+                            input_formats=(settings.DATE_INPUT_FORMATS)
+                        ),
+                        css_class="col-md-3"
+                    ),
+                    Div(
+                        Field('volunteer_email'),
+                        css_class="col-md-3"
+                    ),
+                    Div(
+                        Field('volunteer_phone'),
+                        css_class="col-md-3"
+                    ),
+                    Div(
+                        Field('volunteer_department'),
+                        css_class="col-md-3"
+                    ),
                     css_class="row"
                 )
             ),
             Fieldset(
                 'Adresse oplysninger',
                 Div(
-                    Div(Field('search_address', id="search-address"), css_class="col-md-10"),
-                    Div(Field('manual_entry', id="manual-entry"), css_class="col-md-2"),
-                    Div(Field('streetname', readonly=True, css_class="autofilled-address"), css_class="col-md-9"),
-                    Div(Field('housenumber', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('floor', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('door', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                    Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
-                    Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                    Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                    Hidden('dawa_id', '', id="id_dawa_id"),
+                    Div(
+                        Field(
+                            'search_address',
+                            id="search-address"
+                        ),
+                        css_class="col-md-10"
+                    ),
+                    Div(
+                        Field(
+                            'manual_entry',
+                            id="manual-entry"
+                        ),
+                        css_class="col-md-2"
+                    ),
+                    Div(
+                        Field(
+                            'streetname',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-9"
+                    ),
+                    Div(
+                        Field(
+                            'housenumber',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'floor',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'door',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-1"
+                    ),
+                    Div(
+                        Field(
+                            'zipcode',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ), css_class="col-md-2"),
+                    Div(
+                        Field(
+                            'city',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-5"
+                    ),
+                    Div(
+                        Field(
+                            'placename',
+                            readonly=True,
+                            css_class="autofilled-address"
+                        ),
+                        css_class="col-md-5"
+                    ),
+                    Hidden(
+                        'dawa_id',
+                        '',
+                        id="id_dawa_id"
+                    ),
                     css_class="row"
                 )
             ),
-            Submit('submit', 'Opret', css_class="btn-success")
+            Submit(
+                'submit',
+                'Opret',
+                css_class="btn-success"
+            )
         )
 
     volunteer_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_ADULT_GENDER_CHOICES)
@@ -269,18 +560,33 @@ class ActivitySignupForm(forms.Form):
                         'Tilmeldings oplysninger',
                         Div(
                             Div(
-                                Field('note', aria_describedby="noteHelp"),
-                                HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'), css_class="col-md-6"
+                                Field(
+                                    'note',
+                                    aria_describedby="noteHelp"
+                                ),
+                                HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
+                                css_class="col-md-6"
                             ),
-                            Div('address_permission', 'read_conditions', css_class="col-md-6"),
+                            Div(
+                                'address_permission',
+                                'read_conditions',
+                                css_class="col-md-6"
+                            ),
                             css_class="row"),
                     ),
                     Fieldset(
                         'Betaling',
-                        Field('payment_option', aria_describedby="paymentHelp"),
+                        Field(
+                            'payment_option',
+                            aria_describedby="paymentHelp"
+                        ),
                         HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
                         FormActions(
-                            Submit('submit', 'Tilmeld og betal', css_class="btn-success"),
+                            Submit(
+                                'submit',
+                                'Tilmeld og betal',
+                                css_class="btn-success"
+                            ),
                             HTML("<a href='{% url 'family_detail' family.unique %}'>Tilbage</a>")
                         ),
                     ),
