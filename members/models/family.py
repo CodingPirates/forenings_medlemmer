@@ -15,7 +15,7 @@ class Family(models.Model):
             ("view_family_unique", "Can view family UUID field (password) - gives access to address"),
         )
 
-    unique = models.UUIDField(default=uuid.uuid4)
+    unique = models.UUIDField(default=uuid.UUID('00000000-0000-0000-0000-000000000000'))
     email = models.EmailField(unique=True)
     dont_send_mails = models.BooleanField('Vil ikke kontaktes', default=False)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
