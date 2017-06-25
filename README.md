@@ -17,6 +17,7 @@ pip install -r requirements.txt
 ./manage.py loaddata fixtures/templates.json
 ./manage.py loaddata fixtures/unions.json
 ./manage.py loaddata fixtures/departments.json
+./manage.py createsuperuser
 ./manage.py runserver
 ```
 
@@ -31,3 +32,13 @@ source virtualenv/bin/activate
 ```
 ./manage.py migrate
 ```
+
+## Email og andre cron jobs
+
+Email bliver sendt via et cron job, så for at modtage email skal du køre følgende kommando:
+
+```
+./manage.py runcrons
+```
+
+Andre opgaver der foretages af cron jobs er defineret som funktioner i members/jobs.py
