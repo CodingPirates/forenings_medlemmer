@@ -215,12 +215,10 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
     # if activity is closed for signup, only invited persons can still join
     if activity.signup_closing < timezone.now().date() and invitation is None:
         view_only_mode = True  # Activivty closed for signup
-        signup_closed = True
 
     # check if activity is full
     if activity.seats_left() <= 0:
         view_only_mode = True  # activity full
-        signup_closed = True
 
     if(request.method == "POST"):
         if view_only_mode:
