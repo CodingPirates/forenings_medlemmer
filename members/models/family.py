@@ -27,7 +27,7 @@ class Family(models.Model):
     def __str__(self):
         return self.email
 
-    def send_link_email(self,):
+    def send_link_email(self):
         members.models.emailtemplate.EmailTemplate.objects.get(idname='LINK').makeEmail(self, {})
 
     def get_first_parent(self):
