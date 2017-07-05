@@ -8,4 +8,5 @@ exclude =
     # Don't check migrations because their mostly auto generated
     members/migrations,
     # Ignore virtualenv
-    virtualenv
+    virtualenv,
+    members/models/__init__.py
