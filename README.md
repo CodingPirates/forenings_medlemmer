@@ -14,9 +14,9 @@ source virtualenv/bin/activate
 pip install -r requirements.txt
 
 ./manage.py migrate
-./manage.py loaddata fixtures/templates.json
-./manage.py loaddata fixtures/unions.json
-./manage.py loaddata fixtures/departments.json
+./manage.py loaddata members/fixtures/templates.json
+./manage.py loaddata members/fixtures/unions.json
+./manage.py loaddata members/fixtures/departments.json
 ./manage.py createsuperuser
 ./manage.py runserver
 ```
