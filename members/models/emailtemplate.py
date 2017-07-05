@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from django.db import models
 import members.models.emailitem
 import members.models.person
@@ -13,15 +11,16 @@ class EmailTemplate(models.Model):
     class Meta:
         verbose_name = 'Email Skabelon'
         verbose_name_plural = 'Email Skabeloner'
-    idname = models.SlugField('Unikt reference navn',max_length=50, blank=False, unique=True)
+    idname = models.SlugField('Unikt reference navn', max_length=50, blank=False, unique=True)
     updated_dtm = models.DateTimeField('Sidst redigeret', auto_now=True)
-    name = models.CharField('Skabelon navn',max_length=200, blank=False)
-    description = models.CharField('Skabelon beskrivelse',max_length=200, blank=False)
+    name = models.CharField('Skabelon navn', max_length=200, blank=False)
+    description = models.CharField('Skabelon beskrivelse', max_length=200, blank=False)
     template_help = models.TextField('Hjælp omkring template variable', blank=True)
     from_address = models.EmailField()
-    subject = models.CharField('Emne',max_length=200, blank=False)
+    subject = models.CharField('Emne', max_length=200, blank=False)
     body_html = models.TextField('HTML Indhold', blank=True)
     body_text = models.TextField('Text Indhold', blank=True)
+
     def __str__(self):
         return self.name + " (ID:" + self.idname + ")"
 
@@ -56,16 +55,16 @@ class EmailTemplate(models.Model):
 
             # figure out reciever
             if(type(reciever) is str):
-                #check if family blacklisted. (TODO)
+                # check if family blacklisted. (TODO)
                 destination_address = reciever
             elif(type(reciever) is members.models.person.Person):
-                #skip if family does not want email
+                # skip if family does not want email
                 if reciever.family.dont_send_mails:
                     continue
                 context['person'] = reciever
                 destination_address = reciever.email
             elif(type(reciever) is members.models.family.Family):
-                #skip if family does not want email
+                # skip if family does not want email
                 if reciever.dont_send_mails:
                     continue
                 context['family'] = reciever
@@ -80,7 +79,7 @@ class EmailTemplate(models.Model):
             elif('person' in context):
                 person = context['person']
             else:
-                person=None
+                person = None
 
             # figure out family
             if(type(reciever) is members.models.family.Family):
@@ -90,7 +89,7 @@ class EmailTemplate(models.Model):
             elif('family' in context):
                 family = context['family']
             else:
-                family=None
+                family = None
 
             # figure out activity
             if 'activity' in context:
@@ -105,10 +104,14 @@ class EmailTemplate(models.Model):
                 department = None
 
             # fill out known usefull stuff for context
-            if 'email' not in context: context['email'] = destination_address
-            if 'site' not in context: context['site'] = settings.BASE_URL
-            if 'person' not in context: context['person'] = person
-            if 'family' not in context: context['family'] = family
+            if 'email' not in context:
+                context['email'] = destination_address
+            if 'site' not in context:
+                context['site'] = settings.BASE_URL
+            if 'person' not in context:
+                context['person'] = person
+            if 'family' not in context:
+                context['family'] = family
 
             # Make real context from dict
             context = Context(context)
@@ -122,16 +125,16 @@ class EmailTemplate(models.Model):
             text_content = text_template.render(context)
             subject_content = subject_template.render(context)
 
-            email = members.models.emailitem.EmailItem.objects.create(template = self,
-                reciever = destination_address,
+            email = members.models.emailitem.EmailItem.objects.create(
+                template=self,
+                reciever=destination_address,
                 person=person,
                 family=family,
                 activity=activity,
-                department = department,
-                subject = subject_content,
-                body_html = html_content,
-                body_text = text_content)
+                department=department,
+                subject=subject_content,
+                body_html=html_content,
+                body_text=text_content)
             email.save()
             emails.append(email)
         return emails
-

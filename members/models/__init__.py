@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-
 # ensure all models are included - otherwise makemigrations fails to detect models
 import members.models.activity
 import members.models.activityinvite

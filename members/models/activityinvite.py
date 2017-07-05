@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from django.db import models
 import members.models.emailtemplate
 import members.models.waitinglist
@@ -10,20 +8,20 @@ from django.utils import timezone
 
 # Calculate a day 3 months in future
 # TODO: make configurable in settings file
-def _defaultInviteExpiretime():
+def _default_invite_expiretime():
     now = timezone.now()
-    return now + timedelta(days=30*3)
+    return now + timedelta(days=30 * 3)
 
 
 class ActivityInvite(models.Model):
     class Meta:
-        verbose_name='Invitation'
+        verbose_name = 'Invitation'
         verbose_name_plural = 'Invitationer'
         unique_together = ('activity', 'person')
     activity = models.ForeignKey('Activity')
     person = models.ForeignKey('Person')
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
-    expire_dtm = models.DateField('Udløber', default=_defaultInviteExpiretime)
+    expire_dtm = models.DateField('Udløber', default=_default_invite_expiretime)
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
 
     def clean(self):
@@ -35,16 +33,17 @@ class ActivityInvite(models.Model):
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
             template = members.models.emailtemplate.EmailTemplate.objects.get(idname='ACT_INVITE')
-            context={'activity': self.activity,
-                     'activity_invite' : self,
-                     'person' : self.person,
-                     'family' : self.person.family,
-                     }
+            context = {
+                'activity': self.activity,
+                'activity_invite': self,
+                'person': self.person,
+                'family': self.person.family,
+            }
             if self.person.email and (self.person.email != self.person.family.email):
                 # If invited has own email, also send to that.
                 template.makeEmail([self.person, self.person.family], context)
             else:
-                #otherwise use only family
+                # otherwise use only family
                 template.makeEmail(self.person.family, context)
             # remove from department waiting list
             if self.activity.is_season():
@@ -52,4 +51,4 @@ class ActivityInvite(models.Model):
         return super(ActivityInvite, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{}, {}'.format(self.activity,self.person)
+        return '{}, {}'.format(self.activity, self.person)
