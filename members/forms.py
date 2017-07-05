@@ -300,7 +300,7 @@ class signupForm(forms.Form):
                             'housenumber',
                             readonly=True,
                             css_class="autofilled-address"
-                            ),
+                        ),
                         css_class="col-md-1"
                     ),
                     Div(
