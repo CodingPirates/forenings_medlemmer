@@ -17,7 +17,7 @@ class Member(models.Model):
     member_until = models.DateField('Udmeldt', blank=True, default=None, null=True)
 
     def name(self):
-        return '{}'.format(self.person)
+        return str(self.person.name)
 
     name.short_description = 'Navn'
 
