@@ -6,6 +6,7 @@ from members.utils.address import format_address
 from django.contrib.auth.models import User
 from django.utils import timezone, html
 import requests, json
+from urllib.parse import quote_plus
 
 
 class Department(models.Model):
@@ -67,7 +68,7 @@ class Department(models.Model):
         if (self.latitude is None or self.longtitude is None):
             addressID = 0
             dist = 0
-            req = 'https://dawa.aws.dk/datavask/adresser?betegnelse=' + self.addressWithZip().replace(" ", "%20")
+            req = 'https://dawa.aws.dk/datavask/adresser?betegnelse=' + quote_plus(self.address_with_zip())
             try:
                 washed = json.loads(requests.get(req).text)
                 addressID = washed['resultater'][0]['adresse']['id']
