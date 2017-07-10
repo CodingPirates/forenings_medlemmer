@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone, html
 import requests
 import json
+from urllib.parse import quote_plus
 
 
 class Department(models.Model):
@@ -71,7 +72,7 @@ class Department(models.Model):
         if self.latitude is None or self.longtitude is None:
             addressID = 0
             dist = 0
-            req = 'https://dawa.aws.dk/datavask/adresser?betegnelse=' + self.address_with_zip().replace(" ", "%20")
+            req = 'https://dawa.aws.dk/datavask/adresser?betegnelse=' + quote_plus(self.address_with_zip())
             try:
                 washed = json.loads(requests.get(req).text)
                 addressID = washed['resultater'][0]['adresse']['id']
@@ -83,6 +84,7 @@ class Department(models.Model):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
                     address = json.loads(requests.get(req).text)
+                    # Note: lat and long is flipped
                     self.latitude = address['geometry']['coordinates'][0]
                     self.longtitude = address['geometry']['coordinates'][1]
                     self.save()
