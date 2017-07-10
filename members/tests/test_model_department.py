@@ -2,6 +2,9 @@ from django.test import TestCase
 from members.models.union import Union
 from members.models.department import Department
 from members.models.emailtemplate import EmailTemplate
+from members.models.family import Family
+from members.models.person import Person
+from members.models.member import Member
 import math
 from django.core import mail
 from members.jobs import EmailSendCronJob
@@ -57,3 +60,19 @@ class TestModelDepartment(TestCase):
         self.department.new_volunteer_email("")
         EmailSendCronJob().do()
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_no_members(self):
+        family = Family(email="familly@example.com")
+        family.save()
+        for i in range(5):
+            person = Person(
+                name="person" + str(i),
+                family=family
+            )
+            person.save()
+            member = Member(
+                department=self.department,
+                person=person
+            )
+            member.save()
+        self.assertEqual(self.department.no_members(), 5)
