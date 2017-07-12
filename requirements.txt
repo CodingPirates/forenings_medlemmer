@@ -8,6 +8,7 @@ git+https://github.com/QuickPay/quickpay-python-client.git@c12dd639b86765507b8da
 pytz==2015.7
 django-flat-responsive
 flake8
+freezegun
 
 # useful non-production packages (install manually)
 #django-debug-toolbar
