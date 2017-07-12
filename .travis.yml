@@ -2,7 +2,7 @@ language: python
 python:
   - "3.4"
 install:
-  - "pip install -r requirements.txt"
+  - "pip install -r dev-requirements.txt"
 script:
   - "flake8"
   - "python manage.py migrate"

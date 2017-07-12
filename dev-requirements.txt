@@ -1,0 +1,8 @@
+-r requirements.txt
+flake8
+freezegun
+
+# useful non-production packages (install manually)
+#django-debug-toolbar
+#pylint
+#coverage.py
