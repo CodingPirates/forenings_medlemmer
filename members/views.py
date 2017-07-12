@@ -139,6 +139,9 @@ def DeclineInvitation(request, unique, invitation_id):
 
     activity_invite = get_object_or_404(ActivityInvite, pk=invitation_id, person__family__unique=unique)
 
+    if activity_invite.rejected_dtm is not None:
+        return HttpResponse("Du har allerede afslået denne invitation")
+
     if activity_invite.has_accepted_invite():
         return HttpResponse("Du kan ikke afslå en tilmelding når du allerede har accepterede den")
 
