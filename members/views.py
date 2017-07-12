@@ -215,7 +215,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
         signup_closed = True
 
     # check if activity is full
-    if activity.seats_left() <= 0:
+    if activity.seats_left() <= 0 and (invitation is None or (invitation is not None and not invitation.is_vip)):
         view_only_mode = True # activity full
         signup_closed = True
 
