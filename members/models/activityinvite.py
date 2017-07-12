@@ -25,6 +25,7 @@ class ActivityInvite(models.Model):
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
     expire_dtm = models.DateField('Udløber', default=_defaultInviteExpiretime)
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
+    override_price_in_dkk = models.DecimalField('Special pris', max_digits=10, decimal_places=2, default=None, null=True)
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
