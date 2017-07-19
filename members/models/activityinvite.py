@@ -25,6 +25,7 @@ class ActivityInvite(models.Model):
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
     expire_dtm = models.DateField('Udløber', default=_defaultInviteExpiretime)
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
+    is_vip = models.BooleanField('VIP', default=False, help_text="En VIP kan deltage i en aktivitet selv om der ikke er flere pladser")
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
