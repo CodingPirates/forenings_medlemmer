@@ -660,17 +660,14 @@ def departmentView(request, unique=None):
 
         for department in depQuery:
             coordinates = department.getLongLat()
-            if coordinates is None:
-                print(department.name)
             dep = {
                 'html'       : department.toHTML(),
                 'onMap'      : department.onMap
             }
             if not(coordinates is None):
-                dep['latitude'] = str(coordinates[0])
-                dep['longtitude'] = str(coordinates[1])
+                dep['longtitude'] = str(coordinates[0])
+                dep['latitude'] = str(coordinates[1])
             else:
                 dep['onMap'] = False
-
             deps[department.union.get_region_display()].append(dep)
         return render(request, "members/department_list.html", {'departments' : deps})
