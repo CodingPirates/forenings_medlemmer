@@ -3,6 +3,8 @@
 from django.db import models
 import members.models.emailtemplate
 import members.models.waitinglist
+from members.models.activityparticipant import ActivityParticipant
+from members.models.member import Member
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.utils import timezone
@@ -25,6 +27,10 @@ class ActivityInvite(models.Model):
     invite_dtm = models.DateField('Inviteret', default=timezone.now)
     expire_dtm = models.DateField('Udløber', default=_defaultInviteExpiretime)
     rejected_dtm = models.DateField('Afslået', blank=True, null=True)
+
+    def has_accepted_invite(self):
+        member = Member.objects.get(person=self.person)
+        return ActivityParticipant.objects.filter(member=member, activity=self.activity).exists()
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
