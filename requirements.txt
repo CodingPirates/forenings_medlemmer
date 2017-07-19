@@ -1,13 +1,18 @@
-Django==1.9.1
-django-bootstrap3==6.2.2
-django-extensions==1.6.1
-django-crispy-forms==1.5.2
-sqlparse==0.1.18
-django-cron==0.4.6
+Django
+django-bootstrap3
+django-extensions
+django-crispy-forms
+sqlparse
+django-cron
 git+https://github.com/QuickPay/quickpay-python-client.git@c12dd639b86765507b8da2f3d9651c2ede57db3e#egg=quickpay-api-client
-pytz==2015.7
+pytz
 django-flat-responsive
 
 # useful non-production packages (install manually)
 #django-debug-toolbar
 #pylint
+
+# Django REST
+djangorestframework
+markdown
+django-filter
