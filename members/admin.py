@@ -170,6 +170,7 @@ class ActivityAdmin(admin.ModelAdmin):
             'description',
             'start_date',
             'end_date',
+            'member_justified',
         )
         }
          ),

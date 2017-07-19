@@ -32,6 +32,7 @@ class Activity(models.Model):
     max_participants = models.PositiveIntegerField('Max deltagere', default=30)
     max_age = models.PositiveIntegerField('Maximum Alder', default=17)
     min_age = models.PositiveIntegerField('Minimum Alder', default=7)
+    member_justified = models.BooleanField('Aktiviteten gør personen til medlem',default=True,help_text="Bestemmer om personerne bliver til medlemmer i forhold til DUF. De fleste aktiviteter er sæsoner og medlemsberettiget. Hvis du er i tvivl, så spørg på Slack i #medlemsssystem-support")
 
     def is_historic(self):
         return self.end_date < timezone.now()
