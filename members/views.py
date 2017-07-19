@@ -264,7 +264,13 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             return_link_url = reverse('activity_view_person', args=[family.unique, activity.id, person.id])
 
             # Make payment if activity costs
-            if activity.price_in_dkk is not None and activity.price_in_dkk != 0:
+            require_payment = False
+            if (activity.price_in_dkk is not None and activity.price_in_dkk != 0 and ((invitation is not None and invitation.override_price_in_dkk is None) or invitation is None)) or (invitation is not None and invitation.override_price_in_dkk is not None and invitation.override_price_in_dkk != 0):
+                if invitation is not None and invitation.override_price_in_dkk is not None:
+                    price_in_dkk = invitation.override_price_in_dkk
+                else:
+                    price_in_dkk = activity.price_in_dkk
+
                 # using creditcard ?
                 if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
                     payment = Payment(
@@ -274,7 +280,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                         person=person,
                         family=family,
                         body_text=timezone.now().strftime("%Y-%m-%d") + ' Betaling for ' + activity.name + ' på ' + activity.department.name,
-                        amount_ore = int(activity.price_in_dkk * 100),
+                        amount_ore = int(price_in_dkk * 100),
                     )
                     payment.save()
 
