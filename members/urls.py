@@ -1,6 +1,8 @@
 from django.conf.urls import include,  url
-from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
-    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView
+from rest_framework.urlpatterns import format_suffix_patterns
+from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, \
+    EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
+    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView, person_list
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
@@ -20,5 +22,7 @@ urlpatterns = [
     url(r'quickpay_callback$', QuickpayCallback, name='quickpay_callback'),
     url(r'waitinglist$', waitinglistView, name='waitinglist_view'),
     url(r'departments$', departmentView, name='department_view'),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^persons/$', person_list),
 ]
+urlpatterns = format_suffix_patterns(urlpatterns)

@@ -26,6 +26,25 @@ from members.models.quickpaytransaction import QuickpayTransaction
 from members.models.union import Union
 from members.models.waitinglist import WaitingList
 
+#NEW REST ENDPOINTS
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from members.serializers import PersonSerializer
+
+@api_view(['GET', 'POST'])
+def person_list(request, format=None):
+    if request.method == 'GET':
+        persons = Person.objects.all()
+        serializer = PersonSerializer(persons, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = PersonSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#END NEW REST ENDPOINTS
 
 def FamilyDetails(request, unique):
     try:
