@@ -27,86 +27,25 @@ from members.models.union import Union
 from members.models.waitinglist import WaitingList
 
 #NEW REST ENDPOINTS
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework import generics
 from members.serializers import PersonSerializer, FamilySerializer
 
-@api_view(['GET', 'POST'])
-def person_list(request, format=None):
-    """
-    Retrieve a list of persons or create a new person.
-    """
-    if request.method == 'GET':
-        persons = Person.objects.all()
-        serializer = PersonSerializer(persons, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = PersonSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class PersonList(generics.ListCreateAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
 
+class PersonDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
 
-@api_view(['GET', 'PUT'])
-def person_detail(request, pk, format=None):
-    """
-    Retrieve or update a person.
-    """
-    try:
-        person = Person.objects.get(pk=pk)
-    except Person.DoesNotExist:
-        return Response(status=404)
+class FamilyList(generics.ListCreateAPIView):
+    queryset = Family.objects.all()
+    serializer_class = FamilySerializer
 
-    if request.method == 'GET':
-        serializer = PersonSerializer(person)
-        return Response(serializer.data)
+class FamilyDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Family.objects.all()
+    serializer_class = FamilySerializer
 
-    elif request.method == 'PUT':
-        serializer = PersonSerializer(person, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET', 'POST'])
-def family_list(request, format=None):
-    """
-    Retrieve a list of families or create a new family.
-    """
-    if request.method == 'GET':
-        families = Family.objects.all()
-        serializer = FamilySerializer(families, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = FamilySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['GET', 'PUT'])
-def family_detail(request, pk, format=None):
-    """
-    Retrieve or update a family.
-    """
-    try:
-        family = Family.objects.get(pk=pk)
-    except Family.DoesNotExist:
-        return Response(status=404)
-
-    if request.method == 'GET':
-        serializer = FamilySerializer(family)
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = FamilySerializer(family, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 #END NEW REST ENDPOINTS
 
 def FamilyDetails(request, unique):

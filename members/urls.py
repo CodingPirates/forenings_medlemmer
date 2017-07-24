@@ -2,7 +2,7 @@ from django.conf.urls import include,  url
 from rest_framework.urlpatterns import format_suffix_patterns
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, \
     EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
-    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView, person_list, person_detail, family_list, family_detail
+    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView, PersonList, PersonDetail, FamilyList, FamilyDetail
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
@@ -23,9 +23,9 @@ urlpatterns = [
     url(r'waitinglist$', waitinglistView, name='waitinglist_view'),
     url(r'departments$', departmentView, name='department_view'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^persons/$', person_list),
-    url(r'^persons/(?P<pk>[\d]+)/$',person_detail),
-    url(r'^families/$', family_list),
-    url(r'^families/(?P<pk>[\d]+)/$',family_detail),
+    url(r'^persons/$', PersonList.as_view()),
+    url(r'^persons/(?P<pk>[\d]+)/$',PersonDetail.as_view()),
+    url(r'^families/$', FamilyList.as_view()),
+    url(r'^families/(?P<pk>[\d]+)/$',FamilyDetail.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
