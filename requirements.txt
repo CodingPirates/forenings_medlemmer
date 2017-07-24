@@ -15,4 +15,4 @@ django-flat-responsive
 # Django REST
 djangorestframework
 markdown
-django-filter
+djangorestframework-filters

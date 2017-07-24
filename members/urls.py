@@ -1,8 +1,12 @@
 from django.conf.urls import include,  url
-from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.routers import DefaultRouter
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, \
     EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
-    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView, PersonList, PersonDetail, FamilyList, FamilyDetail
+    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView, PersonViewSet, FamilyViewSet
+
+router = DefaultRouter()
+router.register(r'persons', PersonViewSet)
+router.register(r'families', FamilyViewSet)
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
@@ -23,9 +27,6 @@ urlpatterns = [
     url(r'waitinglist$', waitinglistView, name='waitinglist_view'),
     url(r'departments$', departmentView, name='department_view'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^persons/$', PersonList.as_view()),
-    url(r'^persons/(?P<pk>[\d]+)/$',PersonDetail.as_view()),
-    url(r'^families/$', FamilyList.as_view()),
-    url(r'^families/(?P<pk>[\d]+)/$',FamilyDetail.as_view()),
+    url(r'^', include(router.urls)),
 ]
-urlpatterns = format_suffix_patterns(urlpatterns)
+

@@ -27,22 +27,24 @@ from members.models.union import Union
 from members.models.waitinglist import WaitingList
 
 #NEW REST ENDPOINTS
-from rest_framework import generics
+from rest_framework import viewsets
 from members.serializers import PersonSerializer, FamilySerializer
+import rest_framework_filters as filters
 
-class PersonList(generics.ListCreateAPIView):
-    queryset = Person.objects.all()
+class PersonFilter(filters.FilterSet):
+    class Meta:
+        model = Person
+        fields = {
+            'name': ['exact', 'startswith'],
+            'family': ['exact',]
+        }
+
+class PersonViewSet(viewsets.ModelViewSet):
+    filter_class = PersonFilter
     serializer_class = PersonSerializer
-
-class PersonDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Person.objects.all()
-    serializer_class = PersonSerializer
 
-class FamilyList(generics.ListCreateAPIView):
-    queryset = Family.objects.all()
-    serializer_class = FamilySerializer
-
-class FamilyDetail(generics.RetrieveUpdateDestroyAPIView):
+class FamilyViewSet(viewsets.ModelViewSet):
     queryset = Family.objects.all()
     serializer_class = FamilySerializer
 
