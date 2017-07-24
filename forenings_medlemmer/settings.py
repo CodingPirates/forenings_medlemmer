@@ -96,7 +96,9 @@ DATABASES = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
-
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 20
+}
 LANGUAGE_CODE = 'da-dk'
 
 TIME_ZONE = 'Europe/Copenhagen'
