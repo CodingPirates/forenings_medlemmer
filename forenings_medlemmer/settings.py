@@ -100,6 +100,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_filters.backends.DjangoFilterBackend', 
+        'rest_framework.filters.SearchFilter', 
+        'rest_framework.filters.OrderingFilter', 
     ),
 }
 LANGUAGE_CODE = 'da-dk'

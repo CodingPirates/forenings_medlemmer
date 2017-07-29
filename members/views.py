@@ -36,14 +36,17 @@ class PersonFilter(filters.FilterSet):
         model = Person
         fields = {
             'name': ['exact', 'startswith'],
-            'family': ['exact',]
+            #'family': ['exact',]
         }
 
 class PersonViewSet(viewsets.ModelViewSet):
-    filter_class = PersonFilter
+    #filter_class = PersonFilter
     serializer_class = PersonSerializer
     queryset = Person.objects.all()
-
+    #filter_fields= ('name',)
+    search_fields = ('name', 'streetname','zipcode','city')
+    ordering_fields = ('name', 'city')
+    ordering = ('name',)
 class FamilyViewSet(viewsets.ModelViewSet):
     queryset = Family.objects.all()
     serializer_class = FamilySerializer
