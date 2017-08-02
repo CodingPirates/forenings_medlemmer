@@ -453,7 +453,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-        'description' : '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson. Herefter kan du trykke på personen og tilføje invitationer til personens invitations liste.</p>',
+        'description' : '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson. Herefter kan du vælge de personer på listen, du ønsker at invitere og vælge "Inviter alle valgte til en aktivitet" fra rullemenuen foroven.</p>',
 
         'fields' : (
         'person',
