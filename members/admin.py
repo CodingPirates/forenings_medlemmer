@@ -271,7 +271,7 @@ class FamilyAdmin(admin.ModelAdmin):
             return ('email',)
     search_fields = ('email',)
     inlines = [PersonInline, PaymentInline, EmailItemInline]
-    #actions = ['create_new_uuid', 'resend_link_email'] # new UUID gets used accidentially
+    actions = ['create_new_uuid', 'resend_link_email'] # new UUID gets used accidentially
     actions = ['resend_link_email']
 
     fields = ('email', 'dont_send_mails', 'confirmed_dtm')
@@ -287,7 +287,7 @@ class FamilyAdmin(admin.ModelAdmin):
         else:
             message_bit = "%s familier" % queryset.count()
         self.message_user(request, "%s fik nyt UUID." % message_bit)
-    create_new_uuid.short_description = 'Opret nyt UUID'
+    create_new_uuid.short_description = 'Generer nyt password'
 
     def resend_link_email(self,request, queryset):
         for family in queryset:
