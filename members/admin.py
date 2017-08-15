@@ -259,7 +259,7 @@ class FamilyAdmin(admin.ModelAdmin):
     search_fields = ('email',)
     inlines = [PersonInline, PaymentInline, EmailItemInline]
     actions = ['create_new_uuid', 'resend_link_email'] # new UUID gets used accidentially
-    actions = ['resend_link_email']
+    #actions = ['resend_link_email']
 
     fields = ('email', 'dont_send_mails', 'confirmed_dtm')
     readonly_fields = ('confirmed_dtm',)
