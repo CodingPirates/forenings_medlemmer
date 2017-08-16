@@ -5,8 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
-     <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     {% load bootstrap3 %}
     {% bootstrap_css %}
@@ -28,7 +28,7 @@
         {% for region, depList in departments.items %}
             {% for dep in depList %}
                 {% if dep.onMap == True %}
-            var marker{{forloop.counter}} = L.marker([{{dep.longtitude}},{{dep.latitude}}]).addTo(kort);
+            var marker{{forloop.counter}} = L.marker([{{dep.latitude}},{{dep.longtitude}}]).addTo(kort);
             marker{{forloop.counter}}.bindPopup('{{dep.html | safe}}');
                 {% endif %}
              {% endfor %}
