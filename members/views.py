@@ -665,8 +665,8 @@ def departmentView(request, unique=None):
                 'onMap'      : department.onMap
             }
             if not(coordinates is None):
-                dep['longtitude'] = str(coordinates[0])
-                dep['latitude'] = str(coordinates[1])
+                dep['longtitude'] = str(coordinates[1])
+                dep['latitude'] = str(coordinates[0])
             else:
                 dep['onMap'] = False
             deps[department.union.get_region_display()].append(dep)
