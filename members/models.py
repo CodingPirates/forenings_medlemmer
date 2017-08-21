@@ -259,12 +259,12 @@ class Department(models.Model):
                     self.save()
                     print("Opdateret for " + self.name)
                     print("Updated coordinates for " + self.name)
-                    return(self.latitude, self.longtitude)
+                    return(self.longtitude, self.latitude)
                 except Exception as error:
                     print("Couldn't find coordinates for " + self.name)
                     print("Error " +  str(error))
         else:
-            return(self.latitude, self.longtitude)
+            return(self.longtitude, self.latitude)
 
     def new_volunteer_email(self,volunteer_name):
         # First fetch department leaders email
