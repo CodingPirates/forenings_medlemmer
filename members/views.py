@@ -612,8 +612,8 @@ def departmentView(request, unique=None):
                 'onMap'      : department.onMap
             }
             if not(coordinates == None):
-                dep['latitude'] = str(coordinates[0])
-                dep['longtitude'] = str(coordinates[1])
+                dep['latitude'] = str(coordinates[1])
+                dep['longtitude'] = str(coordinates[0])
             else:
                 dep['onMap'] = False
 

@@ -254,17 +254,17 @@ class Department(models.Model):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
                     address = json.loads(requests.get(req).text)
-                    self.latitude   =  address['geometry']['coordinates'][0]
-                    self.longtitude =  address['geometry']['coordinates'][1]
+                    self.latitude   =  address['geometry']['coordinates'][1]
+                    self.longtitude =  address['geometry']['coordinates'][0]
                     self.save()
                     print("Opdateret for " + self.name)
                     print("Updated coordinates for " + self.name)
-                    return(self.latitude, self.longtitude)
+                    return(self.longtitude, self.latitude)
                 except Exception as error:
                     print("Couldn't find coordinates for " + self.name)
                     print("Error " +  str(error))
         else:
-            return(self.latitude, self.longtitude)
+            return(self.longtitude, self.latitude)
 
     def new_volunteer_email(self,volunteer_name):
         # First fetch department leaders email
