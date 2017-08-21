@@ -4,6 +4,13 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+def clear_longtitude_latitude(apps, schema_editor):
+    Department = apps.get_model('members', 'department')
+    departments = Department.objects.all()
+    for department in departments:
+        department.longtitude = None
+        department.latitude = None
+        department.save()
 
 class Migration(migrations.Migration):
 
@@ -12,5 +19,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL("UPDATE members_department SET longtitude = NULL, latitude = NULL;"),
+        migrations.RunPython(clear_longtitude_latitude),
     ]
