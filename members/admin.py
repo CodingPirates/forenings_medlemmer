@@ -683,30 +683,41 @@ class PersonAdmin(admin.ModelAdmin):
     family_url.short_description = 'Familie'
     list_per_page = 20
 
-    def invite_many_to_activity_action(self,request, queryset):
+    def invite_many_to_activity_action(self, request, queryset):
         # Get list of available departments
-        if request.user.is_superuser or request.user.has_perm('members.view_all_persons'):
+        if (request.user.is_superuser or
+                request.user.has_perm('members.view_all_persons')):
             deparment_list_query = Department.objects.all()
         else:
-            deparment_list_query = Department.objects.filter(adminuserinformation__user=request.user)
-        deparment_list=[('-', '-')]
+            deparment_list_query = Department.objects.filter(
+                adminuserinformation__user=request.user)
+        deparment_list = [('-', '-')]
         for department in deparment_list_query:
             deparment_list.append((department.id, department.name))
 
         # Get list of active and future activities
         department_ids = deparment_list_query.values_list('id', flat=True)
-        activity_list_query = Activity.objects.filter(end_date__gt=timezone.now())
+        activity_list_query = Activity.objects.filter(
+            end_date__gt=timezone.now())
         if not request.user.is_superuser:
-            activity_list_query = activity_list_query.filter(department__in=department_ids)
-        activity_list=[('-', '-')]
+            activity_list_query = activity_list_query.filter(
+                department__in=department_ids)
+        activity_list = [('-', '-')]
         for activity in activity_list_query:
-            activity_list.append((activity.id, activity.department.name + ", " + activity.name))
+            activity_list.append((activity.id,
+                                  activity.department.name +
+                                  "," + activity.name))
+        # Form used to select department and activity
+        # - redundant department is for double check
 
-        # Form used to select department and activity - redundant department is for double check
         class MassInvitationForm(forms.Form):
-            department = forms.ChoiceField(label='Afdeling', choices=deparment_list)
-            activity = forms.ChoiceField(label='Aktivitet', choices=activity_list)
-            expire = forms.DateField(label='Udløber', widget=AdminDateWidget(), initial=timezone.now() + timedelta(days=30*3))
+            department = forms.ChoiceField(label='Afdeling',
+                                           choices=deparment_list)
+            activity = forms.ChoiceField(label='Aktivitet',
+                                         choices=activity_list)
+            expire = forms.DateField(label='Udløber', widget=AdminDateWidget(),
+                                     initial=timezone.now() +
+                                     timedelta(days=30 * 3))
 
         # Lookup all the selected persons - to show confirmation list
         persons = queryset
@@ -720,49 +731,93 @@ class PersonAdmin(admin.ModelAdmin):
             mass_invitation_form = MassInvitationForm(request.POST)
             context['mass_invitation_form'] = mass_invitation_form
 
-            if mass_invitation_form.is_valid() and mass_invitation_form.cleaned_data['activity'] != '-' and mass_invitation_form.cleaned_data['department'] != '-':
-                activity = Activity.objects.get(pk=mass_invitation_form.cleaned_data['activity'])
-
-                # validate activity belongs to user and matches selected department
-                if int(mass_invitation_form.cleaned_data['department']) in department_ids:
-                    if activity.department.id == int(mass_invitation_form.cleaned_data['department']):
+            if (mass_invitation_form.is_valid() and
+                    mass_invitation_form.cleaned_data['activity'] != '-' and
+                    mass_invitation_form.cleaned_data['department'] != '-'):
+                activity = Activity.objects.get(
+                    pk=mass_invitation_form.cleaned_data['activity'])
+                # validate activity belongs to user
+                # and matches selected department
+                if (int(mass_invitation_form.cleaned_data['department']) in
+                        department_ids):
+                    if (activity.department.id == int(
+                            mass_invitation_form.cleaned_data['department'])):
                         invited_counter = 0
 
-                        # get list of already created invitations on selected persons
-                        already_invited = Person.objects.filter(activityinvite__activity=mass_invitation_form.cleaned_data['activity'], activityinvite__person__in=queryset).all()
-                        list(already_invited) # force lookup
-                        already_invited_ids = already_invited.values_list('id', flat=True)
+                        # get list of already created
+                        # invitations on selected persons
+                        already_invited = Person.objects.filter(
+                            activityinvite__activity=mass_invitation_form
+                            .cleaned_data['activity'],
+                            activityinvite__person__in=queryset).all()
+                        list(already_invited)  # force lookup
+                        already_invited_ids = \
+                            already_invited.values_list('id', flat=True)
 
                         # only save if all succeeds
                         try:
                             with transaction.atomic():
                                 for current_person in queryset:
-                                    if(current_person.id not in already_invited_ids):
+                                    if(current_person.id not in
+                                            already_invited_ids and
+                                            (activity.max_age >=
+                                             current_person.age_years() >=
+                                             activity.min_age)):
                                         invited_counter = invited_counter + 1
-                                        invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
+                                        invitation = ActivityInvite(
+                                            activity=activity,
+                                            person=current_person,
+                                            expire_dtm=mass_invitation_form
+                                            .cleaned_data['expire'])
                                         invitation.save()
                         except Exception as e:
-                            messages.error(request, "Fejl - ingen personer blev inviteret! Der var problemer med " + invitation.person.name +  ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.")
+                            messages.error(
+                                request,
+                                """Fejl - ingen personer blev inviteret!
+                                Der var problemer med """ +
+                                invitation.person.name + """. Vær sikker på
+                                personen ikke allerede er inviteret og opfylder
+                                alderskravet.""")
                             return
 
                         # return ok message
-                        already_invited_text=""
+                        already_invited_text = ""
                         if(already_invited.count()):
-                            already_invited_text = ". Dog var : " + str.join(', ', already_invited.values_list('name', flat=True)) + " allerede inviteret!"
-                        messages.success(request, str(invited_counter) + " af " + str(queryset.count()) + " valgte personer blev inviteret til " + str(activity) + already_invited_text)
+                            already_invited_text = (
+                                ". Dog var : " +
+                                str.join(
+                                    ', ',
+                                    already_invited.values_list(
+                                        'name',
+                                        flat=True)) +
+                                " allerede inviteret!")
+                        messages.success(
+                            request,
+                            str(invited_counter) +
+                            " af " +
+                            str(queryset.count()) +
+                            " valgte personer blev inviteret til " +
+                            str(activity) +
+                            already_invited_text)
                         return
 
                     else:
-                        messages.error(request, "Valgt aktivitet stemmer ikke overens med valgt afdeling")
+                        messages.error(
+                            request,
+                            """Valgt aktivitet stemmer
+                            ikke overens med valgt afdeling""")
                         return
                 else:
-                    messages.error(request, "Du kan kun invitere til egne afdelinger")
+                    messages.error(
+                        request,
+                        "Du kan kun invitere til egne afdelinger")
                     return
         else:
             context['mass_invitation_form'] = MassInvitationForm()
 
         return render(request, 'admin/invite_many_to_activity.html', context)
-    invite_many_to_activity_action.short_description = 'Inviter alle valgte til en aktivitet'
+    invite_many_to_activity_action.short_description = (
+        'Inviter alle valgte til en aktivitet')
 
     # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
