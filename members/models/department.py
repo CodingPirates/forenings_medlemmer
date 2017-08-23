@@ -3,6 +3,7 @@
 from django.db import models
 import members.models.emailtemplate
 from members.utils.address import format_address
+from members.models.person import Person
 from django.contrib.auth.models import User
 from django.utils import timezone, html
 import requests, json
@@ -104,5 +105,5 @@ class Department(models.Model):
 
 
 class AdminUserInformation(models.Model):
-    user = models.OneToOneField(User)
+    person = models.OneToOneField(Person)
     departments = models.ManyToManyField(Department)

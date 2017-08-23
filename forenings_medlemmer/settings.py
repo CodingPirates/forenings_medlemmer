@@ -150,3 +150,5 @@ DJANGO_CRON_DELETE_LOGS_OLDER_THAN=7
 
 QUICKPAY_API_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 QUICKPAY_PRIVATE_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+AUTH_USER_MODEL = 'members.Person'
