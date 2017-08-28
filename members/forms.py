@@ -270,7 +270,7 @@ class ActivitySignupForm(forms.Form):
     # photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial=ActivityParticipant.PHOTO_OK, required=True, choices=((ActivityParticipant.PHOTO_OK, 'Ja, det er OK'),(ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
     address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", initial='YES', required=True, choices=( ('YES', 'Ja'), ('NO', 'Nej') ))
     read_conditions = forms.ChoiceField(label="Har du <a target='_blank' href=https://codingpirates.dk/coding-pirates-medlemskab/>læst</a> og accepterer du vores handelsbetingelser?", initial='YES', required=True, choices=( ('YES', 'Ja'), ('NO', 'Nej') ))
-    payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'Betalingskort'), (Payment.OTHER, 'Andet er aftalt')))
+    payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'Betalingskort / MobilePay'), (Payment.OTHER, 'Andet er aftalt')))
 
 class ActivivtyInviteDeclineForm(forms.Form):
     def __init__(self, *args, **kwargs):
