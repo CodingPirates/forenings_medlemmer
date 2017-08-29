@@ -697,16 +697,14 @@ class PersonAdmin(admin.ModelAdmin):
 
         # Get list of active and future activities
         department_ids = deparment_list_query.values_list('id', flat=True)
-        activity_list_query = Activity.objects.filter(
-            end_date__gt=timezone.now())
+        activity_list_query = Activity.objects.filter(end_date__gt=timezone.now())
         if not request.user.is_superuser:
             activity_list_query = activity_list_query.filter(
                 department__in=department_ids)
         activity_list = [('-', '-')]
         for activity in activity_list_query:
             activity_list.append((activity.id,
-                                  activity.department.name +
-                                  "," + activity.name))
+                                  activity.department.name + "," + activity.name))
         # Form used to select department and activity
         # - redundant department is for double check
 
@@ -715,9 +713,9 @@ class PersonAdmin(admin.ModelAdmin):
                                            choices=deparment_list)
             activity = forms.ChoiceField(label='Aktivitet',
                                          choices=activity_list)
-            expire = forms.DateField(label='Udløber', widget=AdminDateWidget(),
-                                     initial=timezone.now() +
-                                     timedelta(days=30 * 3))
+            expire = forms.DateField(label='Udløber',
+                                     widget=AdminDateWidget(),
+                                     initial=timezone.now() + timedelta(days=30 * 3))
 
         # Lookup all the selected persons - to show confirmation list
         persons = queryset
@@ -740,8 +738,8 @@ class PersonAdmin(admin.ModelAdmin):
                 # and matches selected department
                 if (int(mass_invitation_form.cleaned_data['department']) in
                         department_ids):
-                    if (activity.department.id == int(
-                            mass_invitation_form.cleaned_data['department'])):
+                    if (activity.department.id ==
+                            int(mass_invitation_form.cleaned_data['department'])):
                         invited_counter = 0
 
                         # get list of already created
@@ -751,8 +749,7 @@ class PersonAdmin(admin.ModelAdmin):
                             .cleaned_data['activity'],
                             activityinvite__person__in=queryset).all()
                         list(already_invited)  # force lookup
-                        already_invited_ids = \
-                            already_invited.values_list('id', flat=True)
+                        already_invited_ids = already_invited.values_list('id', flat=True)
 
                         # only save if all succeeds
                         try:
@@ -774,10 +771,9 @@ class PersonAdmin(admin.ModelAdmin):
                             messages.error(
                                 request,
                                 """Fejl - ingen personer blev inviteret!
-                                Der var problemer med """ +
-                                invitation.person.name + """. Vær sikker på
-                                personen ikke allerede er inviteret og opfylder
-                                alderskravet.""")
+                                Der var problemer med """ + invitation.person.name +
+                                """. Vær sikker på personen ikke allerede er inviteret og
+                                opfylder alderskravet.""")
                             return
 
                         # return ok message
@@ -787,25 +783,20 @@ class PersonAdmin(admin.ModelAdmin):
                                 ". Dog var : " +
                                 str.join(
                                     ', ',
-                                    already_invited.values_list(
-                                        'name',
-                                        flat=True)) +
+                                    already_invited.values_list('name', flat=True)
+                                ) +
                                 " allerede inviteret!")
                         messages.success(
                             request,
-                            str(invited_counter) +
-                            " af " +
-                            str(queryset.count()) +
-                            " valgte personer blev inviteret til " +
-                            str(activity) +
+                            str(invited_counter) + " af " + str(queryset.count()) +
+                            " valgte personer blev inviteret til " + str(activity) +
                             already_invited_text)
                         return
 
                     else:
                         messages.error(
                             request,
-                            """Valgt aktivitet stemmer
-                            ikke overens med valgt afdeling""")
+                            "Valgt aktivitet stemmer ikke overens med valgt afdeling")
                         return
                 else:
                     messages.error(
