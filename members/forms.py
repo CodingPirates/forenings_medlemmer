@@ -61,6 +61,7 @@ class PersonForm(forms.ModelForm):
                             Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
                             Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
                             Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
+                            Div(Field('address_line2', id="co-address"), css_class="col-md-10"),
                             Field('dawa_id', '',  id="id_dawa_id"),
                             css_class="row"
                            )
@@ -72,7 +73,7 @@ class PersonForm(forms.ModelForm):
         self.fields['birthday'].input_formats=(settings.DATE_INPUT_FORMATS)
     class Meta:
         model=Person
-        fields= ['birthday', 'gender', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'email','phone', 'dawa_id']
+        fields= ['birthday', 'gender', 'name','zipcode','city', 'streetname', 'housenumber', 'floor', 'door', 'placename', 'address_line2', 'email','phone', 'dawa_id']
         labels = {
             'birthday': 'Fødselsdato (dd-mm-åååå)',
         }

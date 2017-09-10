@@ -50,15 +50,15 @@ class UnionAdmin(admin.ModelAdmin):
     list_filter = ('region',)
     fieldsets = [
         ('Navn og Adresse',
-            {'fields':('name', 'union_email', 'region','streetname',
-            'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename'),
-            'description': '<p>Udfyld navnet på foreningen (f.eks København, \
+            {'fields':('name', 'union_email', 'region', 'streetname', 'address_line2',
+             'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename'),
+             'description': '<p>Udfyld navnet på foreningen (f.eks København, \
             vestjylland) og adressen<p>'}),
 
         ('Bestyrelsen',
-            {'fields':('chairman', 'chairman_email','second_chair',
-            'second_chair_email', 'cashier', 'cashier_email', 'secretary',
-            'secratary_email', 'boardMembers')}),
+            {'fields':('chairman', 'chairman_email', 'chairman_phone', 'second_chair',
+             'second_chair_email', 'second_chair_phone', 'cashier', 'cashier_email',
+             'cashier_phone', 'secretary', 'secratary_email', 'boardMembers')}),
 
         ('Info',
             {'fields':('bank_main_org', 'bank_account', 'statues', 'founded'), 'description':
@@ -100,7 +100,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             {'fields':('name', 'union', 'description', 'open_hours'),
             'description': '<p>Lav en beskrivelse af jeres aktiviteter, teknologier og tekniske niveau.</p><p>Åbningstid er ugedag samt tidspunkt<p>'}),
         ('Ansvarlig',
-            {'fields':('responsible_name', 'responsible_contact')}),
+            {'fields':('responsible_name', 'responsible_contact', 'responsible_phone')}),
         ('Adresse',
             {'fields':('streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename')}),
 
@@ -814,7 +814,7 @@ class PersonAdmin(admin.ModelAdmin):
     # email and phonenumber only shown on adults.
     def get_fieldsets(self, request, person=None):
         if(request.user.has_perm('members.view_full_address')):
-            contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'email', 'phone', 'family')
+            contact_fields = ('name', 'streetname', 'housenumber', 'floor', 'door', 'city', 'zipcode', 'placename', 'address_line2', 'email', 'phone', 'family')
         else:
             if(person.membertype == Person.CHILD):
                 contact_fields = ('name', 'city', 'zipcode', 'family')
