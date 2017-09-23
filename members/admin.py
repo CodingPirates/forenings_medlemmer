@@ -851,14 +851,6 @@ class AdminUserInformationInline(admin.StackedInline):
     filter_horizontal = ('departments',)
     can_delete = False
 
-# Define a new User admin
-class UserAdmin(UserAdmin):
-    inlines = (AdminUserInformationInline, )
-
-# Re-register UserAdmin
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
-
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ['pk', 'added', 'payment_type', 'amount_ore', 'family', 'confirmed_dtm', 'cancelled_dtm', 'rejected_dtm', 'activityparticipant']
     list_filter = ['payment_type', 'activity']
