@@ -11,6 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm, \
     vol_signupForm
@@ -27,13 +28,9 @@ from members.models.union import Union
 from members.models.waitinglist import WaitingList
 
 
-def FamilyDetails(request, unique):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
-    family = get_object_or_404(Family, unique=unique)
+@login_required
+def FamilyDetails(request):
+    family = request.user.family
     invites= ActivityInvite.objects.filter(person__family = family, expire_dtm__gte=timezone.now(), rejected_dtm=None)
     open_activities = Activity.objects.filter(open_invite = True, signup_closing__gte=timezone.now()).order_by('zipcode')
     participating = ActivityParticipant.objects.filter(member__person__family = family).order_by('-activity__start_date')
@@ -78,13 +75,10 @@ def FamilyDetails(request, unique):
     }
     return render(request, 'members/family_details.html', context)
 
-def ConfirmFamily(request, unique):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
-    family = get_object_or_404(Family, unique=unique)
+@login_required
+def ConfirmFamily(request):
+    unique = request.user.family.unique
+    family = request.user.family
     persons = Person.objects.filter(family=family)
     subscribed_waiting_lists = WaitingList.objects.filter(person__family=family)
 
@@ -92,7 +86,7 @@ def ConfirmFamily(request, unique):
         ''' No data recieved - just set confirmed_dtm date to now '''
         family.confirmed_dtm = timezone.now()
         family.save()
-        return HttpResponseRedirect(reverse('family_detail', args=[unique]))
+        return HttpResponseRedirect(reverse('family_detail'))
     else:
         context = {
             'family':family,
@@ -101,19 +95,13 @@ def ConfirmFamily(request, unique):
         }
         return render(request, 'members/family_confirm_details.html',context)
 
-def WaitingListSetSubscription(request, unique, id, departmentId, action):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
+def WaitingListSetSubscription(request, id, departmentId, action):
     person = get_object_or_404(Person, pk=id)
-    if person.family.unique != unique:
+    if person.family.unique != request.user.family.unique:
         raise Http404("Person eksisterer ikke")
     department = get_object_or_404(Department,pk=departmentId)
 
     if action == 'subscribe':
-        print('subscribing')
         if WaitingList.objects.filter(person = person, department = department):
             raise Http404("{} er allerede på {}s venteliste".format(person.name,department.name))
         waiting_list = WaitingList()
@@ -122,21 +110,17 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
         waiting_list.save()
 
     if action == 'unsubscribe':
-        print('un-subscribing')
         try:
             waiting_list = WaitingList.objects.get(person = person, department = department)
             waiting_list.delete()
         except:
             raise Http404("{} er ikke på {}s venteliste".format(person.name,department.name))
 
-    return HttpResponseRedirect(reverse('family_detail', args=[unique]))
+    return HttpResponseRedirect(reverse('family_detail'))
 
-def DeclineInvitation(request, unique, invitation_id):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
+@login_required
+def DeclineInvitation(request, invitation_id):
+    unique = request.user.family.unique
     activity_invite = get_object_or_404(ActivityInvite, pk=invitation_id, person__family__unique=unique)
 
     if(request.method == 'POST'):
@@ -155,14 +139,9 @@ def DeclineInvitation(request, unique, invitation_id):
     return render(request, 'members/decline_activivty_invite.html', context)
 
 
-def ActivitySignup(request, activity_id, unique=None, person_id=None):
-    try:
-        if unique is not None:
-            unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
-    if(unique is None or person_id is None):
+@login_required
+def ActivitySignup(request, activity_id, person_id=None):
+    if(person_id is None):
         # View only mode
         view_only_mode = True
     else:
@@ -176,10 +155,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
     if(request.resolver_match.url_name == 'activity_view_person'):
         view_only_mode = True
 
-    if unique:
-        family = get_object_or_404(Family, unique=unique)
-    else:
-        family = None
+    family = request.user.family
 
     if person_id:
         try:
@@ -261,7 +237,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             participant.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
             participant.save()
 
-            return_link_url = reverse('activity_view_person', args=[family.unique, activity.id, person.id])
+            return_link_url = reverse('activity_view_person', args=[activity.id, person.id])
 
             # Make payment if activity costs
             if activity.price_in_dkk is not None and activity.price_in_dkk != 0:
@@ -278,7 +254,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                     )
                     payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('activity_view_person', args=[family.unique, activity.id, person.id]))
+                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('activity_view_person', args=[activity.id, person.id]))
 
 
             # expire invitation
@@ -350,14 +326,9 @@ def UpdatePersonFromForm(person, form):
             relative.save()
 
 
-def PersonCreate(request, unique, membertype):
-    try:
-        if unique is not None:
-            unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
-    family = get_object_or_404(Family, unique=unique)
+@login_required
+def PersonCreate(request, membertype):
+    family = request.user.family
     if request.method == 'POST':
         person = Person()
         person.membertype = membertype
@@ -383,15 +354,9 @@ def PersonCreate(request, unique, membertype):
         form = PersonForm(instance=person)
     return render(request, 'members/person_create_or_update.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
 
-def PersonUpdate(request, unique, id):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
-    person = get_object_or_404(Person, pk=id)
-    if person.family.unique != unique:
-        raise Http404("Person eksisterer ikke")
+@login_required
+def PersonUpdate(request, id):
+    person = request.user
     if request.method == 'POST':
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
@@ -611,12 +576,9 @@ def QuickpayCallback(request):
         return HttpResponseForbidden('Invalid request')
 
 
-def waitinglistView(request, unique=None):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
+@login_required
+def waitinglistView(request):
+    unique = request.user.family.unique
     department_children_waiting = {'departments': {}}
     department_loop_counter=0
     #deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)
@@ -648,7 +610,9 @@ def waitinglistView(request, unique=None):
 
     return render(request, 'members/waitinglist.html', {'department_children_waiting': department_children_waiting, 'unique': unique})
 
-def paymentGatewayErrorView(request, unique=None):
+@login_required
+def paymentGatewayErrorView(request):
+    unique = request.user.family.unique
     return render(request, 'members/payment_gateway_error.html', {'unique': unique})
 
 @xframe_options_exempt

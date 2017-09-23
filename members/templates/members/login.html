@@ -1,0 +1,22 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+    {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="input-group">
+            <span class="input-group-addon">{{ form.username.label_tag }}</span>
+            <span class="form-control">{{ form.username }}</span>
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon">{{ form.password.label_tag }}</span>
+            <span class="form-control">{{ form.password }}</span>
+        </div>
+        <div class="input-group">
+            <input type="submit" class="form-control" value="Login">
+        </div>
+    </form>
+{% endblock %}

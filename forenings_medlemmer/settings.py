@@ -152,3 +152,5 @@ QUICKPAY_API_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 QUICKPAY_PRIVATE_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
 AUTH_USER_MODEL = 'members.Person'
+LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/'

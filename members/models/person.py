@@ -106,3 +106,6 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.name.partition(' ')[0]
+
+    def firstname(self):
+        return self.name.partition(' ')[0]
