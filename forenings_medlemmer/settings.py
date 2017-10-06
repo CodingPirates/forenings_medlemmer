@@ -61,6 +61,7 @@ INSTALLED_APPS = (
     'django_cron',
     'flat_responsive',
     'django.contrib.admin',
+    'rest_framework',
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
@@ -95,7 +96,14 @@ DATABASES = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
-
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_filters.backends.DjangoFilterBackend', 
+        'rest_framework.filters.SearchFilter', 
+        'rest_framework.filters.OrderingFilter', 
+    ),
+}
 LANGUAGE_CODE = 'da-dk'
 
 TIME_ZONE = 'Europe/Copenhagen'

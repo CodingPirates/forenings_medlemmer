@@ -43,6 +43,7 @@ class Person(models.Model):
     housenumber = models.CharField('Husnummer',max_length=5, blank=True)
     floor = models.CharField('Etage',max_length=3, blank=True)
     door = models.CharField('Dør',max_length=5, blank=True)
+    address_line2 = models.CharField('Adresselinje 2', max_length=200, help_text="Skriv CO-adresse her", blank=True)
     dawa_id = models.CharField('DAWA id', max_length=200, blank=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     placename = models.CharField('Stednavn',max_length=200, blank=True)

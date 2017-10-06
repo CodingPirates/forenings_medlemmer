@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import django_extensions.db.fields
+import django.db.models.fields
 
 
 class Migration(migrations.Migration):
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             name='ActivityInvite',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
-                ('unique', django_extensions.db.fields.UUIDField(blank=True, editable=False)),
+                ('unique', django.db.models.fields.UUIDField(blank=True, editable=False)),
                 ('activity', models.ForeignKey(to='members.Activity')),
             ],
             options={
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
             name='Family',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
-                ('unique', django_extensions.db.fields.UUIDField(blank=True, editable=False)),
+                ('unique', django.db.models.fields.UUIDField(blank=True, editable=False)),
                 ('email', models.EmailField(unique=True, max_length=254)),
             ],
             options={

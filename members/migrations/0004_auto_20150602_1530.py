@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import django_extensions.db.fields
+import django.db.models.fields
 import datetime
 import uuid
 from django.utils.timezone import utc
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='emailitem',
             name='bounce_token',
-            field=django_extensions.db.fields.UUIDField(editable=False, default=uuid.uuid4, blank=True),
+            field=django.db.models.fields.UUIDField(editable=False, default=uuid.uuid4, blank=True),
         ),
         migrations.AddField(
             model_name='notification',

@@ -1,6 +1,12 @@
-from django.conf.urls import patterns,  url
-from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
-    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView
+from django.conf.urls import include,  url
+from rest_framework.routers import DefaultRouter
+from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, \
+    EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
+    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView, PersonViewSet, FamilyViewSet
+
+router = DefaultRouter()
+router.register(r'persons', PersonViewSet)
+router.register(r'families', FamilyViewSet)
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
@@ -20,4 +26,7 @@ urlpatterns = [
     url(r'quickpay_callback$', QuickpayCallback, name='quickpay_callback'),
     url(r'waitinglist$', waitinglistView, name='waitinglist_view'),
     url(r'departments$', departmentView, name='department_view'),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^', include(router.urls)),
 ]
+

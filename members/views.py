@@ -26,6 +26,32 @@ from members.models.quickpaytransaction import QuickpayTransaction
 from members.models.union import Union
 from members.models.waitinglist import WaitingList
 
+#NEW REST ENDPOINTS
+from rest_framework import viewsets
+from members.serializers import PersonSerializer, FamilySerializer
+import rest_framework_filters as filters
+
+class PersonFilter(filters.FilterSet):
+    class Meta:
+        model = Person
+        fields = {
+            'name': ['exact', 'startswith'],
+            #'family': ['exact',]
+        }
+
+class PersonViewSet(viewsets.ModelViewSet):
+    #filter_class = PersonFilter
+    serializer_class = PersonSerializer
+    queryset = Person.objects.all()
+    #filter_fields= ('name',)
+    search_fields = ('name', 'streetname','zipcode','city')
+    ordering_fields = ('name', 'city')
+    ordering = ('name',)
+class FamilyViewSet(viewsets.ModelViewSet):
+    queryset = Family.objects.all()
+    serializer_class = FamilySerializer
+
+#END NEW REST ENDPOINTS
 
 def FamilyDetails(request, unique):
     try:
