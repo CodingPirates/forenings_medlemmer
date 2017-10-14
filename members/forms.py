@@ -66,7 +66,7 @@ class PersonForm(forms.ModelForm):
                            )
                      ),
             Submit('submit', 'Opret' if self.instance.id is None else 'Ret', css_class="btn-success"),
-            HTML("""<a class="btn btn-link" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>""")
+            HTML("""<a class="btn btn-link" href="{% url 'family_detail' %}">Fortryd</a>""")
         )
         self.helper.render_unmentioned_fields = False
         self.fields['birthday'].input_formats=(settings.DATE_INPUT_FORMATS)
@@ -260,7 +260,7 @@ class ActivitySignupForm(forms.Form):
             Fieldset('Betaling',
                 Field('payment_option', aria_describedby="paymentHelp"),
                 HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
-                FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' family.unique %}'>Tilbage</a>")),
+                FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>")),
             ),
             css_class="panel-body"),
             css_class="panel panel-success"),

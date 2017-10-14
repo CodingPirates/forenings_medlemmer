@@ -3,6 +3,7 @@ import uuid
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from members.forms import PersonForm
 from members.models.family import Family
@@ -10,14 +11,10 @@ from members.models.person import Person
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
 
-def PersonCreate(request, unique, membertype):
-    try:
-        if unique is not None:
-            unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
 
-    family = get_object_or_404(Family, unique=unique)
+@login_required
+def PersonCreate(request, membertype):
+    family = user_to_person(request.user).family
     if request.method == 'POST':
         person = Person()
         person.membertype = membertype

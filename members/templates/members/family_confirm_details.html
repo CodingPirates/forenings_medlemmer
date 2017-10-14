@@ -66,7 +66,7 @@
       <div>
         <form method="post">
           {% csrf_token %}
-          <button class="btn btn-success" type="submit" href="{% url 'confirm_details' family.unique %}">Bekræft detaljer</button> <a class="btn btn-link" class="btn btn-link"href="{% url 'family_detail' family.unique %}">Fortryd</a>
+          <button class="btn btn-success" type="submit" href="{% url 'confirm_details' %}">Bekræft detaljer</button> <a class="btn btn-link" class="btn btn-link"href="{% url 'family_detail' %}">Fortryd</a>
         </form>
       </div>
     </div>

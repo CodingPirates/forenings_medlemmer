@@ -830,7 +830,7 @@ class PersonAdmin(admin.ModelAdmin):
             }),
             ('Yderlige informationer', {
                 'classes': ('collapse', ),
-                'fields': ('membertype', 'birthday', 'has_certificate', 'added'),
+                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'user'),
             }),
         )
 

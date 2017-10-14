@@ -1,11 +1,11 @@
 import datetime
 import uuid
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 from members.forms import ActivitySignupForm
 from members.models.activity import Activity
@@ -16,14 +16,10 @@ from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
 
-def ActivitySignup(request, activity_id, unique=None, person_id=None):
-    try:
-        if unique is not None:
-            unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
-    if(unique is None or person_id is None):
+@login_required
+def ActivitySignup(request, activity_id, person_id=None):
+	# TODO: is should be possible to view an activity without loggin in
+    if(person_id is None):
         # View only mode
         view_only_mode = True
     else:
@@ -37,10 +33,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
     if(request.resolver_match.url_name == 'activity_view_person'):
         view_only_mode = True
 
-    if unique:
-        family = get_object_or_404(Family, unique=unique)
-    else:
-        family = None
+    family = user_to_person(request.user).family
 
     if person_id:
         try:
@@ -122,7 +115,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             participant.contact_visible = signup_form.cleaned_data['address_permission'] == "YES"
             participant.save()
 
-            return_link_url = reverse('activity_view_person', args=[family.unique, activity.id, person.id])
+            return_link_url = reverse('activity_view_person', args=[activity.id, person.id])
 
             # Make payment if activity costs
             if activity.price_in_dkk is not None and activity.price_in_dkk != 0:
@@ -139,7 +132,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                     )
                     payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('activity_view_person', args=[family.unique, activity.id, person.id]))
+                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('activity_view_person', args=[activity.id, person.id]))
 
 
             # expire invitation
