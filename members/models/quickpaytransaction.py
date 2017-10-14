@@ -72,7 +72,7 @@ class QuickpayTransaction(models.Model):
                 self.save()
             except:
                 # Something went wrong talking to quickpay - ask people to come back later
-                return reverse('payment_gateway_error_view', kwargs={'unique':self.payment.family.unique})
+                return reverse('payment_gateway_error_view')
 
         return self.link_url
 

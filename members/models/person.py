@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 from members.utils.address import format_address
 
 
@@ -55,6 +56,14 @@ class Person(models.Model):
     notes = models.TextField('Noter', blank=True, null=False, default ="")
     added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_DEFAULT,
+        blank=True,
+        null=True,
+        default=None
+    )
+
     def __str__(self):
         return self.name
 
