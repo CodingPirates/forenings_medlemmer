@@ -11,6 +11,11 @@
       {% bootstrap_javascript %}
   </head>
   <body>
+    {% block header %}
+      <header>
+        {% include "members/login_logout.html" %}
+      </header>
+    {% endblock %}
     {% block content %}{% endblock %}
     {% block footer %}
         <div class="container-fluid" style="padding-top: 20px">
