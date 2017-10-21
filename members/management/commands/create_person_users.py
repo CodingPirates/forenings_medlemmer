@@ -10,7 +10,7 @@ class Command(BaseCommand):
             if person.user:
                 continue # Person already has a user
 
-            if person.email and Person.objects.filter(email=person.email).count() > 1:
+            if person.email and Person.objects.filter(email=person.email, membertype__in=[Person.PARENT, Person.GUARDIAN]).count() > 1:
                 continue # Ignore people with duplicate email
 
             user = User.objects.create_user(
