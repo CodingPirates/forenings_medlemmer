@@ -2,6 +2,7 @@ from django.conf.urls import patterns,  url
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
     waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView
 from django.contrib.auth import views as auth_views
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
@@ -23,4 +24,18 @@ urlpatterns = [
     url(r'quickpay_callback$', QuickpayCallback, name='quickpay_callback'),
     url(r'waitinglist$', waitinglistView, name='waitinglist_view'),
     url(r'departments$', departmentView, name='department_view'),
+]
+
+# Redirect all old urls containing family unique values
+urlpatterns += [
+    url(r'family/[\w-]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/Person/[\d]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/Person/[A-Z]{2}$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/activity/[\d]+/person/[\d]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/activity/[\d]+/person/[\d]+/view/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/invitation_decline/[\d]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/waitinglist$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/payment_gateway_error$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'confirm_details/[\w-]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'waiting_list/[\w-]+/[\d]+/[\d]+/(subscribe|unsubscribe)/$', RedirectView.as_view(url='/family/', permanent=True)),
 ]
