@@ -1,22 +1,22 @@
-#Waitinglist (pr. region)
+--Waitinglist (pr. region)
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
   INNER JOIN members_waitinglist AS wl ON wl.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
   GROUP BY zr.region;
 
-#Waitinglist (Total)
+--Waitinglist (Total)
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
   INNER JOIN members_waitinglist AS wl ON wl.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
 
-# Medlemmer (pr. region)
+--Medlemmer (pr. region)
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
   JOIN members_payment AS pay ON pay.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
   WHERE pay.refunded_dtm IS NULL AND pay.amount_ore > 7500
   GROUP BY zr.region;
 
-# members pr. lokalforening 2016
+--members pr. lokalforening 2016
 SELECT u.name, COUNT(DISTINCT p.id) FROM members_person AS p
   JOIN members_payment AS pay ON pay.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
@@ -26,7 +26,7 @@ SELECT u.name, COUNT(DISTINCT p.id) FROM members_person AS p
   WHERE pay.refunded_dtm IS NULL AND pay.amount_ore > 7500 AND pay.added > date('2016-01-01')
   GROUP BY u.id;
 
-# members pr. afdeling 2016
+--members pr. afdeling 2016
 SELECT d.name, u.name, COUNT(DISTINCT p.id) FROM members_person AS p
   JOIN members_payment AS pay ON pay.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
@@ -36,40 +36,40 @@ SELECT d.name, u.name, COUNT(DISTINCT p.id) FROM members_person AS p
   WHERE pay.refunded_dtm IS NULL AND pay.amount_ore > 7500 AND pay.added > date('2016-01-01')
   GROUP BY d.id;
 
-# Medlemmer (pr. region) 2016
+--Medlemmer (pr. region) 2016
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
   JOIN members_payment AS pay ON pay.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
   WHERE pay.refunded_dtm IS NULL AND pay.amount_ore > 7500 AND pay.added > date('2016-01-01')
   GROUP BY zr.region;
 
-# Børn signup dato pr. region
+--Børn signup dato pr. region
 SELECT strftime('%Y-%W', p.added) as week, COUNT(DISTINCT p.id) FROM members_person AS p
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
   WHERE p.membertype='CH'
   GROUP BY week;
 
-# Indkomst (pr. region)
+--Indkomst (pr. region)
 SELECT zr.region, SUM(pay.amount_ore/100) FROM members_person AS p
   INNER JOIN members_payment AS pay ON pay.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
   WHERE pay.refunded_dtm IS NULL
   GROUP BY zr.region;
 
-# Activity age distribution
+--Activity age distribution
 SELECT p.birthday FROM members_person AS p
   JOIN members_member AS m ON m.person_id=p.id
   JOIN members_activityparticipant AS ap ON ap.member_id=m.id
   WHERE ap.activity_id=160;
 
-# Deltagerliste
+--Deltagerliste
 SELECT p.name, f.email, ap.note FROM members_activityparticipant AS ap
 JOIN members_member AS m ON ap.member_id=m.id
 JOIN members_person AS p ON p.id=m.person_id
 JOIN members_family AS f ON p.family_id=f.id
 WHERE ap.activity_id IS 160;
 
-# Aktivitets deltagere i en region
+--Aktivitets deltagere i en region
 SELECT DISTINCT f.email, p.name FROM members_person AS p
   JOIN members_member AS m ON m.person_id=p.id
   JOIN members_activityparticipant AS ap ON ap.member_id=m.id
@@ -79,7 +79,7 @@ SELECT DISTINCT f.email, p.name FROM members_person AS p
     WHERE zr.region IN ('DK01', 'DK02') AND a.end_date > '2017-02-21'
     AND f.dont_send_mails=0;;
 
-# venteliste børn i en region
+--venteliste børn i en region
 SELECT DISTINCT f.email, p.name FROM members_person AS p
   JOIN members_waitinglist AS w ON p.id=w.person_id 
   JOIN members_family AS f ON f.id=p.family_id
@@ -87,7 +87,7 @@ SELECT DISTINCT f.email, p.name FROM members_person AS p
     WHERE zr.region IN ('DK02')
     AND f.dont_send_mails=0;;
 
-# medlemmer i en forening
+--medlemmer i en forening
 SELECT DISTINCT f.email FROM members_person AS p
   JOIN members_member AS m ON m.person_id=p.id
   JOIN members_activityparticipant AS ap ON ap.member_id=m.id
@@ -101,7 +101,7 @@ SELECT DISTINCT f.email FROM members_person AS p
 
 (10, 11, 21, 27, 35, 39, 40, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 84)
 
-# Deltagere i bestemte afdelinger
+--Deltagere i bestemte afdelinger
 SELECT DISTINCT f.email FROM members_person AS p
   JOIN members_member AS m ON m.person_id=p.id
   JOIN members_activityparticipant AS ap ON ap.member_id=m.id
@@ -112,7 +112,7 @@ SELECT DISTINCT f.email FROM members_person AS p
     AND a.end_date > '2017-03-06'
     AND f.dont_send_mails=0;
 
-# Deltagere på venteliste i bestemte afdelinger
+--Deltagere på venteliste i bestemte afdelinger
 SELECT DISTINCT f.email FROM members_person AS p
   JOIN members_family AS f ON f.id=p.family_id
   JOIN members_waitinglist AS w ON p.id=w.person_id 
