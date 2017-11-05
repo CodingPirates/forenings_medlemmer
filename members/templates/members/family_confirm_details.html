@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
   <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -10,11 +10,11 @@
     <div class="container-fluid">
       <h1>Bekræft informationerne vi har om jer</h1>
       <div>
-        <p>Det er vigtigt at vi har korrekte kontakt informationer samt ved hvilke afdelelinger i ønsker at gå til klubaften i.</p>
-        <p>Bekræft nedenfor at data er korrekt og tryk på bekræft</p>
+        <p>Det er vigtigt, at vi har korrekte kontakt informationer samt ved hvilke afdelinger I ønsker at gå til klubaften i.</p>
+        <p>Bekræft nedenfor, at data er korrekt og tryk derefter på bekræft</p>
       </div>
       <div>
-      <h2>Flg. personer og adresser er registrerede:</h2>
+      <h2>Følgende personer og adresser er registrerede:</h2>
       {% for person in persons %}
         <div>
         <address>
@@ -46,7 +46,7 @@
       </div>
       <div>
       <h2>Børnene er opskrevet på venteliste:</h2>
-      <p>Opskrivningstidspunktet, er det tidspunkt barnet blev oprettet i systemet. Man kan forlade og genopskrive sig på ventelisterne uden at miste sin position.</p>
+      <p>Opskrivningstidspunktet, er det tidspunkt barnet blev oprettet i systemet. Man kan forlade og genopskrive sig på ventelisterne uden at miste sin placering.</p>
       {% regroup subscribed_waitinglists by person as ordered_waitinglist %}
         <ul>
           {% for barn in ordered_waitinglist %}
