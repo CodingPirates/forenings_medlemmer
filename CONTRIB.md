@@ -7,27 +7,27 @@ For at kunne køre medlemssystemet skal du have installeret python 3.4 eller sen
 
 De følgende kommandoer vil få dig hurtigt i gang og op at køre:
 ```
-> git clone git@github.com:CodingPirates/forenings_medlemmer.git
-> cd forenings_medlemmer
-> pip install virtualenv
+# git clone git@github.com:CodingPirates/forenings_medlemmer.git
+# cd forenings_medlemmer
+# pip install virtualenv
 
 For Linux-brugere: {
-	> virtualenv -p $(/usr/bin/env python3) virtualenv
-	> source virtualenv/bin/activate
+	# virtualenv -p $(/usr/bin/env python3) virtualenv
+	# source virtualenv/bin/activate
 }
 
 For Windows-brugere: {
-	> virtualenv virtualenv
-	> virtualenv/Scripts/activate
+	# virtualenv virtualenv
+	# virtualenv/Scripts/activate
 }
 
-> pip install -r requirements.txt
-> ./manage.py migrate
-> ./manage.py loaddata fixtures/templates.json
-> ./manage.py loaddata fixtures/unions.json
-> ./manage.py loaddata fixtures/departments.json
-> ./manage.py createsuperuser
-> ./manage.py runserver
+# pip install -r requirements.txt
+# ./manage.py migrate
+# ./manage.py loaddata fixtures/templates.json
+# ./manage.py loaddata fixtures/unions.json
+# ./manage.py loaddata fixtures/departments.json
+# ./manage.py createsuperuser
+# ./manage.py runserver
 ```
 
 Systemet er nu kørende og du kan tilgå admin interfacet gennem 
