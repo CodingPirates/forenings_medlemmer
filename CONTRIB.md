@@ -11,15 +11,13 @@ De følgende kommandoer vil få dig hurtigt i gang og op at køre:
 # cd forenings_medlemmer
 # pip install virtualenv
 
-For Linux-brugere: {
+Kun Linux-brugere:
 	# virtualenv -p $(/usr/bin/env python3) virtualenv
 	# source virtualenv/bin/activate
-}
 
-For Windows-brugere: {
+Kun Windows-brugere:
 	# virtualenv virtualenv
 	# virtualenv/Scripts/activate
-}
 
 # pip install -r requirements.txt
 # ./manage.py migrate
