@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="da">
   <head>
     {% load staticfiles %}
@@ -14,12 +14,12 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1 id="top">Venteliste i alle Coding Pirates afdelinger</h1>
+          <h1 id="top">Venteliste i alle Coding Pirates-afdelinger</h1>
 
           <p>Tryk på en afdeling for at springe til den</p>
 
           {% if unique %}
-            <p><a href="{% url 'family_detail' unique %}">Tilbage til familie oversigt</a></p>
+            <p><a href="{% url 'family_detail' unique %}">Tilbage til familieoversigt</a></p>
           {% else %}
             <p>Listerne er anonymiserede. Log ind på "min familie side" for at se dine børns navne på listerne.</p>
           {% endif %}
@@ -61,7 +61,7 @@
             {% endfor %}
             </table>
               {% else %}
-                  <p>Der er ingen opskrevet på venteliste til denne afdeling</p>
+                  <p>Der er ingen opskrevet på ventelisten til denne afdeling</p>
               {% endif %}
 
           {% endfor %}
