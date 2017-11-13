@@ -9,7 +9,7 @@ from django.http import HttpResponseBadRequest
 
 @login_required
 def waitinglistView(request):
-    unique = request.user.family.unique
+    unique = request.user.person.family.unique
     department_children_waiting = {'departments': {}}
     department_loop_counter=0
     #deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)

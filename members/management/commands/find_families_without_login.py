@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from members.models.person import Person
-from members.models.person import Family
+from members.models.family import Family
 from django.contrib.auth.models import User
 
 class Command(BaseCommand):
