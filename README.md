@@ -1,4 +1,4 @@
-# Coding Pirates medlems- og tilmeldingssystem
+# Coding Pirates' medlems- og tilmeldingssystem
 Medlemssystemet er designet til foreninger  der er organiseret efter DUF modellen. 
 Systemet understøtter lokalforeninger, afdelinger og en landsforeningen. 
 Det kan håndtere ventelister, invitationer, aktiviteter og betalinger. 
