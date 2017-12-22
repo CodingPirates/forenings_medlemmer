@@ -359,10 +359,14 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
             return queryset.filter(activity=self.value())
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
-    list_display = ['added_dtm', 'member', 'activity', 'note']
+    list_display = ['added_dtm', 'member', 'person_age_years', 'activity', 'note']
     list_filter = (ActivityParticipantListFilter,ParticipantPaymentListFilter)
     list_display_links = ('member',)
     search_fields = ('member__person__name', )
+
+    def person_age_years(self, item):
+        return item.member.person.age_years()
+    person_age_years.short_description = "Alder"
 
     # Only show participants to own departments
     def get_queryset(self, request):

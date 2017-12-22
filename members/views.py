@@ -261,6 +261,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
         signup_form = ActivitySignupForm()
 
+    union = activity.department.union
 
     context = {
                 'family' : family,
@@ -273,6 +274,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 'view_only_mode' : view_only_mode,
                 'participating' : participating,
                 'participants': participants,
+                'union' : union,
               }
     return render(request, 'members/activity_signup.html', context)
 
