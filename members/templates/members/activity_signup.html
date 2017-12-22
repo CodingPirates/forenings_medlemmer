@@ -77,6 +77,14 @@
           </p>
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <p>
+            <strong>Lokalforening:</strong><br>
+            {{ union.name }}
+          </p>
+        </div>
+      </div>
       {% if not view_only_mode %}
       <hr>
       {% crispy signupform %}

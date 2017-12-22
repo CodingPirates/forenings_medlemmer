@@ -22,7 +22,8 @@ class SendActivitySignupConfirmationsCronJob(CronJobBase):
             context = {
                 'activity' : announcement.activity,
                 'person' : announcement.member.person,
-                'family' : announcement.member.person.family
+                'family' : announcement.member.person.family,
+                'union' : announcement.activity.department.union,
             }
             emails = EmailTemplate.objects.get(idname='ACT_CONFIRM').makeEmail([announcement.member.person, announcement.member.person.family], context)
             for email in emails:
@@ -210,5 +211,3 @@ class GenerateStatisticsCronJob(CronJobBase):
 # TODO:Find families which are about to get deleted from the list and send warning
 
 # TODO:Find Members which are active, but have expired memberships
-
-
