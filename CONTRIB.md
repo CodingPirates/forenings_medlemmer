@@ -10,8 +10,15 @@ De følgende kommandoer vil få dig hurtigt i gang og op at køre:
 # git clone git@github.com:CodingPirates/forenings_medlemmer.git
 # cd forenings_medlemmer
 # pip install virtualenv
-# virtualenv -p $(/usr/bin/env python3) virtualenv
-# source virtualenv/bin/activate
+
+Kun Linux-brugere:
+	# virtualenv -p $(/usr/bin/env python3) virtualenv
+	# source virtualenv/bin/activate
+
+Kun Windows-brugere:
+	# virtualenv virtualenv
+	# virtualenv/Scripts/activate
+
 # pip install -r requirements.txt
 # ./manage.py migrate
 # ./manage.py loaddata fixtures/templates.json
@@ -20,6 +27,7 @@ De følgende kommandoer vil få dig hurtigt i gang og op at køre:
 # ./manage.py createsuperuser
 # ./manage.py runserver
 ```
+
 Systemet er nu kørende og du kan tilgå admin interfacet gennem 
 [localhost:8000/admin](http://localhost:8000/admin)
 
