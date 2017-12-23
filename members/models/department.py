@@ -81,8 +81,8 @@ class Department(models.Model):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
                     address = json.loads(requests.get(req).text)
-                    self.longtitude =  address['geometry']['coordinates'][0]
-                    self.latitude   =  address['geometry']['coordinates'][1]
+                    self.longtitude =  address['geometry']['coordinates'][1]
+                    self.latitude   =  address['geometry']['coordinates'][0]
                     self.save()
                     print("Opdateret for " + self.name)
                     print("Updated coordinates for " + self.name)
