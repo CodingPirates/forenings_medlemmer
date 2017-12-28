@@ -3,44 +3,29 @@ og fortæl os om det du vil udvikle på, det kan jo tænkes vi allerede er i gan
 
 
 ## Første gangs opsætning
-For at kunne køre medlemssystemet skal du have installeret python 3.4 eller senere og pip
+For at kunne køre medlemssystemet skal du have installeret docker
 
 De følgende kommandoer vil få dig hurtigt i gang og op at køre:
 ```
 # git clone git@github.com:CodingPirates/forenings_medlemmer.git
 # cd forenings_medlemmer
-# pip install virtualenv
-
-Kun Linux-brugere:
-	# virtualenv -p $(/usr/bin/env python3) virtualenv
-	# source virtualenv/bin/activate
-
-Kun Windows-brugere:
-	# virtualenv virtualenv
-	# virtualenv/Scripts/activate
-
-# pip install -r requirements.txt
-# ./manage.py migrate
-# ./manage.py loaddata members/fixtures/templates.json
-# ./manage.py loaddata members/fixtures/unions.json
-# ./manage.py loaddata members/fixtures/departments.json
-# ./manage.py createsuperuser
-# ./manage.py runserver
+# docker-compose run --rm backend environment/reset-db.sh
+# docker-compose up
 ```
 
 Systemet er nu kørende og du kan tilgå admin interfacet gennem 
 [localhost:8000/admin](http://localhost:8000/admin)
+med username=admin, password=admin.
 
 Hver gang du vil arbejde på systemet køres 
 ```
-# source virtualenv/bin/activate
-# ./manage.py runserver
+# docker-compose up
 ```
-Når du henter ændringer ned fra git skal du køre følgende kommando 
-for at sikre din database er up to date:
+Når du henter ændringer ned fra git skal du for at sikre din
+database er up to date restarte serveren.
 ```
-# source virtualenv/bin/activate
-# ./manage.py migrate
+# CTRL-c
+# docker-compose up
 ```
 
 
@@ -59,7 +44,7 @@ alternativ kan du køre flake8 fra kommandolinjen manuelt
   
 Du kan tjekke om dig koden bryder nogle test cases passere ved at køre
 ```
-# ./manage.py test
+# docker-compose run --rm backend ./manage.py test
 ```
 Hvis du har tilføjet ny funktionalitet må du meget gerne skrive unit tests af det
 
