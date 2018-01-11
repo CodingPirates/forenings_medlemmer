@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/lronhoj/forenings_medlemmer.svg?style=svg)](https://circleci.com/gh/lronhoj/forenings_medlemmer)
+[![CircleCI](https://circleci.com/gh/CodingPirates/forenings_medlemmer.svg?style=svg)](https://circleci.com/gh/CodingPirates/forenings_medlemmer)
 
 # Coding Pirates' medlems- og tilmeldingssystem
 Medlemssystemet er designet til foreninger  der er organiseret efter DUF modellen. 
