@@ -23,6 +23,17 @@ def FamilyDetails(request,unique):
     children = family.person_set.filter(membertype = Person.CHILD)
     ordered_persons = family.person_set.order_by('membertype').all()
 
+    open_activities_with_persons = []
+    # augment open invites with the persons who could join it in the family
+    for curActivity in open_activities:
+        applicablePersons = Person.objects.filter(family = family, # only members of this family
+                                                  birthday__lte=timezone.now()-datetime.timedelta(days=curActivity.min_age*365), # old enough
+                                                  birthday__gt=timezone.now()-datetime.timedelta(days=curActivity.max_age*365), # not too old
+                                                  ).exclude(member__activityparticipant__activity=curActivity) # not already participating
+
+        if len(applicablePersons):
+            open_activities_with_persons.append({'id': curActivity.id, 'name': curActivity.name, 'department': curActivity.department, 'persons' :applicablePersons})
+
     #update visited field
     family.last_visit_dtm = timezone.now()
     family.save()
@@ -49,7 +60,7 @@ def FamilyDetails(request,unique):
         'family': family,
         'invites': invites,
         'participating': participating,
-        'open_activities': open_activities,
+        'open_activities': open_activities_with_persons,
         'need_confirmation' : family.confirmed_dtm == None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
         'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 1,
         'department_children_waiting' : department_children_waiting,
