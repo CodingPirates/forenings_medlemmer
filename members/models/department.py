@@ -65,6 +65,7 @@ class Department(models.Model):
         myHTML +=  'Tidspunkt: ' + html.escape(self.open_hours)
         return myHTML
     def getLongLat(self):
+        # TODO: this needs to be put into a utility module for reuse - could also look up dawa-id.
         if (self.latitude is None or self.longtitude is None):
             addressID = 0
             dist = 0
@@ -81,8 +82,8 @@ class Department(models.Model):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
                     address = json.loads(requests.get(req).text)
-                    self.longtitude =  address['geometry']['coordinates'][1]
-                    self.latitude   =  address['geometry']['coordinates'][0]
+                    self.longtitude =  address['geometry']['coordinates'][0]
+                    self.latitude   =  address['geometry']['coordinates'][1]
                     self.save()
                     print("Opdateret for " + self.name)
                     print("Updated coordinates for " + self.name)
