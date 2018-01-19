@@ -15,15 +15,15 @@ class Command(BaseCommand):
             department = mainDepartment
             name = "Forenings medlemskab: %s" % (curUnion.name)
             open_hours = "-"
-            responsible_name = "Coding Pirates"
-            responsible_contact = "kontakt@codingpirates.dk"
-            placename = ""
-            zipcode = "5000"
-            city = "Odense"
-            streetname = "Seebladsgade"
-            housenumber = "1"
-            floor = ""
-            door = ""
+            #responsible_name = "Coding Pirates"
+            #responsible_contact = "kontakt@codingpirates.dk"
+            #placename = ""
+            #zipcode = "5000"
+            #city = "Odense"
+            #streetname = "Seebladsgade"
+            #housenumber = "1"
+            #floor = ""
+            #door = ""
             dawa_id = ""
 
             localDepartments = str.join(", ", Department.objects.filter(union=curUnion).values_list("name", flat=True))
@@ -55,15 +55,15 @@ class Command(BaseCommand):
             activity = Activity(department = department,
                                 name=name,
                                 open_hours = open_hours,
-                                responsible_name = responsible_name,
-                                responsible_contact = responsible_contact,
-                                placename = placename,
-                                zipcode = zipcode,
-                                city = city,
-                                streetname = streetname,
-                                housenumber = housenumber,
-                                floor = floor,
-                                door = door,
+                                responsible_name = curUnion.chairman,
+                                responsible_contact = curUnion.chairman_email,
+                                placename = curUnion.placename,
+                                zipcode = curUnion.zipcode,
+                                city = curUnion.city,
+                                streetname = curUnion.streetname,
+                                housenumber = curUnion.housenumber,
+                                floor = curUnion.floor,
+                                door = curUnion.door,
                                 dawa_id = dawa_id,
                                 description = description,
                                 instructions = instructions,

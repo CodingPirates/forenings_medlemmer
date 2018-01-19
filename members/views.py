@@ -31,7 +31,7 @@ def FamilyDetails(request,unique):
                                                   birthday__gt=timezone.now()-datetime.timedelta(days=curActivity.max_age*365), # not too old
                                                   ).exclude(member__activityparticipant__activity=curActivity) # not already participating
 
-        if len(applicablePersons):
+        if applicablePersons.exists():
             open_activities_with_persons.append({'id': curActivity.id, 'name': curActivity.name, 'department': curActivity.department, 'persons' :applicablePersons})
 
     #update visited field
