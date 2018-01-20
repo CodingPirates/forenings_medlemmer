@@ -105,7 +105,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             {'fields':('streetname', 'housenumber', 'floor', 'door', 'zipcode', 'city', 'placename')}),
 
         ('Længde og Breddegrad',
-            {'fields':('longtitude', 'latitude'),
+            {'fields':('longitude', 'latitude'),
             'description' : '<p>Hvis de ikke er sat opdateres de automatisk på et tidspunkt'}),
 
         ('Afdelingssiden',

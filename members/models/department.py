@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone, html
 import requests, json
 from urllib.parse import quote_plus
-
+from decimal import *
 
 class Department(models.Model):
     class Meta:
@@ -35,7 +35,7 @@ class Department(models.Model):
     isOpening  = models.BooleanField('Er afdelingen under opstart', default=False)
     website    = models.URLField('Hjemmeside', blank=True)
     union      = models.ForeignKey('Union', verbose_name="Lokalforening", blank=False, null=False)
-    longtitude = models.DecimalField("Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6)
+    longitude = models.DecimalField("Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6)
     latitude   = models.DecimalField("Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6)
     onMap      = models.BooleanField("Skal den være på kortet?", default=True)
 
@@ -64,9 +64,9 @@ class Department(models.Model):
         myHTML += 'E-mail: <a href="mailto:' +html.escape(self.responsible_contact) + '">'+ html.escape(self.responsible_contact) + '</a><br>'
         myHTML +=  'Tidspunkt: ' + html.escape(self.open_hours)
         return myHTML
-    def getLongLat(self):
+    def getLatLon(self):
         # TODO: this needs to be put into a utility module for reuse - could also look up dawa-id.
-        if (self.latitude is None or self.longtitude is None):
+        if (self.latitude is None or self.longitude is None):
             addressID = 0
             dist = 0
             req = 'https://dawa.aws.dk/datavask/adresser?betegnelse='
@@ -82,17 +82,20 @@ class Department(models.Model):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
                     address = json.loads(requests.get(req).text)
-                    self.longtitude =  address['geometry']['coordinates'][0]
-                    self.latitude   =  address['geometry']['coordinates'][1]
+                    self.longitude =  address['geometry']['coordinates'][0]
+                    self.latitude = address['geometry']['coordinates'][1]
                     self.save()
                     print("Opdateret for " + self.name)
                     print("Updated coordinates for " + self.name)
-                    return(self.latitude, self.longtitude)
                 except Exception as error:
                     print("Couldn't find coordinates for " + self.name)
                     print("Error " +  str(error))
+                    return None
+
+        if(type(self.latitude) is Decimal and type(self.longitude) is Decimal):
+            return(self.latitude, self.longitude)
         else:
-            return(self.longtitude, self.latitude)
+            return None
 
     def new_volunteer_email(self,volunteer_name):
         # First fetch department leaders email

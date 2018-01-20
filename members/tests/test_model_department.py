@@ -34,10 +34,10 @@ class TestModelDepartment(TestCase):
         # Implements the Haversine formula
         # Ref: https://stackoverflow.com/a/19412565/1689680
         R = 6373.0
-        lat1 = math.radians(coord1[1])
-        lon1 = math.radians(coord1[0])
-        lat2 = math.radians(coord2[1])
-        lon2 = math.radians(coord2[0])
+        lat1 = math.radians(coord1[0])
+        lon1 = math.radians(coord1[1])
+        lat2 = math.radians(coord2[0])
+        lon2 = math.radians(coord2[1])
         dlon = lon2 - lon1
         dlat = lat2 - lat1
         a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
@@ -47,7 +47,7 @@ class TestModelDepartment(TestCase):
     def test_get_long_lat(self):
         self.assertLess(
             self.util_calc_distance(
-                self.department.getLongLat(),
+                self.department.getLatLon(),
                 (55.67680271, 12.57994743)
             ),
             1.0  # Calculated distance from the returned value and the expected value can be no more than 1 km
