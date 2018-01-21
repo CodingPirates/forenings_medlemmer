@@ -92,7 +92,7 @@ class Department(models.Model):
                     print("Error " +  str(error))
                     return None
 
-        if(type(self.latitude) is Decimal and type(self.longitude) is Decimal):
+        if(self.latitude is not None and self.longitude is not None):
             return(self.latitude, self.longitude)
         else:
             return None
