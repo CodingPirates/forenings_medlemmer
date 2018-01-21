@@ -39,7 +39,7 @@ Pull request er altid velkommen, følgende krav skal dog opfyldes.
 Mange editors kan sætte op til at informere dig om formatering problemer, 
 alternativ kan du køre flake8 fra kommandolinjen manuelt
 ```
-# flake8
+# docker-compose run --rm backend flake8
 ```
   
 Du kan tjekke om dig koden bryder nogle test cases passere ved at køre
