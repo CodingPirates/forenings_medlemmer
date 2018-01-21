@@ -54,3 +54,13 @@ Hvis du har tilføjet ny funktionalitet må du meget gerne skrive unit tests af 
 
 ## Debugging via PyCharm
 Se https://www.jetbrains.com/help/pycharm/using-docker-compose-as-a-remote-interpreter.html
+
+Først skal der oprettes forbindelse til en docker server.
+![Docker server config](./doc_assets/docker_server.png)
+
+Derefter skal der oprettes en python interpreter, som kører via vores docker-compose spec.
+![Interpreter config](./doc_assets/interpreter.png)
+
+Sidst skal der laves en run configuration som benytter den nyoprettede interpreter.
+Bemærk at host skal sættes til `0.0.0.0`.
+![Run config](./doc_assets/run_conf.png)
