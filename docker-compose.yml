@@ -1,0 +1,12 @@
+version: "3.1"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: environment/Dockerfile.dev
+    volumes:
+      - .:/usr/app
+    ports:
+      - 8000:8000
+      - 35729:35729
