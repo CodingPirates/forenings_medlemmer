@@ -52,3 +52,5 @@ Du kan tjekke om dig koden bryder nogle test cases passere ved at køre
 ```
 Hvis du har tilføjet ny funktionalitet må du meget gerne skrive unit tests af det
 
+## Debugging via PyCharm
+Se https://www.jetbrains.com/help/pycharm/using-docker-compose-as-a-remote-interpreter.html
