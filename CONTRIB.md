@@ -27,7 +27,11 @@ database er up to date restarte serveren.
 # CTRL-c
 # docker-compose up
 ```
-
+Hvis requirements.txt er ændret, eller python version opdateret eller
+lign. Kan det være docker image skal bygges igen. Det gøres med
+```
+# docker-compose build
+```
 
 ## Pull requests
 Pull request er altid velkommen, følgende krav skal dog opfyldes. 
