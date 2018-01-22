@@ -35,6 +35,7 @@ jobs:
             pip install -r requirements.txt
             pip install flake8
             pip install unittest-xml-reporting
+            pip install coverage
 
       - save_cache:
           paths:
@@ -47,8 +48,9 @@ jobs:
           command: |
             mkdir -p test-reports/tests
             . venv/bin/activate
-            DJANGO_SETTINGS_MODULE="forenings_medlemmer.settings_test" python manage.py test --no-input
-            flake8 --exclude=.git,__pycache__,virtualenv,venv,members/migrations --output-file=test-reports/flake8 .
+            DJANGO_SETTINGS_MODULE="forenings_medlemmer.settings_test" coverage run manage.py test --no-input || true
+            coverage report
+            flake8 --output-file=test-reports/flake8 . || true
 
       - store_artifacts:
           path: test-reports
