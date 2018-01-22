@@ -34,6 +34,7 @@ jobs:
             . venv/bin/activate
             pip install -r requirements.txt
             pip install flake8
+            pip install unittest-xml-reporting
 
       - save_cache:
           paths:
@@ -44,12 +45,14 @@ jobs:
       - run:
           name: run tests
           command: |
-            mkdir -p test-reports
+            mkdir -p test-reports/tests
             . venv/bin/activate
-            python manage.py test
-            flake8 --exclude=.git,__pycache__,virtualenv,venv --output-file=test-reports/flake8 .
+            DJANGO_SETTINGS_MODULE="forenings_medlemmer.settings_test" python manage.py test --no-input
+            flake8 --exclude=.git,__pycache__,virtualenv,venv,members/migrations --output-file=test-reports/flake8 .
 
       - store_artifacts:
           path: test-reports
           destination: test-reports
-          
+
+      - store_test_results:
+          path: test-reports
