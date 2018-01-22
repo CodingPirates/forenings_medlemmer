@@ -3,7 +3,9 @@ og fortæl os om det du vil udvikle på, det kan jo tænkes vi allerede er i gan
 
 
 ## Første gangs opsætning
-For at kunne køre medlemssystemet skal du have installeret docker
+For at kunne køre medlemssystemet skal du have installeret docker. Hvis du bruger
+Docker for Windows vil du opleve at django ikke fanger fil ændringer når du udvikler.
+Der er lavet et tool til at omgå det indtil LCOW er i windows (Linux Containers On Windows). http://blog.subjectify.us/miscellaneous/2017/04/24/docker-for-windows-watch-bindings.html
 
 De følgende kommandoer vil få dig hurtigt i gang og op at køre:
 ```
