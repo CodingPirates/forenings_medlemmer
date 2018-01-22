@@ -41,20 +41,34 @@ jobs:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-        
+
+      - run:
+          name: flake8 linting
+          command: |
+            . venv/bin/activate
+            mkdir -p target/lint
+            flake8 --output-file=target/lint/flake8 .
+          when: always
+
       # run tests!
       - run:
           name: run tests
           command: |
-            mkdir -p test-reports/tests
             . venv/bin/activate
-            DJANGO_SETTINGS_MODULE="forenings_medlemmer.settings_test" coverage run manage.py test --no-input || true
-            coverage report
-            flake8 --output-file=test-reports/flake8 . || true
+            mkdir -p target/test-reports
+            DJANGO_SETTINGS_MODULE="forenings_medlemmer.settings_test" coverage run manage.py test --no-input
+          when: always
+
+      - run:
+          name: coverage report
+          command: |
+            . venv/bin/activate
+            coverage html
+          when: always
 
       - store_artifacts:
-          path: test-reports
-          destination: test-reports
+          path: target
+          destination: artifacts
 
       - store_test_results:
-          path: test-reports
+          path: target/test-reports

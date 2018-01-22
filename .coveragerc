@@ -1,6 +1,13 @@
 [run]
 branch = True
 source = .
+omit =
+    venv/*
+    members/migrations/*
+    members/tests/*
 
 [xml]
-output = test-reports/coverage/coverage.xml
+output = target/coverage/coverage.xml
+
+[html]
+directory = target/coverage
