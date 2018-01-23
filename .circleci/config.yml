@@ -1,74 +1,105 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
 version: 2
 jobs:
   build:
+    working_directory: /usr/app
     docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.6.1
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+      - image: docker:stable-git
     steps:
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
+      - setup_remote_docker
       - run:
-          name: install dependencies
+          name: Build application Docker image
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-            pip install flake8
-            pip install unittest-xml-reporting
-            pip install coverage
-
-      - save_cache:
+            docker build --file environment/Dockerfile -t codingpirates/forenings-medlemmer .
+      - run:
+          name: Save docker image
+          command: |
+            mkdir -p /tmp
+            docker save -o /tmp/images.tar codingpirates/forenings-medlemmer
+      - run:
+          name: Save docker-compose file
+          command: |
+            cp docker-compose.test.yml /tmp/
+      - persist_to_workspace:
+          root: /tmp
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-
+            - images.tar
+            - docker-compose.test.yml
+  test:
+    working_directory: /usr/app
+    docker:
+      - image: docker:stable-git
+    steps:
+      - setup_remote_docker
       - run:
-          name: flake8 linting
+          name: Install dependencies
           command: |
-            . venv/bin/activate
-            mkdir -p target/lint
-            flake8 --output-file=target/lint/flake8 .
-          when: always
-
-      # run tests!
+            apk add --no-cache py-pip
+            pip install docker-compose
+      - attach_workspace:
+          at: /tmp
       - run:
-          name: run tests
+          name: Load docker image
           command: |
-            . venv/bin/activate
-            mkdir -p target/test-reports
-            DJANGO_SETTINGS_MODULE="forenings_medlemmer.settings_test" coverage run manage.py test --no-input
-          when: always
-
+            docker load -i /tmp/images.tar
       - run:
-          name: coverage report
+          name: Setup test environment
           command: |
-            . venv/bin/activate
+            cp /tmp/docker-compose.test.yml .
+            docker-compose -f ./docker-compose.test.yml up -d
+      - run:
+          name: Install test packages
+          command: |
+            docker exec forenings_medlemmer pip install flake8 unittest-xml-reporting coverage
+      - run:
+          name: Run tests
+          command: |
+            docker exec forenings_medlemmer mkdir -p target/test-reports
+            docker exec forenings_medlemmer bash -c 'DJANGO_SETTINGS_MODULE="forenings_medlemmer.settings_test" coverage run manage.py test --no-input'
+      - run:
+          name: Create coverage report
+          command: |
             coverage html
+      - run:
+          name: Run flake8 linting
+          command: |
+            docker exec forenings_medlemmer mkdir -p target/lint
+            docker exec forenings_medlemmer flake8 --output-file=target/lint/flake8 .
           when: always
-
+      - run:
+          name: Tear down test environment
+          command: |
+            docker cp forenings_medlemmer:/usr/app/target .
+            docker-compose -f ./docker-compose.test.yml down
+          when: always
       - store_artifacts:
           path: target
           destination: artifacts
-
       - store_test_results:
           path: target/test-reports
+
+workflows:
+  version: 2
+  on_commit:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+
+
+
+#  deploy:
+#    working_directory: /usr/app
+#    docker:
+#      - image: docker:stable-git
+#    steps:
+
+#      - deploy:
+#          name: Push application Docker image
+#          command: |
+#            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+#              docker tag app "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
+#              docker push "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
+#            fi
+
