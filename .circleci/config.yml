@@ -59,7 +59,7 @@ jobs:
       - run:
           name: Create coverage report
           command: |
-            coverage html
+            docker exec forenings_medlemmer coverage html
       - run:
           name: Run flake8 linting
           command: |
