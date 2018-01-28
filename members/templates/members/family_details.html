@@ -139,15 +139,17 @@
                 </thead>
                 <tbody>
 
-                  {% for child in children %}
-                    {% for activity in open_activities %}
+                  {% for activity in open_activities %}
                       <tr>
-                        <td>{{child.name}}</td>
-                        <td><a href="{%url 'activity_signup' family.unique activity.id child.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
-                        <td><a class="btn btn-success" href="{%url 'activity_signup' family.unique activity.id child.id %}">Tilmeld aktivitet</a></td>
+                        <td> - </td>
+                        <td><a href="{%url 'activity_view_family' family.unique activity.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
+                          <td>
+                          {% for person in activity.persons %}
+                            <a class="btn btn-success" href="{%url 'activity_signup' family.unique activity.id person.id %}">Tilmeld {{ person.name }}</a>
+                          {% endfor %}
+                          </td>
                         <td></td>
                       </tr>
-                    {% endfor %}
                   {% endfor %}
 
                   {% for invite in invites %}
