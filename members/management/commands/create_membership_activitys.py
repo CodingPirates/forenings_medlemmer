@@ -37,7 +37,7 @@ Flg. lokalafdelinger hører under %s:
 """ % (curUnion.name, curUnion.name, curUnion.name, localDepartments)
             instructions = ""
             start_date = datetime.date(year=2018, month=1, day=1)
-            end_date = datetime.date(year=2018, month=12, day=1)
+            end_date = datetime.date(year=2018, month=12, day=31)
             signup_closing = datetime.date(year=2018, month=4, day=30)
             open_invite = True
             price_in_dkk = 75
