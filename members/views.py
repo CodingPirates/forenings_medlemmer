@@ -510,7 +510,7 @@ def volunteerSignup(request):
                         department = department
                     )
                     vol_obj.save()
-                    department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
+                    #department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                     #redirect to success
                     return HttpResponseRedirect(reverse('login_email_sent'))
