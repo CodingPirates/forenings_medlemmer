@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
-from members.models import Person, Union,  Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment
+from members.models import Person, Union,  Family, ActivityInvite, ActivityParticipant, Member, Activity, EmailTemplate, Department, WaitingList, QuickpayTransaction, Payment, Volunteer
 from members.forms import PersonForm, getLoginForm, signupForm, ActivitySignupForm, ActivivtyInviteDeclineForm, vol_signupForm
 from django.utils import timezone
 from django.conf import settings
@@ -481,7 +481,8 @@ def volunteerSignup(request):
                     family.save()
 
                     #create volunteer
-                    volunteer = Person.objects.create(membertype = Person.PARENT,
+                    volunteer = Person.objects.create(
+                        membertype = Person.PARENT,
                         name = vol_signup.cleaned_data['volunteer_name'],
                         zipcode = vol_signup.cleaned_data['zipcode'],
                         city = vol_signup.cleaned_data['city'],
@@ -503,7 +504,11 @@ def volunteerSignup(request):
                     family.send_link_email()
 
                     # send email to department leader
-                    #department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
+                    department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
+                    vol_obj = Volunteer.objects.create(
+                        person = volunteer,
+                        department = department
+                    )
                     #department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                     #redirect to success
