@@ -503,8 +503,8 @@ def volunteerSignup(request):
                     family.send_link_email()
 
                     # send email to department leader
-                    department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
-                    department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
+                    #department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
+                    #department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                     #redirect to success
                     return HttpResponseRedirect(reverse('login_email_sent'))
