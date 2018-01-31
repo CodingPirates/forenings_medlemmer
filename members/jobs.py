@@ -56,14 +56,15 @@ class RequestConfirmationCronJob(CronJobBase):
         # Exclude the families which has already received a notification after they updated last.
         # (to avoid sending again)
         outdated_dtm = timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
-        unconfirmed_families = Family.objects.filter(Q(confirmed_dtm__lt=outdated_dtm) | Q(confirmed_dtm=None)).exclude(Q(notification__update_info_dtm__gt=F('confirmed_dtm')) | Q(~Q(notification__update_info_dtm=None), confirmed_dtm=None))
+        unconfirmed_families = Family.objects.filter(Q(confirmed_dtm__lt=outdated_dtm) | Q(confirmed_dtm=None)).exclude(Q(notification__update_info_dtm__gt=F('confirmed_dtm')) | Q(~Q(notification__update_info_dtm=None), confirmed_dtm=None))[:10]
 
         # send notification to all families asking them to update
         # their family details
         for family in unconfirmed_families:
-            email = EmailTemplate.objects.get(idname='UPDATE_DATA').makeEmail(family, {})[0]
-            notification = Notification(family=family, email=email, update_info_dtm=timezone.now())
-            notification.save()
+            emails = EmailTemplate.objects.get(idname='UPDATE_DATA').makeEmail(family, {})
+            for email in emails:
+                notification = Notification(family=family, email=email, update_info_dtm=timezone.now())
+                notification.save()
 
 # Poll payments which did not recieve callback
 class PollQuickpayPaymentsCronJob(CronJobBase):
