@@ -139,7 +139,9 @@ if DEBUG:
 
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",
-    'members.jobs.RequestConfirmationCronJob',
+    # job disabled due to upcomming change to login, which will
+    # require everyone to access the site anyway
+    #   'members.jobs.RequestConfirmationCronJob',
     'members.jobs.SendActivitySignupConfirmationsCronJob',
     'members.jobs.PollQuickpayPaymentsCronJob',
     'members.jobs.GenerateStatisticsCronJob'
