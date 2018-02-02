@@ -96,8 +96,8 @@ class getLoginForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden('form_id', 'getlogin',  id="id_form_id"),
-            Field('email', placeholder="din@email.dk (den e-mail adresse, du oprindeligt skrev dig op med.)"),
-            Submit('submit','Send',css_class='btn btn-primary'))
+            Div(Field('email', placeholder="din@email.dk (den e-mail adresse, du oprindeligt skrev dig op med.)", css_class="inputFieldSpecial"), css_class="inputField lastField"),
+            Submit('submit','Send',css_class='btn btn-primary submitButton'))
 
     email = forms.EmailField(required=True, label="Email", error_messages={'required': 'Indtast din email adresse først', 'invalid' : 'Ikke en gyldig email adresse!'})
 
@@ -113,38 +113,45 @@ class signupForm(forms.Form):
             Hidden('form_id', 'signup',  id="id_form_id"),
             Fieldset('Barnets oplysninger',
                         Div(
-                             Div(Field('child_gender'), css_class="col-md-2"),
-                             Div(Field('child_name'), css_class="col-md-10"),
-                             Div(Field('child_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
-                             Div(Field('child_email'), css_class="col-md-4"),
-                             Div(Field('child_phone'), css_class="col-md-4"),
+                             Div(Field('child_gender'), css_class="col-md-2 inputField"),
+                             Div(Field('child_name'), css_class="col-md-10 inputField"),
+                             Div(Field('child_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4 inputField"),
+                             Div(Field('child_email'), css_class="col-md-4 inputField"),
+                             Div(Field('child_phone'), css_class="col-md-4 inputField"),
                              css_class="row"
-                           )
+                           ),
+                        css_class="fields"
                     ),
             Fieldset('Forældres oplysninger',
                         Div(
-                            Div(Field('parent_name'), css_class="col-md-12"),
-                            Div(Field('parent_email'), css_class="col-md-6"),
-                            Div(Field('parent_phone'), css_class="col-md-6"),
+                            Div(Field('parent_name'), css_class="col-md-12 inputField"),
+                            Div(Field('parent_email'), css_class="col-md-6 inputField"),
+                            Div(Field('parent_phone'), css_class="col-md-6 inputField"),
                             css_class="row"
-                           )
+                           ),
+                        css_class="fields"
                      ),
             Fieldset('Adresse oplysninger',
                         Div(
-                            Div(Field('search_address', id="search-address"), css_class="col-md-10"),
-                            Div(Field('manual_entry', id="manual-entry"), css_class="col-md-2"),
-                            Div(Field('streetname', readonly=True, css_class="autofilled-address"), css_class="col-md-9"),
-                            Div(Field('housenumber', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                            Div(Field('floor', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                            Div(Field('door', readonly=True, css_class="autofilled-address"), css_class="col-md-1"),
-                            Div(Field('zipcode', readonly=True, css_class="autofilled-address"), css_class="col-md-2"),
-                            Div(Field('city', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
-                            Div(Field('placename', readonly=True, css_class="autofilled-address"), css_class="col-md-5"),
+                            Div(Field('search_address', id="search-address"), css_class="col-md-10 inputField"),
+                            #Div(Field('manual_entry', id="manual-entry"), css_class="col-md-2 inputField mobileOnly checkbox"),
+                            Div(Field('manual_entry', id="manual-entry", onclick="showInputFields('manualAdressLayoutId')"), css_class="col-md-2 inputField checkbox lastField"), 
+                            Div(
+                                Div(Field('streetname', readonly=True, css_class="autofilled-address inputField"), css_class="col-md-9 inputField"),
+                                Div(Field('housenumber', readonly=True, css_class="autofilled-address inputField"), css_class="col-md-1 inputField"),
+                                Div(Field('floor', readonly=True, css_class="autofilled-address inputField"), css_class="col-md-1 inputField"),
+                                Div(Field('door', readonly=True, css_class="autofilled-address inputField"), css_class="col-md-1 inputField"),
+                                Div(Field('zipcode', readonly=True, css_class="autofilled-address inputField"), css_class="col-md-2 inputField"),
+                                Div(Field('city', readonly=True, css_class="autofilled-address inputField"), css_class="col-md-5 inputField"),
+                                Div(Field('placename', readonly=True, css_class="autofilled-address inputField"), css_class="col-md-5 inputField")
+                            , css_class="pcOnly", id="manualAdressLayoutId"),
                             Hidden('dawa_id', '',  id="id_dawa_id"),
                             css_class="row"
-                           )
+                           ),
+                        css_class="fields"
                      ),
-            Submit('submit', 'Opret', css_class="btn-success")
+
+            Submit('submit', 'Opret', css_class="btn-success submitButton")
 
         )
 
