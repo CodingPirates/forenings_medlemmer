@@ -1,0 +1,81 @@
+@media only screen 
+and (max-device-width: 600px) {
+
+.sectionTitle {
+    font-size: 4.4vh;
+}
+.sectionDescription {
+    font-size: 2.3vh;
+}
+
+.inputField, -inputField > div > label {
+    font-size: 2.2vh;
+}
+    .inputField > div > .controls > *, .inputFieldSpecial, .submitButton {
+        font-size: 2.5vh;
+        padding: 0.2em 0.4em;
+        height: 2.4em;
+    }
+
+.fields > legend {
+    font-size: 4vh;
+}
+
+.ui-menu-item {
+    font-size: 3vh;
+}
+
+.checkbox {
+    margin: 1em 0 1.5em 0;
+}
+    .checkbox > label {
+        padding-left: 2em;
+    }
+        .checkbox > label > input {
+            height: 1.5em;
+            width: 1.5em;
+            margin-left: -2em !important;
+        }
+
+.btn {
+    border-radius: 0.4em;
+}
+
+.lastField {
+    margin-bottom: 1em;
+}
+
+.pcOnly {
+    display: none;
+}
+
+}
+
+@media only screen and (min-device-width: 600px) {
+
+    .sectionTitle {
+        font-size: 4.4vh;
+    }
+
+    .sectionDescription {
+        font-size: 2.3vh;
+    }
+
+    .inputField, -inputField > div > label {
+        font-size: 1.4vh;
+    }
+
+        .inputField > div > .controls > *, .inputFieldSpecial, .submitButton {
+            font-size: 1.5vh;
+            padding: 0.2em 0.4em;
+            height: 2.4em;
+        }
+
+    .fields > legend {
+        font-size: 3vh;
+    }
+
+    .mobileOnly {
+        display: none;
+    }
+}
