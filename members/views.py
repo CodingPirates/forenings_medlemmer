@@ -25,6 +25,7 @@ from members.models.person import Person
 from members.models.quickpaytransaction import QuickpayTransaction
 from members.models.union import Union
 from members.models.waitinglist import WaitingList
+from members.models.volunteer import Volunteer
 
 
 def FamilyDetails(request, unique):
@@ -41,6 +42,17 @@ def FamilyDetails(request, unique):
     waiting_lists = WaitingList.objects.filter(person__family = family)
     children = family.person_set.filter(membertype = Person.CHILD)
     ordered_persons = family.person_set.order_by('membertype').all()
+
+    open_activities_with_persons = []
+    # augment open invites with the persons who could join it in the family
+    for curActivity in open_activities:
+        applicablePersons = Person.objects.filter(family = family, # only members of this family
+                                                  birthday__lte=timezone.now()-datetime.timedelta(days=curActivity.min_age*365), # old enough
+                                                  birthday__gt=timezone.now()-datetime.timedelta(days=curActivity.max_age*365), # not too old
+                                                  ).exclude(member__activityparticipant__activity=curActivity) # not already participating
+
+        if applicablePersons.exists():
+            open_activities_with_persons.append({'id': curActivity.id, 'name': curActivity.name, 'department': curActivity.department, 'persons' :applicablePersons})
 
     #update visited field
     family.last_visit_dtm = timezone.now()
@@ -68,7 +80,7 @@ def FamilyDetails(request, unique):
         'family': family,
         'invites': invites,
         'participating': participating,
-        'open_activities': open_activities,
+        'open_activities': open_activities_with_persons,
         'need_confirmation' : family.confirmed_dtm is None or family.confirmed_dtm < timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD),
         'request_parents' : family.person_set.exclude(membertype=Person.CHILD).count() < 1,
         'department_children_waiting' : department_children_waiting,
@@ -301,6 +313,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
 
         signup_form = ActivitySignupForm()
 
+    union = activity.department.union
 
     context = {
                 'family' : family,
@@ -313,6 +326,7 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
                 'view_only_mode' : view_only_mode,
                 'participating' : participating,
                 'participants': participants,
+                'union' : union,
               }
     return render(request, 'members/activity_signup.html', context)
 
@@ -519,7 +533,8 @@ def volunteerSignup(request):
                     family.save()
 
                     #create volunteer
-                    volunteer = Person.objects.create(membertype = Person.PARENT,
+                    volunteer = Person.objects.create(
+                        membertype = Person.PARENT,
                         name = vol_signup.cleaned_data['volunteer_name'],
                         zipcode = vol_signup.cleaned_data['zipcode'],
                         city = vol_signup.cleaned_data['city'],
@@ -542,7 +557,12 @@ def volunteerSignup(request):
 
                     # send email to department leader
                     department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
-                    department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
+                    vol_obj = Volunteer.objects.create(
+                        person = volunteer,
+                        department = department
+                    )
+                    vol_obj.save()
+                    #department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                     #redirect to success
                     return HttpResponseRedirect(reverse('login_email_sent'))
