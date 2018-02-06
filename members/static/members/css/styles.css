@@ -1,56 +1,85 @@
-@media only screen 
-and (max-device-width: 600px) {
+@media only screen and (max-device-width: 600px) {
 
-.sectionTitle {
-    font-size: 4.4vh;
-}
-.sectionDescription {
-    font-size: 2.3vh !important;
-}
-
-.inputField, -inputField > div > label {
-    font-size: 2.2vh;
-}
-    .inputField > div > .controls > *, .inputFieldSpecial, .submitButton {
-        font-size: 2.5vh;
-        padding: 0.2em 0.4em;
-        height: 2.4em;
+    body {
+        margin: 0 1vw;
     }
 
-.fields > legend {
-    font-size: 4vh;
-}
-
-.ui-menu-item {
-    font-size: 3vh;
-}
-
-.checkbox {
-    margin: 1em 0 1.5em 0;
-}
-    .checkbox > label {
-        padding-left: 2em;
+    th, td {
+        font-size: 1.5vh;
+        border-left: 0.2vw dashed;
     }
-        .checkbox > label > input {
-            height: 1.5em;
-            width: 1.5em;
-            margin-left: -2em !important;
+
+        th:nth-child(1), td:nth-child(1) {
+            border-left: none;
         }
 
-.btn {
-    border-radius: 0.4em;
+    .sectionTitle {
+        font-size: 4.4vh;
+    }
+
+    .sectionDescription, .sectionDescriptionSmall {
+        font-size: 2.8vh;
+    }
+
+    .inputField, -inputField > div > label {
+        font-size: 2.2vh;
+    }
+
+    blockquote {
+        border-left-width: 3vw;
+    }
+
+        .inputField > div > .controls > *, .inputFieldSpecial, .submitButton, .button {
+            font-size: 2.5vh;
+            padding: 0.2em 0.4em;
+            height: 2.4em;
+        }
+
+    .button {
+        margin: 1em 0;
+        font-size: 3.4vh;
+    }
+
+    .modal-dialog {
+        width: 90vw;
+        margin: 5vw 5vw;
+    }
+
+    .fields > legend {
+        font-size: 4vh;
+    }
+
+    .ui-menu-item {
+        font-size: 3vh;
+    }
+
+    .checkbox {
+        margin: 1em 0 1.5em 0;
+    }
+
+        .checkbox > label {
+            padding-left: 2em;
+        }
+
+            .checkbox > label > input {
+                height: 1.5em;
+                width: 1.5em;
+                margin-left: -2em !important;
+            }
+
+    .btn {
+        border-radius: 0.4em;
+    }
+
+    .lastField {
+        margin-bottom: 1em;
+    }
+
+    .pcOnly {
+        display: none;
+    }
 }
 
-.lastField {
-    margin-bottom: 1em;
-}
-
-.pcOnly {
-    display: none;
-}
-
-}
-/*
 @media only screen and (min-device-width: 600px) and (max-device-width: 1200px) {
 
     .sectionTitle {
@@ -58,15 +87,19 @@ and (max-device-width: 600px) {
     }
 
     .sectionDescription {
-        font-size: 2.3vh;
+        font-size: 2.5vh !important;
+    }
+
+    .sectionDescriptionSmall {
+        font-size: 1.5vh;
     }
 
     .inputField, -inputField > div > label {
-        font-size: 1.4vh;
+        font-size: 2.3vh;
     }
 
-        .inputField > div > .controls > *, .inputFieldSpecial, .submitButton {
-            font-size: 1.5vh;
+        .inputField > div > .controls > *, .inputFieldSpecial, .submitButton, .button {
+            font-size: 2.5vh;
             padding: 0.2em 0.4em;
             height: 2.4em;
         }
@@ -78,24 +111,28 @@ and (max-device-width: 600px) {
     .mobileOnly {
         display: none;
     }
-}*/
+}
 
-@media only screen and (min-device-width: 600px) {
+@media only screen and (min-device-width: 1200px) {
 
     .sectionTitle {
-        font-size: 4.4vh;
+        font-size: 4vh;
     }
 
     .sectionDescription {
-        font-size: 2.5vh !important;
+        font-size: 2vh;
+    }
+
+    .sectionDescriptionSmall {
+        font-size: 1.5vh;
     }
 
     .inputField, -inputField > div > label {
-        font-size: 2.3vh;
+        font-size: 1.4vh;
     }
 
-        .inputField > div > .controls > *, .inputFieldSpecial, .submitButton {
-            font-size: 2.5vh;
+        .inputField > div > .controls > *, .inputFieldSpecial, .submitButton, .button {
+            font-size: 1.5vh;
             padding: 0.2em 0.4em;
             height: 2.4em;
         }
