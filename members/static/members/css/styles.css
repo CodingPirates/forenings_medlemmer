@@ -5,7 +5,7 @@ and (max-device-width: 600px) {
     font-size: 4.4vh;
 }
 .sectionDescription {
-    font-size: 2.3vh;
+    font-size: 2.3vh !important;
 }
 
 .inputField, -inputField > div > label {
@@ -50,8 +50,8 @@ and (max-device-width: 600px) {
 }
 
 }
-
-@media only screen and (min-device-width: 600px) {
+/*
+@media only screen and (min-device-width: 600px) and (max-device-width: 1200px) {
 
     .sectionTitle {
         font-size: 4.4vh;
@@ -67,6 +67,35 @@ and (max-device-width: 600px) {
 
         .inputField > div > .controls > *, .inputFieldSpecial, .submitButton {
             font-size: 1.5vh;
+            padding: 0.2em 0.4em;
+            height: 2.4em;
+        }
+
+    .fields > legend {
+        font-size: 3vh;
+    }
+
+    .mobileOnly {
+        display: none;
+    }
+}*/
+
+@media only screen and (min-device-width: 600px) {
+
+    .sectionTitle {
+        font-size: 4.4vh;
+    }
+
+    .sectionDescription {
+        font-size: 2.5vh !important;
+    }
+
+    .inputField, -inputField > div > label {
+        font-size: 2.3vh;
+    }
+
+        .inputField > div > .controls > *, .inputFieldSpecial, .submitButton {
+            font-size: 2.5vh;
             padding: 0.2em 0.4em;
             height: 2.4em;
         }
