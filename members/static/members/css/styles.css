@@ -8,7 +8,6 @@
         font-size: 1.5vh;
         border-left: 0.2vw dashed;
     }
-
         th:nth-child(1), td:nth-child(1) {
             border-left: none;
         }
@@ -144,4 +143,49 @@
     .mobileOnly {
         display: none;
     }
+
+
 }
+
+.menu {
+    background-color: rgb(243, 243, 243);
+    padding: 0;
+    margin-bottom: 2vh;
+}
+    .menu > ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+        .menu > ul > li {
+            float: left;
+            padding: 0.75em 1em;
+            cursor: pointer;
+            background-color: rgb(243, 243, 243);
+            font-size: 4vh;
+        }
+            .menu > ul > li:hover {
+                background-color: rgb(0, 191, 243);
+            }
+
+.Ntooltip {
+    position: relative;
+    display: inline;
+}
+
+    .Ntooltip .Ntooltiptext {
+        visibility: hidden;
+        text-align: center;
+        border-radius: 6px;
+        padding: 0.5em;
+        background-color: rgb(198, 198, 198);
+
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+    }
+
+    .Ntooltip:hover .Ntooltiptext {
+        visibility: visible;
+        white-space: nowrap;
+    }

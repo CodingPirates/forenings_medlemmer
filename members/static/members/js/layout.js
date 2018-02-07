@@ -4,3 +4,11 @@ function showInputFields(id) {
         console.log(document.getElementById(id).style.display);
     }
 }
+
+function switchView(pageId) {
+    //if (document.getElementByClass("page").id
+    var elements = document.getElementsByClassName("page");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].id == pageId ? elements[i].style.display = "block" : elements[i].style.display = "none";
+    }
+}
