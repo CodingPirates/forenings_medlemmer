@@ -165,15 +165,15 @@
         height: 100%;
         position: absolute;
     }
-    .menu > .menuLogoContainer > .menuLogo {
-        background-image: url("/static/members/images/Coding Pirates Skrift Logo.png");
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        filter: brightness(0%);
-        height: 100%;
-        position: absolute;
-    }
+        .menu > .menuLogoContainer > .menuLogo {
+            background-image: url("/static/members/images/codingPiratesLogo.svg");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: brightness(0%);
+            height: 100%;
+            position: absolute;
+        }
     .menu > div > ul {
         list-style-type: none;
         padding: 0;
