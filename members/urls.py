@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'family/(?P<unique>[\w-]+)/Person/(?P<membertype>[A-Z]{2})$', PersonCreate, name='person_add'),
     url(r'family/(?P<unique>[\w-]+)/activity/(?P<activity_id>[\d]+)/person/(?P<person_id>[\d]+)/$', ActivitySignup, name='activity_signup'),
     url(r'family/(?P<unique>[\w-]+)/activity/(?P<activity_id>[\d]+)/person/(?P<person_id>[\d]+)/view/$', ActivitySignup, name='activity_view_person'),
+    url(r'family/(?P<unique>[\w-]+)/activity/(?P<activity_id>[\d]+)/view/$', ActivitySignup, name='activity_view_family'),
     url(r'family/(?P<unique>[\w-]+)/invitation_decline/(?P<invitation_id>[\d]+)/$', DeclineInvitation, name='invitation_decline'),
     url(r'family/(?P<unique>[\w-]+)/waitinglist$', waitinglistView, name='family_waitinglist_view'),
     url(r'family/(?P<unique>[\w-]+)/payment_gateway_error$', paymentGatewayErrorView, name='payment_gateway_error_view'),
