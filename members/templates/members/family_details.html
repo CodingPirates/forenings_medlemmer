@@ -158,9 +158,11 @@
                                   </tfoot>
                               </table>
                               {% endif %}
-                              <a class="btn btn-primary btn-sm button" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
-                              <a class="btn btn-primary btn-sm button" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
-                              <a class="btn btn-primary button" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
+                              <div class="dumButtonContainer">
+                                  <a class="button" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
+                                  <a class="button" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
+                                  <a class="button" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
+                              </div>
                               <br />
                               <br />
                               {%if request_parents %}
