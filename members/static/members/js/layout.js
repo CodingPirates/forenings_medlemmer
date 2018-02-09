@@ -1,7 +1,33 @@
 $(document).ready(function () {
     var tables = ["#waitingListTable"]
     for (var i = 0; i < tables.length; i++) {
-        $(tables[i]).DataTable();
+        $(tables[i]).DataTable({
+            "language": {
+                "decimal": "",
+                "emptyTable": "Ingen data tilgænglig",
+                "info": "Viser resultat _START_ til _END_ af ialt _TOTAL_ resultater",
+                "infoEmpty": "Viser 0 til 0 af 0 resultater",
+                "infoFiltered": "(filtered from _MAX_ total entries)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Vis _MENU_ resultater per side",
+                "loadingRecords": "Loader...",
+                "processing": "Arbejder...",
+                "search": "S&oslash;g:",
+                "searchPlaceholder": "fx København",
+                "zeroRecords": "Ingen resultater fundet",
+                "paginate": {
+                    "first": "Første",
+                    "last": "Sidste",
+                    "next": "N&aelig;ste",
+                    "previous": "Forrige"
+                },
+                "aria": {
+                    "sortAscending": ": aktiver for at sortere kolonnen stigende",
+                    "sortDescending": ": aktiver for at sortere kolonnen faldende"
+                }
+            }
+        });
     }
 });
 
