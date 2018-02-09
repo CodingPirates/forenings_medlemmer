@@ -16,16 +16,19 @@
     <link rel="stylesheet" type="text/css" href="{% static 'members/datatables/datatables.min.css' %}" />
   </head>
   <body>
-      <div class="container-fluid">
-          <div class="col-lg-2"></div>
-          <div class="col-lg-8">
-              <div class="menu col-sm-12 col-xs-12">
+      <div>
+          <div class="menu col-sm-12 col-xs-12">
+              <div class="menuLogo col-sm-2 col-xs-2"><div></div></div>
+              <div class="col-sm-8 col-xs-8">
                   <ul>
                       <li onclick="switchView('persons', this)">Personer</li>
                       <li onclick="switchView('activities', this)">Aktiviteter</li>
                       <li onclick="switchView('waitinglist', this)">Ventelister</li>
                   </ul>
               </div>
+          </div>
+          <div class="col-lg-2"></div>
+          <div class="col-lg-8">
               <div class="page" id="persons">
 
                   <span class="sectionTitle">Familiedetaljer</span>

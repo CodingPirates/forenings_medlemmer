@@ -152,9 +152,17 @@
     padding: 0;
     margin-bottom: 2vh;
 }
-.menu >div {
-    background-color: black;
-}
+    .menu > .menuLogo {
+        padding: 0 1vh;
+    }
+        .menu > .menuLogo > div {
+            background-image: url("/static/members/images/Coding Pirates Skrift Logo.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: brightness(0%);
+            height: 11vh;
+        }
     .menu > div > ul {
         list-style-type: none;
         padding: 0;
@@ -166,6 +174,7 @@
             cursor: pointer;
             background-color: rgb(243, 243, 243);
             font-size: 4vh;
+            height: 6vh;
         }
             .menu > div > ul > li:hover {
                 background-color: rgb(0, 191, 243);
