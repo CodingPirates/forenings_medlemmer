@@ -18,7 +18,8 @@
   <body>
       <div>
           <div class="menu col-sm-12 col-xs-12">
-              <div class="menuLogo col-sm-2 col-xs-2"><div></div></div>
+              <div class="menuLogoContainer col-sm-2 col-xs-2 pcOnly"><a class="menuLogo col-sm-11 col-xs-11"></a></div>
+              <div class="col-sm-2 col-xs-2 pcOnly"></div>
               <div class="col-sm-8 col-xs-8">
                   <ul>
                       <li onclick="switchView('persons', this)">Personer</li>
@@ -29,7 +30,7 @@
           </div>
           <div class="col-lg-2"></div>
           <div class="col-lg-8">
-              <div class="page" id="persons">
+              <div class="page col-lg-8" id="persons">
 
                   <span class="sectionTitle">Familiedetaljer</span>
                   <p class="sectionDescription">Velkommen til Coding Pirates' medlemssystem. Du ser nu oversigten over de oplysninger vi har registreret om jeres familie. Det er vigtigt du sikrer dig at oplysningerne er korrekte.</p>
@@ -114,6 +115,7 @@
                                           <th class="col-xs-2" align="left">Postnr./by</th>
                                           <th class="col-xs-2" align="left">E-mail</th>
                                           <th class="col-xs-1" align="left">Telefon</th>
+                                          <th>Handlinger</th>
                                       </tr>
                                   </thead>
                                   <tbody>
@@ -175,7 +177,7 @@
               </div>
 
 
-              <div class="page" id="activities" style="display: none">
+              <div class="page col-lg-8" id="activities" style="display: none">
 
                   {% if participating or waiting %}
                   <span class="sectionTitle">Tilmeldte aktiviteter</span>
@@ -263,7 +265,7 @@
                   </div>
               </div>
 
-              <div class="page" id="waitinglist" style="display: none">
+              <div class="page col-lg-8" id="waitinglist" style="display: none">
               <span class="sectionTitle">Ventelister</span>
               <p class="sectionDescription">Tryk på <kbd>Opskriv</kbd>-knapperne for hver afdeling der har interesse for jer. Bemærk at jeres position på ventelisten afgøres ud fra barnets oprettelses tidspunkt i systemet (datoen "Opskrevet" i Personer) - <i> ikke tidspunktet i melder jeg på ventelisterne nedenfor! - </i> I kan derfor frit tilmelde og framelde jer ventelisterne uden at frygte i mister jeres position på listen.</p>
               <p class="sectionDescription">Tryk på <kbd>Afmeld</kbd>-knapperne for at forlade en afdelings ventelisten igen.</p>
