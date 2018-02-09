@@ -1,3 +1,10 @@
+$(document).ready(function () {
+    var tables = ["#waitingListTable"]
+    for (var i = 0; i < tables.length; i++) {
+        $(tables[i]).DataTable();
+    }
+});
+
 function showInputFields(id) {
     if (screen.width < 600 || window.innerWidth < 600) {
         document.getElementById(id).style.display == "block" ? document.getElementById(id).style.display = "none" : document.getElementById(id).style.display = "block";
@@ -11,4 +18,8 @@ function switchView(pageId) {
     for (var i = 0; i < elements.length; i++) {
         elements[i].id == pageId ? elements[i].style.display = "block" : elements[i].style.display = "none";
     }
+}
+
+function doActive(element) {
+    element.class += "active";
 }

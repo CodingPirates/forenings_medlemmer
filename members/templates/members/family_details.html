@@ -12,6 +12,8 @@
     <script src="{% static 'members/js/layout.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'members/css/styles.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'members/css/pure-min.css' %}" />
+    <script src="{% static 'members/datatables/datatables.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'members/datatables/datatables.min.css' %}" />
   </head>
   <body>
       <div class="container-fluid">
@@ -100,14 +102,14 @@
                       <div class="col-xs-12">
                           <section class="panel panel-defualt">
                               {% if family.person_set.count > 0 %}
-                              <table class="pure-table pure-table-striped table-responsive">
+                              <table id="personsTable" class="pure-table pure-table-striped table-responsive">
                                   <thead>
                                       <tr>
                                           <th class="col-xs-1">Opskrevet</th>
                                           <th class="col-xs-2" align="left">Navn</th>
                                           <th class="col-xs-3" align="left">Adresse</th>
                                           <th class="col-xs-2" align="left">Postnr./by</th>
-                                          <th class="col-xs-2" align="left">Email</th>
+                                          <th class="col-xs-2" align="left">E-mail</th>
                                           <th class="col-xs-1" align="left">Telefon</th>
                                       </tr>
                                   </thead>
@@ -149,14 +151,14 @@
                                   </tfoot>
                               </table>
                               {% endif %}
-                              <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
-                              <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
-                              <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
+                              <a class="btn btn-primary btn-sm button" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
+                              <a class="btn btn-primary btn-sm button" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
+                              <a class="btn btn-primary button" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
                               <br />
                               <br />
                               {%if request_parents %}
                               <blockquote class="bg-warning">
-                                  <p class="sectionDescription">Opret mindst 1 forælder / værge med kontaktoplysninger, så vi i Coding Pirates nemt kan få fat i jer.</p>
+                                  <p class="sectionDescription">Opret mindst 1 forælder / værge med kontaktoplysninger, så vi i Coding Pirates nemt kan kontakte jer.</p>
                               </blockquote>
                               {%endif%}
                               {% if need_confirmation %}
@@ -250,7 +252,7 @@
                               </table>
                               {% else %}
                               <blockquote class="bg-info">
-                                  <p class="sectionDescription">Der er endnu ikke åbnet for tilmelding til aktiviteter. Vi sender en email til {{family.email}} når vi er klar til at modtage tilmeldinger.</p>
+                                  <p class="sectionDescription">Der er endnu ikke åbnet for tilmelding til aktiviteter. Vi sender en e-mail til {{family.email}} når vi er klar til at modtage tilmeldinger.</p>
                               </blockquote>
                               {% endif %}
                           </section>
@@ -260,20 +262,20 @@
 
               <div class="page" id="waitinglist" style="display: none">
               <span class="sectionTitle">Ventelister</span>
-              <p class="sectionDescription">Tryk på <kbd>Opskriv</kbd> knapperne for hver afdeling der har interesse for jer. Bemærk at jeres position på ventelisten afgøres ud fra barnets oprettelses tidspunkt i systemet (datoen "Opskrevet" i Personer) - <i> ikke tidspunktet i melder jeg på ventelisterne nedenfor! - </i> I kan derfor frit tilmelde og framelde jer ventelisterne uden at frygte i mister jeres position på listen.</p>
-              <p class="sectionDescription">Tryk på <kbd>Afmeld</kbd> knapperne for at forlade en afdelings ventelisten igen.</p>
+              <p class="sectionDescription">Tryk på <kbd>Opskriv</kbd>-knapperne for hver afdeling der har interesse for jer. Bemærk at jeres position på ventelisten afgøres ud fra barnets oprettelses tidspunkt i systemet (datoen "Opskrevet" i Personer) - <i> ikke tidspunktet i melder jeg på ventelisterne nedenfor! - </i> I kan derfor frit tilmelde og framelde jer ventelisterne uden at frygte i mister jeres position på listen.</p>
+              <p class="sectionDescription">Tryk på <kbd>Afmeld</kbd>-knapperne for at forlade en afdelings ventelisten igen.</p>
               <p class="sectionDescription">Opret jer kun på de lister der har interesse for jer. Det er en god ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun tilbud om at komme med på de afdelinger de har skrevet sig op til.</p>
               <h3><a href="{% url 'family_waitinglist_view' family.unique %}">Se jeres nuværende position på ventelisterne</a></h3>
               <div class="row">
                   <div class="col-xs-12">
                       <section class="panel panel-defualt">
                           {% if department_children_waiting %}
-                          <table class="pure-table pure-table-striped table-responsive">
+                          <table id="waitingListTable" class="pure-table pure-table-striped table-responsive">
                               <thead>
                                   <tr>
                                       <th class="col-xs-2" align="left">Navn</th>
                                       <th class="col-xs-2" align="left">Adresse</th>
-                                      <th class="col-xs-2" align="left">Åbningstid</th>
+                                      <th class="col-xs-2" align="left">Mødetid</th>
                                       <th class="col-xs-3" align="right">Ikke tilmeldt ventelisten<br />på denne afdeling</th>
                                       <th class="col-xs-3" align="right">Tilmeldt ventelisten<br />på denne afdeling</th>
                                   </tr>
