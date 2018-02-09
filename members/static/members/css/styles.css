@@ -145,9 +145,7 @@
     }
 
     .page {
-        position: fixed;
         background-color: white;
-        height: 100%;
     }
     body {
         background-color: #25a2ce;
@@ -214,4 +212,35 @@
 
 .page {
     padding-top: 2vh;
+    margin-bottom: 15vh;
+}
+
+.footer {
+    background-color: #293339;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 11vh;
+    width: 100%;
+    overflow: hidden;
+}
+    .footer > div {
+        margin: 3vh 5vw;
+    }
+    .footer > div > p > img {
+        height: 3vh;
+        filter: invert(100%);
+    }
+    .footer > div > p {
+        text-align: center;
+        color: white;
+        font-size: 1.5vh;
+        max-height: 3vh;
+    }
+
+.whiteDown {
+    position: fixed;
+    display: block;
+    background-color: white;
+    height: 100%;
 }
