@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from members.models.family import Family
 from members.models.person import Person
 
+
 @xframe_options_exempt
 def EntryPage(request):
     if request.method == 'POST':
@@ -17,6 +18,7 @@ def EntryPage(request):
             signup = signupForm(request.POST)
             if signup.is_valid():
                 # check if family already exists
+                # TODO: rewrite this! >>>>
                 try:
                     family = Family.objects.get(email__iexact=request.POST['parent_email'])
                     # family was already created - we can't create this family again
@@ -25,6 +27,7 @@ def EntryPage(request):
                 except:
                     # all is fine - we did not expect any
                     pass
+                # TODO: rewrite this! <<<<
                 #create new family.
                 family = Family.objects.create(email = signup.cleaned_data['parent_email'])
                 family.confirmed_dtm = timezone.now()

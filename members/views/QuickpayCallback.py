@@ -5,6 +5,14 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
+from members.models.quickpaytransaction import QuickpayTransaction
+
+import hashlib
+import hmac
+
+def signQuickpay(base, private_key):
+    return hmac.new(private_key, base, hashlib.sha256).hexdigest()
+
 @csrf_exempt
 def QuickpayCallback(request):
     checksum = signQuickpay(request.body, bytearray(settings.QUICKPAY_PRIVATE_KEY, 'ascii'))
@@ -22,7 +30,7 @@ def QuickpayCallback(request):
 
         quickpay_transaction = get_object_or_404(QuickpayTransaction, order_id=callback['order_id'])
 
-        if(callback['accepted'] == True):
+        if(callback['accepted'] is True):
             quickpay_transaction.payment.set_confirmed()
         else:
             quickpay_transaction.payment.set_rejected(request.body)

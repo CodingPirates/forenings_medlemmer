@@ -13,7 +13,6 @@ def UpdatePersonFromForm(person, form):
     person.door = form.cleaned_data['door']
     person.placename = form.cleaned_data['placename']
     person.dawa_id = form.cleaned_data['dawa_id']
-
     person.save()
 
     if(form.cleaned_data['address_global'] in 'True'):

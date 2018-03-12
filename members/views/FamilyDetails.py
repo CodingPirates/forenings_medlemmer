@@ -3,6 +3,7 @@ import uuid
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseBadRequest
 from django.utils import timezone
 
 from members.models.activity import Activity

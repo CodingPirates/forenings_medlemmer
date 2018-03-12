@@ -4,6 +4,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from members.models.department import Department
 from members.models.union import Union
 
+
 @xframe_options_exempt
 def departmentView(request, unique=None):
         depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)

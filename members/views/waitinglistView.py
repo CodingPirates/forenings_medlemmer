@@ -5,6 +5,8 @@ from django.shortcuts import render
 from members.models.department import Department
 from members.models.waitinglist import WaitingList
 
+from django.http import HttpResponseBadRequest
+
 def waitinglistView(request, unique=None):
     try:
         unique = uuid.UUID(unique)
