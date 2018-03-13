@@ -11,8 +11,8 @@ class WaitingList(models.Model):
         ordering=['on_waiting_list_since']
     person = models.ForeignKey('Person')
     department = models.ForeignKey('Department')
-    on_waiting_list_since = models.DateField('Venteliste position', blank=False, null=False)
-    added_dtm = models.DateField('Tilføjet', blank=False, null=False, default=timezone.now)
+    on_waiting_list_since = models.DateTimeField('Venteliste position', blank=False, null=False)
+    added_dtm = models.DateTimeField('Tilføjet', blank=False, null=False, default=timezone.now)
     def number_on_waiting_list(self):
         return WaitingList.objects.filter(department = self.department, on_waiting_list_since__lt = self.on_waiting_list_since).count()+1
     number_on_waiting_list.short_description = 'Position på venteliste'
