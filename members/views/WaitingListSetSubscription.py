@@ -8,6 +8,7 @@ from members.models.department import Department
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 
+
 def WaitingListSetSubscription(request, unique, id, departmentId, action):
     try:
         unique = uuid.UUID(unique)

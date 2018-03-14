@@ -8,6 +8,7 @@ from django.utils import timezone
 from members.forms import ActivivtyInviteDeclineForm
 from members.models.activityinvite import ActivityInvite
 
+
 def DeclineInvitation(request, unique, invitation_id):
     try:
         unique = uuid.UUID(unique)
@@ -19,14 +20,14 @@ def DeclineInvitation(request, unique, invitation_id):
     if(request.method == 'POST'):
         form = ActivivtyInviteDeclineForm(request.POST)
         if form.is_valid():
-            activity_invite.rejected_dtm=timezone.now()
+            activity_invite.rejected_dtm = timezone.now()
             activity_invite.save()
             return HttpResponseRedirect(reverse('family_detail', args=[activity_invite.person.family.unique]))
     else:
         form = ActivivtyInviteDeclineForm()
 
     context = {
-                'activity_invite' : activity_invite,
-                'form' : form
-              }
+        'activity_invite': activity_invite,
+        'form': form
+    }
     return render(request, 'members/decline_activivty_invite.html', context)
