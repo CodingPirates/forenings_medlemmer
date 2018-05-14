@@ -1,9 +1,23 @@
 from django.conf import settings
 from django_cron import CronJobBase, Schedule
-from members.models import EmailItem, Family, Notification, EmailTemplate, ActivityParticipant, Payment, \
-    DailyStatisticsDepartment, DailyStatisticsGeneral, Person, WaitingList, Department, Union, Activity, Volunteer, DailyStatisticsUnion, DailyStatisticsRegion, ZipcodeRegion
+from members.models.emailitem import EmailItem
+from members.models.notification import Notification
+from members.models.emailtemplate import EmailTemplate
+from members.models.activityparticipant import ActivityParticipant
+from members.models.payment import Payment
+from members.models.person import Person
+from members.models.waitinglist import WaitingList
+from members.models.department import Department
+from members.models.union import Union
+from members.models.activity import Activity
+from members.models.dailystatisticsgeneral import DailyStatisticsGeneral
+from members.models.dailystatisticsregion import DailyStatisticsRegion
+from members.models.dailystatisticsunion import DailyStatisticsUnion
+import members.models.dailystatisticsdepartment
+from members.models.zipcoderegion import ZipcodeRegion
+from members.models.family import Family
 from django.db.models import Q, F
-from django.db.models import Count, Avg, Sum
+from django.db.models import Sum
 from django.db.models.functions import Coalesce
 import datetime
 from django.utils import timezone
@@ -56,14 +70,15 @@ class RequestConfirmationCronJob(CronJobBase):
         # Exclude the families which has already received a notification after they updated last.
         # (to avoid sending again)
         outdated_dtm = timezone.now() - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
-        unconfirmed_families = Family.objects.filter(Q(confirmed_dtm__lt=outdated_dtm) | Q(confirmed_dtm=None)).exclude(Q(notification__update_info_dtm__gt=F('confirmed_dtm')) | Q(~Q(notification__update_info_dtm=None), confirmed_dtm=None))
+        unconfirmed_families = Family.objects.filter(Q(confirmed_dtm__lt=outdated_dtm) | Q(confirmed_dtm=None)).exclude(Q(notification__update_info_dtm__gt=F('confirmed_dtm')) | Q(~Q(notification__update_info_dtm=None), confirmed_dtm=None))[:10]
 
         # send notification to all families asking them to update
         # their family details
         for family in unconfirmed_families:
-            email = EmailTemplate.objects.get(idname='UPDATE_DATA').makeEmail(family, {})[0]
-            notification = Notification(family=family, email=email, update_info_dtm=timezone.now())
-            notification.save()
+            emails = EmailTemplate.objects.get(idname='UPDATE_DATA').makeEmail(family, {})
+            for email in emails:
+                notification = Notification(family=family, email=email, update_info_dtm=timezone.now())
+                notification.save()
 
 # Poll payments which did not recieve callback
 class PollQuickpayPaymentsCronJob(CronJobBase):
@@ -121,7 +136,7 @@ class GenerateStatisticsCronJob(CronJobBase):
         # generate daily department statistics
         departments = Department.objects.filter(closed_dtm=None)
         for department in departments:
-            dailyStatisticsDepartment = DailyStatisticsDepartment()
+            dailyStatisticsDepartment = members.models.dailystatisticsdepartment.DailyStatisticsDepartment()
 
             dailyStatisticsDepartment.timestamp = timestamp
             dailyStatisticsDepartment.department = department

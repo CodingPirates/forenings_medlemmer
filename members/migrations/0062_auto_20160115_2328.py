@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import members.models
-
+import members.models.activityinvite
 
 class Migration(migrations.Migration):
 
@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='activityinvite',
             name='expire_dtm',
-            field=models.DateField(default=members.models.defaultInviteExpiretime, verbose_name='Udløber'),
+            field=models.DateField(default=members.models.activityinvite._defaultInviteExpiretime, verbose_name='Udløber'),
         ),
     ]

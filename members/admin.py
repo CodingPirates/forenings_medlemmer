@@ -135,6 +135,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 admin.site.register(Department, DepartmentAdmin)
 
 
+
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name', 'department', 'member_since', 'is_active')
     list_filter = ['department']
@@ -398,6 +399,7 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
             return queryset
         else:
             return queryset.filter(activity=self.value())
+
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
@@ -709,6 +711,7 @@ class WaitingListInline(admin.TabularInline):
     fields = ['on_waiting_list_since', 'department', 'number_on_waiting_list']
     readonly_fields = fields
     extra = 0
+
 
 
 class PersonAdmin(admin.ModelAdmin):

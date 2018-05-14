@@ -3,7 +3,7 @@ import csv
 import datetime
 from django.db import IntegrityError, transaction
 from django.core.management.base import BaseCommand, CommandError
-from members.models import Person, Family
+from members.models import person, Family
 from optparse import make_option
 from  django.core.exceptions import ObjectDoesNotExist
 
@@ -93,7 +93,7 @@ class Command(BaseCommand):
 
             #lookup person
             try:
-               person = Person.objects.get(name=name, family=family)
+               person = person.objects.get(name=name, family=family)
 
                # if current waiting list is older, replace timestamp
                if(date < person.added):
@@ -102,7 +102,7 @@ class Command(BaseCommand):
 
             except ObjectDoesNotExist:
                 # create the person
-                person = Person(name=name, membertype=Person.CHILD, family = family, added = date)
+                person = person(name=name, membertype=person.CHILD, family = family, added = date)
                 person.save()
-            except Person.MultipleObjectsReturned:
+            except person.MultipleObjectsReturned:
                 print("family " + family.email + " has duplicate mebers named " + name + " - signup date : " + str(date) + " not recorded")
