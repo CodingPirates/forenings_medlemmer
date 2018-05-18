@@ -10,7 +10,8 @@ from django.http import HttpResponseBadRequest
 
 def waitinglistView(request, unique=None):
     try:
-        unique = uuid.UUID(unique)
+        if unique is not None:
+            unique = uuid.UUID(unique)
     except ValueError:
         return HttpResponseBadRequest("Familie id er ugyldigt")
 
