@@ -2,6 +2,9 @@
 /db.sqlite3*
 *~
 virtualenv/
+venv_win
+venv_osx
+venv_linux
 .idea/
 experiments.py
 forenings_medlemmer/settings_local.py
@@ -10,3 +13,4 @@ forenings_medlemmer/settings.py
 /backup-*
 .DS_Store
 .vs/
+notes.txt
