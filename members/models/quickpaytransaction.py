@@ -7,6 +7,7 @@ from quickpay_api_client import QPClient
 from quickpay_api_client.exceptions import ApiError
 from django.core.urlresolvers import reverse
 
+logging.basicConfig(filename='error_log.log',level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 class QuickpayTransaction(models.Model):
