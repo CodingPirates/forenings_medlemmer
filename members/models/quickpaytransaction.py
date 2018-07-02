@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import logging
 from django.db import models
 from django.conf import settings
 from quickpay_api_client import QPClient
+from quickpay_api_client.exceptions import ApiError
 from django.core.urlresolvers import reverse
 
+logger = logging.getLogger(__name__)
 
 class QuickpayTransaction(models.Model):
     payment = models.ForeignKey('Payment')
@@ -70,8 +73,9 @@ class QuickpayTransaction(models.Model):
 
                 self.link_url = link['url']
                 self.save()
-            except:
+            except ApiError as e:
                 # Something went wrong talking to quickpay - ask people to come back later
+                logger.error(e.body)
                 return reverse('payment_gateway_error_view', kwargs={'unique':self.payment.family.unique})
 
         return self.link_url
