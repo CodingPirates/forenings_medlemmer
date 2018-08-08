@@ -7,16 +7,18 @@ from members.models.waitinglist import WaitingList
 
 from django.http import HttpResponseBadRequest
 
+
 def waitinglistView(request, unique=None):
     try:
-        unique = uuid.UUID(unique)
+        if unique is not None:
+            unique = uuid.UUID(unique)
     except ValueError:
         return HttpResponseBadRequest("Familie id er ugyldigt")
 
     department_children_waiting = {'departments': {}}
-    department_loop_counter=0
-    #deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)
-    deparments_query = Department.objects.filter(has_waiting_list = True, closed_dtm=None).order_by('zipcode')
+    department_loop_counter = 0
+    # deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)
+    deparments_query = Department.objects.filter(has_waiting_list=True, closed_dtm=None).order_by('zipcode')
 
     for department in deparments_query:
         department_children_waiting['departments'][department_loop_counter] = {}
@@ -25,7 +27,7 @@ def waitinglistView(request, unique=None):
 
         waiting_in_department = WaitingList.objects.filter(department__pk=department.pk).select_related('person', 'person__family').order_by('on_waiting_list_since')
 
-        child_loop_counter=1
+        child_loop_counter = 1
         for waiting in waiting_in_department:
             department_children_waiting['departments'][department_loop_counter]['waiting'][child_loop_counter] = {}
             if(waiting.person.family.unique == unique):
@@ -40,6 +42,5 @@ def waitinglistView(request, unique=None):
             department_children_waiting['departments'][department_loop_counter]['waiting'][child_loop_counter]['added'] = waiting.person.added
             child_loop_counter = child_loop_counter + 1
         department_loop_counter = department_loop_counter + 1
-
 
     return render(request, 'members/waitinglist.html', {'department_children_waiting': department_children_waiting, 'unique': unique})
