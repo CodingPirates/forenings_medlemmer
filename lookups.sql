@@ -32,6 +32,18 @@ SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
     AND a.end_date > '2018-03-06'
   GROUP BY zr.region;
 
+# E-mail liste Deltagere (pr. region)
+SELECT distinct(f.email) FROM members_person AS p
+  JOIN members_member AS m ON m.person_id=p.id
+  JOIN members_activityparticipant AS ap ON ap.member_id=m.id
+  JOIN members_activity AS a ON a.id=ap.activity_id
+  JOIN members_family AS f ON f.id=p.family_id
+  JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
+  JOIN members_department AS d ON a.department_id=d.id
+  WHERE f.dont_send_mails == 0
+    AND a.end_date > '2018-03-06'
+    AND zr.region IS "DK01"
+
 # Medlemmer (pr. region)
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
   JOIN members_payment AS pay ON pay.person_id=p.id
@@ -86,11 +98,12 @@ SELECT p.birthday FROM members_person AS p
   WHERE ap.activity_id=160;
 
 # Deltagerliste
-SELECT p.name, f.email, ap.note FROM members_activityparticipant AS ap
+SELECT p.name, f.email, ap.note, m2.confirmed_dtm FROM members_activityparticipant AS ap
 JOIN members_member AS m ON ap.member_id=m.id
 JOIN members_person AS p ON p.id=m.person_id
 JOIN members_family AS f ON p.family_id=f.id
-WHERE ap.activity_id IS 160;
+JOIN members_payment m2 on ap.id = m2.activityparticipant_id
+WHERE ap.activity_id IS 544 AND m2.confirmed_dtm IS NULL;
 
 # Aktivitets deltagere i en region
 SELECT DISTINCT f.email, p.name FROM members_person AS p
