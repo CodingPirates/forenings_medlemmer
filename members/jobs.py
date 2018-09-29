@@ -64,7 +64,7 @@ class UpdateDawaData(CronJobBase):
     code = 'members.update_dawa_data'
 
     def do(self):
-        persons = Person.objects.filter(municipality__isnull=True).exclude(streetname__exact="")[:50]
+        persons = Person.objects.filter(municipality__isnull=True).exclude(streetname__exact="").exclude(address_invalid__exact=True)[:50]
 
         for person in persons:
             person.update_dawa_data()

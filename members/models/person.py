@@ -64,6 +64,7 @@ class Person(models.Model):
     notes = models.TextField('Noter', blank=True, null=False, default="")
     added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
+    address_invalid = models.BooleanField('Ugyldig adresse', default=False)
 
     def __str__(self):
         return self.name
@@ -121,6 +122,9 @@ class Person(models.Model):
                     print("Couldn't find coordinates for " + self.name)
                     print("Error " + str(error))
                     return None
+            else:
+                self.address_invalid = True
+                self.save()
     # TODO: Move to dawa_data in utils
 
     firstname.admin_order_field = 'name'
