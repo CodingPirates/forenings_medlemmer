@@ -1,4 +1,4 @@
-from django.conf.urls import patterns,  url
+from django.conf.urls import url
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
     waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView
 from django.contrib.auth import views as auth_views
