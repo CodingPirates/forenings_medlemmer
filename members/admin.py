@@ -896,6 +896,7 @@ class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ('departments',)
     can_delete = False
+    raw_id_fields = ("person",)
 
 
 # Define PersonInline
