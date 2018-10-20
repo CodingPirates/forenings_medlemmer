@@ -3,11 +3,10 @@
 from django.db import models
 import members.models.emailtemplate
 from members.utils.address import format_address
-from django.contrib.auth.models import User
 from django.utils import timezone, html
 import requests, json
 from urllib.parse import quote_plus
-from decimal import *
+from django.conf import settings
 
 class Department(models.Model):
     class Meta:
@@ -108,5 +107,7 @@ class Department(models.Model):
 
 
 class AdminUserInformation(models.Model):
-    user = models.OneToOneField(User)
+    def __str__(self):
+        return self.user.username + " user information"
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     departments = models.ManyToManyField(Department)

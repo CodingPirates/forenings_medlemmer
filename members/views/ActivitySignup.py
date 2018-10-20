@@ -15,6 +15,7 @@ from members.models.family import Family
 from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
+from members.utils.user import user_to_person
 
 @login_required
 def ActivitySignup(request, activity_id, person_id=None):

@@ -9,14 +9,11 @@ from django.contrib.auth.decorators import login_required
 from members.models.family import Family
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
+from members.utils.user import user_to_person
 
 
 @login_required
 def ConfirmFamily(request):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
 
     family = user_to_person(request.user).family
     persons = Person.objects.filter(family=family)

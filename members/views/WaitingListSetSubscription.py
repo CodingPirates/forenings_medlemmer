@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
@@ -7,16 +8,16 @@ from django.shortcuts import get_object_or_404
 from members.models.department import Department
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
+from members.utils.user import user_to_person
 
-def WaitingListSetSubscription(request, unique, id, departmentId, action):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
+@login_required
+def WaitingListSetSubscription(request, id, departmentId, action):
 
+    family = user_to_person(request.user).family
     person = get_object_or_404(Person, pk=id)
-    if person.family.unique != unique:
-        raise Http404("Person eksisterer ikke")
+
+    if person.family.id != family.id:
+        raise Http404("Person ikke i samme familie som bruger")
     department = get_object_or_404(Department,pk=departmentId)
 
     if action == 'subscribe':
@@ -36,4 +37,4 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
         except:
             raise Http404("{} er ikke på {}s venteliste".format(person.name,department.name))
 
-    return HttpResponseRedirect(reverse('family_detail', args=[unique]))
+    return HttpResponseRedirect(reverse('family_detail'))

@@ -719,7 +719,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_filter = ('membertype', 'gender', VolunteerListFilter, PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
     search_fields = ('name', 'family__email', 'notes')
     actions = ['invite_many_to_activity_action', 'export_emaillist', 'export_csv']
-    raw_id_fields = ('family',)
+    raw_id_fields = ('family', 'user')
 
     inlines = [PaymentInline, VolunteerInline, ActivityInviteInline, MemberInline, WaitingListInline]
 
@@ -894,20 +894,24 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(EmailTemplate)
 
 
+# Define AdmingUserInformation as inline
 class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ('departments',)
     can_delete = False
+    raw_id_fields = ("person",)
+
+# Define PersonInline
+class PersonInline(admin.StackedInline):
+    model = Person
+    fields = ('name',)
+    readonly_fields = ('name',)
 
 # Define a new User admin
-
-
 class UserAdmin(UserAdmin):
-    inlines = (AdminUserInformationInline, )
+    inlines = (AdminUserInformationInline, PersonInline)
 
 # Re-register UserAdmin
-
-
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
@@ -945,5 +949,9 @@ class EquipmentAdmin(admin.ModelAdmin):
     inlines = (EquipmentLoanInline, )
     list_per_page = 20
 
+#class AdminUserInformationAdmin(admin.ModelAdmin):
+#    raw_id_fields = ("person",)
+
+#admin.site.register(AdminUserInformation, AdminUserInformationAdmin)
 
 admin.site.register(Equipment, EquipmentAdmin)

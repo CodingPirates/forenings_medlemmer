@@ -10,7 +10,7 @@ from members.models.family import Family
 from members.models.person import Person
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
-
+from members.utils.user import user_to_person
 
 @login_required
 def PersonCreate(request, membertype):
