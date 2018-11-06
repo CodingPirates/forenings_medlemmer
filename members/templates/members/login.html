@@ -2,21 +2,34 @@
 
 {% block content %}
     {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
+    <p>Dit brugernavn eller password var forkert. Prøv igen.</p>
     {% endif %}
-    <form method="post">
+    <form class="col-md-8 col-md-offset-2" method="post">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
-        <div class="input-group">
-            <span class="input-group-addon">{{ form.username.label_tag }}</span>
-            <span class="form-control">{{ form.username }}</span>
+        <div class="row">
+            <div class="input-group">
+                <span class="input-group-addon">{{ form.username.label_tag }}</span>
+                <span class="form-control">{{ form.username }}</span>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">{{ form.password.label_tag }}</span>
+                <span class="form-control">{{ form.password }}</span>
+            </div>
         </div>
-        <div class="input-group">
-            <span class="input-group-addon">{{ form.password.label_tag }}</span>
-            <span class="form-control">{{ form.password }}</span>
-        </div>
-        <div class="input-group">
-            <input type="submit" class="form-control" value="Login">
+        <div class="row form-inline">
+            <div class="input-group">
+                <input type="submit"
+                        class="form-control btn-success float-left" value="Login" />
+            </div>
+            <div class="input-group">
+                <a
+                    href="{% url 'password_reset' %}"
+                    title="Glemt kode?"
+                    class="btn btn-info float-right">
+                    Glemt kode?
+                </a>
+            </div>
         </div>
     </form>
 {% endblock %}

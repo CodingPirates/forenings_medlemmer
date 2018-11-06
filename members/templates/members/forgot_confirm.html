@@ -1,0 +1,37 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+    {% if validlink %}
+    <div class="row">
+        <div class="col-md-12 col-md-offset-1">
+            <h1>Lav ny kode</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-1">
+            <p>Indtast din nye kode nedenfor 2 gange, så vi er sikre på du har skrevet rigtigt.</p>
+        </div>
+    </div>
+    <form method="post">{% csrf_token %}
+    <fieldset class="module aligned">
+        <div class="form-row field-password1">
+            {{ form.new_password1.errors }}
+            <label for="id_new_password1">Ny adgangskode: </label>
+            {{ form.new_password1 }}
+        </div>
+        <div class="form-row field-password2">
+            {{ form.new_password2.errors }}
+            <label for="id_new_password1">Gentag ny adgangskode: </label>
+            {{ form.new_password2 }}
+        </div>
+        <input type="submit" value="Ændr adgangskoden" />
+    </fieldset>
+    </form>
+    {% else %}
+    <div class="row">
+        <div class="col-md-12 col-md-offset-1">
+            <h1>Password reset link forkert. Prøv igen.</h1>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
