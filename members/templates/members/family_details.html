@@ -1,19 +1,6 @@
 {% extends 'members/base.html' %}
 
-<!DOCTYPE html>
-<html>
-  <head>
- 	  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    {% load bootstrap3 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-  </head>
-  <body>
-    <div class="container-fluid">
-      {% include "members/login_logout.html" %}
+{% block content %}
       <h1>Familiedetaljer</h1>
       <p>Velkommen til Coding Pirates' medlemssystem. Du ser nu oversigten over de oplysninger vi har registreret om jeres familie. Det er vigtigt du sikrer dig at oplysningerne er korrekte.</p>
       <p>For yderligere hjælp med at bruge denne side - se på <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores medlemssystem"</a> eller skriv til os på <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
