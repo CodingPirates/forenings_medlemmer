@@ -5,11 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="{% static "members/css/style.css" %}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     {% load bootstrap3 %}
-    {% load crispy_forms_tags %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    {% load crispy_forms_tags %}
     <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
     <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
     <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
@@ -54,10 +55,30 @@
 
   </head>
   <body>
+      <header>
+        <nav class="navbar navbar-expand-md navbar-light fixed-top">
+            <a href="https://codingpirates.dk" class="navbar-brand" title="Coding Pirates">
+                <img src="https://codingpirates.dk/wp-content/uploads/2016/09/Forside-Logo.png"
+                     title="Coding Pirates"
+                     height="60" />
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://codingpirates.dk/">codingpirates.dk</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Tilmeld barn</a>
+                    </li>
+                    <li class="nav-item">
+                        {% include "members/login_logout.html" %}
+                    </li>
+                </ul>
+            </div>
+        </nav>
+      </header>
     <div class="container">
-      <div class="row">
-      {% include "members/login_logout.html" %}
-      </div>
       <div class="row">
         <div class="col-md-12">
           <h1>Gå til min side</h1>
