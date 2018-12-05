@@ -5,7 +5,10 @@ from django.utils import timezone
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
+import logging
 import json
+
+logger = logging.getLogger(__name__)
 
 
 class Person(models.Model):
@@ -104,23 +107,27 @@ class Person(models.Model):
                 addressID = washed['resultater'][0]['adresse']['id']
                 dist = washed['resultater'][0]['vaskeresultat']['afstand']
             except Exception as error:
-                print("Couldn't find addressID for " + self.name)
-                print("Error " + str(error))
+                logger.error("Couldn't find addressID for " + self.name)
+                logger.error("Error " + str(error))
             if (addressID != 0 and dist < 10):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"
                     address = json.loads(requests.get(req).text)
-                    self.longitude = address['geometry']['coordinates'][0]
+                    self.zipcode = address['properties']['postnr']
+                    self.city = address['properties']['postnrnavn']
+                    self.streetname = address['properties']['vejnavn']
+                    self.housenumber = address['properties']['husnr']
+                    self.floor = address['properties']['etage']
+                    self.door = address['properties']['dør']
+                    self.placename = address['properties']['supplerendebynavn']
                     self.latitude = address['geometry']['coordinates'][1]
+                    self.longitude = address['geometry']['coordinates'][0]
                     self.municipality = address['properties']['kommunenavn']
                     self.dawa_id = address['properties']['id']
                     self.save()
-                    print("Opdateret for " + self.name)
-                    print("Updated coordinates for " + self.name)
-                    print("Updated municipality for " + self.name)
                 except Exception as error:
-                    print("Couldn't find coordinates for " + self.name)
-                    print("Error " + str(error))
+                    logger.error("Couldn't find coordinates for " + self.name)
+                    logger.error("Error " + str(error))
                     return None
             else:
                 self.address_invalid = True
