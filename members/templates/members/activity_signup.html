@@ -109,18 +109,6 @@
                         <th>Forældres e-mail</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {% for participant in participants %}
-                        <tr>
-                          <td>{{participant.member.person.name}}</td>
-                          {% if participant.contact_visible %}
-                            <td>{{participant.member.person.family.email}}</td>
-                          {% else %}
-                            <td></td>
-                          {% endif %}
-                        </tr>
-                      {%endfor%}
-                    </tbody>
                   </table>
                 </div>
               </div>

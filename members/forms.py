@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from members.models.activityparticipant import ActivityParticipant
 from members.models.department import Department
 from members.models.person import Person
 from members.models.payment import Payment
@@ -246,7 +247,7 @@ class ActivitySignupForm(forms.Form):
                                  HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
                                  css_class="col-md-6"),
                              Div(
-                                 'address_permission', 'read_conditions',
+                                 'photo_permission', 'read_conditions',
                                  css_class="col-md-6"),
                              css_class="row"),
                          ),
@@ -260,9 +261,8 @@ class ActivitySignupForm(forms.Form):
         )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
-    # photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial=ActivityParticipant.PHOTO_OK, required=True, choices=((ActivityParticipant.PHOTO_OK, 'Ja, det er OK'),(ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
-    address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", initial='YES', required=True, choices=(('YES', 'Ja'), ('NO', 'Nej')))
-    read_conditions = forms.ChoiceField(label="Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?", initial='YES', required=True, choices=(('YES', 'Ja'), ('NO', 'Nej')))
+    photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial=ActivityParticipant.PHOTO_NOTOK, required=True, choices=((ActivityParticipant.PHOTO_OK, 'Ja, det er OK'), (ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
+    read_conditions = forms.ChoiceField(label="Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?", initial='NO', required=True, choices=(('YES', 'Ja'), ('NO', 'Nej')))
     payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'Betalingskort / Mobilepay'), (Payment.OTHER, 'Andet er aftalt')))
 
 
