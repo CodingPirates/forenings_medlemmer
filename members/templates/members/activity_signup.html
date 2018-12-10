@@ -98,24 +98,9 @@
             <div class="panel-heading">
               <h2 class="panel-title">{{person.name}} er tilmeldt dette arrangement</h2>
             </div>
-            <div class="panel-body">
-              <div class="row">
-                <div class="col-md-12">
-                  <h3>Holdliste</h3>
-                  <table class="table table-striped table-responsive">
-                    <thead>
-                      <tr>
-                        <th>Navn</th>
-                        <th>Forældres e-mail</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
-            </div>
           </div>
         {% endif %}
-        {% if signup_closed %}
+        {% if signup_closed and not participating %}
           <hr>
             <blockquote class="bg-warning">
               <p >Arrangementet er desværre udsolgt!</p>
