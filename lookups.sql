@@ -1,3 +1,10 @@
+# Regions
+# DK01 Hovedstaden
+# DK02 Sjælland
+# DK03 Syddanmark
+# DK04 Midtjylland
+# DK05 Nordjylland
+
 #Waitinglist (pr. region)
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
   INNER JOIN members_waitinglist AS wl ON wl.person_id=p.id
@@ -8,6 +15,22 @@ SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
   INNER JOIN members_waitinglist AS wl ON wl.person_id=p.id
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
+
+# personer (pr. postnummer)
+SELECT (zr.latitude || ", " || zr.longitude) as Location, (zr.zipcode) as Postnummer, COUNT(DISTINCT p.id) as Value FROM members_person AS p
+  JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
+  GROUP BY zr.zipcode;
+
+# Deltagere (pr. region)
+SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
+  JOIN members_member AS m ON m.person_id=p.id
+  JOIN members_activityparticipant AS ap ON ap.member_id=m.id
+  JOIN members_activity AS a ON a.id=ap.activity_id
+  JOIN members_family AS f ON f.id=p.family_id
+  JOIN members_department AS d ON d.id=a.department_id
+  JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
+    AND a.end_date > '2018-03-06'
+  GROUP BY zr.region;
 
 # Medlemmer (pr. region)
 SELECT zr.region, COUNT(DISTINCT p.id) FROM members_person AS p
@@ -76,7 +99,7 @@ SELECT DISTINCT f.email, p.name FROM members_person AS p
   JOIN members_zipcoderegion AS zr ON zr.zipcode=p.zipcode
   JOIN members_activity AS a ON a.id=ap.activity_id
   JOIN members_family AS f ON f.id=p.family_id
-    WHERE zr.region IN ('DK01', 'DK02') AND a.end_date > '2017-02-21'
+    a.end_date > '2018-02-21'
     AND f.dont_send_mails=0;;
 
 # venteliste børn i en region
