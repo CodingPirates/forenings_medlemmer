@@ -58,6 +58,19 @@ class EmailSendCronJob(CronJobBase):
             curEmail.send()
 
 
+class UpdateDawaData(CronJobBase):
+    RUN_EVERY_MINS = 1
+
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'members.update_dawa_data'
+
+    def do(self):
+        persons = Person.objects.filter(municipality__isnull=True).exclude(streetname__exact="").exclude(address_invalid__exact=True)[:50]
+
+        for person in persons:
+            person.update_dawa_data()
+
+
 # Find families, which needs to update their information
 class RequestConfirmationCronJob(CronJobBase):
     RUN_AT_TIMES = ['15:00', ]

@@ -3,14 +3,15 @@
 from django.db import models
 from django.utils import timezone
 
+
 class Activity(models.Model):
     class Meta:
-        verbose_name='Aktivitet'
+        verbose_name = 'Aktivitet'
         verbose_name_plural = 'Aktiviteter'
-        ordering = ['department__zipcode','start_date']
+        ordering = ['department__zipcode', 'start_date']
     department = models.ForeignKey('Department')
     union = models.ForeignKey('Union', blank=True, null=True)
-    name = models.CharField('Navn',max_length=200)
+    name = models.CharField('Navn', max_length=200)
     open_hours = models.CharField('Tidspunkt',max_length=200)
     responsible_name = models.CharField('Ansvarlig',max_length=200)
     responsible_contact = models.EmailField('E-mail')
