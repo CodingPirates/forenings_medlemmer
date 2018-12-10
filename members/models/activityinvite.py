@@ -12,12 +12,12 @@ from django.utils import timezone
 # TODO: make configurable in settings file
 def _defaultInviteExpiretime():
     now = timezone.now()
-    return now + timedelta(days=30*3)
+    return now + timedelta(days=30 * 3)
 
 
 class ActivityInvite(models.Model):
     class Meta:
-        verbose_name='Invitation'
+        verbose_name = 'Invitation'
         verbose_name_plural = 'Invitationer'
         unique_together = ('activity', 'person')
     activity = models.ForeignKey('Activity')
@@ -35,16 +35,16 @@ class ActivityInvite(models.Model):
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
             template = members.models.emailtemplate.EmailTemplate.objects.get(idname='ACT_INVITE')
-            context={'activity': self.activity,
-                     'activity_invite' : self,
-                     'person' : self.person,
-                     'family' : self.person.family,
-                     }
+            context = {'activity': self.activity,
+                       'activity_invite': self,
+                       'person': self.person,
+                       'family': self.person.family,
+                       }
             if self.person.email and (self.person.email != self.person.family.email):
                 # If invited has own email, also send to that.
                 template.makeEmail([self.person, self.person.family], context)
             else:
-                #otherwise use only family
+                # otherwise use only family
                 template.makeEmail(self.person.family, context)
             # remove from department waiting list
             if self.activity.is_season():
@@ -52,4 +52,4 @@ class ActivityInvite(models.Model):
         return super(ActivityInvite, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{}, {}'.format(self.activity,self.person)
+        return '{}, {}'.format(self.activity, self.person)

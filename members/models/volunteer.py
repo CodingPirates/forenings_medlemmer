@@ -10,10 +10,12 @@ class Volunteer(models.Model):
         verbose_name_plural = "Frivillige"
     person = models.ForeignKey('Person')
     department = models.ForeignKey('Department')
+
     def has_certificate(self):
         return self.person.has_certificate
     added = models.DateTimeField('Start', default=timezone.now)
     confirmed = models.DateTimeField('Bekræftet', blank=True, null=True, default=None)
     removed = models.DateTimeField('Slut', blank=True, null=True, default=None)
+
     def __str__(self):
         return self.person.__str__()
