@@ -261,7 +261,7 @@ class ActivitySignupForm(forms.Form):
         )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
-    photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial=ActivityParticipant.PHOTO_NOTOK, required=True, choices=((ActivityParticipant.PHOTO_OK, 'Ja, det er OK'), (ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
+    photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial='Choose', required=True, choices=(('Choose', 'Vælg om vi må tage billeder'), (ActivityParticipant.PHOTO_OK, 'Ja, det er OK'), (ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
     read_conditions = forms.ChoiceField(label="Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?", initial='NO', required=True, choices=(('YES', 'Ja'), ('NO', 'Nej')))
     payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'Betalingskort / Mobilepay'), (Payment.OTHER, 'Andet er aftalt')))
 

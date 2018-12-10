@@ -71,6 +71,9 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
     else:
         invitation = None
 
+    # signup_closed should default to False
+    signup_closed = False
+
     # if activity is closed for signup, only invited persons can still join
     if activity.signup_closing < timezone.now().date() and invitation is None:
         view_only_mode = True  # Activivty closed for signup
@@ -122,7 +125,9 @@ def ActivitySignup(request, activity_id, unique=None, person_id=None):
             if signup_form.cleaned_data['read_conditions'] == "NO":
                 return HttpResponse("For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser.")
 
-            # update photo permission and contact open info
+            # Make sure people have selected yes or no in photo permission and update photo permission
+            if signup_form.cleaned_data['photo_permission'] == "Choose":
+                return HttpResponse("Du skal vælge om vi må tage billeder eller ej.")
             participant.photo_permission = signup_form.cleaned_data['photo_permission']
             participant.save()
 
