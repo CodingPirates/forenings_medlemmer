@@ -107,7 +107,7 @@ USE_L10N = True
 USE_TZ = True
 
 DATE_INPUT_FORMATS = (
-    '%d-%m-%Y', '%d-%m-%y', # '25-10-06', '25-10-06'
+    '%d-%m-%Y', '%d-%m-%y',  # '25-10-06', '25-10-06'
 )
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -149,7 +149,7 @@ CRON_CLASSES = [
 ]
 
 # Dont keep job logs more than 7 days old
-DJANGO_CRON_DELETE_LOGS_OLDER_THAN=7
+DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 7
 
-QUICKPAY_API_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-QUICKPAY_PRIVATE_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+QUICKPAY_API_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+QUICKPAY_PRIVATE_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
