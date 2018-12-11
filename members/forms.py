@@ -81,10 +81,9 @@ class PersonForm(forms.ModelForm):
         }
         widgets = {'dawa_id': forms.HiddenInput()}
 
-
-search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
-manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
-address_global = forms.ChoiceField(label="Opdater hele familien med denne adresse", widget=forms.CheckboxInput, initial=True, required=False, choices=((True, 'True'), (False, 'False')))
+    search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
+    manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
+    address_global = forms.ChoiceField(label="Opdater hele familien med denne adresse", widget=forms.CheckboxInput, initial=True, required=False, choices=((True, 'True'), (False, 'False')))
 
 
 class getLoginForm(forms.Form):
