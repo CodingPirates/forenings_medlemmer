@@ -9,6 +9,7 @@ from members.models.person import Person
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
 
+
 def PersonUpdate(request, unique, id):
     try:
         unique = uuid.UUID(unique)
@@ -21,7 +22,7 @@ def PersonUpdate(request, unique, id):
     if request.method == 'POST':
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
-            UpdatePersonFromForm(person,form)
+            UpdatePersonFromForm(person, form)
             return HttpResponseRedirect(reverse('family_detail', args=[person.family.unique]))
     else:
         form = PersonForm(instance=person)
