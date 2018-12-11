@@ -1,3 +1,4 @@
+# flake8: noqa  # ignored since it is being used in the files
 from members.views.FamilyDetails import FamilyDetails
 from members.views.ConfirmFamily import ConfirmFamily
 from members.views.PersonCreate import PersonCreate
