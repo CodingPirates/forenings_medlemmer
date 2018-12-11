@@ -784,7 +784,7 @@ class PersonAdmin(admin.ModelAdmin):
                                         invited_counter = invited_counter + 1
                                         invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
                                         invitation.save()
-                        except Exception as e:
+                        except Exception:
                             messages.error(request, "Fejl - ingen personer blev inviteret! Der var problemer med " + invitation.person.name + ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.")
                             return
 
