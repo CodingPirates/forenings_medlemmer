@@ -1,7 +1,6 @@
 .navbar {
     border-bottom: 5px #B1B9BA solid;
     display:block;
-    height:50px;
 }
 .navbar-nav {
     float:right;
@@ -10,8 +9,19 @@
     float:left;
 }
  .navbar-nav>li {
-    list-style: none;
     display:list-item;
-    padding:10px;
     font-size:150%;
+    list-style: none;
+    padding:10px;
+}
+
+.newloginnotice {
+    background-color:#FFFF00;
+    min-width: 100%;
+    padding: 10px;
+}
+
+.input-group-addon {
+    min-width: 200px;
+    text-align: left;
 }

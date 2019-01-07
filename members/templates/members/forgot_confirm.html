@@ -2,31 +2,33 @@
 
 {% block content %}
     {% if validlink %}
-    <div class="row">
-        <div class="col-md-12 col-md-offset-1">
-            <h1>Lav ny kode</h1>
+    <div class="col-md-10 col-md-offset-1">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Lav ny kode</h1>
+            </div>
         </div>
+        <div class="row">
+            <div class="col-md-8">
+                <p>Indtast din nye kode nedenfor 2 gange, så vi er sikre på du har skrevet rigtigt.</p>
+            </div>
+        </div>
+        <form method="post">{% csrf_token %}
+        <fieldset class="module aligned">
+            <div class="input-group form-row field-password1">
+                {{ form.new_password1.errors }}
+                <span class="input-group-addon">Ny adgangskode: </span>
+                <span class="form-control">{{ form.new_password1 }}</span>
+            </div>
+            <div class="input-group form-row field-password2">
+                {{ form.new_password2.errors }}
+                <span class="input-group-addon">Gentag ny adgangskode: </span>
+                <span class="form-control">{{ form.new_password2 }}</span>
+            </div>
+            <input type="submit" class="btn btn-success" value="Ændr adgangskoden" />
+        </fieldset>
+        </form>
     </div>
-    <div class="row">
-        <div class="col-md-8 col-md-offset-1">
-            <p>Indtast din nye kode nedenfor 2 gange, så vi er sikre på du har skrevet rigtigt.</p>
-        </div>
-    </div>
-    <form method="post">{% csrf_token %}
-    <fieldset class="module aligned">
-        <div class="form-row field-password1">
-            {{ form.new_password1.errors }}
-            <label for="id_new_password1">Ny adgangskode: </label>
-            {{ form.new_password1 }}
-        </div>
-        <div class="form-row field-password2">
-            {{ form.new_password2.errors }}
-            <label for="id_new_password1">Gentag ny adgangskode: </label>
-            {{ form.new_password2 }}
-        </div>
-        <input type="submit" value="Ændr adgangskoden" />
-    </fieldset>
-    </form>
     {% else %}
     <div class="row">
         <div class="col-md-12 col-md-offset-1">
