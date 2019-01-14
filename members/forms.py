@@ -267,7 +267,8 @@ class ActivitySignupForm(forms.Form):
                          ),
                 css_class="panel-body"),
                 css_class="panel panel-success"),
-        )
+                )
+            )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
     photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial='Choose', required=True, choices=(('Choose', 'Vælg om vi må tage billeder'), (ActivityParticipant.PHOTO_OK, 'Ja, det er OK'), (ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
