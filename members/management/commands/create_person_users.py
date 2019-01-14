@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from members.models.person import Person
 from django.contrib.auth.models import User
-import random
 
 
 class Command(BaseCommand):
