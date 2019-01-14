@@ -131,10 +131,11 @@
                   {% for activity in open_activities %}
                       <tr>
                         <td> - </td>
-                        <td><a href="{%url 'activity_signup' activity.id child.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
+                        {{ children }}
+                        <td><a href="{%url 'activity_view_family' activity.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
                           <td>
                           {% for person in activity.persons %}
-                        <td><a class="btn btn-success" href="{%url 'activity_signup' activity.id child.id %}">Tilmeld aktivitet</a></td>
+                        <td><a class="btn btn-success" href="{%url 'activity_signup' activity.id person.id %}">Tilmeld aktivitet</a></td>
                           {% endfor %}
                           </td>
                         <td></td>

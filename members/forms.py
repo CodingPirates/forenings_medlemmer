@@ -263,7 +263,7 @@ class ActivitySignupForm(forms.Form):
                          Fieldset('Betaling',
                                   Field('payment_option', aria_describedby="paymentHelp"),
                                   HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
-                                  FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' family.unique %}'>Tilbage</a>")),
+                                  FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>")),
                                   ),
                          css_class="panel-body"),
                     css_class="panel panel-success"),
@@ -284,5 +284,5 @@ class ActivivtyInviteDeclineForm(forms.Form):
         self.helper.form_action = ''
         self.helper.html5_required = True
         self.helper.layout = Layout(Submit('submit', 'Afslå invitationen', css_class="btn-danger"),
-                                    HTML('<a class="btn btn-link" href="{% url "family_detail" activity_invite.person.family.unique %}">Tilbage</a>')
+                                    HTML('<a class="btn btn-link" href="{% url "family_detail" %}">Tilbage</a>')
                                     )
