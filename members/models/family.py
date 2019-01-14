@@ -24,7 +24,7 @@ class Family(models.Model):
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
 
     def get_abosolute_url(self):
-        return reverse('family_form', kwargs={'pk': self.unique})
+        return reverse('family_form')
 
     def __str__(self):
         return self.email

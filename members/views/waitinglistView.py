@@ -1,20 +1,16 @@
 import uuid
-
 from django.shortcuts import render
 
 from members.models.department import Department
 from members.models.waitinglist import WaitingList
+from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponseBadRequest
 
 
-def waitinglistView(request, unique=None):
-    try:
-        if unique is not None:
-            unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
-
+@login_required
+def waitinglistView(request):
+    unique = request.user.family.unique
     department_children_waiting = {'departments': {}}
     department_loop_counter = 0
     # deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)

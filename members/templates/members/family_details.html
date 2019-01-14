@@ -45,7 +45,7 @@
                     <td></td>
                     {%endif%}
 
-                    <td><p><a href="{% url 'person_update' family.unique person.id %}">{{person.name}}</a></p>
+                    <td><p><a href="{% url 'person_update' person.id %}">{{person.name}}</a></p>
 
                     {%if person.membertype == 'PA' %} <p class="text-muted">(Forælder)</p> {%endif%}
                     {%if person.membertype == 'GU' %} <p class="text-muted">(Værge)</p> {%endif%}
@@ -67,9 +67,9 @@
               </tfoot>
             </table>
             {% endif %}
-            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'CH' %}">Opret barn</a>
-            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'PA' %}">Opret forælder</a>
-            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' family.unique 'GU' %}">Opret værge</a>
+            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' 'CH' %}">Opret barn</a>
+            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' 'PA' %}">Opret forælder</a>
+            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' 'GU' %}">Opret værge</a>
             <br/>
             <br/>
             {%if request_parents %}
@@ -79,7 +79,7 @@
             {%endif%}
             {% if need_confirmation %}
             <blockquote class="bg-danger">
-            <p>Det er længe siden du sidst bekræftede dine oplysninger. <a class="btn btn-success" href="{% url 'confirm_details' family.unique %}">Bekræft oplysninger</a>
+            <p> Det er længe siden du sidst bekræftede dine oplysninger. <a class="btn btn-success" href="{% url 'confirm_details' %}">Bekræft oplysninger</a>
             </blockquote>
             {%endif%}
           </section>
@@ -106,7 +106,7 @@
                 {% for participation in participating %}
                   <tr>
                     <td>{{participation.member.person.name}}</td>
-                    <td><a href="{%url 'activity_view_person' family.unique participation.activity.id participation.member.person.id %}">{{participation.activity.name}} - {{participation.activity.department.name}}</a>
+                    <td><a href="{%url 'activity_view_person' participation.activity.id participation.member.person.id %}">{{participation.activity.name}} - {{participation.activity.department.name}}</a>
                     {% if not participation.paid %}
                     <a class="btn btn-danger" role="button" href="{{participation.get_payment_link}}">Betal</a>
                     {%endif%}
@@ -142,10 +142,10 @@
                   {% for activity in open_activities %}
                       <tr>
                         <td> - </td>
-                        <td><a href="{%url 'activity_view_family' family.unique activity.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
+                        <td><a href="{%url 'activity_signup' activity.id child.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
                           <td>
                           {% for person in activity.persons %}
-                            <a class="btn btn-success" href="{%url 'activity_signup' family.unique activity.id person.id %}">Tilmeld {{ person.name }}</a>
+                        <td><a class="btn btn-success" href="{%url 'activity_signup' activity.id child.id %}">Tilmeld aktivitet</a></td>
                           {% endfor %}
                           </td>
                         <td></td>
@@ -155,9 +155,9 @@
                   {% for invite in invites %}
                     <tr>
                       <td>{{invite.person.name}}</td>
-                      <td><a href="{%url 'activity_signup' family.unique invite.activity.id invite.person.id %}">{{invite.activity.name}} - <h4><b>{{invite.activity.department.name}}</b></h4></a></td>
-                      <td><a class="btn btn-success" href="{%url 'activity_signup' family.unique invite.activity.id invite.person.id %}">Tilmeld aktivitet</a></td>
-                      <td><a class="btn btn-danger" href="{%url 'invitation_decline' family.unique invite.id %}">Afslå</a></td>
+                      <td><a href="{%url 'activity_signup' invite.activity.id invite.person.id %}">{{invite.activity.name}} - <h4><b>{{invite.activity.department.name}}</b></h4></a></td>
+                      <td><a class="btn btn-success" href="{%url 'activity_signup' invite.activity.id invite.person.id %}">Tilmeld aktivitet</a></td>
+                      <td><a class="btn btn-danger" href="{%url 'invitation_decline' invite.id %}">Afslå</a></td>
                     </tr>
                   {% endfor %}
 
@@ -176,7 +176,7 @@
       <p>Tryk på <kbd>Opskriv</kbd> knapperne for hver afdeling der har interesse for jer. Bemærk at jeres position på ventelisten afgøres ud fra barnets oprettelses tidspunkt i systemet (datoen "Opskrevet" i Personer) - <i> ikke tidspunktet i melder jeg på ventelisterne nedenfor! - </i> I kan derfor frit tilmelde og framelde jer ventelisterne uden at frygte i mister jeres position på listen.</p>
       <p>Tryk på <kbd>Afmeld</kbd> knapperne for at forlade en afdelings ventelisten igen.</p>
       <p>Opret jer kun på de lister der har interesse for jer. Det er en god ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun tilbud om at komme med på de afdelinger de har skrevet sig op til.</p>
-      <h3><a href="{% url 'family_waitinglist_view' family.unique %}">Se jeres nuværende position på ventelisterne</a></h3>
+      <h3><a href="{% url 'family_waitinglist_view' %}">Se jeres nuværende position på ventelisterne</a></h3>
       <div class="row">
         <div class="col-xs-12">
           <section class="panel panel-defualt">
@@ -200,14 +200,14 @@
                       <td>
                       {%for key, child in department.children_status.items %}
                         {%if not child.waiting %}
-                          <a class="btn btn-success" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'subscribe' %}">Opskriv: {{child.firstname}}</a>
+                          <a class="btn btn-success" href="{% url 'waiting_list_subscription' child.object.id department.object.id 'subscribe' %}">Opskriv: {{child.firstname}}</a>
                         {%endif%}
                       {%endfor%}
                       </td>
                       <td>
                       {%for key, child in department.children_status.items %}
                         {%if child.waiting %}
-                          <a class="btn btn-danger" href="{% url 'waiting_list_subscription' child.object.family.unique child.object.id department.object.id 'unsubscribe' %}">Afmeld: {{child.firstname}}</a>
+                          <a class="btn btn-danger" href="{% url 'waiting_list_subscription' child.object.id department.object.id 'unsubscribe' %}">Afmeld: {{child.firstname}}</a>
                         {%endif%}
                       {%endfor%}
                       </td>

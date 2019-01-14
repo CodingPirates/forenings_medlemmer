@@ -65,7 +65,7 @@ class PersonForm(forms.ModelForm):
                          css_class="row")
                      ),
             Submit('submit', 'Opret' if self.instance.id is None else 'Ret', css_class="btn-success"),
-            HTML("""<a class="btn btn-link" href="{% url 'family_detail' person.family.unique %}">Fortryd</a>""")
+            HTML("""<a class="btn btn-link" href="{% url 'family_detail' %}">Fortryd</a>""")
         )
         self.helper.render_unmentioned_fields = False
         self.fields['birthday'].input_formats = (settings.DATE_INPUT_FORMATS)

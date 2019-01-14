@@ -1,10 +1,10 @@
 import datetime
 import uuid
-
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseBadRequest
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
@@ -15,13 +15,10 @@ from members.models.person import Person
 from members.models.waitinglist import WaitingList
 
 
-def FamilyDetails(request, unique):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
+@login_required
+def FamilyDetails(request):
 
-    family = get_object_or_404(Family, unique=unique)
+    family = user_to_person(request.user).family
     invites = ActivityInvite.objects.filter(person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None)
     open_activities = Activity.objects.filter(open_invite=True, signup_closing__gte=timezone.now()).order_by('zipcode')
     participating = ActivityParticipant.objects.filter(member__person__family=family).order_by('-activity__start_date')
