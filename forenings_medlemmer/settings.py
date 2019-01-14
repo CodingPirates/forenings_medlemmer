@@ -135,7 +135,7 @@ EMAIL_HOST_PASSWORD = 'password'
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 30
 
-#if DEBUG:
+# if DEBUG:
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 CRON_CLASSES = [
@@ -152,8 +152,8 @@ CRON_CLASSES = [
 # Dont keep job logs more than 7 days old
 DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 7
 
-QUICKPAY_API_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-QUICKPAY_PRIVATE_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+QUICKPAY_API_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+QUICKPAY_PRIVATE_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
 LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/family/'
