@@ -76,7 +76,7 @@ class Department(models.Model):
                 dist = washed['resultater'][0]['vaskeresultat']['afstand']
             except Exception as error:
                 print("Couldn't find addressID for " + self.name)
-                print("Error " +  str(error))
+                print("Error " + str(error))
             if (addressID != 0 and dist < 10):
                 try:
                     req = 'https://dawa.aws.dk/adresser/' + addressID + "?format=geojson"

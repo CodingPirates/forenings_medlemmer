@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from members.models.activityparticipant import ActivityParticipant
 from members.models.department import Department
 from members.models.person import Person
 from members.models.payment import Payment
@@ -79,7 +80,6 @@ class PersonForm(forms.ModelForm):
             'birthday': {'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'},
         }
         widgets = {'dawa_id': forms.HiddenInput()}
-
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     manual_entry = forms.ChoiceField(label="Indtast felter manuelt", widget=forms.CheckboxInput, required=False, choices=((True, 'True'), (False, 'False')))
@@ -249,20 +249,29 @@ class ActivitySignupForm(forms.Form):
                         'address_permission', 'read_conditions',
                         css_class="col-md-6"),
                     css_class="row"),
-            ),
-            Fieldset('Betaling',
-                Field('payment_option', aria_describedby="paymentHelp"),
-                HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
-                FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>")),
-            ),
-            css_class="panel-body"),
-            css_class="panel panel-success"),
+                Fieldset('Tilmeldings oplysninger',
+                         Div(
+                             Div(
+                                 Field('note', aria_describedby="noteHelp"),
+                                 HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
+                                 css_class="col-md-6"),
+                             Div(
+                                 'photo_permission', 'read_conditions',
+                                 css_class="col-md-6"),
+                             css_class="row"),
+                         ),
+                Fieldset('Betaling',
+                         Field('payment_option', aria_describedby="paymentHelp"),
+                         HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
+                         FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' family.unique %}'>Tilbage</a>")),
+                         ),
+                css_class="panel-body"),
+                css_class="panel panel-success"),
         )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
-    # photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial=ActivityParticipant.PHOTO_OK, required=True, choices=((ActivityParticipant.PHOTO_OK, 'Ja, det er OK'),(ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
-    address_permission = forms.ChoiceField(label="Må vi sætte din email samt telefonnummer på holdlisten, der er synlig for de andre deltagere?", initial='YES', required=True, choices=(('YES', 'Ja'), ('NO', 'Nej')))
-    read_conditions = forms.ChoiceField(label="Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?", initial='YES', required=True, choices=(('YES', 'Ja'), ('NO', 'Nej')))
+    photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial='Choose', required=True, choices=(('Choose', 'Vælg om vi må tage billeder'), (ActivityParticipant.PHOTO_OK, 'Ja, det er OK'), (ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
+    read_conditions = forms.ChoiceField(label="Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?", initial='NO', required=True, choices=(('YES', 'Ja'), ('NO', 'Nej')))
     payment_option = forms.ChoiceField(label="Vælg betalings metode", required=True, choices=((Payment.CREDITCARD, 'Betalingskort / Mobilepay'), (Payment.OTHER, 'Andet er aftalt')))
 
 
