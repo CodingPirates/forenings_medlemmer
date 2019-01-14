@@ -1,14 +1,24 @@
 from django.conf.urls import url
-from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, loginEmailSent, ConfirmFamily, QuickpayCallback, ActivitySignup, \
+from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, userCreated, ConfirmFamily, QuickpayCallback, ActivitySignup, \
     waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView
 from django.contrib.auth import views as auth_views
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     url(r'^$', EntryPage, name='entry_page'),
     url(r'^account/login/$', auth_views.login, {'template_name': 'members/login.html'}, name='person_login'),
+    url(r'^account/forgot/$', auth_views.password_reset,
+        {'template_name': 'members/forgot.html',
+         'email_template_name': 'members/email/password_reset.txt',
+         'html_email_template_name': 'members/email/password_reset.html',
+         'subject_template_name': 'members/email/password_reset_subject.txt'},
+        name='password_reset'),
+    url(r'^account/forgot/done/$', auth_views.password_reset_done, {'template_name': 'members/forgot_done.html'}, name='password_reset_done'),
+    url(r'^account/forgot/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, {'template_name': 'members/forgot_confirm.html'}, name='password_reset_confirm'),
+    url(r'^account/forgot/complete/$', auth_views.password_reset_complete, {'template_name': 'members/forgot_complete.html'}, name='password_reset_complete'),
     url(r'^account/logout/$', auth_views.logout, {'next_page': '/'}, name='person_logout'),
     url(r'volunteer$', volunteerSignup, name='volunteer_signup'),
-    url(r'login_email_sent/$', loginEmailSent, name='login_email_sent'),
+    url(r'user_created/$', userCreated, name='user_created'),
     url(r'family/$', FamilyDetails, name='family_detail'),
     url(r'family/Person/(?P<id>[\d]+)/$', PersonUpdate, name='person_update'),
     url(r'family/Person/(?P<membertype>[A-Z]{2})$', PersonCreate, name='person_add'),
@@ -24,4 +34,18 @@ urlpatterns = [
     url(r'quickpay_callback$', QuickpayCallback, name='quickpay_callback'),
     url(r'waitinglist$', waitinglistView, name='waitinglist_view'),
     url(r'departments$', departmentView, name='department_view'),
+]
+
+# Redirect all old urls containing family unique values
+urlpatterns += [
+    url(r'family/[\w-]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/Person/[\d]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/Person/[A-Z]{2}$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/activity/[\d]+/person/[\d]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/activity/[\d]+/person/[\d]+/view/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/invitation_decline/[\d]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/waitinglist$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'family/[\w-]+/payment_gateway_error$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'confirm_details/[\w-]+/$', RedirectView.as_view(url='/family/', permanent=True)),
+    url(r'waiting_list/[\w-]+/[\d]+/[\d]+/(subscribe|unsubscribe)/$', RedirectView.as_view(url='/family/', permanent=True)),
 ]

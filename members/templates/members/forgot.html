@@ -1,0 +1,23 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+    {% if form.errors %}
+    <p>Du skal skrive en rigtig email.</p>
+    {% endif %}
+    <form class="col-md-8 col-md-offset-1" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="row">
+            <div class="input-group">
+                <span class="input-group-addon">{{ form.email.label_tag }}</span>
+                <span class="form-control">{{ form.email }}</span>
+            </div>
+        </div>
+        <div class="row form-inline">
+            <div class="input-group">
+                <input type="submit"
+                        class="form-control btn-success float-left" value="Nulstil kode" />
+            </div>
+        </div>
+    </form>
+{% endblock %}

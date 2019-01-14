@@ -1,9 +1,10 @@
 from django.core.urlresolvers import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
-from members.forms import getLoginForm, signupForm
+from members.forms import signupForm
 from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 from members.models.family import Family
 from members.models.person import Person
 
@@ -14,7 +15,6 @@ def EntryPage(request):
         # figure out which form was filled out.
         if request.POST['form_id'] == 'signup':
             # signup has been filled
-            getLogin = getLoginForm()
             signup = signupForm(request.POST)
             if signup.is_valid():
                 # check if family already exists
@@ -22,8 +22,8 @@ def EntryPage(request):
                 try:
                     family = Family.objects.get(email__iexact=request.POST['parent_email'])
                     # family was already created - we can't create this family again
-                    signup.add_error('parent_email', 'Denne email adresse er allerede oprettet. Du kan tilføje flere børn på samme forælder, når du er kommet videre! - Benyt "Gå til min side" ovenfor, for at få gensendt et link hvis du har mistet det')
-                    return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
+                    signup.add_error('parent_email', 'Denne email adresse er allerede oprettet. Du kan tilføje flere børn på samme forælder, når du er kommet videre! - Log ind ovenfor, for at få adgang.')
+                    return render(request, 'members/entry_page.html', {'signupform': signup})
                 except Exception:
                     # all is fine - we did not expect any
                     pass
@@ -69,37 +69,21 @@ def EntryPage(request):
                                               )
                 child.save()
 
-                # send email with login link
-                family.send_link_email()
+                # create parent as user
+                user = User.objects.create_user(
+                    username=parent.email,
+                    email=parent.email
+                )
+                password = User.objects.make_random_password()
+                user.set_password(password)
+                user.save()
 
                 # redirect to success
-                return HttpResponseRedirect(reverse('login_email_sent'))
+                request.session['password'] = password
+                return HttpResponseRedirect(reverse('user_created'))
             else:
-                getLogin = getLoginForm()
-                return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
-
-        elif request.POST['form_id'] == 'getlogin':
-            # just resend email
-            signup = signupForm()
-            getLogin = getLoginForm(request.POST)
-            if getLogin.is_valid():
-                # find family
-                try:
-                    family = Family.objects.get(email=getLogin.cleaned_data['email'])
-
-                    if family.dont_send_mails:
-                        getLogin.add_error('email', 'Du har frabedt dig emails fra systemet. Kontakt Coding Pirates direkte.')
-                    else:
-                        # send email to user
-                        family.send_link_email()
-                        return HttpResponseRedirect(reverse('login_email_sent'))
-
-                except Family.DoesNotExist:
-                    getLogin.add_error('email', 'Denne addresse er ikke kendt i systemet. Hvis du er sikker på du er oprettet, så check adressen, eller opret dig via tilmeldings formularen først.')
-
-            return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
+                return render(request, 'members/entry_page.html', {'signupform': signup})
 
     # initial load (if we did not return above)
-    getLogin = getLoginForm()
     signup = signupForm()
-    return render(request, 'members/entry_page.html', {'loginform': getLogin, 'signupform': signup})
+    return render(request, 'members/entry_page.html', {'signupform': signup})

@@ -1,0 +1,14 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12 col-md-offset-1">
+            <h1>Adgangskode ændret</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-1">
+            <p>Din adgangskode er nu blevet ændret, og du kan nu <a href="{% url 'person_login' %}" title="Log ind">logge ind</a>.</p>
+        </div>
+    </div>
+{% endblock %}

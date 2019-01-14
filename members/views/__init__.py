@@ -8,8 +8,8 @@ from members.views.DeclineInvitation import DeclineInvitation
 from members.views.ActivitySignup import ActivitySignup
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
 from members.views.EntryPage import EntryPage
+from members.views.userCreated import userCreated
 from members.views.volunteerSignup import volunteerSignup
-from members.views.loginEmailSent import loginEmailSent
 from members.views.QuickpayCallback import QuickpayCallback
 from members.views.waitinglistView import waitinglistView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView

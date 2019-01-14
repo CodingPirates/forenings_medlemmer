@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 from members.forms import ActivivtyInviteDeclineForm
 from members.models.activityinvite import ActivityInvite
+from members.utils.user import user_to_person
 
 
 @login_required

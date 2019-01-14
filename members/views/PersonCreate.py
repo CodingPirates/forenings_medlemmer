@@ -10,6 +10,7 @@ from members.models.family import Family
 from members.models.person import Person
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
+from members.utils.user import user_to_person
 
 
 @login_required
@@ -22,7 +23,7 @@ def PersonCreate(request, membertype):
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
             UpdatePersonFromForm(person, form)
-            return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
+            return HttpResponseRedirect(reverse('family_detail'))
     else:
         person = Person()
         person.membertype = membertype

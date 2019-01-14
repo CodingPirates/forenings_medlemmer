@@ -25,6 +25,7 @@ TEMPLATES = [
                 # list if you haven't customized them:
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
+                'django.core.context_processors.request',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
@@ -134,8 +135,8 @@ EMAIL_HOST_PASSWORD = 'password'
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 30
 
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#if DEBUG:
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",
@@ -155,4 +156,4 @@ QUICKPAY_API_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 QUICKPAY_PRIVATE_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
 LOGIN_URL = '/account/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/family/'

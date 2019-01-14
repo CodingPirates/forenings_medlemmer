@@ -28,8 +28,7 @@ class Command(BaseCommand):
 
         try:
             csvfile = open(args[0], 'r', encoding='utf-8')
-
-        except Exception:
+        except IOError:
             self.stdout.write('Unable to open file: ' + args[0])
             exit()
 

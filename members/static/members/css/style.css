@@ -1,0 +1,27 @@
+.navbar {
+    border-bottom: 5px #B1B9BA solid;
+    display:block;
+}
+.navbar-nav {
+    float:right;
+}
+.navbar-brand {
+    float:left;
+}
+ .navbar-nav>li {
+    display:list-item;
+    font-size:150%;
+    list-style: none;
+    padding:10px;
+}
+
+.newloginnotice {
+    background-color:#FFFF00;
+    min-width: 100%;
+    padding: 10px;
+}
+
+.input-group-addon {
+    min-width: 200px;
+    text-align: left;
+}

@@ -231,13 +231,23 @@ class ActivitySignupForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Div(Div(HTML("<h2>Tilmelding</h2>"), css_class="panel-heading"),
+            Div(
+            Div(Div(HTML('''
+                <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
+                Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
+                <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
+                '''),
+                css_class="col-md-12"),
+                css_class="row"),
+            Fieldset('Tilmeldings oplysninger',
                 Div(
-                Div(Div(HTML('''
-                    <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
-                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
-                    <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
-                    '''),
-                    css_class="col-md-12"),
+                    Div(
+                        Field('note', aria_describedby="noteHelp"),
+                        HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
+                        css_class="col-md-6"),
+                    Div(
+                        'address_permission', 'read_conditions',
+                        css_class="col-md-6"),
                     css_class="row"),
                 Fieldset('Tilmeldings oplysninger',
                          Div(
@@ -257,7 +267,8 @@ class ActivitySignupForm(forms.Form):
                          ),
                 css_class="panel-body"),
                 css_class="panel panel-success"),
-        )
+                )
+            )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
     photo_permission = forms.ChoiceField(label="Må Coding Pirates tage og bruge billeder af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)", initial='Choose', required=True, choices=(('Choose', 'Vælg om vi må tage billeder'), (ActivityParticipant.PHOTO_OK, 'Ja, det er OK'), (ActivityParticipant.PHOTO_NOTOK, 'Nej, vi vil ikke have i fotograferer')))
