@@ -26,8 +26,8 @@ def ConfirmFamily(request):
         return HttpResponseRedirect(reverse('family_detail'))
     else:
         context = {
-            'family':family,
-            'persons':persons,
+            'family': family,
+            'persons': persons,
             'subscribed_waitinglists': subscribed_waiting_lists
         }
-        return render(request, 'members/family_confirm_details.html',context)
+        return render(request, 'members/family_confirm_details.html', context)

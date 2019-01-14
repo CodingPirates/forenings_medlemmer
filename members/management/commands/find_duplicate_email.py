@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count
 from members.models.person import Person
 
+
 class Command(BaseCommand):
     help = 'Finds parent and guardians with duplicate emails'
 
@@ -10,6 +11,6 @@ class Command(BaseCommand):
 
         for person in Person.objects.filter(membertype__in=[Person.PARENT, Person.GUARDIAN]):
             if person.email and Person.objects.filter(email=person.email, membertype__in=[Person.PARENT, Person.GUARDIAN]).count() < 2:
-                continue # Ignore people with unique emails
+                continue  # Ignore people with unique emails
 
             print(str(person.pk) + ',' + person.email)

@@ -899,7 +899,7 @@ class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ('departments',)
     can_delete = False
-    raw_id_fields = ("person",)
+
 
 # Define PersonInline
 class PersonInline(admin.StackedInline):
@@ -907,9 +907,11 @@ class PersonInline(admin.StackedInline):
     fields = ('name',)
     readonly_fields = ('name',)
 
+
 # Define a new User admin
 class UserAdmin(UserAdmin):
     inlines = (AdminUserInformationInline, PersonInline)
+
 
 # Re-register UserAdmin
 admin.site.unregister(User)
@@ -949,9 +951,10 @@ class EquipmentAdmin(admin.ModelAdmin):
     inlines = (EquipmentLoanInline, )
     list_per_page = 20
 
-#class AdminUserInformationAdmin(admin.ModelAdmin):
+# class AdminUserInformationAdmin(admin.ModelAdmin):
 #    raw_id_fields = ("person",)
 
-#admin.site.register(AdminUserInformation, AdminUserInformationAdmin)
+# admin.site.register(AdminUserInformation, AdminUserInformationAdmin)
+
 
 admin.site.register(Equipment, EquipmentAdmin)

@@ -5,11 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="{% static "members/css/style.css" %}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     {% load bootstrap3 %}
-    {% load crispy_forms_tags %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    {% load crispy_forms_tags %}
     <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
     <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
     <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
@@ -54,22 +55,43 @@
 
   </head>
   <body>
+      <header>
+        <nav class="navbar navbar-expand-md navbar-light fixed-top">
+            <a href="https://codingpirates.dk" class="navbar-brand" title="Coding Pirates">
+                <img src="https://codingpirates.dk/wp-content/uploads/2016/09/Forside-Logo.png"
+                     title="Coding Pirates"
+                     height="60" />
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://codingpirates.dk/">codingpirates.dk</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Tilmeld barn</a>
+                    </li>
+                    <li class="nav-item">
+                        {% include "members/login_logout.html" %}
+                    </li>
+                </ul>
+            </div>
+        </nav>
+      </header>
     <div class="container">
       <div class="row">
-      {% include "members/login_logout.html" %}
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <h1>Gå til min side</h1>
-          <p>Hvis du allerede har tilmeldt dig, så kan du ved at skrive din e-mail-adresse her, få et nyt link til at ændre dine data, eller se din placering på ventelisten.</p>
-        </div>
-        <div class="col-md-12">
-          <div class="panel panel-default">
-            <div class="panel-body">
-              {% crispy loginform %}
-            </div>
+          <div class="newloginnotice">
+              <p>Kære bruger</p>
+
+              <p>Vi har ændret måden, du logger ind i medlemssystemet.
+                  Fremover skal du logge ind med din email og adgangskode.
+                  Det gør du under punktet "Login" i toppen af siden.
+                  Er det første gang, du benytter det nye loginsystem,
+                  skal du generere en adgangskode ved at trykke på knappen "Login" i toppen
+                  og derefter trykke på knappen "Opret adgangskode".
+                  Hvis du har spørgsmål kan du skrive en e-mail til
+                  <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
           </div>
-        </div>
       </div>
 
       <div class="row">
@@ -84,6 +106,13 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="container-fluid" style="padding-top: 20px">
+          <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                  <small><p>Coding Pirates Denmark - Sverigesgade 20, 1., 5000 Odense C, E-mail:<a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a> - <abbr title="Telefon">Tlf</abbr>: +45 28597550 - CVR: 35552316</p></small>
+              </div>
+          </div>
       </div>
     </div>
   </body>

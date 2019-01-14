@@ -4,7 +4,7 @@
     {% if form.errors %}
     <p>Du skal skrive en rigtig email.</p>
     {% endif %}
-    <form class="col-md-8 col-md-offset-2" method="post">
+    <form class="col-md-8 col-md-offset-1" method="post">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
         <div class="row">

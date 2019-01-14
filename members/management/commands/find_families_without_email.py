@@ -3,6 +3,7 @@ from members.models.person import Person
 from members.models.family import Family
 from django.contrib.auth.models import User
 
+
 class Command(BaseCommand):
     help = 'Finds families who has no email at all and print the familys pk'
 
