@@ -1,11 +1,8 @@
-import uuid
 from django.shortcuts import render
 
 from members.models.department import Department
 from members.models.waitinglist import WaitingList
 from django.contrib.auth.decorators import login_required
-
-from django.http import HttpResponseBadRequest
 
 
 @login_required

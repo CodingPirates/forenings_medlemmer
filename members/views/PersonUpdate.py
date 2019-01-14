@@ -1,12 +1,9 @@
-import uuid
-
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from members.forms import PersonForm
-from members.models.person import Person
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
 
@@ -24,4 +21,3 @@ def PersonUpdate(request, id):
     else:
         form = PersonForm(instance=person)
     return render(request, 'members/person_create_or_update.html', {'form': form, 'person': person})
-

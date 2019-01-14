@@ -1,8 +1,6 @@
-import uuid
-
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 
 from members.models.department import Department

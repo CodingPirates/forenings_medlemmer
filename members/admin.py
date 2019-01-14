@@ -827,7 +827,7 @@ class PersonAdmin(admin.ModelAdmin):
             }),
             ('Yderlige informationer', {
                 'classes': ('collapse', ),
-                'fields' : ('membertype', 'birthday', 'has_certificate', 'added', 'user'),
+                'fields': ('membertype', 'birthday', 'has_certificate', 'added', 'user'),
             }),
         )
 
@@ -896,7 +896,6 @@ class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ('departments',)
     can_delete = False
-
 
 
 # Define PersonInline

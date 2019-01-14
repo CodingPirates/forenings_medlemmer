@@ -1,8 +1,6 @@
 import datetime
-import uuid
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseBadRequest
+from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
@@ -10,7 +8,6 @@ from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
 from members.models.department import Department
-from members.models.family import Family
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person

@@ -1,7 +1,6 @@
-import uuid
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
@@ -10,7 +9,6 @@ from members.forms import ActivitySignupForm
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
-from members.models.family import Family
 from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
@@ -141,8 +139,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                     )
                     payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url = settings.BASE_URL + reverse('activity_view_person', args=[activity.id, person.id]))
-
+                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url=settings.BASE_URL + reverse('activity_view_person', args=[activity.id, person.id]))
 
             # expire invitation
             if invitation:

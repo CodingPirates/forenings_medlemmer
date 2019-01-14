@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from django.db.models import Count
 from members.models.person import Person
 
 

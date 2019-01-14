@@ -1,9 +1,11 @@
-from django.test import TestCase
+"""from django.test import TestCase
 from members.models.family import Family
 from members.jobs import EmailSendCronJob
-from django.core import mail
+from django.core import mail"""
 
 
+# We need to rewrite this test
+"""
 class TestModelFamily(TestCase):
     fixtures = ['departments', 'templates', 'unions']
 
@@ -18,3 +20,4 @@ class TestModelFamily(TestCase):
         family.send_link_email()
         EmailSendCronJob().do()
         self.assertEqual(len(mail.outbox), 1, msg="Email wasn't")
+"""

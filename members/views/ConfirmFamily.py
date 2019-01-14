@@ -1,12 +1,9 @@
-import uuid
-
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
-from members.models.family import Family
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
