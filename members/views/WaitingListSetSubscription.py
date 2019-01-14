@@ -8,6 +8,7 @@ from members.models.department import Department
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 
+
 def WaitingListSetSubscription(request, unique, id, departmentId, action):
     try:
         unique = uuid.UUID(unique)
@@ -17,12 +18,12 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
     person = get_object_or_404(Person, pk=id)
     if person.family.unique != unique:
         raise Http404("Person eksisterer ikke")
-    department = get_object_or_404(Department,pk=departmentId)
+    department = get_object_or_404(Department, pk=departmentId)
 
     if action == 'subscribe':
         print('subscribing')
-        if WaitingList.objects.filter(person = person, department = department):
-            raise Http404("{} er allerede på {}s venteliste".format(person.name,department.name))
+        if WaitingList.objects.filter(person=person, department=department):
+            raise Http404("{} er allerede på {}s venteliste".format(person.name, department.name))
         waiting_list = WaitingList()
         waiting_list.person = person
         waiting_list.department = department
@@ -31,9 +32,9 @@ def WaitingListSetSubscription(request, unique, id, departmentId, action):
     if action == 'unsubscribe':
         print('un-subscribing')
         try:
-            waiting_list = WaitingList.objects.get(person = person, department = department)
+            waiting_list = WaitingList.objects.get(person=person, department=department)
             waiting_list.delete()
-        except:
-            raise Http404("{} er ikke på {}s venteliste".format(person.name,department.name))
+        except Exception:
+            raise Http404("{} er ikke på {}s venteliste".format(person.name, department.name))
 
     return HttpResponseRedirect(reverse('family_detail', args=[unique]))

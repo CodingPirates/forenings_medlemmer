@@ -135,7 +135,6 @@ class DepartmentAdmin(admin.ModelAdmin):
 admin.site.register(Department, DepartmentAdmin)
 
 
-
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name', 'department', 'member_since', 'is_active')
     list_filter = ['department']
@@ -399,7 +398,6 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
             return queryset
         else:
             return queryset.filter(activity=self.value())
-
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
@@ -713,7 +711,6 @@ class WaitingListInline(admin.TabularInline):
     extra = 0
 
 
-
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added', 'notes')
     list_filter = ('membertype', 'gender', VolunteerListFilter, PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
@@ -787,7 +784,7 @@ class PersonAdmin(admin.ModelAdmin):
                                         invited_counter = invited_counter + 1
                                         invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
                                         invitation.save()
-                        except Exception as e:
+                        except Exception:
                             messages.error(request, "Fejl - ingen personer blev inviteret! Der var problemer med " + invitation.person.name + ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.")
                             return
 

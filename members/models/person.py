@@ -94,10 +94,7 @@ class Person(models.Model):
         return self.name.partition(' ')[0]
 
     def update_dawa_data(self):
-        if(self.dawa_id is None or
-           self.latitude is None or
-           self.longitude is None or
-           self.municipality is None):
+        if(self.dawa_id is None or self.latitude is None or self.longitude is None or self.municipality is None):
             addressID = 0
             dist = 0
             req = 'https://dawa.aws.dk/datavask/adresser?betegnelse='

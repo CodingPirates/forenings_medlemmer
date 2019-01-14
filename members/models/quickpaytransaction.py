@@ -8,11 +8,11 @@ from django.core.urlresolvers import reverse
 
 class QuickpayTransaction(models.Model):
     payment = models.ForeignKey('Payment')
-    link_url =  models.CharField('Link til Quickpay formular',max_length=512, blank=True)
+    link_url = models.CharField('Link til Quickpay formular', max_length=512, blank=True)
     transaction_id = models.IntegerField('Transaktions ID', null=True, default=None)
     refunding = models.ForeignKey('self', null=True, default=None, on_delete=models.PROTECT)
-    amount_ore = models.IntegerField('Beløb i øre', default=0) # payments to us is positive
-    order_id = models.CharField('Quickpay order id',max_length=20, blank=True, unique=True)
+    amount_ore = models.IntegerField('Beløb i øre', default=0)  # payments to us is positive
+    order_id = models.CharField('Quickpay order id', max_length=20, blank=True, unique=True)
 
     def save(self, *args, **kwargs):
         """ On creation make quickpay order_id from payment id """
@@ -28,17 +28,17 @@ class QuickpayTransaction(models.Model):
     # return_url is the url which Quickpay redirects to (used for both success and failure)
     def get_link_url(self, return_url=''):
         if(self.link_url == ''):
-            #request only if not already requested
+            # request only if not already requested
             client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
 
             parent = self.payment.family.get_first_parent()
 
-            address = {'name' : parent.name,
-                       'street' : parent.address(),
-                       'city' : parent.city,
-                       'zip_code' : parent.zipcode,
-                       'att' : self.payment.family.email,
-                       'country_code' : 'DNK'
+            address = {'name': parent.name,
+                       'street': parent.address(),
+                       'city': parent.city,
+                       'zip_code': parent.zipcode,
+                       'att': self.payment.family.email,
+                       'country_code': 'DNK'
                        }
 
             variables = address.copy()
@@ -66,13 +66,13 @@ class QuickpayTransaction(models.Model):
                     cancelurl=return_url,
                     customer_email=self.payment.family.email,
                     autocapture=True
-                    )
+                )
 
                 self.link_url = link['url']
                 self.save()
-            except:
+            except Exception:
                 # Something went wrong talking to quickpay - ask people to come back later
-                return reverse('payment_gateway_error_view', kwargs={'unique':self.payment.family.unique})
+                return reverse('payment_gateway_error_view', kwargs={'unique': self.payment.family.unique})
 
         return self.link_url
 

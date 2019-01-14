@@ -10,6 +10,7 @@ from members.models.person import Person
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
 
+
 def PersonCreate(request, unique, membertype):
     try:
         if unique is not None:
@@ -24,12 +25,12 @@ def PersonCreate(request, unique, membertype):
         person.family = family
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
-            UpdatePersonFromForm(person,form)
+            UpdatePersonFromForm(person, form)
             return HttpResponseRedirect(reverse('family_detail', args=[family.unique]))
     else:
         person = Person()
         person.membertype = membertype
-        if family.person_set.count() > 0 :
+        if family.person_set.count() > 0:
             first_person = family.person_set.first()
             person.family = family
             person.zipcode = first_person.zipcode
@@ -41,4 +42,4 @@ def PersonCreate(request, unique, membertype):
             person.placename = first_person.placename
             person.dawa_id = first_person.dawa_id
         form = PersonForm(instance=person)
-    return render(request, 'members/person_create_or_update.html', {'form': form, 'person' : person, 'family': family, 'membertype': membertype})
+    return render(request, 'members/person_create_or_update.html', {'form': form, 'person': person, 'family': family, 'membertype': membertype})
