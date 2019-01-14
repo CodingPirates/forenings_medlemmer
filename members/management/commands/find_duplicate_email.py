@@ -10,7 +10,7 @@ class Command(BaseCommand):
         print('pk,email')
 
         for person in Person.objects.filter(membertype__in=[Person.PARENT, Person.GUARDIAN]):
-            if person.email and Person.objects.filter(email=person.email, membertype__in=[Person.PARENT, Person.GUARDIAN]).count() < 2:
+            if person.email and Person.objects.filter(email=person.email).count() < 2:
                 continue  # Ignore people with unique emails
 
             print(str(person.pk) + ',' + person.email)
