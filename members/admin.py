@@ -135,7 +135,6 @@ class DepartmentAdmin(admin.ModelAdmin):
 admin.site.register(Department, DepartmentAdmin)
 
 
-
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name', 'department', 'member_since', 'is_active')
     list_filter = ['department']
@@ -399,7 +398,6 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
             return queryset
         else:
             return queryset.filter(activity=self.value())
-
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
@@ -713,13 +711,12 @@ class WaitingListInline(admin.TabularInline):
     extra = 0
 
 
-
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added', 'notes')
     list_filter = ('membertype', 'gender', VolunteerListFilter, PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
     search_fields = ('name', 'family__email', 'notes')
     actions = ['invite_many_to_activity_action', 'export_emaillist', 'export_csv']
-    raw_id_fields = ('family',)
+    raw_id_fields = ('family', 'user')
 
     inlines = [PaymentInline, VolunteerInline, ActivityInviteInline, MemberInline, WaitingListInline]
 
@@ -787,7 +784,7 @@ class PersonAdmin(admin.ModelAdmin):
                                         invited_counter = invited_counter + 1
                                         invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
                                         invitation.save()
-                        except Exception as e:
+                        except Exception:
                             messages.error(request, "Fejl - ingen personer blev inviteret! Der var problemer med " + invitation.person.name + ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.")
                             return
 
@@ -830,7 +827,7 @@ class PersonAdmin(admin.ModelAdmin):
             }),
             ('Yderlige informationer', {
                 'classes': ('collapse', ),
-                'fields': ('membertype', 'birthday', 'has_certificate', 'added'),
+                'fields': ('membertype', 'birthday', 'has_certificate', 'added', 'user'),
             }),
         )
 
@@ -894,20 +891,26 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(EmailTemplate)
 
 
+# Define AdmingUserInformation as inline
 class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ('departments',)
     can_delete = False
 
+
+# Define PersonInline
+class PersonInline(admin.StackedInline):
+    model = Person
+    fields = ('name',)
+    readonly_fields = ('name',)
+
+
 # Define a new User admin
-
-
 class UserAdmin(UserAdmin):
-    inlines = (AdminUserInformationInline, )
+    inlines = (AdminUserInformationInline, PersonInline)
+
 
 # Re-register UserAdmin
-
-
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
@@ -944,6 +947,11 @@ class EquipmentAdmin(admin.ModelAdmin):
     raw_id_fields = ('department', 'union')
     inlines = (EquipmentLoanInline, )
     list_per_page = 20
+
+# class AdminUserInformationAdmin(admin.ModelAdmin):
+#    raw_id_fields = ("person",)
+
+# admin.site.register(AdminUserInformation, AdminUserInformationAdmin)
 
 
 admin.site.register(Equipment, EquipmentAdmin)

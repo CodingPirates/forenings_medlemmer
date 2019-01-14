@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
@@ -67,6 +68,13 @@ class Person(models.Model):
     notes = models.TextField('Noter', blank=True, null=False, default="")
     added = models.DateTimeField('Tilføjet', default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField('Slettet', null=True, blank=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_DEFAULT,
+        blank=True,
+        null=True,
+        default=None
+    )
     address_invalid = models.BooleanField('Ugyldig adresse', default=False)
 
     def __str__(self):
@@ -94,10 +102,7 @@ class Person(models.Model):
         return self.name.partition(' ')[0]
 
     def update_dawa_data(self):
-        if(self.dawa_id is None or
-           self.latitude is None or
-           self.longitude is None or
-           self.municipality is None):
+        if(self.dawa_id is None or self.latitude is None or self.longitude is None or self.municipality is None):
             addressID = 0
             dist = 0
             req = 'https://dawa.aws.dk/datavask/adresser?betegnelse='

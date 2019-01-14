@@ -1084,8 +1084,10 @@ zipcodegeo = '''PostCodeIdentifier	DistrictName	Latitude	Longitude
 9990	Skagen	57.7206280601	10.5621491391
 9999	Ukendt	0.0000000000	0.0000000000'''
 
+
 def reverseDummy(apps, schema_editor):
     pass
+
 
 def updateCoordinates(apps, schema_editor):
     zipcodes = apps.get_model("members", "Zipcoderegion")
@@ -1103,7 +1105,7 @@ def updateCoordinates(apps, schema_editor):
             zipcode.longitude = data[zipcode.zipcode][1]
             zipcode.save()
         except KeyError:
-            print("Postnummer %s ikke fundet" % (zipcode.zipcode))
+            zipcode.delete()  # I've manually checked the zipcodes we get errors on, and we don't need them
 #        except Exception as e:
 #            print("fejl på %s (%s): %s" % (zipcode.zipcode, repr(e), repr(data[zipcode.zipcode])))
 

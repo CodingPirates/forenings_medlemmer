@@ -1,0 +1,53 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+    {% if form.errors %}
+    <div class="col-md-4 col-md-offset-1">Dit brugernavn eller password var forkert. Prøv igen.</div>
+    {% endif %}
+    <form class="col-md-8 col-md-offset-1" method="post">
+        <div class="newloginnotice">
+            <p>Kære bruger</p>
+
+            <p>Vi har ændret måden du logger ind i medlemssystemet.
+                Fremover skal du logge ind med din email og adgangskode.
+                Er det første gang du benytter det nye loginsystem,
+                skal du generere en adgangskode via knappen "opret adgangskode".
+                Hvis du har spørgsmål kan du skrive en email til
+                <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
+        </div>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="row">
+            <div class="input-group">
+                <span class="input-group-addon">{{ form.username.label_tag }}</span>
+                <span class="form-control">{{ form.username }}</span>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">{{ form.password.label_tag }}</span>
+                <span class="form-control">{{ form.password }}</span>
+            </div>
+        </div>
+        <div class="row form-inline">
+            <div class="input-group">
+                <input type="submit"
+                        class="form-control btn-success float-left" value="Login" />
+            </div>
+            <div class="input-group">
+                <a
+                    href="{% url 'password_reset' %}"
+                    title="Glemt kode?"
+                    class="btn btn-info float-right">
+                    Glemt kode?
+                </a>
+            </div>
+            <div class="input-group">
+                <a
+                    href="{% url 'password_reset' %}"
+                    title="Opret adgangskode"
+                    class="btn btn-info float-right">
+                    Opret adgangskode
+                </a>
+            </div>
+        </div>
+    </form>
+{% endblock %}

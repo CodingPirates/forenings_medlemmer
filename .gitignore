@@ -14,3 +14,4 @@ forenings_medlemmer/settings.py
 .DS_Store
 .vs/
 notes.txt
+gamle_db/
