@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from members.models.person import Person
 from django.contrib.auth.models import User
-import random
 
 
 class Command(BaseCommand):
@@ -19,7 +18,8 @@ class Command(BaseCommand):
                 username=person.email,
                 email=person.email
             )
-            user.set_password(str(random.random()))
+            password = User.objects.make_random_password()
+            user.set_password(password)
             user.save()
             person.user = user
             person.save()
