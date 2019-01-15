@@ -125,6 +125,7 @@ MANAGERS = ADMINS
 
 EMAIL_SUBJECT_PREFIX = '[Acme Medlemsdatabase] '
 SERVER_EMAIL = 'hostmaster@example.org'
+DEFAULT_FROM_EMAIL = 'kontakt@example.com'
 SITE_CONTACT = 'Acme Industries <contact@example.org>'
 DEBUG_EMAIL_DESTINATION = 'debug@example.org'
 
