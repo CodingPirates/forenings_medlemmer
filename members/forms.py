@@ -246,28 +246,17 @@ class ActivitySignupForm(forms.Form):
                                  HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
                                  css_class="col-md-6"),
                              Div(
-                                 'address_permission', 'read_conditions',
+                                 'photo_permission', 'read_conditions',
                                  css_class="col-md-6"),
                              css_class="row"),
-                         Fieldset('Tilmeldings oplysninger',
-                                  Div(
-                                      Div(
-                                          Field('note', aria_describedby="noteHelp"),
-                                          HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
-                                          css_class="col-md-6"),
-                                      Div(
-                                          'photo_permission', 'read_conditions',
-                                          css_class="col-md-6"),
-                                      css_class="row"),
-                                  ),
-                         Fieldset('Betaling',
-                                  Field('payment_option', aria_describedby="paymentHelp"),
-                                  HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
-                                  FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>")),
-                                  ),
-                         css_class="panel-body"),
-                    css_class="panel panel-success"),
-                )
+                         ),
+                Fieldset('Betaling',
+                         Field('payment_option', aria_describedby="paymentHelp"),
+                         HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
+                         FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>")),
+                         ),
+                    css_class="panel-body"),
+                css_class="panel panel-success"),
         )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
