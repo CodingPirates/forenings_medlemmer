@@ -28,7 +28,6 @@ def WaitingListSetSubscription(request, id, departmentId, action):
         waiting_list.save()
 
     if action == 'unsubscribe':
-        print('un-subscribing')
         try:
             waiting_list = WaitingList.objects.get(person=person, department=department)
             waiting_list.delete()
