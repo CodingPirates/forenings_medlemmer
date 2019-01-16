@@ -17,7 +17,7 @@ def PersonUpdate(request, id):
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
             UpdatePersonFromForm(person, form)
-            return HttpResponseRedirect(reverse('family_detail', args=[person.family.unique]))
+            return HttpResponseRedirect(reverse('family_detail'))
     else:
         form = PersonForm(instance=person)
     return render(request, 'members/person_create_or_update.html', {'form': form, 'person': person})
