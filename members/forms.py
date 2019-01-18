@@ -284,5 +284,5 @@ class ActivivtyInviteDeclineForm(forms.Form):
         self.helper.form_action = ''
         self.helper.html5_required = True
         self.helper.layout = Layout(Submit('submit', 'Afslå invitationen', css_class="btn-danger"),
-                                    HTML('<a class="btn btn-link" href="{% url "family_detail" activity_invite.person.family.unique %}">Tilbage</a>')
+                                    HTML('<a class="btn btn-link" href="{% url "entry_page" %}">Til forsiden</a>')
                                     )
