@@ -20,7 +20,7 @@ def DeclineInvitation(request, unique, invitation_id):
         if form.is_valid():
             activity_invite.rejected_dtm = timezone.now()
             activity_invite.save()
-            return HttpResponseRedirect(reverse('entry_page'))
+            return HttpResponseRedirect(reverse('family_detail'))
     else:
         form = ActivivtyInviteDeclineForm()
 
