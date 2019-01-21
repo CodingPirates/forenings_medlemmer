@@ -156,7 +156,7 @@ admin.site.register(Member, MemberAdmin)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'department', 'start_date', 'open_invite', 'price_in_dkk', 'max_participants')
     date_hierarchy = 'start_date'
-    search_fields = ('name',)
+    search_fields = ('name', 'department__name')
     list_per_page = 20
     raw_id_fields = ('department',)
     # list_filter = ('department','open_invite')
