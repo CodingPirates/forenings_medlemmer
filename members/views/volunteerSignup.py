@@ -34,6 +34,15 @@ def volunteerSignup(request):
                     family.confirmed_dtm = timezone.now()
                     family.save()
 
+                    # create volunteer as user
+                    user = User.objects.create_user(
+                        username=vol_signup.cleaned_data['volunteer_email'],
+                        email=vol_signup.cleaned_data['volunteer_email']
+                    )
+                    password = User.objects.make_random_password()
+                    user.set_password(password)
+                    user.save()
+
                     # create volunteer
                     volunteer = Person.objects.create(
                         membertype=Person.PARENT,
@@ -53,15 +62,6 @@ def volunteerSignup(request):
                         family=family)
                     volunteer.save()
 
-                    # create volunteer as user
-                    user = User.objects.create_user(
-                        username=volunteer.email,
-                        email=volunteer.email
-                    )
-                    password = User.objects.make_random_password()
-                    user.set_password(password)
-                    user.save()
-
                     # send email to department leader
                     department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
                     vol_obj = Volunteer.objects.create(
@@ -72,7 +72,8 @@ def volunteerSignup(request):
                     # department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                     # redirect to success
-                    return HttpResponseRedirect(reverse('user_created', kwargs={'password': password}))
+                    request.session['password'] = password
+                    return HttpResponseRedirect(reverse('user_created'))
                 else:
                     return render(request, 'members/volunteer_signup.html', {'vol_signupform': vol_signup})
 
