@@ -26,7 +26,6 @@ def ActivitySignup(request, activity_id, person_id=None):
 
     activity = get_object_or_404(Activity, pk=activity_id)
 
-    participants = ActivityParticipant.objects.filter(activity=activity).order_by('member__person__name')
     participating = False
 
     if(request.resolver_match.url_name == 'activity_view_person'):
@@ -174,7 +173,6 @@ def ActivitySignup(request, activity_id, person_id=None):
         'signup_closed': signup_closed,
         'view_only_mode': view_only_mode,
         'participating': participating,
-        'participants': participants,
         'union': union,
     }
     return render(request, 'members/activity_signup.html', context)
