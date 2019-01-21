@@ -780,7 +780,7 @@ class PersonAdmin(admin.ModelAdmin):
                         try:
                             with transaction.atomic():
                                 for current_person in queryset:
-                                    if(current_person.id not in already_invited_ids):
+                                    if(current_person.id not in already_invited_ids and (activity.max_age >= current_person.age_years() >= activity.min_age)):
                                         invited_counter = invited_counter + 1
                                         invitation = ActivityInvite(activity=activity, person=current_person, expire_dtm=mass_invitation_form.cleaned_data['expire'])
                                         invitation.save()

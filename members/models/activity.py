@@ -37,6 +37,7 @@ class Activity(models.Model):
     help_temp = "Bestemmer om personerne bliver til medlemmer i forhold til DUF."
     help_temp += " De fleste aktiviteter er sæsoner og medlemsberettiget. Hvis "
     help_temp += "du er i tvivl, så spørg på Slack i #medlemsssystem-support."
+    membership_activity = models.BooleanField('Er aktiviteten en medlemsskabsaktivitet?', default=False)
     member_justified = models.BooleanField('Aktiviteten gør personen til medlem',
                                            default=True,
                                            help_text=help_temp)

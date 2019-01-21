@@ -68,7 +68,8 @@ class Command(BaseCommand):
                                 price_in_dkk=price_in_dkk,
                                 max_participants=max_participants,
                                 max_age=max_age,
-                                min_age=min_age
+                                min_age=min_age,
+                                membership_activity=True
                                 )
 
             activity.save()
