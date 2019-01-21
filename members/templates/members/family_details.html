@@ -131,6 +131,7 @@
                   {% for activity in open_activities %}
                       <tr>
                         <td> - </td>
+                        {{ children }}
                         <td><a href="{%url 'activity_view_family' activity.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
                           <td>
                           {% for person in activity.persons %}

@@ -107,9 +107,9 @@
               <footer>Det er ikke længere muligt at tilmelde sig.</footer>
             </blockquote>
         {% endif %}
-        {% if family.unique %}
+        {% if family %}
           <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
-        {% endif%}
+        {% endif %}
       {% endif %}
     </div>
 {% endblock %}

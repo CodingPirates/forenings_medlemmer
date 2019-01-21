@@ -125,6 +125,7 @@ MANAGERS = ADMINS
 
 EMAIL_SUBJECT_PREFIX = '[Acme Medlemsdatabase] '
 SERVER_EMAIL = 'hostmaster@example.org'
+DEFAULT_FROM_EMAIL = 'kontakt@example.com'
 SITE_CONTACT = 'Acme Industries <contact@example.org>'
 DEBUG_EMAIL_DESTINATION = 'debug@example.org'
 
@@ -135,8 +136,8 @@ EMAIL_HOST_PASSWORD = 'password'
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 30
 
-# if DEBUG:
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",

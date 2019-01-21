@@ -20,7 +20,6 @@ def WaitingListSetSubscription(request, id, departmentId, action):
     department = get_object_or_404(Department, pk=departmentId)
 
     if action == 'subscribe':
-        # print('subscribing')
         if WaitingList.objects.filter(person=person, department=department):
             raise Http404("{} er allerede på {}s venteliste".format(person.name, department.name))
         waiting_list = WaitingList()
@@ -29,7 +28,6 @@ def WaitingListSetSubscription(request, id, departmentId, action):
         waiting_list.save()
 
     if action == 'unsubscribe':
-        print('un-subscribing')
         try:
             waiting_list = WaitingList.objects.get(person=person, department=department)
             waiting_list.delete()
