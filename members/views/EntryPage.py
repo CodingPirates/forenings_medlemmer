@@ -33,6 +33,15 @@ def EntryPage(request):
                 family.confirmed_dtm = timezone.now()
                 family.save()
 
+                # create parent as user
+                user = User.objects.create_user(
+                    username=signup.cleaned_data['parent_email'],
+                    email=signup.cleaned_data['parent_email']
+                )
+                password = User.objects.make_random_password()
+                user.set_password(password)
+                user.save()
+
                 # create parent
                 parent = Person.objects.create(membertype=Person.PARENT,
                                                name=signup.cleaned_data['parent_name'],
@@ -46,7 +55,8 @@ def EntryPage(request):
                                                placename=signup.cleaned_data['placename'],
                                                email=signup.cleaned_data['parent_email'],
                                                phone=signup.cleaned_data['parent_phone'],
-                                               family=family
+                                               family=family,
+                                               user=user
                                                )
                 parent.save()
 
@@ -68,15 +78,6 @@ def EntryPage(request):
                                               family=family
                                               )
                 child.save()
-
-                # create parent as user
-                user = User.objects.create_user(
-                    username=parent.email,
-                    email=parent.email
-                )
-                password = User.objects.make_random_password()
-                user.set_password(password)
-                user.save()
 
                 # redirect to success
                 request.session['password'] = password
