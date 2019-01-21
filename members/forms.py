@@ -246,7 +246,7 @@ class ActivitySignupForm(forms.Form):
                                  HTML('<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'),
                                  css_class="col-md-6"),
                              Div(
-                                 'address_permission', 'read_conditions',
+                                 'photo_permission', 'read_conditions',
                                  css_class="col-md-6"),
                              css_class="row"),
                          Fieldset('Tilmeldings oplysninger',
