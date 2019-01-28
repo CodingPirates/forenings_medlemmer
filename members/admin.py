@@ -401,7 +401,7 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
-    list_display = ['added_dtm', 'member', 'person_age_years', 'activity', 'note']
+    list_display = ['added_dtm', 'member', 'person_age_years', 'photo_permission', 'activity', 'note']
     list_filter = (ActivityParticipantListFilter, ParticipantPaymentListFilter)
     list_display_links = ('member',)
     raw_id_fields = ('activity', 'member')
