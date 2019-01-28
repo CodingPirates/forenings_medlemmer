@@ -45,5 +45,5 @@ class Union(models.Model):
         return "Foreningen for " + self.name
 
     def clean(self):
-        if(self.bank_main_org is not False and not self.bank_account):
+        if(self.bank_main_org is False and not self.bank_account):
             raise ValidationError('Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal bankkonto udfyldes.')
