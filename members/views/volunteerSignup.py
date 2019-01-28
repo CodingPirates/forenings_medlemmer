@@ -59,7 +59,8 @@ def volunteerSignup(request):
                         phone=vol_signup.cleaned_data['volunteer_phone'],
                         birthday=vol_signup.cleaned_data['volunteer_birthday'],
                         gender=vol_signup.cleaned_data['volunteer_gender'],
-                        family=family)
+                        family=family,
+                        user=user)
                     volunteer.save()
 
                     # send email to department leader
