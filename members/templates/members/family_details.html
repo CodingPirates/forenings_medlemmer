@@ -131,7 +131,7 @@
                   {% for activity in open_activities %}
                       <tr>
                         <td> - </td>
-                        <td><a href="{%url 'activity_view_family' activity.id %}">{{activity.name}} - <h4><b>{{activity.department.name}}</b></h4></a></td>
+                        <td><a href="{%url 'activity_view_family' activity.id %}">{{activity.name}} - <h4><b>Coding Pirates {{activity.department.name}}</b></h4></a></td>
                           <td>
                           {% for person in activity.persons %}
                         <td><a class="btn btn-success" href="{%url 'activity_signup' activity.id person.id %}">Tilmeld aktivitet</a></td>
@@ -183,7 +183,7 @@
                 <tbody>
                   {% for key, department in department_children_waiting.departments.items %}
                     <tr>
-                      <td>{{department.object.name}}</td>
+                      <td>Coding Pirates {{department.object.name}}</td>
                       <td><p>{{department.object.address}}</p> <p>{{department.object.zipcode}} {{department.object.city}}</p></td>
                       <td>{{department.object.open_hours}}</td>
                       <td>
