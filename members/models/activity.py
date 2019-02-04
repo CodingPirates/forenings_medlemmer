@@ -30,14 +30,16 @@ class Activity(models.Model):
     signup_closing = models.DateField('Tilmelding lukker', null=True)
     updated_dtm = models.DateTimeField('Opdateret', auto_now=True)
     open_invite = models.BooleanField('Fri tilmelding', default=False)
-    price_in_dkk = models.DecimalField('Pris', max_digits=10, decimal_places=2, default=500)
+    help_price = "På prisen for aktiviteten fratrækker vi automatisk 75 kr."
+    help_price += " pr. barn hvis det er en sæsonaktivitet."
+    price_in_dkk = models.DecimalField('Pris', max_digits=10, decimal_places=2,
+                                       default=500, help_text=help_price)
     max_participants = models.PositiveIntegerField('Max deltagere', default=30)
     max_age = models.PositiveIntegerField('Maximum Alder', default=17)
     min_age = models.PositiveIntegerField('Minimum Alder', default=7)
     help_temp = "Bestemmer om personerne bliver til medlemmer i forhold til DUF."
     help_temp += " De fleste aktiviteter er sæsoner og medlemsberettiget. Hvis "
     help_temp += "du er i tvivl, så spørg på Slack i #medlemsssystem-support."
-    membership_activity = models.BooleanField('Er aktiviteten en medlemsskabsaktivitet?', default=False)
     member_justified = models.BooleanField('Aktiviteten gør personen til medlem',
                                            default=True,
                                            help_text=help_temp)

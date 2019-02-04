@@ -15,7 +15,9 @@ class Department(models.Model):
         verbose_name_plural = 'Afdelinger'
         verbose_name = 'Afdeling'
         ordering = ['zipcode']
-    name = models.CharField('Navn', max_length=200)
+    help_dept = "Vi tilføjer automatisk \"Coding Pirates\" foran navnet "
+    help_dept += "når vi nævner det de fleste steder på siden."
+    name = models.CharField('Navn', max_length=200, help_text=help_dept)
     description = models.TextField('Beskrivelse af afdeling', blank=True)
     open_hours = models.CharField('Åbningstid', max_length=200, blank=True)
     responsible_name = models.CharField('Afdelingsleder', max_length=200, blank=True)
