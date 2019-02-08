@@ -134,7 +134,7 @@
                         <td><a href="{%url 'activity_view_family' activity.id %}">{{activity.name}} - <h4><b>Coding Pirates {{activity.department.name}}</b></h4></a></td>
                           <td>
                           {% for person in activity.persons %}
-                        <td><a class="btn btn-success" href="{%url 'activity_signup' activity.id person.id %}">Tilmeld aktivitet</a></td>
+                        <td><a class="btn btn-success" href="{%url 'activity_signup' activity.id person.id %}">Tilmeld {{ person.firstname }} aktivitet</a></td>
                           {% endfor %}
                           </td>
                         <td></td>
