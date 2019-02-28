@@ -166,7 +166,7 @@ class GenerateStatisticsCronJob(CronJobBase):
             dailyStatisticsDepartment.waitinglist = Person.objects.filter(waitinglist__department=department).distinct().count()
             firstWaitingListItem = WaitingList.objects.filter(department=department).order_by('on_waiting_list_since').first()
             if firstWaitingListItem:
-                dailyStatisticsDepartment.waitingtime = timestamp.date() - firstWaitingListItem.on_waiting_list_since
+                dailyStatisticsDepartment.waitingtime = timestamp - firstWaitingListItem.on_waiting_list_since
             else:
                 dailyStatisticsDepartment.waitingtime = datetime.timedelta(days=0)
             dailyStatisticsDepartment.payments = Payment.objects.filter(activity__department=department,
