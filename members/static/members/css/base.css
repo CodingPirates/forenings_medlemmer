@@ -1,0 +1,25 @@
+﻿@import url('https://fonts.googleapis.com/css?family=Pirata+One');
+
+ul.navbar-nav {
+    height: 100%;
+}
+ul.navbar-nav > li {
+    padding: 0 !important;
+}
+
+    ul.navbar-nav > li > a {
+        padding: 0.8em 0.5em;
+        display: block;
+        color: white;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-size: 1em;
+    }
+    ul.navbar-nav > li > a.active {
+        border-bottom: 3px solid #ffffff;
+    }
+        ul.navbar-nav > li > a:hover {
+            background-color: #2C8098;
+        }
+nav {
+    background-color: #25A2CE;
+}
