@@ -17,7 +17,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/family/">Familie</a>
                 </li>
-                {% if not user.is_authenticated %}
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/volunteer/details">Frivillig</a>
+                    </li>
+                {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="/volunteer">Frivillig</a>
                     </li>

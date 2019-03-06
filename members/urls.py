@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from members.views import FamilyDetails, PersonCreate, PersonUpdate, WaitingListSetSubscription, DeclineInvitation, EntryPage, userCreated, ConfirmFamily, QuickpayCallback, ActivitySignup, \
-    waitinglistView, paymentGatewayErrorView, volunteerSignup, departmentView
+    waitinglistView, paymentGatewayErrorView, volunteerSignup, VolunteerDetails, departmentView
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 
@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^account/forgot/complete/$', auth_views.password_reset_complete, {'template_name': 'members/forgot_complete.html'}, name='password_reset_complete'),
     url(r'^account/logout/$', auth_views.logout, {'next_page': '/'}, name='person_logout'),
     url(r'volunteer$', volunteerSignup, name='volunteer_signup'),
+    url(r'volunteer/details$', VolunteerDetails, name='volunteer_detail'),
     url(r'user_created/$', userCreated, name='user_created'),
     url(r'family/$', FamilyDetails, name='family_detail'),
     url(r'family/Person/(?P<id>[\d]+)/$', PersonUpdate, name='person_update'),
