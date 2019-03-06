@@ -59,7 +59,9 @@
     {% block header %}
       {% include 'members/menu.html' %}
     {% endblock %}
-    {% block content %}{% endblock %}
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
     {% block footer %}
         <div class="container-fluid" style="padding-top: 20px">
             <div class="row">
