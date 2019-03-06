@@ -17,9 +17,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/family/">Familie</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/volunteer">Frivillig</a>
-                </li>
+                {% if not user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/volunteer">Frivillig</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
                     {% include "members/login_logout.html" %}
                 </li>
