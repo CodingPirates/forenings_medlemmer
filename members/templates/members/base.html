@@ -65,8 +65,6 @@
                 <ul class="navbar-nav ml-auto">
                     <li style="margin-right: 2em;">
                         <a href="https://codingpirates.dk" class="navbar-brand" style="padding: 0 8px; height: 2.6em" title="Coding Pirates">
-                            <!--<img src="{% static "Coding Pirates Skrift og Hack Logo.png" %}"
-         title="Coding Pirates" style="height: 100%;" />-->
                             <img src="{% static "Coding Pirates Hack Logo.png" %}" style="height: 100%; padding: 5px 0; display: inline-block; vertical-align: middle;" /><span style="vertical-align: middle; margin-left: 0.4em;font-size: 1.2em;font-family: 'Pirata One', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Coding Pirates</span>
                         </a>
                     </li>
@@ -84,17 +82,15 @@
                     </li>
                 </ul>
         </nav>
-      </header>
+    </header>
     {% endblock %}
     {% block content %}{% endblock %}
     {% block footer %}
-        <div class="container-fluid" style="padding-top: 20px">
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <small><p>Coding Pirates Denmark - Sverigesgade 20, 1., 5000 Odense C, E-mail:<a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a> - <abbr title="Telefon">Tlf</abbr>: +45 28597550 - CVR: 35552316</p></small>
-                </div>
-            </div>
+    <footer class="page-footer col-xs-12" style="background-color: #2C8098; color: #ffffff; padding: 15px 30px">
+        <div class="footer-copyright text-center py-3">
+            <small>Coding Pirates Denmark - Sverigesgade 20, 1., 5000 Odense C, E-mail: <a href="mailto:kontakt@codingpirates.dk" style="color: #c5c5c5">kontakt@codingpirates.dk</a> - <abbr title="Telefon">Tlf</abbr>: +45 28597550 - CVR: 35552316</small>
         </div>
+    </footer>
     {% endblock %}
   </body>
 </html>
