@@ -71,9 +71,11 @@
                             <img src="{% static "Coding Pirates Hack Logo.png" %}" style="height: 100%; padding: 5px 0; display: inline-block; vertical-align: middle;" /><span style="vertical-align: middle; margin-left: 0.4em;font-size: 1.2em;font-family: 'Pirata One', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Coding Pirates</span>
                         </span>
                     </li>
+                    {% if not user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="/">Tilmeld barn</a>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="/family/">Familie</a>
                     </li>
