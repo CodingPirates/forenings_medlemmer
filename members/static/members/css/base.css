@@ -2,12 +2,13 @@
 
 ul.navbar-nav {
     height: 100%;
+    padding: 0;
 }
 ul.navbar-nav > li {
     padding: 0 !important;
 }
 
-    ul.navbar-nav > li > a {
+    ul.navbar-nav > li > * {
         padding: 0.8em 0.5em;
         display: block;
         color: white;
