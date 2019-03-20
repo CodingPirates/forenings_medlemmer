@@ -1,9 +1,6 @@
 {% extends 'members/base.html' %}
 
 {% block content %}
-    {% if form.errors %}
-    <div class="col-md-4 col-md-offset-1">Dit brugernavn eller password var forkert. Prøv igen.</div>
-    {% endif %}
     <form class="col-md-8 col-md-offset-1" method="post">
         <div class="newloginnotice">
             <p>Kære bruger</p>
@@ -15,39 +12,30 @@
                 Hvis du har spørgsmål kan du skrive en email til
                 <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
         </div>
+        {% if form.errors %}
+        <div class="row"><blockquote class="error">Dit brugernavn eller adgangskode var forkert. Prøv igen.</blockquote></div>
+        {% endif %}
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
-        <div class="row">
-            <div class="input-group">
-                <span class="input-group-addon">{{ form.username.label_tag }}</span>
-                <span class="form-control">{{ form.username }}</span>
+        <div class="row center"><div class="loginBox col-lg-6 col-md-7 col-sm-8 col-xs-11 ">
+            <div class="loginTitle"><span>Log ind</span></div>
+            <div class="field">
+                {{ form.username.label_tag }} <br />
+                {{ form.username }}
             </div>
-            <div class="input-group">
-                <span class="input-group-addon">{{ form.password.label_tag }}</span>
-                <span class="form-control">{{ form.password }}</span>
+            <div class="field">
+            {{ form.password.label_tag }} <br />
+            {{ form.password }}
             </div>
-        </div>
-        <div class="row form-inline">
-            <div class="input-group">
-                <input type="submit"
-                        class="form-control btn-success float-left" value="Login" />
-            </div>
-            <div class="input-group">
-                <a
-                    href="{% url 'password_reset' %}"
-                    title="Glemt kode?"
-                    class="btn btn-info float-right">
-                    Glemt kode?
-                </a>
-            </div>
-            <div class="input-group">
-                <a
-                    href="{% url 'password_reset' %}"
-                    title="Opret adgangskode"
-                    class="btn btn-info float-right">
+            <div class="field" style="margin-top: 1.2em;">
+                <input type="submit" class="form-control btn-success" value="Log ind" />
+                <a href="{% url 'password_reset' %}" title="Opret adgangskode" class="btn btn-info float-right">
                     Opret adgangskode
                 </a>
+                <a href="{% url 'password_reset' %}" title="Glemt kode?">
+                    Glemt adgangskode?
+                </a>
             </div>
-        </div>
+        </div></div>
     </form>
 {% endblock %}
