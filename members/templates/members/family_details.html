@@ -1,10 +1,10 @@
 {% extends 'members/base.html' %}
 
 {% block content %}
+  <div class="container">
       <h1>Familiedetaljer</h1>
-      <p>Velkommen til Coding Pirates' medlemssystem. Du ser nu oversigten over de oplysninger vi har registreret om jeres familie. Det er vigtigt du sikrer dig at oplysningerne er korrekte.</p>
+      <p>Velkommen til Coding Pirates' medlemssystem. Du ser nu oversigten over de oplysninger vi har registreret om jeres familie. Det er vigtigt du sikrer dig at oplysningerne er korrekte. Din familie er registreret på e-mail-adressen <a class="text-info">{{family.email}}</a>, hvilket også er denne vi sender informationer til dig om tilmeding til hold og aktiviteter.</p>
       <p>For yderligere hjælp med at bruge denne side - se på <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores medlemssystem"</a> eller skriv til os på <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
-      <p>Din familie er registreret på e-mail-adressen <a class="text-info">{{family.email}}</a>. Det er denne e-mail-adresse vi sender informationer til dig om tilmeding til hold og aktiviteter.</p>
 
       <h2>Personer</h2>
       <p>Tryk på hvert navn, for at checke og opdatere oplysningerne på de personer der er på listen.</p>
@@ -20,7 +20,7 @@
                   <th class="col-xs-2" align="left">Navn</th>
                   <th class="col-xs-3" align="left">Adresse</th>
                   <th class="col-xs-2" align="left">Postnr./by</th>
-                  <th class="col-xs-2" align="left">Email</th>
+                  <th class="col-xs-2" align="left">E-mail</th>
                   <th class="col-xs-1" align="left">Telefon</th>
                 </tr>
               </thead>
@@ -34,7 +34,7 @@
                     <td></td>
                     {%endif%}
 
-                    <td><p><a href="{% url 'person_update' person.id %}">{{person.name}}</a></p>
+                    <td><p><a title="Rediger" href="{% url 'person_update' person.id %}">{{person.name}}</a></p>
 
                     {%if person.membertype == 'PA' %} <p class="text-muted">(Forælder)</p> {%endif%}
                     {%if person.membertype == 'GU' %} <p class="text-muted">(Værge)</p> {%endif%}
@@ -154,7 +154,7 @@
               </table>
             {% else %}
               <blockquote class="bg-info">
-              <p>Der er endnu ikke åbnet for tilmelding til aktiviteter. Vi sender en email til {{family.email}} når vi er klar til at modtage tilmeldinger.</p>
+              <p>Der er endnu ikke åbnet for tilmelding til aktiviteter. Vi sender en e-mail til {{family.email}} når vi er klar til at modtage tilmeldinger.</p>
             </blockquote>
             {% endif %}
           </section>
@@ -225,4 +225,5 @@
         </div>
       </div>
     </div>
-  {% endblock %}
+  </div>
+{% endblock %}
