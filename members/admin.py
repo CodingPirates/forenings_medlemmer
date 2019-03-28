@@ -712,7 +712,7 @@ class WaitingListInline(admin.TabularInline):
 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'membertype', 'family_url', 'age_years', 'zipcode', 'added', 'notes')
+    list_display = ('name', 'membertype', 'family_url', 'age_years', 'gender', 'municipality', 'zipcode', 'added', 'notes')
     list_filter = ('membertype', 'gender', VolunteerListFilter, PersonWaitinglistListFilter, PersonInvitedListFilter, PersonParticipantListFilter)
     search_fields = ('name', 'family__email', 'notes')
     actions = ['invite_many_to_activity_action', 'export_emaillist', 'export_csv']
