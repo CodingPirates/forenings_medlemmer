@@ -1,27 +1,37 @@
-[![CircleCI](https://circleci.com/gh/CodingPirates/forenings_medlemmer.svg?style=svg)](https://circleci.com/gh/CodingPirates/forenings_medlemmer)
+# Coding Pirates member mangement system.
+This system is used by the union [Coding Pirates][cpDK], we are a volunteer
+non profit that teaches programming, 3D printing, and other IT related
+activities to kids.
 
-# Coding Pirates' medlems- og tilmeldingssystem
-Medlemssystemet er designet til foreninger  der er organiseret efter DUF modellen. 
-Systemet understøtter lokalforeninger, afdelinger og en landsforeningen. 
-Det kan håndtere ventelister, invitationer, aktiviteter og betalinger. 
+We use this system to mange our unions, chapters, members, activities and
+volunteers.
+
+### The system
+> The system is going through a redesign and thus the code is still between
+> phases and thus a bit messy.
+
+The system is coded in [django][django], and exposes a [graphQL][graphQL]
+endpoint that can be consumed by a front end, and the built in django admin
+interface which is used by the administrative personal.
+
+The system is setup using the principles of a [twelve factor app][12factor],
+which makes it easy to deploy.
 
 
-Har du spørgsmål til den videre udvikling af systemet sker det på vores 
-[slack](https://codingpirates.signup.team) i kanalen #medlemssystem_dev. 
-Har du en fed ændring så hører vi også gerne dem. 😀 
-
-
-## Vil du hjælpe til?
-Vi tager glædeligt imod pull requests, vi beder dig dog om at læse 
-[CONTRIB.md](CONTRIB.md) først. Den beskriver hvordan du kommer 
-igang med systemet, hvordan du løser issues og krav til pull requests.
-
-Vi sætter naturligvis stor pris på alt hjælp vi får, og en pull request 
-kan altid indløses til en øl til næste PiratBar, kode-dag eller hvis du 
-fanger nogle af os på en bar. 
-Hvis du har brug for hjælp så spørg efter Kristoffer, Per eller Benjamin.
-
+### Development
 
 
 
 
+
+
+```
+./manage.py migrate
+```
+
+
+<!-- Links -->
+[cpDK]: https://codingpirates.dk
+[django]: https://www.djangoproject.com
+[graphQl]: https://www.howtographql.com
+[12factor]: https://12factor.net
