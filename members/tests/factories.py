@@ -1,4 +1,3 @@
-# TODO: fix OneToOne for Person and Member
 # TODO: Factories for AdminUserInformation, equipment, equipment loan, emails, emailtemplates and statistics
 # TODO: write tests using the factories
 
@@ -6,8 +5,10 @@ import pytz
 from datetime import date, timedelta
 import random
 
+from django.contrib.auth import get_user_model
+
 import factory
-from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute
+from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
 from factory.fuzzy import FuzzyChoice
 from faker.providers import BaseProvider
 
@@ -18,7 +19,6 @@ from members.models.volunteer import Volunteer
 from members.models.union import Union
 from members.models.department import Department, AdminUserInformation
 from members.models.member import Member
-from members.models.volunteer import Volunteer
 from members.models.waitinglist import WaitingList
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
@@ -29,6 +29,7 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.notification import Notification
 from members.models.equipment import Equipment
 from members.models.equipmentloan import EquipmentLoan
+
 
 class CodingPiratesProvider(BaseProvider):
     activity_types = ["Hackathon", "Gamejam", "Børne IT-konference", "Summercamp",
@@ -80,14 +81,13 @@ class DanishProvider(BaseProvider):
         """
         return self.random_element(self.street_suffixes)
 
-    
     def city(self):
         """
         :example 'Frederiksværk'
         """
         pattern = "{{first_name}}{{city_suffix}}"
         return self.generator.parse(pattern)
-    
+
     def municipality(self):
         """ Formatter for generating danish municipality names
         """
@@ -98,23 +98,26 @@ class DanishProvider(BaseProvider):
         """
         return self.generator.parse("{{name}}s {{street_suffix}}")
 
-Faker.add_provider(CodingPiratesProvider, locale = "dk_DK")
-Faker.add_provider(DanishProvider, locale = "dk_DK")
+
+Faker.add_provider(CodingPiratesProvider, locale="dk_DK")
+Faker.add_provider(DanishProvider, locale="dk_DK")
+
 
 LOCALE = "dk_DK"
 TIMEZONE = pytz.timezone("Europe/Copenhagen")
 # Setting default locale (this is not documented or intended by factory_boy)
 Faker._DEFAULT_LOCALE = LOCALE
 
+
 def datetime_after(dt):
     """
     For use with lazy attribute to generate DateTime's after the given
     datetime.
     """
-    END_OF_TIME = date.today() + timedelta(days = 60 * 365)
+    END_OF_TIME = date.today() + timedelta(days=60 * 365)
     return Faker("date_time_between", tzinfo=TIMEZONE,
                  start_date=dt,
-                 end_date=END_OF_TIME).generate({})  
+                 end_date=END_OF_TIME).generate({})
 
 
 class ZipcodeRegionFactory(DjangoModelFactory):
@@ -129,23 +132,30 @@ class ZipcodeRegionFactory(DjangoModelFactory):
     longitude = Faker("longitude")
     latitude = Faker("latitude")
 
+
 class FamilyFactory(DjangoModelFactory):
     class Meta:
         model = Family
 
     unique = Faker("uuid4")
     email = Faker("email")
-    dont_send_mails = Faker("boolean")
+    # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
     last_visit_dtm = Faker("date_time", tzinfo=TIMEZONE)
     deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
 
+
+class UserFactory(DjangoModelFactory):
+    class Meta:
+        model = get_user_model()
+
+
 class PersonFactory(DjangoModelFactory):
     class Meta:
         model = Person
-        
-    membertype = FuzzyChoice(Person.MEMBER_TYPE_CHOICES)
+
+    # membertype = FuzzyChoice(Person.MEMBER_TYPE_CHOICES)
     name = Faker("name")
     placename = Faker("city_suffix")
     zipcode = Faker("zipcode")
@@ -163,13 +173,16 @@ class PersonFactory(DjangoModelFactory):
     phone = Faker("phone_number")
     gender = FuzzyChoice(Person.MEMBER_GENDER_CHOICES)
     birthday = Faker("date")
-    has_certificate = Faker("date")
+    # has_certificate = Faker("date")
     family = SubFactory(FamilyFactory)
     notes = Faker("text")
-    added = Faker("date_time", tzinfo=TIMEZONE)
-    deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
-#    user = SubFactory()  # TODO
+    # added = Faker("date_time", tzinfo=TIMEZONE)
+    # deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
+    user = SubFactory(UserFactory,
+                      username=SelfAttribute('..email'),
+                      email=SelfAttribute('..email'))
     address_invalid = Faker("boolean")
+
 
 class UnionFactory(DjangoModelFactory):
     class Meta:
@@ -196,15 +209,14 @@ class UnionFactory(DjangoModelFactory):
     floor = Faker("floor")
     door = Faker("door")
     boardMembers = Faker("text")
-    bank_main_org = Faker("boolean")
+    # bank_main_org = Faker("boolean")
     bank_account = Faker("numerify", text="####-##########")
 
 
-    
 class DepartmentFactory(DjangoModelFactory):
     class Meta:
         model = Department
-  
+
     name = Faker("city")
     description = Faker("text")
     open_hours = Faker("numerify", text="kl. ##:##-##:##")
@@ -230,21 +242,16 @@ class DepartmentFactory(DjangoModelFactory):
     onMap = Faker("boolean")
 
 
-class AdminUserInformationFactory(DjangoModelFactory):
-    class Meta:
-        model = AdminUserInformation
-
-    # TODO
-
 class MemberFactory(DjangoModelFactory):
     class Meta:
         model = Member
 
     department = SubFactory(DepartmentFactory)
-    # person = TODO OneToOne relation
+    person = SubFactory(PersonFactory)
     is_active = Faker("boolean")
     member_since = Faker("date_time", tzinfo=TIMEZONE)
     member_until = LazyAttribute(lambda m: None if m.is_active else datetime_after(m.member_since))
+
 
 class VolunteerFactory(DjangoModelFactory):
     class Meta:
@@ -267,7 +274,7 @@ class WaitingListFactory(DjangoModelFactory):
     on_waiting_list_since = Faker("date_time", tzinfo=TIMEZONE)
     added_dtm = Faker("date_time", tzinfo=TIMEZONE)
 
-    
+
 class ActivityFactory(DjangoModelFactory):
     class Meta:
         model = Activity
@@ -328,7 +335,7 @@ class PaymentFactory(DjangoModelFactory):
         model = Payment
 
     added = Faker("date_time", tzinfo=TIMEZONE)
-    payment_type= FuzzyChoice(Payment.PAYMENT_METHODS)
+    payment_type = FuzzyChoice(Payment.PAYMENT_METHODS)
     activity = SubFactory(ActivityFactory)
     activityparticipant = SubFactory(ActivityParticipantFactory)
     person = SubFactory(PersonFactory)
@@ -341,11 +348,20 @@ class PaymentFactory(DjangoModelFactory):
     rejected_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_message = Faker("text")
 
+
+class AdminUserInformationFactory(DjangoModelFactory):
+    class Meta:
+        model = AdminUserInformation
+
+    # TODO
+
+
 class EmailItemFactory(DjangoModelFactory):
     class Meta:
         model = EmailItem
 
     # TODO
+
 
 class EmailTemplateFactory(DjangoModelFactory):
     class Meta:
@@ -353,18 +369,21 @@ class EmailTemplateFactory(DjangoModelFactory):
 
     # TODO
 
+
 class NotificationFactory(DjangoModelFactory):
     class Meta:
         model = Notification
 
     # TODO
 
+
 class EquipmentFactory(DjangoModelFactory):
     class Meta:
         model = Equipment
 
+
 class EquipmentLoanFactory(DjangoModelFactory):
     class Meta:
-        model = Equipment
+        model = EquipmentLoan
 
     # TODO
