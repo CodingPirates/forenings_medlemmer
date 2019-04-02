@@ -2,7 +2,7 @@ Django==1.9.1
 django-bootstrap3==6.2.2
 django-bootstrap4==0.0.8
 django-extensions==1.6.1
-django-crispy-forms==1.5.2
+django-crispy-forms
 django-fontawesome
 sqlparse==0.1.18
 django-cron==0.4.6
