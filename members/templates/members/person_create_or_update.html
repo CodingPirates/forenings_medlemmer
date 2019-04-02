@@ -6,7 +6,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    {% load bootstrap4 %}
+    {% load bootstrap3 %}
     {% load crispy_forms_tags %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
@@ -55,8 +55,8 @@
   <body>
     <div class="container-fluid">
       <div class="row">
-        <div class="col-12">
-          <section class="panel panel-defualt">
+        <div class="col-xs-12">
+          <section class="card card-defualt">
             {% load crispy_forms_tags %}
             {% crispy form %}
           </section>
