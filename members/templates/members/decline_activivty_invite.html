@@ -15,7 +15,7 @@
     <div class="container-fluid">
       <h1>Nej tak til {{activity_invite.activity.name}} <small>{{activity_invite.activity.department.name}}</small></h1>
       <div class="row">
-        <div class="col-xs-12">
+        <div class="col-12">
           <section class="panel panel-defualt">
             <h3>Hej {{activity_invite.person.name}}</h3>
             <p>Hvis du trykker <kbd>Afslå invitation</kbd> nedenfor, giver du din plads på <strong>{{activity_invite.activity.name}}, {{activity_invite.activity.department.name}}</strong> videre til den næste på ventelisten.</p>
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12">
+        <div class="col-12">
         {% crispy form %}
         </div>
       </div>
