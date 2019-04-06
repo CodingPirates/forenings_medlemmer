@@ -12,8 +12,9 @@
       {% load bootstrap4 %}
       {% bootstrap_css %}
       {% bootstrap_javascript %}
-      <link rel="stylesheet" type ="text/css" href="{% static "members/css/login.css" %}">
-      <link rel="stylesheet" type ="text/css" href="{% static "members/css/base.css" %}" />
+      <link rel="stylesheet" type ="text/css" href="{% static "members/css/login.css" %}"/>
+      <link rel="stylesheet" type ="text/css" href="{% static "members/css/base.css" %}"/>
+      <link rel="stylesheet" type ="text/css" href="{% static "members/css/menu.css" %}"/>
       {% if request.get_full_path == "/" %}
       {% load crispy_forms_tags %}
       <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
@@ -62,31 +63,33 @@
   <body>
     {% block header %}
       <header>
-        <nav class="navbar navbar-expand-md navbar-light fixed-top" style="border: none; border-radius: 0;">
-
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://codingpirates.dk/">←  codingpirates.dk</a>
-                    </li>
-                    <li style="margin-left: 5em;">
-                        <span href="https://codingpirates.dk" class="navbar-brand" style="padding: 0 8px; height: 2.6em" title="Coding Pirates">
-                            <img src="{% static "Coding Pirates Hack Logo.png" %}" style="height: 100%; padding: 5px 0; display: inline-block; vertical-align: middle;" /><span style="vertical-align: middle; margin-left: 0.4em;font-size: 1.2em;font-family: 'Pirata One', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Coding Pirates</span>
-                        </span>
-                    </li>
-                    {% if not user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Tilmeld barn</a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/family/">Familie</a>
-                    </li>
-                    <li class="nav-item">
-                        {% include "members/login_logout.html" %}
-                    </li>
-                </ul>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
+          <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleMenu" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggleMenu">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                  {% include "members/login_logout.html" %}
+                </li>
+                {% if not user.is_authenticated %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="/">Tilmeld barn</a>
+                  </li>
+                {% endif %}
+                <li class="nav-item">
+                  <a class="nav-link" href="/family/">Familie</a>
+                </li>
+              </ul>
+            </div>
+            <a href="https://codingpirates.dk" class="navbar-brand" style="height: 48px; padding: 0px; margin: 0px;" title="Coding Pirates">
+                <img src="{% static "Coding Pirates Hack Logo.png" %}" style="height: 100%; display: inline-block; vertical-align: middle;" />
+                <span style="vertical-align: middle; margin-left: 0.4em;font-size: 1.2em;font-family: 'Pirata One', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Coding Pirates</span>
+            </a>
+          </div>
         </nav>
-    </header>
+      </header>
     {% endblock %}
     {% block content %}{% endblock %}
     {% block footer %}
