@@ -16,88 +16,88 @@
       <link rel="stylesheet" type ="text/css" href="{% static "members/css/base.css" %}"/>
       <link rel="stylesheet" type ="text/css" href="{% static "members/css/menu.css" %}"/>
       {% if request.get_full_path == "/" %}
-      {% load crispy_forms_tags %}
-      <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
-      <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
-      <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
-      <script>
-       $(function() {
-        $( ".datepicker" ).datepicker({
-          format: "dd-mm-yyyy",
-          autoclose: true,
-          weekStart: 1,
-          language: 'da'
-        });
-        $('#search-address').dawaautocomplete({
-        select: function(event, adresse) {
-          // denne funktion bliver kaldt når brugeren vælger en adresse.
-          // Udfyld adressefelterne
-          $("#id_streetname").val(adresse.adresse.vejnavn);
-          $("#id_housenumber").val(adresse.adresse.husnr);
-          $("#id_floor").val(adresse.adresse.etage);
-          $("#id_door").val(adresse.adresse.dør);
-          $("#id_placename").val(adresse.adresse.supplerendebynavn);
-          $("#id_zipcode").val(adresse.adresse.postnr);
-          $("#id_city").val(adresse.adresse.postnrnavn);
-          $("#id_dawa_id").val(adresse.adresse.id);
-        }});
-        $("#manual-entry").click(function() {
-          $("#id_streetname").val('');
-          $("#id_housenumber").val('');
-          $("#id_floor").val('');
-          $("#id_door").val('');
-          $("#id_placename").val('');
-          $("#id_zipcode").val('');
-          $("#id_city").val('');
-          $("#id_dawa_id").val(null);
-          $("#search-address").val(null);
+        {% load crispy_forms_tags %}
+        <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
+        <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
+        <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
+        <script>
+         $(function() {
+          $( ".datepicker" ).datepicker({
+            format: "dd-mm-yyyy",
+            autoclose: true,
+            weekStart: 1,
+            language: 'da'
+          });
+          $('#search-address').dawaautocomplete({
+          select: function(event, adresse) {
+            // denne funktion bliver kaldt når brugeren vælger en adresse.
+            // Udfyld adressefelterne
+            $("#id_streetname").val(adresse.adresse.vejnavn);
+            $("#id_housenumber").val(adresse.adresse.husnr);
+            $("#id_floor").val(adresse.adresse.etage);
+            $("#id_door").val(adresse.adresse.dør);
+            $("#id_placename").val(adresse.adresse.supplerendebynavn);
+            $("#id_zipcode").val(adresse.adresse.postnr);
+            $("#id_city").val(adresse.adresse.postnrnavn);
+            $("#id_dawa_id").val(adresse.adresse.id);
+          }});
+          $("#manual-entry").click(function() {
+            $("#id_streetname").val('');
+            $("#id_housenumber").val('');
+            $("#id_floor").val('');
+            $("#id_door").val('');
+            $("#id_placename").val('');
+            $("#id_zipcode").val('');
+            $("#id_city").val('');
+            $("#id_dawa_id").val(null);
+            $("#search-address").val(null);
 
-          var checked = $("#manual-entry").get(0).checked;
-          $(".autofilled-address").attr("readonly", !checked);
-          $("#search-address").attr("readonly", checked);
+            var checked = $("#manual-entry").get(0).checked;
+            $(".autofilled-address").attr("readonly", !checked);
+            $("#search-address").attr("readonly", checked);
+          });
         });
-      });
-      </script>
+        </script>
       {% endif %}
   </head>
   <body>
     {% block header %}
-      <header>
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
-          <div class="container">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleMenu" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarToggleMenu">
-              <ul class="navbar-nav mr-auto">
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
+        <div class="container">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleMenu" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggleMenu">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item">
+                {% include "members/login_logout.html" %}
+              </li>
+              {% if not user.is_authenticated %}
                 <li class="nav-item">
-                  {% include "members/login_logout.html" %}
+                  <a class="nav-link" href="/">Tilmeld barn</a>
                 </li>
-                {% if not user.is_authenticated %}
-                  <li class="nav-item">
-                    <a class="nav-link" href="/">Tilmeld barn</a>
-                  </li>
-                {% endif %}
-                <li class="nav-item">
-                  <a class="nav-link" href="/family/">Familie</a>
-                </li>
-              </ul>
-            </div>
-            <a href="https://codingpirates.dk" class="navbar-brand" style="height: 48px; padding: 0px; margin: 0px;" title="Coding Pirates">
-                <img src="{% static "Coding Pirates Hack Logo.png" %}" style="height: 100%; display: inline-block; vertical-align: middle;" />
-                <span style="vertical-align: middle; margin-left: 0.4em;font-size: 1.2em;font-family: 'Pirata One', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Coding Pirates</span>
-            </a>
+              {% endif %}
+              <li class="nav-item">
+                <a class="nav-link" href="/family/">Familie</a>
+              </li>
+            </ul>
           </div>
-        </nav>
-      </header>
-    {% endblock %}
-    {% block content %}{% endblock %}
-    {% block footer %}
-    <footer class="page-footer col-12" style="background-color: #2C8098; color: #ffffff; padding: 15px 30px">
-        <div class="footer-copyright text-center py-3">
-            <small>Coding Pirates Denmark - Sverigesgade 20, 1., 5000 Odense C, E-mail: <a href="mailto:kontakt@codingpirates.dk" style="color: #c5c5c5">kontakt@codingpirates.dk</a> - <abbr title="Telefon">Tlf</abbr>: +45 28597550 - CVR: 35552316</small>
+          <a href="https://codingpirates.dk" class="navbar-brand" style="height: 48px; padding: 0px; margin: 0px;" title="Coding Pirates">
+              <img src="{% static "Coding Pirates Hack Logo.png" %}" style="height: 100%; display: inline-block; vertical-align: middle;" />
+              <span style="vertical-align: middle; margin-left: 0.4em;font-size: 1.2em;font-family: 'Pirata One', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Coding Pirates</span>
+          </a>
         </div>
-    </footer>
+      </nav>
+    {% endblock %}
+    <section class="main">
+      {% block content %}{% endblock %}
+    </section>
+    {% block footer %}
+      <footer class="page-footer col-12" style="background-color: #2C8098; color: #ffffff; padding: 15px 30px">
+        <div class="footer-copyright text-center py-3">
+          <small>Coding Pirates Denmark - Sverigesgade 20, 1., 5000 Odense C, E-mail: <a href="mailto:kontakt@codingpirates.dk" style="color: #c5c5c5">kontakt@codingpirates.dk</a> - <abbr title="Telefon">Tlf</abbr>: +45 28597550 - CVR: 35552316</small>
+        </div>
+      </footer>
     {% endblock %}
   </body>
 </html>

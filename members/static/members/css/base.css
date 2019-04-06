@@ -14,5 +14,13 @@
 }
 
 body {
-    padding-top: 4em;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+section.main {
+    padding-top: 60px;
+    padding-bottom: 20px;
 }
