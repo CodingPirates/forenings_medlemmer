@@ -2,20 +2,16 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<div class="alert alert-warning alert-dismissible fade show">
   <div class="container">
-    <div class="jumbotron">
-      <h1>Til frivillige der ikke tidligere er oprettet som forælder</h1>
-      <p>Hvis du har børn der er tilmeldt i systemet og allerede er oprettet som familie, så log blot på jeres familie side med den email du opskrev dig med, da du tilmeldte dig. Her kan du også tilføje flere personer, hvis det f.eks. er din partner der har tilmeldt børnene men du nu selv vil være med som frivillig.</p>
-      <p>
-        Denne formular er tænkt til frivillige, der ikke har børn der er medlemmer i Coding Pirates.
-      </p>
-      <p>
-        Siden man kommer til som tilmeldt frivillig, er identisk med den forældre ser når de tilmelder deres børn - der er blot mulighed for at stå opskrevet uden børn.
-      </p>
-      <p>
-        På sigt kommer der flere funktioner, der er relevante for de frivillige.
-      </p>
-    </div>
+    <strong>Hvis du allerede har en familiekonto</strong>
+    <p>Så log blot på jeres familie side med den email der blev brugt til tilmelding. Her kan du tilføje flere personer til systemet, f.eks. en partner der er frivillig. Har du spørgsmål så <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</div>
+  <div class="container">
     <div class="row">
       <div class="col-md-12">
         <h1>Tilmelding til Coding Pirates (for frivillige)</h1>
