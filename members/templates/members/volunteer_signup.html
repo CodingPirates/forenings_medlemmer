@@ -1,125 +1,33 @@
-<!DOCTYPE html>
-<html lang="da">
-  <head>
-    {% load staticfiles %}
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/style.css" %}" />
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    {% load bootstrap4 %}
-    {% load crispy_forms_tags %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-    <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
-    <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
-    <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
-    <script>
-     $(function() {
-      $( ".datepicker" ).datepicker({
-        format: "dd-mm-yyyy",
-        autoclose: true,
-        weekStart: 1,
-        language: 'da'
-      });
-      $('#search-address').dawaautocomplete({
-      select: function(event, adresse) {
-        // denne funktion bliver kaldt når brugeren vælger en adresse.
-        // Udfyld adressefelterne
-        $("#id_streetname").val(adresse.adresse.vejnavn);
-        $("#id_housenumber").val(adresse.adresse.husnr);
-        $("#id_floor").val(adresse.adresse.etage);
-        $("#id_door").val(adresse.adresse.dør);
-        $("#id_placename").val(adresse.adresse.supplerendebynavn);
-        $("#id_zipcode").val(adresse.adresse.postnr);
-        $("#id_city").val(adresse.adresse.postnrnavn);
-        $("#id_dawa_id").val(adresse.adresse.id);
-      }});
-      $("#manual-entry").click(function() {
-        $("#id_streetname").val('');
-        $("#id_housenumber").val('');
-        $("#id_floor").val('');
-        $("#id_door").val('');
-        $("#id_placename").val('');
-        $("#id_zipcode").val('');
-        $("#id_city").val('');
-        $("#id_dawa_id").val(null);
-        $("#search-address").val(null);
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
 
-        var checked = $("#manual-entry").get(0).checked;
-        $(".autofilled-address").attr("readonly", !checked);
-        $("#search-address").attr("readonly", checked);
-      });
-    });
-    </script>
-
-  </head>
-  <body>
-      <header>
-        <nav class="navbar navbar-expand-md navbar-light fixed-top">
-            <a href="https://codingpirates.dk" class="navbar-brand" title="Coding Pirates">
-                <img src="https://codingpirates.dk/wp-content/uploads/2016/09/Forside-Logo.png"
-                     title="Coding Pirates"
-                     height="60" />
-            </a>
-
-            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://codingpirates.dk/">codingpirates.dk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Tilmeld barn</a>
-                    </li>
-                    <li class="nav-item">
-                        {% include "members/login_logout.html" %}
-                    </li>
-                </ul>
-            </div>
-        </nav>
-      </header>
-    <div class="container">
-      <div class="jumbotron">
-        <h1>Til frivillige der ikke tidligere er oprettet som forælder</h1>
-        <p>Hvis du har børn der er tilmeldt i systemet og allerede er oprettet som familie, så log blot på jeres familie side med den email du opskrev dig med, da du tilmeldte dig. Her kan du også tilføje flere personer, hvis det f.eks. er din partner der har tilmeldt børnene men du nu selv vil være med som frivillig.</p>
-        <p>
-          Denne formular er tænkt til frivillige, der ikke har børn der er medlemmer i Coding Pirates.
-        </p>
-        <p>
-          Siden man kommer til som tilmeldt frivillig, er identisk med den forældre ser når de tilmelder deres børn - der er blot mulighed for at stå opskrevet uden børn.
-        </p>
-        <p>
-          På sigt kommer der flere funktioner, der er relevante for de frivillige.
-        </p>
+{% block content %}
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Til frivillige der ikke tidligere er oprettet som forælder</h1>
+      <p>Hvis du har børn der er tilmeldt i systemet og allerede er oprettet som familie, så log blot på jeres familie side med den email du opskrev dig med, da du tilmeldte dig. Her kan du også tilføje flere personer, hvis det f.eks. er din partner der har tilmeldt børnene men du nu selv vil være med som frivillig.</p>
+      <p>
+        Denne formular er tænkt til frivillige, der ikke har børn der er medlemmer i Coding Pirates.
+      </p>
+      <p>
+        Siden man kommer til som tilmeldt frivillig, er identisk med den forældre ser når de tilmelder deres børn - der er blot mulighed for at stå opskrevet uden børn.
+      </p>
+      <p>
+        På sigt kommer der flere funktioner, der er relevante for de frivillige.
+      </p>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Tilmelding til Coding Pirates (for frivillige)</h1>
+        <p>Indtast dine oplysninger, for at tilmelde dig som frivillig i en Coding Pirates afdeling.</p>
       </div>
-      <div class="row">
-          <div class="newloginnotice">
-              <p>Kære bruger</p>
-
-              <p>Vi har ændret måden, du logger ind i medlemssystemet.
-                  Fremover skal du logge ind med din email og adgangskode.
-                  Det gør du under punktet "Login" i toppen af siden.
-                  Er det første gang, du benytter det nye loginsystem,
-                  skal du generere en adgangskode ved at trykke på knappen "Login" i toppen
-                  og derefter trykke på knappen "Opret adgangskode".
-                  Hvis du har spørgsmål kan du skrive en e-mail til
-                  <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
-          </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-12">
-          <h1>Tilmelding til Coding Pirates (for frivillige)</h1>
-          <p>Indtast dine oplysninger, for at tilmelde dig som frivillig i en Coding Pirates afdeling.</p>
-        </div>
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-body">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
             {% crispy vol_signupform %}
-            </div>
           </div>
         </div>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+{% endblock %}
