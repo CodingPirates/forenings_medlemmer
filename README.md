@@ -19,7 +19,14 @@ which makes it easy to deploy.
 
 
 ### Development
-
+To get a working copy of the system up and running run the following commands in
+a bash shell.
+```
+# git clone git@github.com:CodingPirates/forenings_medlemmer.git
+# cd forenings_medlemmer
+# docker-compose run --rm backend environment/reset-db.sh
+# docker-compose up
+```
 
 
 

@@ -1,30 +1,21 @@
 version: "3.1"
 
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: environment/Dockerfile.dev
+  web:
+    build: .
     volumes:
-      - .:/usr/app
+      - .:/app
     ports:
-      - 8000:8000
-      - 35729:35729
-    env_file: .env
+      - "8000:8000"
+      - "35729:35729"
     depends_on:
       - database
 
   database:
     image: mdillon/postgis:10-alpine
-    volumes:
-      - db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - PGDATA=/var/lib/postgresql/data
       - POSTGRES_DB=coding_pirates
     ports:
-      - 5432:5432
-
-volumes:
-  db-data:
+      - "5432:5432"

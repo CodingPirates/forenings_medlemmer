@@ -1,3 +1,2 @@
 build:
-  docker:
-    web: environment/Dockerfile
+  docker: Dockerfile
