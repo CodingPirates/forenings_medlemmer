@@ -1,21 +1,53 @@
-version: "3.1"
+version: "3.7"
 
 services:
   web:
     build: .
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
     ports:
-      - "8000:8000"
-      - "35729:35729"
+      - 8000
     depends_on:
       - database
+    networks:
+      - webnet
+    environment:
+      - SECRET_KEY=$SECRET_KEY
+      - DEBUG=$DEBUG
+      - BASE_URL=$BASE_URL
+      - DB_PASS=$DB_PASS
+      - QUICKPAY_API_KEY=$QUICKPAY_API_KEY
+      - QUICKPAY_PRIVATE_KEY=$QUICKPAY_PRIVATE_KEY
+
+
+  nginx:
+    networks:
+      - webnet
+    build: ./nginx
+    volumes:
+      - static_volume:/app/staticfiles
+    ports:
+      - "$PORT:80"
+    depends_on:
+      - web
 
   database:
     image: mdillon/postgis:10-alpine
+    networks:
+      - webnet
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=coding_pirates
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=forenings_medlemmer
     ports:
-      - "5432:5432"
+      - 5432
+
+volumes:
+  postgres_data:
+  static_volume:
+
+networks:
+  webnet:
