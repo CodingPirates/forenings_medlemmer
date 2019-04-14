@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from members.forms import signupForm
 from django.shortcuts import render
