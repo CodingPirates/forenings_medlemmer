@@ -1,11 +1,9 @@
 *.pyc
+__pycache__
 .env
 /db.sqlite3*
+staticfiles
 *~
-virtualenv/
-venv_win
-venv_osx
-venv_linux
 .idea/
 experiments.py
 *_old
