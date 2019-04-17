@@ -1,0 +1,25 @@
+{
+  "name": "Coding Pirates CRM",
+  "description": "The member system for coding pirates",
+  "website": "https://codingpirates.dk",
+  "stack": "container",
+  "environments": {
+    "test": {
+        "env": {
+            "ALLOWED_HOSTS": "*",
+            "BASE_URL": "https://members.codingpirates.dk",
+            "DEBUG": "True",
+            "QUICKPAY_API_KEY": "some_key",
+            "QUICKPAY_PRIVATE_KEY": "some_private_key",
+            "SECRET_KEY": "some_secret_key",
+            "SERVER_COMMAND": "gunicorn forenings_medlemmer.wsgi:application --bind"
+        },
+        "addons":[
+            "heroku-postgres:in-dyno"
+        ],
+        "scripts": {
+            "test": "./manage.py test"
+        }
+    }
+  }
+}
