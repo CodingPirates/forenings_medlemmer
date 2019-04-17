@@ -8,8 +8,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 COPY . /app
 
-RUN apt-get update &&\
-    apt-get install -y binutils libproj-dev gdal-bin
+RUN apt-get update && apt-get install -y binutils libproj-dev gdal-bin
 
 RUN pip install -r requirements.txt
 
@@ -20,4 +19,4 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 
 # Set the default command to be executed.
-CMD gunicorn forenings_medlemmer.wsgi:application --bind 0.0.0.0:8000
+CMD gunicorn forenings_medlemmer.wsgi:application --bind 0.0.0.0:$PORT

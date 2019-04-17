@@ -11,6 +11,8 @@ freezegun==0.3.11
 gunicorn==19.9.0
 idna==2.8
 psycopg2==2.8.2
+dj-database-url
+environs
 python-dateutil==2.8.0
 pytz==2019.1
 quickpay-api-client==1.0.1
@@ -18,3 +20,4 @@ requests==2.21.0
 six==1.12.0
 sqlparse==0.3.0
 urllib3==1.24.1
+whitenoise

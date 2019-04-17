@@ -11,10 +11,15 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import logging
+from environs import Env
+import dj_database_url
+
+env = Env()
+env.read_env()
 
 logger = logging.getLogger(__name__)
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TEMPLATES = [
     {
@@ -44,16 +49,16 @@ TEMPLATES = [
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ["DEBUG"] == "True"
+DEBUG = env.bool("DEBUG")
 if DEBUG:
     logger.warning("RUNNING IN DEBUG MODE")
 else:
     logger.info("RUNNING IN PRODUCTION")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 BASE_URL = os.environ["BASE_URL"]
 
@@ -84,6 +89,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 )
 
 ROOT_URLCONF = "forenings_medlemmer.urls"
@@ -94,15 +100,11 @@ WSGI_APPLICATION = "forenings_medlemmer.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 DATABASES = {
-    "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "forenings_medlemmer",
-        "USER": "postgres",
-        "PASSWORD": os.environ["DB_PASS"],
-        "HOST": "database",
-        "PORT": "5432",
-    }
+    "default": dj_database_url.parse(
+        os.environ["DATABASE_URL"].replace("postgres://", "postgis://")
+    )
 }
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
@@ -128,7 +130,7 @@ REQUEST_FAMILY_VALIDATION_PERIOD = 180
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 ADMIN_MEDIA_PREFIX = "/static/admin/"
-
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 ADMINS = (("Administrator", "admin@example.org"),)
 MANAGERS = ADMINS
 
