@@ -3,7 +3,7 @@ setup:
     - plan: heroku-postgresql
       as: DATABASE
   command:
-     psql -d $DATABASE_URL -c "CREATE EXTENSION postgis;"    
+     psql -d $DATABASE_URL -c "CREATE EXTENSION postgis;"
 build:
   docker:
     web: Dockerfile
