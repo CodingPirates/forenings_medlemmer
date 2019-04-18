@@ -3,6 +3,9 @@
   "description": "The member system for coding pirates",
   "website": "https://codingpirates.dk",
   "stack": "container",
+  "buildpacks": [
+    { "url": "heroku/python" }
+  ],
   "environments": {
     "test": {
         "env": {

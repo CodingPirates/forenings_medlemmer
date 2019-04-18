@@ -58,9 +58,7 @@ if DEBUG:
 else:
     logger.info("RUNNING IN PRODUCTION")
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
-print("WE ALLOW::::this")
-print(ALLOWED_HOSTS)
+ALLOWED_HOSTS = [host.replace(" ", "") for host in env.list("ALLOWED_HOSTS")]
 BASE_URL = os.environ["BASE_URL"]
 
 # Application definition
