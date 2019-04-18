@@ -19,6 +19,7 @@ services:
       - QUICKPAY_API_KEY=$QUICKPAY_API_KEY
       - QUICKPAY_PRIVATE_KEY=$QUICKPAY_PRIVATE_KEY
       - DATABASE_URL=$DATABASE_URL
+      - ALLOWED_HOSTS=$ALLOWED_HOSTS
 
   database:
     image: mdillon/postgis:10-alpine
