@@ -11,5 +11,5 @@ jobs:
       - run: docker-compose exec ./manage.py test
 
       - store_artifacts:
-        path: test-reports
-        destination: test-reports
+        - path: test-reports
+        - destination: test-reports
