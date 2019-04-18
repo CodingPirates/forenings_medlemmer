@@ -21,7 +21,6 @@
           "heroku-postgresql:in-dyno"
         ],
         "scripts": {
-            "test-setup": "psql -d $DATABASE_URL -c \"CREATE EXTENSION postgis;\"",
             "test": "./manage.py test"
         }
     }
