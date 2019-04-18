@@ -22,7 +22,7 @@ services:
       - ALLOWED_HOSTS=$ALLOWED_HOSTS
 
   database:
-    image: mdillon/postgis:10-alpine
+    image: postgres:11.2-alpine
     networks:
       - webnet
     volumes:

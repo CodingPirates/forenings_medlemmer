@@ -8,7 +8,6 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 COPY . /app
 
-RUN apt-get update && apt-get install -y binutils libproj-dev gdal-bin
 
 RUN pip install -r requirements.txt
 
