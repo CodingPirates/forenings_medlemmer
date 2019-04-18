@@ -21,3 +21,4 @@ six==1.12.0
 sqlparse==0.3.0
 urllib3==1.24.1
 whitenoise
+unittest-xml-reporting
