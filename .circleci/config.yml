@@ -7,8 +7,12 @@ jobs:
     steps:
       - checkout
       # Maybe you need to add some config file specific to circle…
-      - run: docker-compose up -d
-      - run: docker-compose exec ./manage.py test
+      - run:
+        name: Start docker
+        command: docker-compose up -d
+      - run:
+        name: Run tests
+        command: docker-compose exec ./manage.py test
 
       - store_artifacts:
         path: test-reports
