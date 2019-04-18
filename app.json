@@ -15,7 +15,7 @@
             "SERVER_COMMAND": "gunicorn forenings_medlemmer.wsgi:application --bind"
         },
         "addons":[
-            "heroku-postgresql:in-dyno"
+          "heroku-postgresql:in-dyno"
         ],
         "scripts": {
             "test": "./manage.py test"
