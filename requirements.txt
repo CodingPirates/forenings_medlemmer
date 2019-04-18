@@ -1,5 +1,4 @@
 Django==1.9.1
-django-bootstrap3==6.2.2
 django-bootstrap4==0.0.8
 django-extensions==1.6.1
 django-crispy-forms
