@@ -5,8 +5,3 @@ setup:
 build:
   docker:
     web: Dockerfile
-
-release:
-  image: web
-  command:
-    - psql -d $DATABASE_URL -c "CREATE EXTENSION postgis;"
