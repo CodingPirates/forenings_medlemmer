@@ -12,3 +12,5 @@ experiments.py
 .vs/
 notes.txt
 gamle_db/
+test-results
+.coverage

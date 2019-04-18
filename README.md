@@ -1,4 +1,5 @@
 # Coding Pirates member mangement system.
+[![CircleCI](https://circleci.com/gh/Rotendahl/forenings_medlemmer.svg?style=svg)](https://circleci.com/gh/Rotendahl/forenings_medlemmer)[![Coverage Status](https://coveralls.io/repos/github/Rotendahl/forenings_medlemmer/badge.svg?branch=master)](https://coveralls.io/github/Rotendahl/forenings_medlemmer?branch=master)
 This system is used by the union [Coding Pirates][cpDK], we are a volunteer
 non profit that teaches programming, 3D printing, and other IT related
 activities to kids.
