@@ -13,13 +13,13 @@ services:
     networks:
       - webnet
     environment:
-      - "SECRET_KEY=${SECRET_KEY}"
-      - "DEBUG=${DEBUG}"
-      - "BASE_URL=${BASE_URL}"
-      - "QUICKPAY_API_KEY=${QUICKPAY_API_KEY}"
-      - "QUICKPAY_PRIVATE_KEY=${QUICKPAY_PRIVATE_KEY}"
-      - "DATABASE_URL=${DATABASE_URL}"
-      - "ALLOWED_HOSTS=${ALLOWED_HOSTS}"
+      - SECRET_KEY=$SECRET_KEY
+      - DEBUG=$DEBUG
+      - BASE_URL=$BASE_URL
+      - QUICKPAY_API_KEY=$QUICKPAY_API_KEY
+      - QUICKPAY_PRIVATE_KEY=$QUICKPAY_PRIVATE_KEY
+      - DATABASE_URL=$DATABASE_URL
+      - ALLOWED_HOSTS=$ALLOWED_HOSTS
 
   database:
     image: postgres:11.2-alpine

@@ -2,10 +2,17 @@ version: 2
 jobs:
   build:
     machine: true
+    image:
     working_directory: ~/repo
 
     steps:
       - checkout
       # Maybe you need to add some config file specific to circle…
+      - run:
+        name: Install Docker Compose
+        command: |
+          curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+          chmod +x ~/docker-compose
+          sudo mv ~/docker-compose /usr/local/bin/docker-compose
       - run: docker-compose up -d
       - run: docker-compose exec ./manage.py test
