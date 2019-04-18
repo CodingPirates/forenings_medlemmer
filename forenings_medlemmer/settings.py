@@ -98,11 +98,7 @@ WSGI_APPLICATION = "forenings_medlemmer.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-DATABASES = {
-    "default": dj_database_url.parse(
-        os.environ["DATABASE_URL"].replace("postgres://", "postgis://")
-    )
-}
+DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
