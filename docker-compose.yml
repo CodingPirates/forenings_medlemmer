@@ -20,6 +20,7 @@ services:
       - QUICKPAY_PRIVATE_KEY=$QUICKPAY_PRIVATE_KEY
       - DATABASE_URL=$DATABASE_URL
       - ALLOWED_HOSTS=$ALLOWED_HOSTS
+      - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN
 
   database:
     image: postgres:11.2-alpine
