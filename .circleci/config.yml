@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      # Maybe you need to add some config file specific to circle…
+      - run: docker-compose up -d
+      - run: docker-compose exec ./manage.py test
+
+      - store_artifacts:
+        path: test-reports
+        destination: test-reports
