@@ -12,4 +12,4 @@ jobs:
       - run: chmod +x ~/docker-compose
       - run: sudo mv ~/docker-compose /usr/local/bin/docker-compose
       - run: docker-compose up -d
-      - run: docker-compose exec ./manage.py test
+      - run: docker-compose run web ./manage.py test
