@@ -1,13 +1,3 @@
-RUNNING IN DEBUG MODE
-[36;1mOperations to perform:[0m
-[1m  Apply all migrations: [0madmin, auth, contenttypes, django_cron, members, sessions
-[36;1mRunning migrations:[0m
-  No migrations to apply.
-RUNNING IN DEBUG MODE
-Found another file with the destination path 'admin/css/responsive.css'. It will be ignored since only the first encountered file is collected. If this is not what you want, make sure every static file has a unique path.
-Found another file with the destination path 'admin/css/responsive_rtl.css'. It will be ignored since only the first encountered file is collected. If this is not what you want, make sure every static file has a unique path.
-
-0 static files copied to '/app/staticfiles', 131 unmodified.
 certifi==2019.3.9
 chardet==3.0.4
 coverage==4.5.3
