@@ -33,7 +33,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib import messages
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
-admin.site.index_title = "Site Admin"
+admin.site.index_title = "Afdelings admin"
 
 
 class EmailItemInline(admin.TabularInline):
