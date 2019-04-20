@@ -50,28 +50,25 @@
                   </tr>
                 {% endfor %}
               </tbody>
-              <tfoot>
-                <tr>
-                </tr>
-              </tfoot>
             </table>
             {% endif %}
-            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' 'CH' %}">Opret barn</a>
-            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' 'PA' %}">Opret forælder</a>
-            <a class="btn btn-primary btn-sm" role="button" href="{% url 'person_add' 'GU' %}">Opret værge</a>
-            <br/>
-            <br/>
-            {%if request_parents %}
-            <blockquote class="bg-warning">
-              <p>Opret mindst 1 forælder / værge med kontaktoplysninger, så vi i Coding Pirates nemt kan få fat i jer.</p>
-            </blockquote>
-            {%endif%}
-            {% if need_confirmation %}
-            <blockquote class="bg-danger">
-            <p> Det er længe siden du sidst bekræftede dine oplysninger. <a class="btn btn-success" href="{% url 'confirm_details' %}">Bekræft oplysninger</a>
-            </blockquote>
-            {%endif%}
           </section>
+          <br>
+          <a class="btn btn-primary" role="button" href="{% url 'person_add' 'CH' %}">Opret barn</a>
+          <a class="btn btn-primary" role="button" href="{% url 'person_add' 'PA' %}">Opret forælder</a>
+          <a class="btn btn-primary" role="button" href="{% url 'person_add' 'GU' %}">Opret værge</a>
+          <br>
+          <br>
+          {%if request_parents %}
+          <blockquote class="bg-warning">
+            <p>Opret mindst 1 forælder / værge med kontaktoplysninger, så vi i Coding Pirates nemt kan få fat i jer.</p>
+          </blockquote>
+          {%endif%}
+          {% if need_confirmation %}
+          <blockquote class="bg-danger">
+          <p> Det er længe siden du sidst bekræftede dine oplysninger. <a class="btn btn-success" href="{% url 'confirm_details' %}">Bekræft oplysninger</a>
+          </blockquote>
+          {%endif%}
         </div>
       </div>
 
