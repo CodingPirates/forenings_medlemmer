@@ -12,6 +12,11 @@
       "generator": "secret",
       "description": "Secret key for django"
     },
+    "BASE_URL": {
+      "required": true,
+      "description": "The URL it should be served on (deprecated)",
+      "value": "members.codingpirates.dk"
+    },
     "ALLOWED_HOSTS": {
       "required": true,
       "description": "Which urls that can host the service",
