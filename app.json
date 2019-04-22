@@ -39,7 +39,7 @@
       "required": true,
       "description": "The Service that starts the app",
       "value" : "gunicorn forenings_medlemmer.wsgi:application --bind"
-    },
+    }
   },
   "addons": {"heroku-postgresql:hobby-dev"},
   "environments": {
