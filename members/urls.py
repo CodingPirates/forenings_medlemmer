@@ -17,9 +17,11 @@ from members.views import (
 )
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
+from graphene_django.views import GraphQLView
 
 urlpatterns = [
     url(r"^$", EntryPage, name="entry_page"),
+    url(r"^graphql", GraphQLView.as_view(graphiql=True)),
     url(
         r"^account/login/$",
         auth_views.LoginView,

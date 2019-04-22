@@ -75,6 +75,7 @@ INSTALLED_APPS = (
     "django_cron",
     "flat_responsive",
     "django.contrib.admin",
+    "graphene_django",
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
@@ -95,6 +96,7 @@ ROOT_URLCONF = "forenings_medlemmer.urls"
 
 WSGI_APPLICATION = "forenings_medlemmer.wsgi.application"
 
+GRAPHENE = {"SCHEMA": "members.schema.schema"}
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
