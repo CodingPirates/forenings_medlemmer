@@ -24,4 +24,9 @@ import members.models.quickpaytransaction
 import members.models.union
 import members.models.volunteer
 import members.models.waitinglist
-import members.models.zipcoderegion # noqa  # fine to hav eall models included
+import members.models.zipcoderegion  # noqa  # fine to hav eall models included
+
+
+# Export models not files
+from .department import Department
+from .union import Union
