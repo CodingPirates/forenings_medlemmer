@@ -97,6 +97,7 @@ MIDDLEWARE = (
 CORS_ORIGIN_WHITELIST = [host.replace(" ", "") for host in env.list("CORS_LIST")]
 CORS_ALLOW_CREDENTIALS = True
 ROOT_URLCONF = "forenings_medlemmer.urls"
+CORS_ORIGIN_ALLOW_ALL = True
 
 WSGI_APPLICATION = "forenings_medlemmer.wsgi.application"
 
