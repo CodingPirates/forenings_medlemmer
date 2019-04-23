@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "bootstrap3",
+    "corsheaders",
     "members",
     "crispy_forms",
     "django_cron",
@@ -81,6 +82,7 @@ INSTALLED_APPS = (
 CRISPY_TEMPLATE_PACK = "bootstrap3"
 
 MIDDLEWARE = (
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -92,6 +94,8 @@ MIDDLEWARE = (
     "whitenoise.middleware.WhiteNoiseMiddleware",
 )
 
+CORS_ORIGIN_WHITELIST = [host.replace(" ", "") for host in env.list("CORS_LIST")]
+CORS_ALLOW_CREDENTIALS = True
 ROOT_URLCONF = "forenings_medlemmer.urls"
 
 WSGI_APPLICATION = "forenings_medlemmer.wsgi.application"

@@ -7,6 +7,12 @@
     { "url": "heroku/python" }
   ],
   "env" : {
+    "CORS_LIST" : {
+      "required": true,
+      "description": "The hosts that are allowed to acces cros origin",
+      "value": "members.codingpirates.dk"
+    },
+
     "SECRET_KEY": {
       "required": true,
       "generator": "secret",

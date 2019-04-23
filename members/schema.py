@@ -8,7 +8,7 @@ from members.models import Department, Union
 class UnionType(DjangoObjectType):
     class Meta:
         model = Union
-        only_fields = ("name", "chairman")
+        exclude_fields = ("region", "bank_main_org", "bank_account")
 
 
 class DepartmentType(DjangoObjectType):
