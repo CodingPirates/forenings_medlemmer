@@ -7,7 +7,13 @@
     { "url": "heroku/python" }
   ],
   "env" : {
-    "CORS_LIST" : {
+     "FORCE_HTTPS" : {
+      "required": true,
+      "description": "Wheter or not https is enforced",
+      "value": "True"
+    },
+
+   "CORS_LIST" : {
       "required": true,
       "description": "The hosts that are allowed to acces cros origin",
       "value": "members.codingpirates.dk"

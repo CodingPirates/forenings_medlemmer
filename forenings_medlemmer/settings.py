@@ -82,6 +82,7 @@ INSTALLED_APPS = (
 CRISPY_TEMPLATE_PACK = "bootstrap3"
 
 MIDDLEWARE = (
+    "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -149,7 +150,7 @@ EMAIL_HOST_PASSWORD = "password"
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 30
 
-AUTHENTICATION_BACKENDS = ('members.backends.CaseInsensitiveModelBackend',)
+AUTHENTICATION_BACKENDS = ("members.backends.CaseInsensitiveModelBackend",)
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -170,7 +171,7 @@ DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 7
 
 QUICKPAY_API_KEY = os.environ["QUICKPAY_API_KEY"]
 QUICKPAY_PRIVATE_KEY = os.environ["QUICKPAY_PRIVATE_KEY"]
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = env.bool("FORCE_HTTPS")
 
 
 LOGIN_URL = "/account/login/"
