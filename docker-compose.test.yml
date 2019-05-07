@@ -1,7 +1,0 @@
-version: "3.1"
-
-services:
-  backend:
-    image: codingpirates/forenings-medlemmer
-    container_name: forenings_medlemmer
-    command: tail -f /dev/null
