@@ -135,26 +135,29 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 ADMIN_MEDIA_PREFIX = "/static/admin/"
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-ADMINS = (("Administrator", "admin@example.org"),)
+ADMINS = eval(os.environ["ADMINS"])
 MANAGERS = ADMINS
 
-EMAIL_SUBJECT_PREFIX = "[Acme Medlemsdatabase] "
-SERVER_EMAIL = "hostmaster@example.org"
-DEFAULT_FROM_EMAIL = "kontakt@example.com"
-SITE_CONTACT = "Acme Industries <contact@example.org>"
-DEBUG_EMAIL_DESTINATION = "debug@example.org"
 
-EMAIL_HOST = "smtp.example.org"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = "username"
-EMAIL_HOST_PASSWORD = "password"
-EMAIL_USE_TLS = True
+SITE_CONTACT = "Coding Pirates <kontakt@codingpirates.dk>"
+EMAIL_SUBJECT_PREFIX = "[Coding Pirates Medlemsdatabase] "
+email = env.dj_email_url("EMAIL_URL")
+EMAIL_BACKEND = email["EMAIL_BACKEND"]
+EMAIL_HOST = email["EMAIL_HOST"]
+EMAIL_HOST_USER = email["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = email["EMAIL_HOST_PASSWORD"]
+EMAIL_FILE_PATH = BASE_DIR
+SERVER_EMAIL = "hostmaster@members.codingpirates.dk"
+EMAIL_PORT = email["EMAIL_PORT"]
+EMAIL_USE_SSL = email["EMAIL_USE_SSL"]
+DEFAULT_FROM_EMAIL = "kontakt@codingpirates.dk"
 EMAIL_TIMEOUT = 30
+
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 
 AUTHENTICATION_BACKENDS = ("members.backends.CaseInsensitiveModelBackend",)
 
-if DEBUG:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",

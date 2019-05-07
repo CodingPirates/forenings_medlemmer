@@ -23,6 +23,8 @@ services:
       - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN
       - CORS_LIST=$CORS_LIST
       - FORCE_HTTPS=$FORCE_HTTPS
+      - EMAIL_URL=$EMAIL_URL
+      - ADMINS=$ADMINS
 
   database:
     image: postgres:11.2-alpine

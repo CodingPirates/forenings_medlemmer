@@ -7,12 +7,21 @@
     { "url": "heroku/python" }
   ],
   "env" : {
+    "EMAIL_URL" : {
+     "required": true,
+     "description": "EMAIL URL",
+     "value": "console:"
+    },
+    "ADMINS" : {
+     "required": true,
+     "description": "Admins that get email on crashes",
+     "value": "[('dit navn', 'din@email.dk')]"
+    },
      "FORCE_HTTPS" : {
       "required": true,
       "description": "Wheter or not https is enforced",
       "value": "True"
     },
-
    "CORS_LIST" : {
       "required": true,
       "description": "The hosts that are allowed to acces cros origin",
