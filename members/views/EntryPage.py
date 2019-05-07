@@ -55,6 +55,8 @@ def EntryPage(request):
                                                placename=signup.cleaned_data['placename'],
                                                email=signup.cleaned_data['parent_email'],
                                                phone=signup.cleaned_data['parent_phone'],
+                                               birthday=signup.cleaned_data['parent_birthday'],
+                                               gender=signup.cleaned_data['parent_gender'],
                                                family=family,
                                                user=user
                                                )
