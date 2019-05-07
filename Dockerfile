@@ -10,7 +10,9 @@ COPY . /app
 
 RUN apt-get update && apt-get install -y binutils libproj-dev gdal-bin
 
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+
 
 EXPOSE 8000
 

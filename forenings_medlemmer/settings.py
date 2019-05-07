@@ -77,6 +77,7 @@ INSTALLED_APPS = (
     "flat_responsive",
     "django.contrib.admin",
     "graphene_django",
+    "fontawesome",
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
