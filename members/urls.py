@@ -25,15 +25,13 @@ urlpatterns = [
     url(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     url(
         r"^account/login/$",
-        auth_views.LoginView,
-        {"template_name": "members/login.html"},
+        auth_views.LoginView.as_view(template_name="members/login.html"),
         name="person_login",
     ),
     url(
         r"^account/forgot/$",
-        auth_views.PasswordResetView,
+        auth_views.PasswordResetView.as_view(template_name="members/forgot.html"),
         {
-            "template_name": "members/forgot.html",
             "email_template_name": "members/email/password_reset.txt",
             "html_email_template_name": "members/email/password_reset.html",
             "subject_template_name": "members/email/password_reset_subject.txt",
@@ -42,25 +40,22 @@ urlpatterns = [
     ),
     url(
         r"^account/forgot/done/$",
-        auth_views.PasswordResetDoneView,
-        {"template_name": "members/forgot_done.html"},
+        auth_views.PasswordResetDoneView.as_view(template_name="members/forgot_done.html"),
         name="password_reset_done",
     ),
     url(
         r"^account/forgot/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
-        auth_views.PasswordResetConfirmView,
-        {"template_name": "members/forgot_confirm.html"},
+        auth_views.PasswordResetConfirmView.as_view(template_name="members/forgot_confirm.html"),
         name="password_reset_confirm",
     ),
     url(
         r"^account/forgot/complete/$",
-        auth_views.PasswordResetCompleteView,
-        {"template_name": "members/forgot_complete.html"},
+        auth_views.PasswordResetCompleteView.as_view(template_name="members/forgot_complete.html"),
         name="password_reset_complete",
     ),
     url(
         r"^account/logout/$",
-        auth_views.LogoutView,
+        auth_views.LogoutView.as_view(),
         {"next_page": "/"},
         name="person_logout",
     ),
