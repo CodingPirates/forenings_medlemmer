@@ -1,5 +1,5 @@
-# TODO: Factories for AdminUserInformation, equipment, equipment loan, emails, emailtemplates and statistics
-# TODO: write tests using the factories
+# TODO: Factories for AdminUserInformation, equipment, equipment loan, emails and statistics
+# TODO: tests for departments, members, volunteers, activities, equipment, equipmentloan, statistics
 
 import pytz
 from datetime import date, timedelta
@@ -138,7 +138,8 @@ class FamilyFactory(DjangoModelFactory):
         model = Family
 
     unique = Faker("uuid4")
-    email = Faker("email")
+    #email = Faker("email")
+    email = factory.Sequence(lambda n: 'family{0}@example.com'.format(n)) #Faker("email")
     # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
@@ -169,12 +170,12 @@ class PersonFactory(DjangoModelFactory):
     longitude = Faker("longitude")
     latitude = Faker("latitude")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    email = Faker("email")
+    email = factory.Sequence(lambda n: 'person{0}@example.com'.format(n)) #Faker("email")
     phone = Faker("phone_number")
     gender = FuzzyChoice(Person.MEMBER_GENDER_CHOICES)
     birthday = Faker("date")
     # has_certificate = Faker("date")
-    family = SubFactory(FamilyFactory)
+    family = SubFactory(FamilyFactory, email=email)
     notes = Faker("text")
     # added = Faker("date_time", tzinfo=TIMEZONE)
     # deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
@@ -248,10 +249,9 @@ class MemberFactory(DjangoModelFactory):
 
     department = SubFactory(DepartmentFactory)
     person = SubFactory(PersonFactory)
-    is_active = Faker("boolean")
+    # is_active = Faker("boolean")
     member_since = Faker("date_time", tzinfo=TIMEZONE)
-    member_until = LazyAttribute(lambda m: None if m.is_active else datetime_after(m.member_since))
-
+    # member_until = LazyAttribute(lambda m: None if m.is_active else datetime_after(m.member_since))
 
 class VolunteerFactory(DjangoModelFactory):
     class Meta:
