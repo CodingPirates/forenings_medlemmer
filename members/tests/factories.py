@@ -54,7 +54,7 @@ class DanishProvider(BaseProvider):
     floor_formats = ["", "Stuen", "1. sal", "1", "1.", "2.",
                      "0", "0.", "4.", "kl", "st", "kælder", "k2"]
 
-    door_formats = ["", "410", "th", "tv", "mf", "v28", "værelse 17"]
+    door_formats = ["", "410", "th", "tv", "mf", "v28"] #, "værelse 17"]
 
     city_suffixes = ["rød", "havn", "borg", "by", "bjerg", "ssund", "sværk", "ning"]
     street_suffixes = ["Vej", "Gade", "Vangen", "Stræde", "Plads"]
@@ -68,6 +68,12 @@ class DanishProvider(BaseProvider):
         """ Formatter for generating door names in danish
         """
         return random.choice(self.door_formats)
+
+
+    def zipcode(self):
+        """ Formatter for generating door names in danish
+        """
+        return str(random.randint(1000,9999))
 
     def city_suffix(self):
         """
@@ -203,7 +209,7 @@ class UnionFactory(DjangoModelFactory):
     union_email = Faker("email")
     statues = Faker("url")
     founded = Faker("date_time", tzinfo=TIMEZONE)
-    region = FuzzyChoice(Union.regions)
+    region = FuzzyChoice(['S', 'J', 'F', 'Ø'])
     zipcode = Faker("zipcode")
     streetname = Faker("street_name")
     housenumber = Faker("building_number")

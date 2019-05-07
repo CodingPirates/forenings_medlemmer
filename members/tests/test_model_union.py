@@ -25,23 +25,7 @@ class TestModelUnion(TestCase):
         union.clean()  # Should not raise error
 
     def test_bank_account_correct_format1(self):
-        union = UnionFactory(bank_main_org=False, bank_account="4723 4382732")
-        union.clean()  # Should not raise error
-
-    def test_bank_account_correct_format2(self):
-        union = UnionFactory(bank_main_org=False, bank_account="4723 - 4382732")
-        union.clean()  # Should not raise error
-
-    def test_bank_account_correct_format3(self):
-        union = UnionFactory(bank_main_org=False, bank_account="0723 - 4382732348")
-        union.clean()  # Should not raise error
-
-    def test_bank_account_correct_format4(self):
-        union = UnionFactory(bank_main_org=False, bank_account="0723 - 438273")
-        union.clean()  # Should not raise error
-
-    def test_bank_account_correct_format5(self):
-        union = UnionFactory(bank_main_org=False, bank_account="07234382734382")
+        union = UnionFactory(bank_main_org=False, bank_account="4723-0438273223")
         union.clean()  # Should not raise error
 
     def test_string_representation(self):
