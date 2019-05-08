@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="members/tests/test_model_waitinglist.py" name="members.tests.test_model_waitinglist.TestModelWaitinglist-20190419004012" skipped="0" tests="1" time="0.041" timestamp="2019-04-19T00:40:13">
+	<testcase classname="members.tests.test_model_waitinglist.TestModelWaitinglist" file="members/tests/test_model_waitinglist.py" line="46" name="test_waiting_list_position" time="0.041" timestamp="2019-04-19T00:40:13">
+		<system-out>
+<![CDATA[]]>		</system-out>
+		<system-err>
+<![CDATA[]]>		</system-err>
+	</testcase>
+</testsuite>

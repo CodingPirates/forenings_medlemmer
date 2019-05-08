@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="members/tests/test_model_department.py" name="members.tests.test_model_department.TestModelDepartment-20190419004012" skipped="0" tests="1" time="0.165" timestamp="2019-04-19T00:40:13">
+	<testcase classname="members.tests.test_model_department.TestModelDepartment" file="members/tests/test_model_department.py" line="50" name="test_get_long_lat" time="0.165" timestamp="2019-04-19T00:40:13">
+		<system-out>
+<![CDATA[Opdateret for 
+Updated coordinates for 
+]]>		</system-out>
+		<system-err>
+<![CDATA[]]>		</system-err>
+	</testcase>
+</testsuite>

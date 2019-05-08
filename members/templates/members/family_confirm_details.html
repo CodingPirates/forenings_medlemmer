@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    {% load bootstrap4 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-  </head>
-  <body>
+{% extends 'members/base.html' %}
+
+{% block content %}
     <div class="container-fluid">
       <h1>Bekræft informationerne vi har om jer</h1>
       <div>
@@ -69,6 +63,6 @@
           <button class="btn btn-success" type="submit" href="{% url 'confirm_details' %}">Bekræft detaljer</button> <a class="btn btn-link" class="btn btn-link"href="{% url 'family_detail' %}">Fortryd</a>
         </form>
       </div>
+      <p></p>
     </div>
-  </body>
-</html>
+{% endblock %}

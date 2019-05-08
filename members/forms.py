@@ -27,6 +27,7 @@ class PersonForm(forms.ModelForm):
                                         css_class="row")
                                     )
             self.fields['birthday'].required = True
+            self.fields['gender'].choices = Person.MEMBER_GENDER_CHOICES
         else:
             nameFieldSet = Fieldset('Forældres / Værges oplysninger',
                                     Div(
@@ -39,6 +40,7 @@ class PersonForm(forms.ModelForm):
                                     ))
             self.fields['email'].required = True
             self.fields['phone'].required = True
+            self.fields['gender'].choices = Person.MEMBER_ADULT_GENDER_CHOICES
 
         self.fields['birthday'].widget.format = '%d-%m-%Y'
         self.fields['streetname'].required = True
@@ -122,9 +124,11 @@ class signupForm(forms.Form):
                          css_class="row")),
             Fieldset('Forældres oplysninger',
                      Div(
-                         Div(Field('parent_name'), css_class="col-md-12"),
-                         Div(Field('parent_email'), css_class="col-md-6"),
-                         Div(Field('parent_phone'), css_class="col-md-6"),
+                         Div(Field('parent_gender'), css_class="col-md-2"),
+                         Div(Field('parent_name'), css_class="col-md-10"),
+                         Div(Field('parent_birthday', css_class="datepicker", input_formats=(settings.DATE_INPUT_FORMATS)), css_class="col-md-4"),
+                         Div(Field('parent_email'), css_class="col-md-4"),
+                         Div(Field('parent_phone'), css_class="col-md-4"),
                          css_class="row")),
             Fieldset('Adresse oplysninger',
                      Div(
@@ -149,9 +153,11 @@ class signupForm(forms.Form):
     child_phone = forms.CharField(label='Barns telefon', required=False, max_length=50)
     child_birthday = forms.DateField(label='Barns fødselsdato (dd-mm-åååå)', input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
 
+    parent_gender = forms.ChoiceField(label="Køn", required=True, choices=Person.MEMBER_ADULT_GENDER_CHOICES)
     parent_name = forms.CharField(label='Forældres navn', required=True, max_length=200)
     parent_email = forms.EmailField(label='Forældres private email', required=True)
     parent_phone = forms.CharField(label='Forældres telefon', required=True, max_length=50)
+    parent_birthday = forms.DateField(label="Forældres fødselsdato (dd-mm-åååå)", input_formats=(settings.DATE_INPUT_FORMATS), error_messages={'invalid': 'Indtast en gyldig dato. (dd-mm-åååå)'})
 
     search_address = forms.CharField(label='Indtast adresse', required=False, max_length=200)
     streetname = forms.CharField(label='Vejnavn', required=True, max_length=200)

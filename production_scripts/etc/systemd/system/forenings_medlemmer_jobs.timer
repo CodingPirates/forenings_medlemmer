@@ -1,9 +1,0 @@
-[Unit]
-Description=Run django website cronjobs timer
-
-[Timer]
-OnBootSec=1min
-OnUnitActiveSec=1min
-
-[Install]
-WantedBy=basic.target

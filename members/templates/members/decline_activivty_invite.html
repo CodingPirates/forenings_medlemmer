@@ -1,17 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-      {% load staticfiles %}
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-      {% load bootstrap4 %}
-      {% load crispy_forms_tags %}
-      {% bootstrap_css %}
-      {% bootstrap_javascript %}
-  </head>
-  <body>
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
     <div class="container-fluid">
       <h1>Nej tak til {{activity_invite.activity.name}} <small>{{activity_invite.activity.department.name}}</small></h1>
       <div class="row">
@@ -28,6 +17,6 @@
         {% crispy form %}
         </div>
       </div>
+      <p></p>
     </div>
-  </body>
-</html>
+{% endblock %}

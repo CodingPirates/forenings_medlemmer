@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="da">
-  <head>
-    {% load staticfiles %}
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    {% load bootstrap4 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-  </head>
-  <body>
+{% extends 'members/base.html' %}
+
+{% block content %}
     <div class="container">
       <div class="row">
         <div class="col-md-12">
@@ -69,5 +59,4 @@
         </div>
       </div>
     </div>
-  </body>
-</html>
+{% endblock %}
