@@ -209,7 +209,7 @@ class UnionFactory(DjangoModelFactory):
     union_email = Faker("email")
     statues = Faker("url")
     founded = Faker("date_time", tzinfo=TIMEZONE)
-    region = FuzzyChoice(['S', 'J', 'F', 'Ø'])
+    region = FuzzyChoice([r[0] for r in Union.regions])
     zipcode = Faker("zipcode")
     streetname = Faker("street_name")
     housenumber = Faker("building_number")
