@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" file="members/tests/test_model_equiment.py" name="members.tests.test_model_equiment.TestModelEquipment-20190419004012" skipped="0" tests="4" time="0.049" timestamp="2019-04-19T00:40:13">
+	<testcase classname="members.tests.test_model_equiment.TestModelEquipment" file="members/tests/test_model_equiment.py" line="63" name="test_clean_department_and_union" time="0.020" timestamp="2019-04-19T00:40:13">
+		<system-out>
+<![CDATA[]]>		</system-out>
+		<system-err>
+<![CDATA[]]>		</system-err>
+	</testcase>
+	<testcase classname="members.tests.test_model_equiment.TestModelEquipment" file="members/tests/test_model_equiment.py" line="47" name="test_clean_department_owner" time="0.010" timestamp="2019-04-19T00:40:13">
+		<system-out>
+<![CDATA[]]>		</system-out>
+		<system-err>
+<![CDATA[]]>		</system-err>
+	</testcase>
+	<testcase classname="members.tests.test_model_equiment.TestModelEquipment" file="members/tests/test_model_equiment.py" line="40" name="test_clean_no_owner" time="0.007" timestamp="2019-04-19T00:40:13">
+		<system-out>
+<![CDATA[]]>		</system-out>
+		<system-err>
+<![CDATA[]]>		</system-err>
+	</testcase>
+	<testcase classname="members.tests.test_model_equiment.TestModelEquipment" file="members/tests/test_model_equiment.py" line="55" name="test_clean_union_owner" time="0.011" timestamp="2019-04-19T00:40:13">
+		<system-out>
+<![CDATA[]]>		</system-out>
+		<system-err>
+<![CDATA[]]>		</system-err>
+	</testcase>
+</testsuite>

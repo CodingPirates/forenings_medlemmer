@@ -1,15 +1,11 @@
 {% extends 'members/base.html' %}
-{% load crispy_forms_tags %}
 {% block content %}
-  <div class="container-fluid">
-    <h1>Bekræft informationerne vi har om jer</h1>
-    <div>
-      <p>Det er vigtigt, at vi har korrekte kontakt informationer samt ved hvilke afdelinger I ønsker at gå til klubaften i.</p>
-      <p>Bekræft nedenfor, at data er korrekt og tryk derefter på bekræft</p>
-    </div>
-    <div>
-    <h2>Følgende personer og adresser er registrerede:</h2>
-    {% for person in persons %}
+    <div class="container-fluid">
+      <h1>Bekræft informationerne vi har om jer</h1>
+      <div>
+        <p>Det er vigtigt, at vi har korrekte kontakt informationer samt ved hvilke afdelinger I ønsker at gå til klubaften i.</p>
+        <p>Bekræft nedenfor, at data er korrekt og tryk derefter på bekræft</p>
+      </div>
       <div>
       <address>
       <i>{{person.name}}</i>
@@ -42,26 +38,27 @@
     <h2>Børnene er opskrevet på venteliste:</h2>
     <p>Opskrivningstidspunktet, er det tidspunkt barnet blev oprettet i systemet. Man kan forlade og genopskrive sig på ventelisterne uden at miste sin placering.</p>
     {% regroup subscribed_waitinglists by person as ordered_waitinglist %}
-      <ul>
-        {% for barn in ordered_waitinglist %}
-          <li>{{ barn.grouper }}
-          <ul>
-          {% for item in barn.list %}
-            <li>{{ item.department.name }} siden {{ item.on_waiting_list_since }} ({{ item.on_waiting_list_since|timesince }})</li>
+        <ul>
+          {% for barn in ordered_waitinglist %}
+            <li>{{ barn.grouper }}
+            <ul>
+            {% for item in barn.list %}
+              <li>{{ item.department.name }} siden {{ item.on_waiting_list_since }} ({{ item.on_waiting_list_since|timesince }})</li>
+            {% endfor %}
+            </ul>
+            </li>
           {% endfor %}
-          </ul>
-          </li>
-        {% endfor %}
-      </ul>
-      {% if not subscribed_waitinglists %}
-      <p><i>Der er ingen børn tilmeldt ventelisterne. Tilmeld jer ventelisterne på de afdelinger der er relevante for jer. (kun nødvendigt i visse områder af landet)</i></p>
-      {%endif%}
+        </ul>
+        {% if not subscribed_waitinglists %}
+        <p><i>Der er ingen børn tilmeldt ventelisterne. Tilmeld jer ventelisterne på de afdelinger der er relevante for jer. (kun nødvendigt i visse områder af landet)</i></p>
+        {%endif%}
+      </div>
+      <div>
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-success" type="submit" href="{% url 'confirm_details' %}">Bekræft detaljer</button> <a class="btn btn-link" class="btn btn-link"href="{% url 'family_detail' %}">Fortryd</a>
+        </form>
+      </div>
+      <p></p>
     </div>
-    <div>
-      <form method="post">
-        {% csrf_token %}
-        <button class="btn btn-success" type="submit" href="{% url 'confirm_details' %}">Bekræft detaljer</button> <a class="btn btn-link" class="btn btn-link"href="{% url 'family_detail' %}">Fortryd</a>
-      </form>
-    </div>
-  </div>
 {% endblock %}
