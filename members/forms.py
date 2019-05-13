@@ -236,7 +236,7 @@ class ActivitySignupForm(forms.Form):
         self.helper.form_action = ''
         self.helper.html5_required = True
         self.helper.layout = Layout(
-            Div(Div(HTML("<h2>Tilmelding</h2>"), css_class="panel-heading"),
+            Div(Div(HTML("<h2>Tilmelding</h2>"), css_class="card-header"),
                 Div(
                 Div(Div(HTML('''
                     <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
@@ -261,8 +261,8 @@ class ActivitySignupForm(forms.Form):
                              HTML('<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen</p></span>'),
                              FormActions(Submit('submit', 'Tilmeld og betal', css_class="btn-success"), HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>")),
                              ),
-                    css_class="panel-body"),
-                css_class="panel panel-success"),
+                    css_class="card-body"),
+                css_class="card bg-success"),
         )
 
     note = forms.CharField(label='Besked til arrangør', widget=forms.Textarea, required=False)
