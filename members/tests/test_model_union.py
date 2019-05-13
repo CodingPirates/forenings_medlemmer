@@ -1,21 +1,33 @@
 from django.test import TestCase
-from members.models.union import Union
-# from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError
+
+from members.tests.factories import UnionFactory
 
 
 class TestModelUnion(TestCase):
-    def test_clean_undefined_bank(self):
-        # Validation should fail if the union doesn't have a bank
-        union = Union(bank_main_org=False)
-        # we need to rewrite the below test since we basically already have
-        # sorted the ones with bank_main_org equal to False
-        # with self.assertRaises(ValidationError):
-        #    union.clean()
 
-        # If we set the bank it shouldn't fail
-        # ToDo: maybe test some differently formatted bank accounts
-        union.bank_account = "1234-1234567890"
-        union.clean()
+    def test_defaults_to_having_an_account_at_main_org(self):
+        union = UnionFactory()
+        self.assertTrue(union.bank_main_org)
 
-        union.bank_main_org = True
-        union.clean()
+    def test_bank_account_not_required_if_account_at_main_org(self):
+        union = UnionFactory(bank_main_org=True, bank_account="")
+        union.clean()  # Should not raise error
+
+    def test_bank_account_required_if_no_account_at_main_org(self):
+        union = UnionFactory(bank_main_org=False, bank_account="")
+
+        with self.assertRaises(ValidationError):
+            union.clean()
+
+    def test_bank_account_correct_format0(self):
+        union = UnionFactory(bank_main_org=False, bank_account="4723-4382732")
+        union.clean()  # Should not raise error
+
+    def test_bank_account_correct_format1(self):
+        union = UnionFactory(bank_main_org=False, bank_account="4723-0438273223")
+        union.clean()  # Should not raise error
+
+    def test_string_representation(self):
+        union = UnionFactory()
+        self.assertEqual("Foreningen for " + union.name, str(union))

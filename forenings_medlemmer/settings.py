@@ -134,7 +134,8 @@ REQUEST_FAMILY_VALIDATION_PERIOD = 180
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 ADMIN_MEDIA_PREFIX = "/static/admin/"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "assets")]
 ADMINS = eval(os.environ["ADMINS"])
 MANAGERS = ADMINS
 
