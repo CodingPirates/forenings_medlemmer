@@ -64,12 +64,12 @@ BASE_URL = os.environ["BASE_URL"]
 # Application definition
 
 INSTALLED_APPS = (
+    'bootstrap4',
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "bootstrap3",
     "corsheaders",
     "members",
     "crispy_forms",
@@ -80,7 +80,7 @@ INSTALLED_APPS = (
     "fontawesome",
 )
 
-CRISPY_TEMPLATE_PACK = "bootstrap3"
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
@@ -134,7 +134,8 @@ REQUEST_FAMILY_VALIDATION_PERIOD = 180
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 ADMIN_MEDIA_PREFIX = "/static/admin/"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "assets")]
 ADMINS = eval(os.environ["ADMINS"])
 MANAGERS = ADMINS
 

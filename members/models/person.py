@@ -47,7 +47,7 @@ class Person(models.Model):
     city = models.CharField("By", max_length=200, blank=True)
     streetname = models.CharField("Vejnavn", max_length=200, blank=True)
     housenumber = models.CharField("Husnummer", max_length=5, blank=True)
-    floor = models.CharField("Etage", max_length=3, blank=True)
+    floor = models.CharField("Etage", max_length=10, blank=True)
     door = models.CharField("Dør", max_length=5, blank=True)
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
     municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite errors="0" failures="0" file="members/tests/test_model_union.py" name="members.tests.test_model_union.TestModelUnion-20190419004012" skipped="0" tests="1" time="0.008" timestamp="2019-04-19T00:40:13">
-	<testcase classname="members.tests.test_model_union.TestModelUnion" file="members/tests/test_model_union.py" line="7" name="test_clean_undefined_bank" time="0.008" timestamp="2019-04-19T00:40:13">
-		<system-out>
-<![CDATA[]]>		</system-out>
-		<system-err>
-<![CDATA[]]>		</system-err>
-	</testcase>
-</testsuite>

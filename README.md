@@ -1,5 +1,7 @@
 # Coding Pirates member mangement system.
-[![CircleCI](https://circleci.com/gh/CodingPirates/forenings_medlemmer.svg?style=svg)](https://circleci.com/gh/CodingPirates/forenings_medlemmer)[![Coverage Status](https://coveralls.io/repos/github/CodingPirates/forenings_medlemmer/badge.svg?branch=master)](https://coveralls.io/github/CodingPirates/forenings_medlemmer?branch=master)
+![CircleCI branch](https://img.shields.io/circleci/project/github/CodingPirates/forenings_medlemmer/master.svg?style=for-the-badge)![Coveralls github branch](https://img.shields.io/coveralls/github/CodingPirates/forenings_medlemmer/master.svg?style=for-the-badge)
+
+
 This system is used by the union [Coding Pirates][cpDK], we are a volunteer
 non profit that teaches programming, 3D printing, and other IT related
 activities to kids.
@@ -20,22 +22,6 @@ which makes it easy to deploy.
 
 
 ### Development
-To get a working copy of the system up and running run the following commands in
-a bash shell.
-```
-# git clone git@github.com:CodingPirates/forenings_medlemmer.git
-# cd forenings_medlemmer
-# docker-compose run --rm backend environment/reset-db.sh
-# docker-compose up
-```
-
-
-
-
-
-```
-./manage.py migrate
-```
 For more info, see our [wiki][wiki] or ask on [Slack][slack]
 
 <!-- Links -->
