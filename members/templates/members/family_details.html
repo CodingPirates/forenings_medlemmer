@@ -7,7 +7,6 @@
       <p>For yderligere hjælp med at bruge denne side - se på <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores medlemssystem"</a> eller skriv til os på <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
 
       <h2>Personer</h2>
-      <p>Tryk på hvert navn, for at checke og opdatere oplysningerne på de personer der er på listen.</p>
       <p>Tryk på <kbd>Opret</kbd>-knapperne, for at tilføje flere personer. Opret gerne begge forældre, så vi kan få fat i jer nemt.</p>
       <div class="row">
         <div class="col-12">
@@ -19,9 +18,10 @@
                   <th class="col-1">Opskrevet</th>
                   <th class="col-2" align="left">Navn</th>
                   <th class="col-3" align="left">Adresse</th>
-                  <th class="col-2" align="left">Postnr./by</th>
+                  <th class="col-1" align="left">Postnr./by</th>
                   <th class="col-2" align="left">E-mail</th>
                   <th class="col-1" align="left">Telefon</th>
+                  <th class="col-2">Handlinger</th>
                 </tr>
               </thead>
               <tbody>
@@ -34,7 +34,7 @@
                     <td></td>
                     {%endif%}
 
-                    <td><p><a title="Rediger" href="{% url 'person_update' person.id %}">{{person.name}}</a></p>
+                    <td><p><b>{{person.name}}</b></p>
 
                     {%if person.membertype == 'PA' %} <p class="text-muted">(Forælder)</p> {%endif%}
                     {%if person.membertype == 'GU' %} <p class="text-muted">(Værge)</p> {%endif%}
@@ -47,6 +47,7 @@
                     <td><p>{{person.zipcode}} {{person.city}}</p></td>
                     <td><p>{{person.email}}</p></td>
                     <td><p>{{person.phone}}</p></td>
+                    <td><p><a type="button" href="{% url 'person_update' person.id %}" class="btn btn-warning">Redigér</a></p></td>
                   </tr>
                 {% endfor %}
               </tbody>
