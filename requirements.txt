@@ -6,7 +6,7 @@ coveralls==1.7.0
 dj-database-url==0.5.0
 dj-email-url==0.2.0
 Django==2.2
-django-bootstrap3==11.0.0
+django-bootstrap4==0.0.8
 django-common-helpers==0.9.2
 django-cors-headers==2.5.2
 django-crispy-forms==1.7.2
