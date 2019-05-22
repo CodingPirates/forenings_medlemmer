@@ -46,28 +46,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             },
         ),
         ("Ansvarlig", {"fields": ("responsible_name", "responsible_contact")}),
-        (
-            "Adresse",
-            {
-                "fields": (
-                    "streetname",
-                    "housenumber",
-                    "floor",
-                    "door",
-                    "zipcode",
-                    "city",
-                    "placename",
-                )
-            },
-        ),
-        ("Adresse-New", {"fields": ("address",)},),
-        (
-            "Længde og Breddegrad",
-            {
-                "fields": ("longitude", "latitude"),
-                "description": "<p>Hvis de ikke er sat opdateres de automatisk på et tidspunkt",
-            },
-        ),
+        ("Adresse", {"fields": ("address",)},),
         (
             "Afdelingssiden",
             {

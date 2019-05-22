@@ -1,9 +1,12 @@
 from members.models.person import Person
-from django.http import Http404
 
 
 def user_to_person(user):
-    q = Person.objects.filter(user=user)
-    if not q.exists():
-        raise Http404('User doesn\'t have an associated Person')
-    return q.get()
+    try:
+        return Person.objects.filter(user=user).get()
+    except Person.DoesNotExist:
+        return None
+
+
+def has_user(user):
+    return user_to_person(user) is not None

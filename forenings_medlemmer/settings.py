@@ -10,14 +10,29 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 import logging
 from environs import Env
 import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 
 env = Env()
 env.read_env()
 
+if env.str("SENTRY_DSN") != "not set":
+    sentry_sdk.init(
+        dsn=env.str("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+        environment=env.str("MODE"),
+    )
+
 logger = logging.getLogger(__name__)
+
+
+TESTING = os.path.basename(sys.argv[0]) in ("pytest", "py.test")
+USE_DAWA_ON_SAVE = not TESTING
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -64,7 +79,7 @@ BASE_URL = os.environ["BASE_URL"]
 # Application definition
 
 INSTALLED_APPS = (
-    'bootstrap4',
+    "bootstrap4",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -78,9 +93,10 @@ INSTALLED_APPS = (
     "django.contrib.admin",
     "graphene_django",
     "fontawesome",
+    "django_extensions",
 )
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
@@ -169,6 +185,7 @@ CRON_CLASSES = [
     "members.jobs.PollQuickpayPaymentsCronJob",
     "members.jobs.GenerateStatisticsCronJob",
     "members.jobs.UpdateDawaData",
+    "members.jobs.CaptureOutstandingPayments",
 ]
 
 # Dont keep job logs more than 7 days old
