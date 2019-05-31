@@ -1,8 +1,8 @@
 {% extends 'members/base.html' %}
 
 {% block content %}
-    <form class="col-md-8 col-md-offset-1" method="post">
-        <div class="newloginnotice">
+    <div class="alert alert-warning">
+        <div class="container">
             <p>Kære bruger</p>
 
             <p>Vi har ændret måden du logger ind i medlemssystemet.
@@ -10,17 +10,20 @@
                 Er det første gang du benytter det nye loginsystem,
                 skal du generere en adgangskode via knappen "opret adgangskode".
                 Hvis du har spørgsmål kan du skrive en email til
-                <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
+                <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.
+            </p>
         </div>
+    </div>
+    <form class="col-md-8 col-md-offset-1" method="post">
         {% if form.errors %}
         <div class="row"><blockquote class="error">Dit brugernavn eller adgangskode var forkert. Prøv igen.</blockquote></div>
         {% endif %}
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
-        <div class="row center"><div class="loginBox col-lg-6 col-md-7 col-sm-8 col-xs-11 ">
+        <div class="row center"><div class="loginBox col-lg-6 col-md-7 col-sm-8 col-11 ">
             <div class="loginTitle"><span>Log ind</span></div>
             <div class="field">
-                {{ form.username.label_tag }} <br />
+                <label for="id_username">E-mail-adresse:</label> <br />
                 {{ form.username }}
             </div>
             <div class="field">
