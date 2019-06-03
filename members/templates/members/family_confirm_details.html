@@ -1,5 +1,4 @@
 {% extends 'members/base.html' %}
-
 {% block content %}
     <div class="container-fluid">
       <h1>Bekræft informationerne vi har om jer</h1>
@@ -8,40 +7,37 @@
         <p>Bekræft nedenfor, at data er korrekt og tryk derefter på bekræft</p>
       </div>
       <div>
-      <h2>Følgende personer og adresser er registrerede:</h2>
-      {% for person in persons %}
-        <div>
-        <address>
-        <i>{{person.name}}</i>
-        {%if person.membertype == 'CH' %}
-          {%if person.birthday %}
-            ({{person.birthday|timesince}} gammel)
-          {%else%}
-            <i><b class="text-danger">(Fødselsdag mangler!)</b></i>
-          {%endif%}
-        {%endif%}
-        <br>
-        {%if person.streetname%}
-        {{person.streetname}} {{person.housenumber}} {{person.floor}} {{person.door}}<br>
-        {% if person.placename %} {{person.placename}}<br> {%endif%}
-        {{person.zipcode}} {{person.city}}<br>
+      <address>
+      <i>{{person.name}}</i>
+      {%if person.membertype == 'CH' %}
+        {%if person.birthday %}
+          ({{person.birthday|timesince}} gammel)
         {%else%}
-        <i><b class="text-danger">Adresse mangler!</b></i><br>
+          <i><b class="text-danger">(Fødselsdag mangler!)</b></i>
         {%endif%}
-        Telefon: {{person.phone|default:" (intet)"}}<br>
-        E-mail: {{person.email|default:" (ingen)"}}<br>
-        </address>
-        </div>
-      {% empty %}
-      <div>
-      <p>Der er ingen personer registreret</p>
+      {%endif%}
+      <br>
+      {%if person.streetname%}
+      {{person.streetname}} {{person.housenumber}} {{person.floor}} {{person.door}}<br>
+      {% if person.placename %} {{person.placename}}<br> {%endif%}
+      {{person.zipcode}} {{person.city}}<br>
+      {%else%}
+      <i><b class="text-danger">Adresse mangler!</b></i><br>
+      {%endif%}
+      Telefon: {{person.phone|default:" (intet)"}}<br>
+      E-mail: {{person.email|default:" (ingen)"}}<br>
+      </address>
       </div>
-      {%endfor%}
-      </div>
-      <div>
-      <h2>Børnene er opskrevet på venteliste:</h2>
-      <p>Opskrivningstidspunktet, er det tidspunkt barnet blev oprettet i systemet. Man kan forlade og genopskrive sig på ventelisterne uden at miste sin placering.</p>
-      {% regroup subscribed_waitinglists by person as ordered_waitinglist %}
+    {% empty %}
+    <div>
+    <p>Der er ingen personer registreret</p>
+    </div>
+    {%endfor%}
+    </div>
+    <div>
+    <h2>Børnene er opskrevet på venteliste:</h2>
+    <p>Opskrivningstidspunktet, er det tidspunkt barnet blev oprettet i systemet. Man kan forlade og genopskrive sig på ventelisterne uden at miste sin placering.</p>
+    {% regroup subscribed_waitinglists by person as ordered_waitinglist %}
         <ul>
           {% for barn in ordered_waitinglist %}
             <li>{{ barn.grouper }}
