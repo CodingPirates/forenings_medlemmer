@@ -1,12 +1,6 @@
 linters:
-  flake8:
-    fixer: true
-  csslint: {  }
-  shellcheck:
-    shell: bash
-files:
-  ignore:
-    - 'bower_components/*'
-    - 'node_modules/*'
+    black:
+        config: ./pyproject.toml
+        fixer: true
 fixers:
   enable: true
