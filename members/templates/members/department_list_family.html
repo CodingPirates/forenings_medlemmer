@@ -1,0 +1,40 @@
+{% extends 'members/base.html' %}
+{% block extra %} <test /> {% endblock %}
+{% block content %}
+<div id="kort"></div>
+<ul class="nav nav-tabs nav-justified">
+{% for region, depList in departments.items %}
+    {% if region == 'Sjælland' %}
+        <li class="active"><a data-toggle="pill" href="#{{region}}">{{region}}
+        </a></li>
+    {% else %}
+        <li><a data-toggle="pill" href="#{{region}}">{{region}}</a></li>
+    {% endif %}
+{% endfor %}
+</ul>
+<br>
+<div class="container">
+    <div class="tab-content">
+    {% for region, depList in departments.items %}
+        {% if region == 'Sjælland'%}
+        <div id="{{region}}" class="tab-pane fade in active">
+        {% else %}
+        <div id="{{region}}" class="tab-pane fade in">
+        {% endif %}
+        <div class="row">
+        {% for dep in depList %}
+            <div class="col-sm-4 col-centered">
+                {{dep.html | safe}}
+            </div>
+            {% if forloop.counter|divisibleby:"3" %}
+            </div>
+            <br>
+            <div class="row">
+            {% endif %}
+        {% endfor %}
+        </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
