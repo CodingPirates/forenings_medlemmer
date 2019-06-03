@@ -1,5 +1,5 @@
 # Coding Pirates member mangement system.
-![CircleCI branch](https://img.shields.io/circleci/project/github/CodingPirates/forenings_medlemmer/master.svg?style=for-the-badge)![Coveralls github branch](https://img.shields.io/coveralls/github/CodingPirates/forenings_medlemmer/master.svg?style=for-the-badge)
+![CircleCI branch](https://img.shields.io/circleci/project/github/CodingPirates/forenings_medlemmer/master.svg?style=for-the-badge)![Coveralls github branch](https://img.shields.io/coveralls/github/CodingPirates/forenings_medlemmer/master.svg?style=for-the-badge)[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 
 This system is used by the union [Coding Pirates][cpDK], we are a volunteer

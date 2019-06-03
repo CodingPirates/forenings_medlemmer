@@ -10,7 +10,6 @@ from members.tests.factories import FamilyFactory, PersonFactory
 
 
 class TestModelFamily(TestCase):
-
     def test_saving_and_retrieving_family(self):
         family = FamilyFactory()
         PersonFactory(family=family)
@@ -55,7 +54,7 @@ class TestModelFamily(TestCase):
             description="TEMPLATE DESCRIPTION",
             subject="TEMPLATE SUBJECT",
             body_html="TEMPLATE HTML",
-            body_text="TEMPLATE TEXT"
+            body_text="TEMPLATE TEXT",
         )
         self.template.save()
 

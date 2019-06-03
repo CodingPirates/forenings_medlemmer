@@ -6,7 +6,7 @@ import datetime
 
 
 class Command(BaseCommand):
-    help = 'Creates an activity pr. union to sign up for membership'
+    help = "Creates an activity pr. union to sign up for membership"
     output_transaction = True
 
     def handle(self, *args, **options):
@@ -23,7 +23,12 @@ class Command(BaseCommand):
             open_hours = "-"
             dawa_id = ""
 
-            localDepartments = str.join(", ", Department.objects.filter(union=curUnion).values_list("name", flat=True))
+            localDepartments = str.join(
+                ", ",
+                Department.objects.filter(union=curUnion).values_list(
+                    "name", flat=True
+                ),
+            )
 
             description = """Denne aktivitet er en særlig aktivitet oprettet for, at frivillige i Coding Pirates kan melde sig ind i vores forening og dermed få stemmeret i foreningen Coding Pirates %s samt Coding Pirates Denmark.
 
@@ -36,7 +41,12 @@ class Command(BaseCommand):
             Flg. lokalafdelinger hører under %s:
 
             %s
-            """ % (curUnion.name, curUnion.name, curUnion.name, localDepartments)
+            """ % (
+                curUnion.name,
+                curUnion.name,
+                curUnion.name,
+                localDepartments,
+            )
             instructions = ""
             start_date = datetime.date(year=2019, month=1, day=1)
             end_date = datetime.date(year=2019, month=12, day=31)
@@ -47,31 +57,32 @@ class Command(BaseCommand):
             max_age = 99
             min_age = 16
 
-            activity = Activity(department=department,
-                                union=curUnion,
-                                name=name,
-                                open_hours=open_hours,
-                                responsible_name=curUnion.chairman,
-                                responsible_contact=curUnion.chairman_email,
-                                placename=curUnion.placename,
-                                zipcode=curUnion.zipcode,
-                                city=curUnion.city,
-                                streetname=curUnion.streetname,
-                                housenumber=curUnion.housenumber,
-                                floor=curUnion.floor,
-                                door=curUnion.door,
-                                dawa_id=dawa_id,
-                                description=description,
-                                instructions=instructions,
-                                start_date=start_date,
-                                end_date=end_date,
-                                signup_closing=signup_closing,
-                                open_invite=open_invite,
-                                price_in_dkk=price_in_dkk,
-                                max_participants=max_participants,
-                                max_age=max_age,
-                                min_age=min_age,
-                                membership_activity=True
-                                )
+            activity = Activity(
+                department=department,
+                union=curUnion,
+                name=name,
+                open_hours=open_hours,
+                responsible_name=curUnion.chairman,
+                responsible_contact=curUnion.chairman_email,
+                placename=curUnion.placename,
+                zipcode=curUnion.zipcode,
+                city=curUnion.city,
+                streetname=curUnion.streetname,
+                housenumber=curUnion.housenumber,
+                floor=curUnion.floor,
+                door=curUnion.door,
+                dawa_id=dawa_id,
+                description=description,
+                instructions=instructions,
+                start_date=start_date,
+                end_date=end_date,
+                signup_closing=signup_closing,
+                open_invite=open_invite,
+                price_in_dkk=price_in_dkk,
+                max_participants=max_participants,
+                max_age=max_age,
+                min_age=min_age,
+                membership_activity=True,
+            )
 
             activity.save()
