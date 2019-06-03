@@ -9,8 +9,18 @@ from members.models.family import Family
 from members.models.person import Person
 
 
+def delte_me_uglyFunciton():
+    a ="Hej jeg er en "
+    b='Meget grim function der gerne skulle flaggess, den her linje bliver også meget langog skrald'
+    c = False
+    if(c == False):
+        "Flag mig"
+    return "hej"
+
 @xframe_options_exempt
 def EntryPage(request):
+
+
     if request.method == 'POST':
         # figure out which form was filled out.
         if request.POST['form_id'] == 'signup':
