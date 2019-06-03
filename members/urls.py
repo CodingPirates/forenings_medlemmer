@@ -89,7 +89,7 @@ urlpatterns = [
         name="invitation_decline",
     ),
     url(r"family/waitinglist$", waitinglistView, name="family_waitinglist_view"),
-    url(r"family/departments$", departmentViewFamily, name="departments_list_family"),
+    url(r"family/departments$", departmentViewFamily, name="departments_view_family"),
     url(
         r"family/payment_gateway_error$",
         paymentGatewayErrorView,
