@@ -57,6 +57,8 @@
         });
         </script>
       {% endif %}
+      {% block heading %}
+      {% endblock %}
   </head>
   <body>
     {% block header %}
@@ -85,7 +87,7 @@
                   <a class="nav-link" href="/family/waitinglist">Ventelister</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="/family/">Afdelinger</a>
+                  <a class="nav-link" href="/family/departments">Afdelinger</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="/activities">Arrangementer</a>
