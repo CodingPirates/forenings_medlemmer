@@ -11,7 +11,7 @@ from members.models.person import Person
 
 @xframe_options_exempt
 def EntryPage(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         # figure out which form was filled out.
         if request.POST["form_id"] == "signup":
             # signup has been filled

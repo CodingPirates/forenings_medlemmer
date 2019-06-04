@@ -18,7 +18,7 @@ from members.utils.user import user_to_person
 @login_required
 def ActivitySignup(request, activity_id, person_id=None):
     # TODO: is should be possible to view an activity without loggin in
-    if(person_id is None):
+    if person_id is None:
         # View only mode
         view_only_mode = True
     else:
@@ -28,7 +28,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
     participating = False
 
-    if(request.resolver_match.url_name == 'activity_view_person'):
+    if request.resolver_match.url_name == "activity_view_person":
         view_only_mode = True
 
     family = user_to_person(request.user).family
@@ -39,7 +39,9 @@ def ActivitySignup(request, activity_id, person_id=None):
 
             # Check not already signed up
             try:
-                participant = ActivityParticipant.objects.get(activity=activity, member__person=person)
+                participant = ActivityParticipant.objects.get(
+                    activity=activity, member__person=person
+                )
                 # found - we can only allow one - switch to view mode
                 participating = True
                 view_only_mode = True
@@ -47,14 +49,16 @@ def ActivitySignup(request, activity_id, person_id=None):
                 participating = False  # this was expected - if not signed up yet
 
         except Person.DoesNotExist:
-            raise Http404('Person not found on family')
+            raise Http404("Person not found on family")
     else:
         person = None
 
-    if(not activity.open_invite):
-        ''' Make sure valid not expired invitation to event exists '''
+    if not activity.open_invite:
+        """ Make sure valid not expired invitation to event exists """
         try:
-            invitation = ActivityInvite.objects.get(activity=activity, person=person, expire_dtm__gte=timezone.now())
+            invitation = ActivityInvite.objects.get(
+                activity=activity, person=person, expire_dtm__gte=timezone.now()
+            )
         except ActivityInvite.DoesNotExist:
             view_only_mode = True  # not invited - switch to view mode
             invitation = None
@@ -74,15 +78,33 @@ def ActivitySignup(request, activity_id, person_id=None):
         view_only_mode = True  # activity full
         signup_closed = True
 
-    if(request.method == "POST"):
+    if request.method == "POST":
         if view_only_mode:
-            return HttpResponse('Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)')
+            return HttpResponse(
+                "Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)"
+            )
 
-        if activity.max_age < person.age_years() or activity.min_age > person.age_years():
-            return HttpResponse('Barnet skal være mellem ' + str(activity.min_age) + ' og ' + str(activity.max_age) + ' år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)')
+        if (
+            activity.max_age < person.age_years()
+            or activity.min_age > person.age_years()
+        ):
+            return HttpResponse(
+                "Barnet skal være mellem "
+                + str(activity.min_age)
+                + " og "
+                + str(activity.max_age)
+                + " år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+            )
 
-        if Person.objects.filter(family=family).exclude(membertype=Person.CHILD).count() <= 0:
-            return HttpResponse('Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.')
+        if (
+            Person.objects.filter(family=family)
+            .exclude(membertype=Person.CHILD)
+            .count()
+            <= 0
+        ):
+            return HttpResponse(
+                "Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder."
+            )
 
         signup_form = ActivitySignupForm(request.POST)
 
@@ -90,8 +112,12 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Sign up and redirect to payment link or family page
 
             # Calculate membership
-            membership_start = timezone.datetime(year=activity.start_date.year, month=1, day=1)
-            membership_end = timezone.datetime(year=activity.start_date.year, month=12, day=31)
+            membership_start = timezone.datetime(
+                year=activity.start_date.year, month=1, day=1
+            )
+            membership_end = timezone.datetime(
+                year=activity.start_date.year, month=12, day=31
+            )
             # check if person is member, otherwise make a member
             try:
                 member = Member.objects.get(person=person)
@@ -109,36 +135,49 @@ def ActivitySignup(request, activity_id, person_id=None):
             member.save()
 
             # Make ActivityParticipant
-            participant = ActivityParticipant(member=member, activity=activity, note=signup_form.cleaned_data['note'])
+            participant = ActivityParticipant(
+                member=member, activity=activity, note=signup_form.cleaned_data["note"]
+            )
 
             # If conditions not accepted, make error
-            if signup_form.cleaned_data['read_conditions'] == "NO":
-                return HttpResponse("For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser.")
+            if signup_form.cleaned_data["read_conditions"] == "NO":
+                return HttpResponse(
+                    "For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser."
+                )
 
             # Make sure people have selected yes or no in photo permission and update photo permission
-            if signup_form.cleaned_data['photo_permission'] == "Choose":
+            if signup_form.cleaned_data["photo_permission"] == "Choose":
                 return HttpResponse("Du skal vælge om vi må tage billeder eller ej.")
-            participant.photo_permission = signup_form.cleaned_data['photo_permission']
+            participant.photo_permission = signup_form.cleaned_data["photo_permission"]
             participant.save()
 
-            return_link_url = reverse('activity_view_person', args=[activity.id, person.id])
+            return_link_url = reverse(
+                "activity_view_person", args=[activity.id, person.id]
+            )
 
             # Make payment if activity costs
             if activity.price_in_dkk is not None and activity.price_in_dkk != 0:
                 # using creditcard ?
-                if signup_form.cleaned_data['payment_option'] == Payment.CREDITCARD:
+                if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
                     payment = Payment(
                         payment_type=Payment.CREDITCARD,
                         activity=activity,
                         activityparticipant=participant,
                         person=person,
                         family=family,
-                        body_text=timezone.now().strftime("%Y-%m-%d") + ' Betaling for ' + activity.name + ' på ' + activity.department.name,
+                        body_text=timezone.now().strftime("%Y-%m-%d")
+                        + " Betaling for "
+                        + activity.name
+                        + " på "
+                        + activity.department.name,
                         amount_ore=int(activity.price_in_dkk * 100),
                     )
                     payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(return_url=settings.BASE_URL + reverse('activity_view_person', args=[activity.id, person.id]))
+                    return_link_url = payment.get_quickpaytransaction().get_link_url(
+                        return_url=settings.BASE_URL
+                        + reverse("activity_view_person", args=[activity.id, person.id])
+                    )
 
             # expire invitation
             if invitation:
@@ -148,7 +187,9 @@ def ActivitySignup(request, activity_id, person_id=None):
             # reject all seasonal invitations on person if this was a seasonal invite
             # (to avoid signups on multiple departments for club season)
             if activity.is_season():
-                invites = ActivityInvite.objects.filter(person=person).exclude(activity=activity)
+                invites = ActivityInvite.objects.filter(person=person).exclude(
+                    activity=activity
+                )
                 for invite in invites:
                     if invite.activity.is_season():
                         invite.rejected_dtm = timezone.now()
@@ -163,16 +204,16 @@ def ActivitySignup(request, activity_id, person_id=None):
     union = activity.department.union
 
     context = {
-        'family': family,
-        'activity': activity,
-        'person': person,
-        'invitation': invitation,
-        'price': activity.price_in_dkk,
-        'seats_left': activity.seats_left(),
-        'signupform': signup_form,
-        'signup_closed': signup_closed,
-        'view_only_mode': view_only_mode,
-        'participating': participating,
-        'union': union,
+        "family": family,
+        "activity": activity,
+        "person": person,
+        "invitation": invitation,
+        "price": activity.price_in_dkk,
+        "seats_left": activity.seats_left(),
+        "signupform": signup_form,
+        "signup_closed": signup_closed,
+        "view_only_mode": view_only_mode,
+        "participating": participating,
+        "union": union,
     }
-    return render(request, 'members/activity_signup.html', context)
+    return render(request, "members/activity_signup.html", context)

@@ -19,19 +19,23 @@ def WaitingListSetSubscription(request, id, departmentId, action):
         raise Http404("Person ikke i samme familie som bruger")
     department = get_object_or_404(Department, pk=departmentId)
 
-    if action == 'subscribe':
+    if action == "subscribe":
         if WaitingList.objects.filter(person=person, department=department):
-            raise Http404("{} er allerede på {}s venteliste".format(person.name, department.name))
+            raise Http404(
+                "{} er allerede på {}s venteliste".format(person.name, department.name)
+            )
         waiting_list = WaitingList()
         waiting_list.person = person
         waiting_list.department = department
         waiting_list.save()
 
-    if action == 'unsubscribe':
+    if action == "unsubscribe":
         try:
             waiting_list = WaitingList.objects.get(person=person, department=department)
             waiting_list.delete()
         except Exception:
-            raise Http404("{} er ikke på {}s venteliste".format(person.name, department.name))
+            raise Http404(
+                "{} er ikke på {}s venteliste".format(person.name, department.name)
+            )
 
-    return HttpResponseRedirect(reverse('family_detail'))
+    return HttpResponseRedirect(reverse("family_detail"))
