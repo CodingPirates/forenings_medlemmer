@@ -1,44 +1,55 @@
 {% extends 'members/base.html' %}
 
 {% block heading %}
-    <!-- Leaflet script -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var southEast = L.latLng(54.91711327768886, 8.76734733581543);
+        var northEast = L.latLng(58.038693522227945, 14.979954628418003);
+        var kort = L.map('kort').fitBounds([southEast, northEast]);
+        L.tileLayer('https://api.mapbox.com/styles/v1/codingpirates/cjdaaa7yt3qts2rrwzpsx5ysw/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY29kaW5ncGlyYXRlcyIsImEiOiJjamRhN3JtZHgxamphMzNvMHpraTJra2J1In0.lVqzzzCf9gHneicqDONuaw', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 18,
+            accessToken: 'pk.eyJ1IjoiY29kaW5ncGlyYXRlcyIsImEiOiJjamRhOXM1ZGIwdm04MnlvMnQ5dDBsdWpkIn0.NMaydnMG6m8OBpJhUbNgzg'
+        }).addTo(kort);
+
+        {% for region, depList in departments.items %}
+            {% for dep in depList %}
+                {% if dep.onMap == True %}
+            var marker{{forloop.counter}} = L.marker([{{dep.latitude}},{{dep.longtitude}}]).addTo(kort);
+            marker{{forloop.counter}}.bindPopup('{{dep.html | safe}}');
+                {% endif %}
+             {% endfor %}
+        {% endfor %}
+    });
+</script>
+<style>
+:root {
+    --secondSize: 400px;
+}
+
+#wrapper {
+    /* width: 100vw;
+    max-width: 100%; */
+    overflow: hidden; /* will contain if #first is longer than #second */
+}
+.first {
+    width: calc(100vw - var(--secondSize));
+    float:left; /* add this */
+}
+.second {
+    overflow: hidden; /* if you don't want #second to wrap below #first */
+    padding: 1rem;
+
+}</style>
 {% endblock %}
 
 {% block content %}
-<div id="kort"></div>
-<ul class="nav nav-tabs nav-justified">
-{% for region, depList in departments.items %}
-    {% if region == 'Sjælland' %}
-        <li class="active"><a data-toggle="pill" href="#{{region}}">{{region}}
-        </a></li>
-    {% else %}
-        <li><a data-toggle="pill" href="#{{region}}">{{region}}</a></li>
-    {% endif %}
-{% endfor %}
-</ul>
-<br>
-<div class="container">
-    <div class="tab-content">
-    {% for region, depList in departments.items %}
-        {% if region == 'Sjælland'%}
-        <div id="{{region}}" class="tab-pane fade in active">
-        {% else %}
-        <div id="{{region}}" class="tab-pane fade in">
-        {% endif %}
-        <div class="row">
-        {% for dep in depList %}
-            <div class="col-sm-4 col-centered">
-                {{dep.html | safe}}
-            </div>
-            {% if forloop.counter|divisibleby:"3" %}
-            </div>
-            <br>
-            <div class="row">
-            {% endif %}
-        {% endfor %}
-        </div>
-        </div>
-    {% endfor %}
-    </div>
+<div id="wrapper">
+    <div id="kort" class="first" style="height: 60vh;"></div>
+    <div class="second" style="">display: inline-block; width: calc(100vw - 200px) display: inline-block; width: 200px</div>
 </div>
+
+
 {% endblock %}
