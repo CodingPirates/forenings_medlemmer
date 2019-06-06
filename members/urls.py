@@ -14,6 +14,7 @@ from members.views import (
     paymentGatewayErrorView,
     volunteerSignup,
     departmentView,
+    Activities,
 )
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
@@ -65,6 +66,8 @@ urlpatterns = [
         {"next_page": "/"},
         name="person_logout",
     ),
+
+    url(r"activities/$", Activities, name="activities"),
     url(r"volunteer$", volunteerSignup, name="volunteer_signup"),
     url(r"user_created/$", userCreated, name="user_created"),
     url(r"family/$", FamilyDetails, name="family_detail"),
