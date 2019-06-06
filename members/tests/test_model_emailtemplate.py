@@ -16,27 +16,18 @@ class TestEmailTemplate(TestCase):
             description="TEMPLATE DESCRIPTION",
             subject="TEMPLATE SUBJECT",
             body_html="TEMPLATE HTML",
-            body_text="TEMPLATE TEXT"
+            body_text="TEMPLATE TEXT",
         )
         self.template.save()
 
-        self.family = Family(
-            email="family@example.com"
-        )
+        self.family = Family(email="family@example.com")
         self.family.save()
 
-        self.person = Person(
-            family=self.family
-        )
+        self.person = Person(family=self.family)
         self.person.save()
 
         self.union = Union(
-            name="",
-            region="S",
-            streetname="",
-            housenumber="1",
-            zipcode="1234",
-            city=""
+            name="", region="S", streetname="", housenumber="1", zipcode="1234", city=""
         )
         self.union.save()
 
@@ -47,37 +38,33 @@ class TestEmailTemplate(TestCase):
             housenumber="1",
             zipcode="1234",
             city="",
-            responsible_contact="department@example.com"
+            responsible_contact="department@example.com",
         )
         self.department.save()
 
     def util_check_email(self, receivers):
         self.assertEqual(len(mail.outbox), len(receivers))
         self.assertEqual(
-            mail.outbox[0].to,
-            receivers,
-            msg="Email receiver is incorrect")
+            mail.outbox[0].to, receivers, msg="Email receiver is incorrect"
+        )
         self.assertEqual(
             mail.outbox[0].from_email,
             "TEST <from@example.com>",
-            msg="Email from address is incorrect")
+            msg="Email from address is incorrect",
+        )
         # Note: breaks if Django decides to swap plain text and html
         self.assertEqual(
             mail.outbox[0].content_subtype,
             "plain",
-            msg="Django changed how they handle mail with multiple types (Plain text version broke)"
+            msg="Django changed how they handle mail with multiple types (Plain text version broke)",
         )
-        self.assertEqual(
-            mail.outbox[0].body,
-            "TEMPLATE TEXT")
+        self.assertEqual(mail.outbox[0].body, "TEMPLATE TEXT")
         self.assertEqual(
             mail.outbox[0].alternatives[0][1],
             "text/html",
-            msg="Django changed how they handle mail with multiple types (HTML version broke)"
+            msg="Django changed how they handle mail with multiple types (HTML version broke)",
         )
-        self.assertEqual(
-            mail.outbox[0].alternatives[0][0],
-            "TEMPLATE HTML")
+        self.assertEqual(mail.outbox[0].alternatives[0][0], "TEMPLATE HTML")
 
     @override_settings(SITE_CONTACT="TEST <from@example.com>")
     def test_send_email_family(self):

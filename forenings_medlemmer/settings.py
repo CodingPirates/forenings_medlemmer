@@ -64,7 +64,7 @@ BASE_URL = os.environ["BASE_URL"]
 # Application definition
 
 INSTALLED_APPS = (
-    'bootstrap4',
+    "bootstrap4",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -80,7 +80,7 @@ INSTALLED_APPS = (
     "fontawesome",
 )
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",

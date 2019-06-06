@@ -41,17 +41,23 @@ urlpatterns = [
     ),
     url(
         r"^account/forgot/done/$",
-        auth_views.PasswordResetDoneView.as_view(template_name="members/forgot_done.html"),
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="members/forgot_done.html"
+        ),
         name="password_reset_done",
     ),
     url(
         r"^account/forgot/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
-        auth_views.PasswordResetConfirmView.as_view(template_name="members/forgot_confirm.html"),
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="members/forgot_confirm.html"
+        ),
         name="password_reset_confirm",
     ),
     url(
         r"^account/forgot/complete/$",
-        auth_views.PasswordResetCompleteView.as_view(template_name="members/forgot_complete.html"),
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="members/forgot_complete.html"
+        ),
         name="password_reset_complete",
     ),
     url(
