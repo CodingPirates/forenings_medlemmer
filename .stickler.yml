@@ -1,0 +1,6 @@
+linters:
+    black:
+        config: ./pyproject.toml
+        fixer: true
+fixers:
+  enable: true
