@@ -7,6 +7,11 @@
     { "url": "heroku/python" }
   ],
   "env" : {
+     "SENTRY_DSN" : {
+     "required": true,
+     "description": "SENTRY DSN",
+     "value": "not set"
+    },
     "EMAIL_URL" : {
      "required": true,
      "description": "EMAIL URL",
