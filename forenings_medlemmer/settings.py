@@ -23,7 +23,8 @@ env.read_env()
 if env.str("SENTRY_DSN") != 'not set':
     sentry_sdk.init(
         dsn=env.str("SENTRY_DSN"),
-        integrations=[DjangoIntegration()]
+        integrations=[DjangoIntegration()],
+        environment=env.str("MODE")
     )
 
 logger = logging.getLogger(__name__)
