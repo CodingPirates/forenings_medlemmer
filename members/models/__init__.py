@@ -30,3 +30,4 @@ import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 # Export models not files
 from .department import Department
 from .union import Union
+from .person import Person
