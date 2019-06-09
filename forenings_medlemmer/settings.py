@@ -13,9 +13,18 @@ import os
 import logging
 from environs import Env
 import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 
 env = Env()
 env.read_env()
+
+if env.str("SENTRY_DSN") != 'not set':
+    sentry_sdk.init(
+        dsn=env.str("SENTRY_DSN"),
+        integrations=[DjangoIntegration()]
+    )
 
 logger = logging.getLogger(__name__)
 
