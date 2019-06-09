@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
+from members.models import Person
 from members.utils.user import user_to_person
 
 @login_required

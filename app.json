@@ -7,6 +7,11 @@
     { "url": "heroku/python" }
   ],
   "env" : {
+      "MODE" : {
+      "required": true,
+      "description": "The mode the system is running in",
+      "value": "staging"
+     },
      "SENTRY_DSN" : {
      "required": true,
      "description": "SENTRY DSN",
