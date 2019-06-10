@@ -27,6 +27,7 @@ def departmentViewFamily(request, unique=None):
             dep['onMap'] = False
         deps[department.union.get_region_display()].append(dep)
 
+    family = user_to_person(request.user).family
     waiting_lists = WaitingList.objects.filter(person__family=family)
     children = family.person_set.filter(membertype=Person.CHILD)
 
