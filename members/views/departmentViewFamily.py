@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 
 from members.models.department import Department
 from members.models.union import Union
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
+
+import json
 
 @login_required
 def departmentViewFamily(request, unique=None):
@@ -27,6 +30,15 @@ def departmentViewFamily(request, unique=None):
             dep['onMap'] = False
         deps[department.union.get_region_display()].append(dep)
 
+    # departments_json = json.dumps(list(Department.objects.all()))
+    departments_json = serializers.serialize("json", depQuery)
+    print(departments_json)
+
+    departments_json = []
+    for row in json.loads(serializers.serialize("json", depQuery)):
+        departments_json.append(row["fields"])
+
+
     family = user_to_person(request.user).family
     waiting_lists = WaitingList.objects.filter(person__family=family)
     children = family.person_set.filter(membertype=Person.CHILD)
@@ -41,5 +53,6 @@ def departmentViewFamily(request, unique=None):
         'departments': deps,
         'children': children,
         'waiting_lists': waiting_lists,
-        'in_waiting_list': in_waiting_list
+        'in_waiting_list': in_waiting_list,
+        'departments_json': json.dumps(departments_json)
     })
