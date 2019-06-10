@@ -1,0 +1,1 @@
+from members.templatetags.waiting_list import number_on_waiting_list

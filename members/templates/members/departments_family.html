@@ -34,6 +34,9 @@
     max-width: 100%; */
     overflow: hidden; /* will contain if #first is longer than #second */
 }
+#wrapper > * {
+    height: 60vh;
+}
 .first {
     width: calc(100vw - var(--secondSize));
     float:left; /* add this */
@@ -46,10 +49,34 @@
 {% endblock %}
 
 {% block content %}
+{% load waiting_list %}
 <div id="wrapper">
-    <div id="kort" class="first" style="height: 60vh;"></div>
-    <div class="second" style="">display: inline-block; width: calc(100vw - 200px) display: inline-block; width: 200px</div>
+    <div id="kort" class="first"></div>
+    <div class="second" style="background-color: #2C8098">afdeling</div>
 </div>
 
+<div class="container">
+    {% for person in children %}
+    <h4>{{person.name}}</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Afdeling</th><th>Plads</th></tr>
+        </thead>
+        <tbody>
+            {% if person in in_waiting_list %}
+            {% for waiting_listsROW in waiting_lists %}
+            <tr>
+                {% if waiting_listsROW.person == person %}
+                    <td>{{ waiting_listsROW.department.name }}</td>
+                    <td>{% number_on_waiting_list waiting_listsROW %}. i køen</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            {% else %}
+                <tr><td colspan="2"><i>Endnu ikke på nogen ventelister</i></td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
