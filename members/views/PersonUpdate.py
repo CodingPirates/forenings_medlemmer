@@ -15,15 +15,21 @@ from members.utils.user import user_to_person
 @login_required
 def PersonUpdate(request, id):
     person = Person.objects.get(pk=id)
-    persons_in_family = Person.objects.filter(family=user_to_person(request.user).family)
+    persons_in_family = Person.objects.filter(
+        family=user_to_person(request.user).family
+    )
     if person in persons_in_family:
-        if request.method == 'POST':
+        if request.method == "POST":
             form = PersonForm(request.POST, instance=person)
             if form.is_valid():
                 UpdatePersonFromForm(person, form)
-                return HttpResponseRedirect(reverse('family_detail'))
+                return HttpResponseRedirect(reverse("family_detail"))
         else:
             form = PersonForm(instance=person)
-        return render(request, 'members/person_create_or_update.html', {'form': form, 'person': person})
+        return render(
+            request,
+            "members/person_create_or_update.html",
+            {"form": form, "person": person},
+        )
     else:
         return HttpResponse("Du kan kun redigere en person i din egen familie")

@@ -3,32 +3,106 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="newloginnotice">
-                <p>Kære bruger</p>
+            {% if user.is_authenticated %}
+              <div class="col-md-6">
+                <div class="card mt-5 p-4 bg-primary">
+                  <div class="row no-gutters">
+                    <div class="col-md-4 d-flex justify-content-center align-items-center">
+                      <i class="fa fa-4x fa-users text-white"></i>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title text-white">Familie</h5>
+                        <a class="btn btn-accent" href="/family">
+                          Jeres familie <i class="fa fa-long-arrow-right"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                <p>Vi har ændret måden, du logger ind i medlemssystemet.
-                    Fremover skal du logge ind med din email og adgangskode.
-                    Det gør du under punktet "Login" i toppen af siden.
-                    Er det første gang, du benytter det nye loginsystem,
-                    skal du generere en adgangskode ved at trykke på knappen "Login" i toppen
-                    og derefter trykke på knappen "Opret adgangskode".
-                    Hvis du har spørgsmål kan du skrive en e-mail til
-                    <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
-            </div>
-        </div>
+              <div class="col-md-6">
+                <div class="card mt-5 p-4 bg-primary">
+                  <div class="row no-gutters">
+                    <div class="col-md-4 d-flex justify-content-center align-items-center">
+                      <i class="fa fa-4x fa-list-ol text-white"></i>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title text-white">Se plads på ventelister</h5>
+                        <a class="btn btn-accent" href="/family/waitinglist">
+                          Ventelister <i class="fa fa-long-arrow-right"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Tilmelding til Coding Pirates</h1>
-                <p>Indtast barnets og forældrenes informationer, for at tilmelde en Coding Pirates-workshop, eller for at komme med på ventelisten.</p>
-            </div>
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        {% crispy signupform %}
+              <div class="col-md-6">
+                <div class="card mt-5 p-4 bg-primary">
+                  <div class="row no-gutters">
+                    <div class="col-md-4 d-flex justify-content-center align-items-center">
+                      <i class="fa fa-4x fa-map text-white"></i>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title text-white">Find en afdeling</h5>
+                        <a class="btn btn-accent" href="/family">
+                          Afdelinger <i class="fa fa-long-arrow-right"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="card mt-5 p-4 bg-primary">
+                  <div class="row no-gutters">
+                    <div class="col-md-4 d-flex justify-content-center align-items-center">
+                      <i class="fa fa-4x fa-calendar text-white"></i>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title text-white">Tilmeld arrangementer</h5>
+                        <a class="btn btn-accent" href="/activities">
+                          Arrangementer <i class="fa fa-long-arrow-right"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% else %}   
+                <div class="newloginnotice">
+                    <p>Kære bruger</p>
+
+                    <p>
+                        Vi har ændret måden, du logger ind i medlemssystemet.
+                        Fremover skal du logge ind med din email og adgangskode.
+                        Det gør du under punktet "Login" i toppen af siden.
+                        Er det første gang, du benytter det nye loginsystem,
+                        skal du generere en adgangskode ved at trykke på knappen "Login" i toppen
+                        og derefter trykke på knappen "Opret adgangskode".
+                        Hvis du har spørgsmål kan du skrive en e-mail til
+                        <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.
+                    </p>
+                </div>
+
+                <div class="col-md-12">
+                    <h1>Tilmelding til Coding Pirates</h1>
+                    <p>Indtast barnets og forældrenes informationer, for at tilmelde en Coding Pirates-workshop, eller for at komme med på ventelisten.</p>
+                </div>
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            {% crispy signupform %}
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
