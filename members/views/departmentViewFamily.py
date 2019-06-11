@@ -10,6 +10,7 @@ from members.utils.user import user_to_person
 
 import json
 
+
 @login_required
 def departmentViewFamily(request, unique=None):
     depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
@@ -32,12 +33,10 @@ def departmentViewFamily(request, unique=None):
 
     # departments_json = json.dumps(list(Department.objects.all()))
     departments_json = serializers.serialize("json", depQuery)
-    print(departments_json)
 
     departments_json = []
     for row in json.loads(serializers.serialize("json", depQuery)):
         departments_json.append(row["fields"])
-
 
     family = user_to_person(request.user).family
     waiting_lists = WaitingList.objects.filter(person__family=family)
@@ -47,7 +46,6 @@ def departmentViewFamily(request, unique=None):
     for person in children:
         if waiting_lists.filter(person=person).exists():
             in_waiting_list.append(person)
-
 
     return render(request, "members/departments_family.html", {
         'departments': deps,
