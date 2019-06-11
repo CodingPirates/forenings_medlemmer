@@ -47,8 +47,10 @@ def departmentViewFamily(request, unique=None):
         if waiting_lists.filter(person=person).exists():
             in_waiting_list.append(person)
 
+    print(depQuery)
+
     return render(request, "members/departments_family.html", {
-        'departments': deps,
+        'departments': depQuery,
         'children': children,
         'waiting_lists': waiting_lists,
         'in_waiting_list': in_waiting_list,
