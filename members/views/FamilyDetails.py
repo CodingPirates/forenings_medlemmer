@@ -11,12 +11,16 @@ from members.models.department import Department
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
+from django.shortcuts import redirect
+from django.urls import reverse
 
 
 @login_required
 def FamilyDetails(request):
-
-    family = user_to_person(request.user).family
+    person = user_to_person(request.user)
+    if person == None:
+        return redirect(reverse("admin_signup"))
+    family = person.family
     invites = ActivityInvite.objects.filter(
         person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None
     )
