@@ -10,8 +10,4 @@ def user_to_person(user):
         return None
 
 def has_user(user):
-    person = user_to_person(user)
-    if person == None:
-        return False
-    else:
-        return True
+    return user_to_person(user) is not None
