@@ -2,12 +2,15 @@ from django.shortcuts import render
 
 from members.models.department import Department
 from members.models.waitinglist import WaitingList
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from members.utils.user import user_to_person, has_user
 
 
 @login_required
+@user_passes_test(has_user, '/admin_signup/')
 def waitinglistView(request):
-    unique = request.user.person.family.unique
+    family = user_to_person(request.user).family
     department_children_waiting = {"departments": {}}
     department_loop_counter = 0
     # deparments_query = Department.objects.filter(has_waiting_list = True).order_by('zipcode').filter(waitinglist__person__family__unique=unique)
@@ -35,7 +38,7 @@ def waitinglistView(request):
             department_children_waiting["departments"][department_loop_counter][
                 "waiting"
             ][child_loop_counter] = {}
-            if waiting.person.family.unique == unique:
+            if waiting.person.family == family:
                 department_children_waiting["departments"][department_loop_counter][
                     "waiting"
                 ][child_loop_counter]["firstname"] = waiting.person.firstname()
@@ -59,11 +62,11 @@ def waitinglistView(request):
             department_children_waiting["departments"][department_loop_counter][
                 "waiting"
             ][child_loop_counter]["added"] = waiting.person.added
-            child_loop_counter = child_loop_counter + 1
-        department_loop_counter = department_loop_counter + 1
+            child_loop_counter += 1
+        department_loop_counter += 1
 
     return render(
         request,
         "members/waitinglist.html",
-        {"department_children_waiting": department_children_waiting, "unique": unique},
+        {"department_children_waiting": department_children_waiting, "family": family},
     )

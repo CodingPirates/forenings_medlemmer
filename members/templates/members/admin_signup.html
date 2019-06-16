@@ -1,0 +1,18 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+    <div class="jumbotron">
+      <h1>Til afdelingskaptajnen</h1>
+      <p>Vi lagde mærke til at du ikke har en profil i systemet som frivillig.</p>
+      <p>Derfor beder vi dig udfylde dette skema, så kan vi lave en profil til dig.</p>
+      </div>
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            {% crispy adminSignupForm %}
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
