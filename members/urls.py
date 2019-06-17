@@ -15,6 +15,7 @@ from members.views import (
     volunteerSignup,
     departmentView,
     Activities,
+    AdminSignup,
 )
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
@@ -70,6 +71,7 @@ urlpatterns = [
     url(r"activities/$", Activities, name="activities"),
     url(r"volunteer$", volunteerSignup, name="volunteer_signup"),
     url(r"user_created/$", userCreated, name="user_created"),
+    url(r"admin_signup/$", AdminSignup, name="admin_signup"),
     url(r"family/$", FamilyDetails, name="family_detail"),
     url(r"family/Person/(?P<id>[\d]+)/$", PersonUpdate, name="person_update"),
     url(r"family/Person/(?P<membertype>[A-Z]{2})$", PersonCreate, name="person_add"),
