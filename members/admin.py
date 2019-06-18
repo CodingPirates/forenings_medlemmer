@@ -296,7 +296,8 @@ class ActivityAdmin(admin.ModelAdmin):
     # inlines = [ActivityParticipantInline, ActivityInviteInline]
 
     def save_model(self, request, obj, form, change):
-        obj.union_id = 1
+        if not obj.pk:
+            obj.union_id = 1
         super().save_model(request, obj, form, change)
 
 
