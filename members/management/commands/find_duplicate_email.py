@@ -3,13 +3,15 @@ from members.models.person import Person
 
 
 class Command(BaseCommand):
-    help = 'Finds parent and guardians with duplicate emails'
+    help = "Finds parent and guardians with duplicate emails"
 
     def handle(self, *args, **options):
-        print('pk,email')
+        print("pk,email")
 
-        for person in Person.objects.filter(membertype__in=[Person.PARENT, Person.GUARDIAN]):
+        for person in Person.objects.filter(
+            membertype__in=[Person.PARENT, Person.GUARDIAN]
+        ):
             if person.email and Person.objects.filter(email=person.email).count() < 2:
                 continue  # Ignore people with unique emails
 
-            print(str(person.pk) + ',' + person.email)
+            print(str(person.pk) + "," + person.email)

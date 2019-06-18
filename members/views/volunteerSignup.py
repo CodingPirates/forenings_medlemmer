@@ -14,30 +14,41 @@ from django.contrib.auth.models import User
 
 @xframe_options_exempt
 def volunteerSignup(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         # figure out which form was filled out.
-        if request.POST['form_id'] == 'vol_signup':
+        if request.POST["form_id"] == "vol_signup":
             # signup has been filled
             vol_signup = vol_signupForm(request.POST)
             if vol_signup.is_valid():
                 # check if family already exists
                 try:
-                    family = Family.objects.get(email__iexact=request.POST['volunteer_email'])
+                    family = Family.objects.get(
+                        email__iexact=request.POST["volunteer_email"]
+                    )
                     # family was already created - we can't create this family again
-                    vol_signup.add_error('volunteer_email', 'Denne email adresse er allerede oprettet. Log ind ovenfor, for at få adgang.')
-                    return render(request, 'members/volunteer_signup.html', {'vol_signupform': vol_signup})
+                    vol_signup.add_error(
+                        "volunteer_email",
+                        "Denne email adresse er allerede oprettet. Log ind ovenfor, for at få adgang.",
+                    )
+                    return render(
+                        request,
+                        "members/volunteer_signup.html",
+                        {"vol_signupform": vol_signup},
+                    )
                 except:  # noqa: E722
                     # all is fine - we did not expect any
                     pass
                 # create new family.
-                family = Family.objects.create(email=vol_signup.cleaned_data['volunteer_email'])
+                family = Family.objects.create(
+                    email=vol_signup.cleaned_data["volunteer_email"]
+                )
                 family.confirmed_dtm = timezone.now()
                 family.save()
 
                 # create volunteer as user
                 user = User.objects.create_user(
-                    username=vol_signup.cleaned_data['volunteer_email'],
-                    email=vol_signup.cleaned_data['volunteer_email']
+                    username=vol_signup.cleaned_data["volunteer_email"],
+                    email=vol_signup.cleaned_data["volunteer_email"],
                 )
                 password = User.objects.make_random_password()
                 user.set_password(password)
@@ -46,38 +57,46 @@ def volunteerSignup(request):
                 # create volunteer
                 volunteer = Person.objects.create(
                     membertype=Person.PARENT,
-                    name=vol_signup.cleaned_data['volunteer_name'],
-                    zipcode=vol_signup.cleaned_data['zipcode'],
-                    city=vol_signup.cleaned_data['city'],
-                    streetname=vol_signup.cleaned_data['streetname'],
-                    housenumber=vol_signup.cleaned_data['housenumber'],
-                    floor=vol_signup.cleaned_data['floor'],
-                    door=vol_signup.cleaned_data['door'],
-                    dawa_id=vol_signup.cleaned_data['dawa_id'],
-                    placename=vol_signup.cleaned_data['placename'],
-                    email=vol_signup.cleaned_data['volunteer_email'],
-                    phone=vol_signup.cleaned_data['volunteer_phone'],
-                    birthday=vol_signup.cleaned_data['volunteer_birthday'],
-                    gender=vol_signup.cleaned_data['volunteer_gender'],
+                    name=vol_signup.cleaned_data["volunteer_name"],
+                    zipcode=vol_signup.cleaned_data["zipcode"],
+                    city=vol_signup.cleaned_data["city"],
+                    streetname=vol_signup.cleaned_data["streetname"],
+                    housenumber=vol_signup.cleaned_data["housenumber"],
+                    floor=vol_signup.cleaned_data["floor"],
+                    door=vol_signup.cleaned_data["door"],
+                    dawa_id=vol_signup.cleaned_data["dawa_id"],
+                    placename=vol_signup.cleaned_data["placename"],
+                    email=vol_signup.cleaned_data["volunteer_email"],
+                    phone=vol_signup.cleaned_data["volunteer_phone"],
+                    birthday=vol_signup.cleaned_data["volunteer_birthday"],
+                    gender=vol_signup.cleaned_data["volunteer_gender"],
                     family=family,
-                    user=user)
+                    user=user,
+                )
                 volunteer.save()
 
                 # send email to department leader
-                department = Department.objects.get(name=vol_signup.cleaned_data['volunteer_department'])
+                department = Department.objects.get(
+                    name=vol_signup.cleaned_data["volunteer_department"]
+                )
                 vol_obj = Volunteer.objects.create(
-                    person=volunteer,
-                    department=department
+                    person=volunteer, department=department
                 )
                 vol_obj.save()
                 # department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                 # redirect to success
-                request.session['password'] = password
-                return HttpResponseRedirect(reverse('user_created'))
+                request.session["password"] = password
+                return HttpResponseRedirect(reverse("user_created"))
             else:
-                return render(request, 'members/volunteer_signup.html', {'vol_signupform': vol_signup})
+                return render(
+                    request,
+                    "members/volunteer_signup.html",
+                    {"vol_signupform": vol_signup},
+                )
 
     # initial load (if we did not return above)
     vol_signup = vol_signupForm()
-    return render(request, 'members/volunteer_signup.html', {'vol_signupform': vol_signup})
+    return render(
+        request, "members/volunteer_signup.html", {"vol_signupform": vol_signup}
+    )

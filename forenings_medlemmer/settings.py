@@ -13,9 +13,19 @@ import os
 import logging
 from environs import Env
 import dj_database_url
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 
 env = Env()
 env.read_env()
+
+if env.str("SENTRY_DSN") != 'not set':
+    sentry_sdk.init(
+        dsn=env.str("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+        environment=env.str("MODE")
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +74,7 @@ BASE_URL = os.environ["BASE_URL"]
 # Application definition
 
 INSTALLED_APPS = (
-    'bootstrap4',
+    "bootstrap4",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -80,7 +90,7 @@ INSTALLED_APPS = (
     "fontawesome",
 )
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",

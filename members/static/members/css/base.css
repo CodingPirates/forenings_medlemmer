@@ -5,6 +5,10 @@
     background-color: #25A2CE !important;
 }
 
+.bg-accent {
+    background-color: #EFB422 !important;
+}
+
 .nav-link {
     font-family: 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS', sans-serif !important;
     font-size: 20px;
