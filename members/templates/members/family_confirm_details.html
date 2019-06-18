@@ -6,6 +6,7 @@
         <p>Det er vigtigt, at vi har korrekte kontakt informationer samt ved hvilke afdelinger I ønsker at gå til klubaften i.</p>
         <p>Bekræft nedenfor, at data er korrekt og tryk derefter på bekræft</p>
       </div>
+      {% for person in persons %}
       <div>
       <address>
       <i>{{person.name}}</i>
@@ -28,11 +29,7 @@
       E-mail: {{person.email|default:" (ingen)"}}<br>
       </address>
       </div>
-    {% empty %}
-    <div>
-    <p>Der er ingen personer registreret</p>
-    </div>
-    {%endfor%}
+    {% endfor %}
     </div>
     <div>
     <h2>Børnene er opskrevet på venteliste:</h2>
