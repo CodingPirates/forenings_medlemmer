@@ -13,7 +13,7 @@ class TestModelEquipment(TestCase):
             streetname="",
             housenumber="1",
             zipcode="1234",
-            city=""
+            city="",
         )
         self.union1.save()
 
@@ -23,7 +23,7 @@ class TestModelEquipment(TestCase):
             streetname="",
             housenumber="1",
             zipcode="1234",
-            city=""
+            city="",
         )
         self.union2.save()
 
@@ -33,7 +33,7 @@ class TestModelEquipment(TestCase):
             streetname="",
             housenumber="1",
             zipcode="1234",
-            city=""
+            city="",
         )
         self.department.save()
 
@@ -46,17 +46,13 @@ class TestModelEquipment(TestCase):
 
     def test_clean_department_owner(self):
         # Test model validation with only department as owner
-        equipment = Equipment(
-            department=self.department
-        )
+        equipment = Equipment(department=self.department)
         equipment.clean()
         equipment.save()
 
     def test_clean_union_owner(self):
         # Test model validation with only union as owner
-        equipment = Equipment(
-            union=self.union1
-        )
+        equipment = Equipment(union=self.union1)
         equipment.clean()
         equipment.save()
 
@@ -64,10 +60,7 @@ class TestModelEquipment(TestCase):
         # Test the mode validation with both department and union set
         self.department.union = self.union1
         self.department.save()
-        equipment = Equipment(
-            union=self.union1,
-            department=self.department
-        )
+        equipment = Equipment(union=self.union1, department=self.department)
         # Test validation with department union matching union in equipment
         equipment.clean()
         equipment.save()

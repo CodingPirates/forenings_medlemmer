@@ -4,7 +4,7 @@ from members.models.family import Family
 
 
 class Command(BaseCommand):
-    help = 'Finds families who has no person who can login, and print the familys pk'
+    help = "Finds families who has no person who can login, and print the familys pk"
 
     def handle(self, *args, **options):
         for family in Family.objects.all():
