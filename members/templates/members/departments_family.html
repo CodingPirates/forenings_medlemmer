@@ -33,7 +33,7 @@
     )
 
     function createHTML(department) {
-        return "<h4>Coding Pirates " + department["name"] + "</h4>" + "<table class=\"departmentTable\"><tbody><tr><td>Afdelingsleder: </td><td>" + department["responsible_name"] + "</td></tr><tr><td>Kontakt: </td><td>" + department["responsible_contact"] + "</td></tr><tr><td>Møde tid: </td><td>" + department["open_hours"] + "</td></tr></tbody></table>" + (department["isOpening"] ? "<p><i>Afdelingen åbner snart</i></p>" : "");
+        return "<h4>Coding Pirates " + department["name"] + "</h4>" + "<table class=\"departmentTable\"><tbody><tr><td>Afdelingsleder: </td><td>" + department["responsible_name"] + "</td></tr><tr><td>Kontakt: </td><td>" + department["responsible_contact"] + "</td></tr><tr><td>Møde tid: </td><td>" + department["open_hours"] + "</td></tr><tr><td>Adresse: </td><td>" + department["streetname"] + " " + department["housenumber"] + ", " + department["zipcode"] + " " + department["city"] + "</td></tr></tbody></table>" + "<p>" + department["description"] + "</p>" + "<a href=\"" + department["website"] + "\">" + department["website"] + "</a>" + (department["isOpening"] ? "<p><i>Afdelingen åbner snart</i></p>" : "");
     }
 
     function show(e) {
