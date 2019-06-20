@@ -12,6 +12,7 @@ import json
 
 
 @login_required
+@user_passes_test(has_user, '/admin_signup')
 def departmentViewFamily(request, unique=None):
     depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
     deps = {}
