@@ -16,7 +16,7 @@ from members.views import (
     departmentView,
     departmentViewFamily,
     Activities,
-    AdminSignup
+    AdminSignup,
 )
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
