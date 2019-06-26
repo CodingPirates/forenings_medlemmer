@@ -31,6 +31,7 @@ import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 from .department import Department
 from .union import Union
 from .person import Person
+from .family import Family
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion

@@ -1,6 +1,6 @@
 import graphene
 from graphene_django.types import DjangoObjectType
-
+from .person_mutations import CreateAdultMutation
 
 from members.models import (
     Department,
@@ -35,7 +35,10 @@ class UnionType(DjangoObjectType):
 class DepartmentType(DjangoObjectType):
     class Meta:
         model = Department
-        # only_fields = ("name", "description")
+
+
+class Mutation(graphene.ObjectType):
+    create_adult = CreateAdultMutation.Field()
 
 
 class Query(graphene.ObjectType):
@@ -61,4 +64,4 @@ class Query(graphene.ObjectType):
         return Department.objects.all()
 
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=Query, mutation=Mutation)

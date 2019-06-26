@@ -201,8 +201,10 @@ class PersonFactory(DjangoModelFactory):
         lambda n: "person{0}@example.com".format(n)
     )  # Faker("email")
     phone = Faker("phone_number")
-    gender = FuzzyChoice(Person.MEMBER_GENDER_CHOICES)
-    birthday = Faker("date")
+    gender = FuzzyChoice(
+        [short_name for (short_name, long_name) in Person.MEMBER_GENDER_CHOICES]
+    )
+    birthday = Faker("date_between", start_date="-100y", end_date="-18y")
     # has_certificate = Faker("date")
     family = SubFactory(FamilyFactory, email=email)
     notes = Faker("text")
