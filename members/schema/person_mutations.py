@@ -2,7 +2,6 @@ import datetime
 import django
 import graphene
 from graphql import GraphQLError
-import graphql_jwt
 from django.contrib.auth.models import User
 from dateutil.relativedelta import relativedelta
 from members.models import Person
