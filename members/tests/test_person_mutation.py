@@ -42,7 +42,7 @@ class PersonMutationsTest(GraphQLTestCase):
         person_after_muation = Person.objects.filter(email=self.person.email)
         self.assertEqual(len(person_after_muation), 1)
         person_after_muation = person_after_muation[0]
-
+        print(response.content)
         self.assertResponseNoErrors(response)
         data = json.loads(response.content)["data"]["createAdult"]
         self.assertEqual(data["name"], self.person.name)
@@ -66,6 +66,7 @@ class PersonMutationsTest(GraphQLTestCase):
             op_name="createAdult",
             input_data=self.input,
         )
+        print(response.content)
         self.assertResponseHasErrors(response)
         person_after_muation = Person.objects.filter(email=self.person.email)
         self.assertEqual(len(persons_before_mutation), len(person_after_muation))
