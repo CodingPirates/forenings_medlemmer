@@ -4,16 +4,12 @@
     {% load staticfiles %}
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
     {% load bootstrap4 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <style>
-        #kort { height: 480px; }
-    </style>
+
     <script type="text/javascript">
     $(document).ready(function() {
         var southEast = L.latLng(54.91711327768886, 8.76734733581543);
@@ -37,15 +33,17 @@
   </head>
 
   <body>
-      <div id="kort"></div>
-    <ul class="nav nav-tabs nav-justified">
+      <div style="height:500px;" id="kort"></div>
+    <ul class="nav nav-pills nav-fill">
     {% for region, depList in departments.items %}
+    <li  class="nav-item">
         {% if region == 'Sjælland' %}
-         <li class="active"><a data-toggle="pill" href="#{{region}}">{{region}}
-         </a></li>
+           <a class="nav-link active" data-toggle="pill" href="#{{region}}">{{region}}
+         </a>
         {% else %}
-            <li><a data-toggle="pill" href="#{{region}}">{{region}}</a></li>
+          <a  class="nav-link" data-toggle="pill" href="#{{region}}">{{region}}</a>
         {% endif %}
+    </li>
     {% endfor %}
     </ul>
     <br>
@@ -53,7 +51,7 @@
       <div class="tab-content">
         {% for region, depList in departments.items %}
           {% if region == 'Sjælland'%}
-            <div id="{{region}}" class="tab-pane fade in active">
+            <div id="{{region}}" class="tab-pane fade in active show">
           {% else %}
             <div id="{{region}}" class="tab-pane fade in">
           {% endif %}
