@@ -77,6 +77,14 @@
           </p>
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <p>
+            <strong>Lokalforening:</strong><br>
+            {{ union.name }}
+          </p>
+        </div>
+      </div>
       {% if not view_only_mode %}
       <hr>
       {% crispy signupform %}
@@ -86,42 +94,22 @@
 
           <hr/>
 
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h2 class="panel-title">{{person.name}} er tilmeldt dette arrangement</h2>
-            </div>
-            <div class="panel-body">
-              <div class="row">
-                <div class="col-md-12">
-                  <h3>Hold liste</h3>
-                  <table class="table table-striped table-responsive">
-                    <thead>
-                      <tr>
-                        <th>Navn</th>
-                        <th>Forældres E-Mail</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for participant in participants %}
-                        <tr>
-                          <td>{{participant.member.person.name}}</td>
-                          {% if participant.contact_visible %}
-                            <td>{{participant.member.person.family.email}}</td>
-                          {% else %}
-                            <td></td>
-                          {% endif %}
-                        </tr>
-                      {%endfor%}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">{{person.name}} er tilmeldt dette arrangement</h2>
             </div>
           </div>
         {% endif %}
-        {% if family.unique %}
-          <a class="btn btn-primary" href="{% url 'family_detail' family.unique %}">Tilbage</a>
-        {% endif%}
+        {% if signup_closed and not participating %}
+          <hr>
+            <blockquote class="bg-warning">
+              <p >Arrangementet er desværre udsolgt!</p>
+              <footer>Det er ikke længere muligt at tilmelde sig.</footer>
+            </blockquote>
+        {% endif %}
+        {% if family %}
+          <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
+        {% endif %}
       {% endif %}
     </div>
 {% endblock %}

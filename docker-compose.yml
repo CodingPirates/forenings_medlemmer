@@ -1,0 +1,48 @@
+version: "3.3"
+
+services:
+  web:
+    build: .
+    command: "${SERVER_COMMAND} 0.0.0.0:${PORT}"
+    volumes:
+      - .:/app
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - database
+    networks:
+      - webnet
+    environment:
+      - SECRET_KEY=$SECRET_KEY
+      - DEBUG=$DEBUG
+      - BASE_URL=$BASE_URL
+      - QUICKPAY_API_KEY=$QUICKPAY_API_KEY
+      - QUICKPAY_PRIVATE_KEY=$QUICKPAY_PRIVATE_KEY
+      - DATABASE_URL=$DATABASE_URL
+      - ALLOWED_HOSTS=$ALLOWED_HOSTS
+      - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN
+      - CORS_LIST=$CORS_LIST
+      - FORCE_HTTPS=$FORCE_HTTPS
+      - EMAIL_URL=$EMAIL_URL
+      - ADMINS=$ADMINS
+      - SENTRY_DSN=$SENTRY_DSN
+      - MODE=$MODE
+
+  database:
+    image: postgres:11.2-alpine
+    networks:
+      - webnet
+    volumes:
+      - database:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+    ports:
+      - "5432${DB_PORT}"
+
+volumes:
+  database:
+
+networks:
+  webnet:

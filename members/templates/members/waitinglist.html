@@ -1,25 +1,15 @@
-<!DOCTYPE html>
-<html lang="da">
-  <head>
-    {% load staticfiles %}
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    {% load bootstrap3 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-  </head>
-  <body>
+{% extends 'members/base.html' %}
+
+{% block content %}
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1 id="top">Venteliste i alle Coding Pirates afdelinger</h1>
+          <h1 id="top">Venteliste i alle Coding Pirates-afdelinger</h1>
 
           <p>Tryk på en afdeling for at springe til den</p>
 
-          {% if unique %}
-            <p><a href="{% url 'family_detail' unique %}">Tilbage til familie oversigt</a></p>
+          {% if family %}
+            <p><a href="{% url 'family_detail' %}">Tilbage til familie oversigt</a></p>
           {% else %}
             <p>Listerne er anonymiserede. Log ind på "min familie side" for at se dine børns navne på listerne.</p>
           {% endif %}
@@ -61,7 +51,7 @@
             {% endfor %}
             </table>
               {% else %}
-                  <p>Der er ingen opskrevet på venteliste til denne afdeling</p>
+                  <p>Der er ingen opskrevet på ventelisten til denne afdeling</p>
               {% endif %}
 
           {% endfor %}
@@ -69,5 +59,4 @@
         </div>
       </div>
     </div>
-  </body>
-</html>
+{% endblock %}

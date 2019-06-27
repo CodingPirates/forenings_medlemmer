@@ -1,0 +1,101 @@
+{
+  "name": "Coding Pirates CRM",
+  "description": "The member system for coding pirates",
+  "website": "https://codingpirates.dk",
+  "stack": "container",
+  "buildpacks": [
+    { "url": "heroku/python" }
+  ],
+  "env" : {
+      "MODE" : {
+      "required": true,
+      "description": "The mode the system is running in",
+      "value": "staging"
+     },
+     "SENTRY_DSN" : {
+     "required": true,
+     "description": "SENTRY DSN",
+     "value": "not set"
+    },
+    "EMAIL_URL" : {
+     "required": true,
+     "description": "EMAIL URL",
+     "value": "console:"
+    },
+    "ADMINS" : {
+     "required": true,
+     "description": "Admins that get email on crashes",
+     "value": "[('dit navn', 'din@email.dk')]"
+    },
+     "FORCE_HTTPS" : {
+      "required": true,
+      "description": "Wheter or not https is enforced",
+      "value": "True"
+    },
+
+   "CORS_LIST" : {
+      "required": true,
+      "description": "The hosts that are allowed to acces cros origin",
+      "value": "members.codingpirates.dk"
+    },
+
+    "SECRET_KEY": {
+      "required": true,
+      "generator": "secret",
+      "description": "Secret key for django"
+    },
+    "BASE_URL": {
+      "required": true,
+      "description": "The URL it should be served on (deprecated)",
+      "value": "members.codingpirates.dk"
+    },
+    "ALLOWED_HOSTS": {
+      "required": true,
+      "description": "Which urls that can host the service",
+      "value" : "*"
+    },
+    "COVERALLS_REPO_TOKEN": {
+      "value": "x"
+    },
+    "DEBUG" : {
+      "required": true,
+      "description": "Wheter the service will run in debug mode",
+      "value" : "False"
+    },
+    "QUICKPAY_API_KEY" : {
+      "required": true,
+      "description": "The key for quickpay",
+      "value" : "xxxx"
+    },
+    "QUICKPAY_PRIVATE_KEY" : {
+      "required": true,
+      "description": "The key for quickpay",
+      "value" : "xxxx"
+    },
+    "SERVER_COMMAND" : {
+      "required": true,
+      "description": "The Service that starts the app",
+      "value" : "gunicorn forenings_medlemmer.wsgi:application --bind"
+    }
+  },
+  "addons": ["heroku-postgresql:hobby-dev"],
+  "environments": {
+    "test": {
+        "env": {
+            "ALLOWED_HOSTS": "*",
+            "BASE_URL": "https://members.codingpirates.dk",
+            "DEBUG": "True",
+            "QUICKPAY_API_KEY": "some_key",
+            "QUICKPAY_PRIVATE_KEY": "some_private_key",
+            "SECRET_KEY": "some_secret_key",
+            "SERVER_COMMAND": "gunicorn forenings_medlemmer.wsgi:application --bind"
+        },
+        "addons":[
+          "heroku-postgresql:in-dyno"
+        ],
+        "scripts": {
+            "test": "./manage.py test"
+        }
+    }
+  }
+}

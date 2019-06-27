@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="da">
+  <head>
+    {% load staticfiles %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        var southEast = L.latLng(54.91711327768886, 8.76734733581543);
+        var northEast = L.latLng(58.038693522227945, 14.979954628418003);
+        var kort = L.map('kort').fitBounds([southEast, northEast]);
+        L.tileLayer('https://api.mapbox.com/styles/v1/codingpirates/cjdaaa7yt3qts2rrwzpsx5ysw/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY29kaW5ncGlyYXRlcyIsImEiOiJjamRhN3JtZHgxamphMzNvMHpraTJra2J1In0.lVqzzzCf9gHneicqDONuaw', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 18,
+            accessToken: 'pk.eyJ1IjoiY29kaW5ncGlyYXRlcyIsImEiOiJjamRhOXM1ZGIwdm04MnlvMnQ5dDBsdWpkIn0.NMaydnMG6m8OBpJhUbNgzg'
+        }).addTo(kort);
+        {% for region, depList in departments.items %}
+            {% for dep in depList %}
+                {% if dep.onMap == True %}
+            var marker{{forloop.counter}} = L.marker([{{dep.latitude}},{{dep.longtitude}}]).addTo(kort);
+            marker{{forloop.counter}}.bindPopup('{{dep.html | safe}}');
+                {% endif %}
+             {% endfor %}
+        {% endfor %}
+    });
+    </script>
+  </head>
+
+  <body>
+      <div style="height:500px;" id="kort"></div>
+    <ul class="nav nav-pills nav-fill">
+    {% for region, depList in departments.items %}
+    <li  class="nav-item">
+        {% if region == 'Sjælland' %}
+           <a class="nav-link active" data-toggle="pill" href="#{{region}}">{{region}}
+         </a>
+        {% else %}
+          <a  class="nav-link" data-toggle="pill" href="#{{region}}">{{region}}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+    </ul>
+    <br>
+    <div class="container">
+      <div class="tab-content">
+        {% for region, depList in departments.items %}
+          {% if region == 'Sjælland'%}
+            <div id="{{region}}" class="tab-pane fade in active show">
+          {% else %}
+            <div id="{{region}}" class="tab-pane fade in">
+          {% endif %}
+          <div class="row">
+            {% for dep in depList %}
+              <div class="col-sm-4 col-centered">
+                  {{dep.html | safe}}
+              </div>
+              {% if forloop.counter|divisibleby:"3" %}
+                </div>
+                <br>
+                <div class="row">
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>
