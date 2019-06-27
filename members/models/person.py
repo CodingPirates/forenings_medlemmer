@@ -43,13 +43,16 @@ class Person(models.Model):
         "Type", max_length=2, choices=MEMBER_TYPE_CHOICES, default=PARENT
     )
     name = models.CharField("Navn", max_length=200)
-    zipcode = models.CharField("Postnummer", max_length=4, blank=True)
-    city = models.CharField("By", max_length=200, blank=True)
-    streetname = models.CharField("Vejnavn", max_length=200, blank=True)
-    housenumber = models.CharField("Husnummer", max_length=5, blank=True)
-    floor = models.CharField("Etage", max_length=10, blank=True)
-    door = models.CharField("Dør", max_length=5, blank=True)
-    dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
+    postal_address = models.ForeignKey("Address", on_delete=models.PROTECT, null=True, blank=True)
+    # Kept these fields on purpose to be able to migrate existing data. Once
+    # the data are converted, we can delete them.
+    zipcode = models.CharField("Postnummer", max_length=4, blank=True, null=True)
+    city = models.CharField("By", max_length=200, blank=True, null=True)
+    streetname = models.CharField("Vejnavn", max_length=200, blank=True, null=True)
+    housenumber = models.CharField("Husnummer", max_length=5, blank=True, null=True)
+    floor = models.CharField("Etage", max_length=10, blank=True, null=True)
+    door = models.CharField("Dør", max_length=5, blank=True, null=True)
+    dawa_id = models.CharField("DAWA id", max_length=200, blank=True, null=True)
     municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
@@ -58,7 +61,7 @@ class Person(models.Model):
         "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
-    placename = models.CharField("Stednavn", max_length=200, blank=True)
+    placename = models.CharField("Stednavn", max_length=200, blank=True, null=True)
     email = models.EmailField(blank=True)
     phone = models.CharField("Telefon", max_length=50, blank=True)
     gender = models.CharField(
@@ -78,6 +81,7 @@ class Person(models.Model):
         default=None,
     )
     address_invalid = models.BooleanField("Ugyldig adresse", default=False)
+    address_moved = models.BooleanField('Adresse flyttet', default=False)
 
     def __str__(self):
         return self.name
