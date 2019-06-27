@@ -1,6 +1,9 @@
 import graphene
 from graphene_django.types import DjangoObjectType
+import graphql_jwt
+
 from .person_mutations import CreateAdultMutation
+
 
 from members.models import (
     Department,
@@ -39,6 +42,9 @@ class DepartmentType(DjangoObjectType):
 
 class Mutation(graphene.ObjectType):
     create_adult = CreateAdultMutation.Field()
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
 
 
 class Query(graphene.ObjectType):

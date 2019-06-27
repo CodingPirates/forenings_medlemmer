@@ -15,7 +15,7 @@ from environs import Env
 import dj_database_url
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-
+import datetime
 
 env = Env()
 env.read_env()
@@ -113,7 +113,15 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 WSGI_APPLICATION = "forenings_medlemmer.wsgi.application"
 
-GRAPHENE = {"SCHEMA": "members.schema.schema"}
+GRAPHENE = {
+    "SCHEMA": "members.schema.schema",
+    "MIDDLEWARE": ["graphql_jwt.middleware.JSONWebTokenMiddleware"],
+}
+
+GRAPHQL_JWT = {
+    "JWT_VERIFY_EXPIRATION": True,
+    "JWT_EXPIRATION_DELTA": datetime.timedelta(days=10),
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -167,7 +175,11 @@ EMAIL_TIMEOUT = 30
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-AUTHENTICATION_BACKENDS = ("members.backends.CaseInsensitiveModelBackend",)
+AUTHENTICATION_BACKENDS = [
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "members.backends.CaseInsensitiveModelBackend",
+]
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
