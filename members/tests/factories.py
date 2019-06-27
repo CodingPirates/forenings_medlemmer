@@ -309,7 +309,7 @@ class ActivityFactory(DjangoModelFactory):
     class Meta:
         model = Activity
 
-    department = SubFactory(DepartmentFactory)
+    department = SubFactory(DepartmentFactory, union=factory.SelfAttribute("..union"))
     union = SubFactory(UnionFactory)
     name = Faker("activity")
     open_hours = Faker("numerify", text="kl. ##:00-##:00")

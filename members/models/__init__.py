@@ -28,9 +28,11 @@ import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
 
 # Export models not files
+from .activity import Activity
 from .department import Department
 from .union import Union
 from .person import Person
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
+from .dailystatisticsdepartment import DailyStatisticsDepartment

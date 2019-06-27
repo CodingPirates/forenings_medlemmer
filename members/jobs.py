@@ -237,22 +237,26 @@ class GenerateStatisticsCronJob(CronJobBase):
         dailyStatisticsGeneral.save()
 
         # generate daily department statistics
-        departments = Department.objects.filter(closed_dtm=None)
+
+        [
+            DailyStatisticsDepartment(department=department).save()
+            for department in Department.objects.filter(closed_dtm=None)
+        ]
         for department in departments:
             dailyStatisticsDepartment = (
                 members.models.dailystatisticsdepartment.DailyStatisticsDepartment()
             )
 
-            dailyStatisticsDepartment.timestamp = timestamp
-            dailyStatisticsDepartment.department = department
-            dailyStatisticsDepartment.active_activities = Activity.objects.filter(
-                department=department,
-                start_date__lte=timestamp,
-                end_date__gte=timestamp,
-            ).count()
-            dailyStatisticsDepartment.activities = Activity.objects.filter(
-                department=department
-            ).count()
+            # dailyStatisticsDepartment.timestamp = timestamp
+            # dailyStatisticsDepartment.department = department
+            # dailyStatisticsDepartment.active_activities = Activity.objects.filter(
+            #     department=department,
+            #     start_date__lte=timestamp,
+            #     end_date__gte=timestamp,
+            # ).count()
+            # dailyStatisticsDepartment.activities = Activity.objects.filter(
+            #     department=department
+            # ).count()
             dailyStatisticsDepartment.current_activity_participants = (
                 Person.objects.filter(
                     member__activityparticipant__activity__start_date__lte=timestamp,
