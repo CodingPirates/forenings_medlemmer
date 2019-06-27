@@ -8,7 +8,7 @@ def move_person(apps, schema_editor):
     Person = apps.get_model('members', 'Person')
     Address = apps.get_model('members', 'Address')
     for person in Person.objects.all():
-        if person.address_moved == False
+        if person.address_moved == False:
             if person.dawa_id in Address.objects.values_list('dawa_id', flat=True):
                 address_obj = Address.objects.get(dawa_id=person.dawa_id)
                 person.postal_address = address_obj
