@@ -58,7 +58,7 @@ class CreateAdultMutation(graphene.Mutation):
         try:
             django.contrib.auth.password_validation.validate_password(input["password"])
         except django.core.exceptions.ValidationError as error:
-            raise GraphQLError(" ".join(err.messages))
+            raise GraphQLError(" ".join(error.messages))
 
         if len(input["phone"]) < 8:
             raise GraphQLError("Ugyldigt telefon nummer")

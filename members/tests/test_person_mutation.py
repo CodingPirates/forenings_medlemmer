@@ -11,7 +11,7 @@ class PersonMutationsTest(GraphQLTestCase):
     def setUp(self):
         self.person = PersonFactory.build()
         self.input = {
-            "password": "Password8!",
+            "password": "xftydjel31",
             "email": self.person.email,
             "gender": self.person.gender,
             "name": self.person.name,
@@ -42,7 +42,6 @@ class PersonMutationsTest(GraphQLTestCase):
         person_after_muation = Person.objects.filter(email=self.person.email)
         self.assertEqual(len(person_after_muation), 1)
         person_after_muation = person_after_muation[0]
-        print(response.content)
         self.assertResponseNoErrors(response)
         data = json.loads(response.content)["data"]["createAdult"]
         self.assertEqual(data["name"], self.person.name)
@@ -52,7 +51,7 @@ class PersonMutationsTest(GraphQLTestCase):
         self.assertEqual(person_after_muation.email, self.person.email)
 
     def test_create_adult_invalid(self):
-        self.input["password"] = "invalid password"
+        self.input["email"] = "BenjaminRotendahl.dk"
         persons_before_mutation = Person.objects.filter(email=self.person.email)
         response = self.query(
             """
@@ -66,7 +65,6 @@ class PersonMutationsTest(GraphQLTestCase):
             op_name="createAdult",
             input_data=self.input,
         )
-        print(response.content)
         self.assertResponseHasErrors(response)
         person_after_muation = Person.objects.filter(email=self.person.email)
         self.assertEqual(len(persons_before_mutation), len(person_after_muation))
