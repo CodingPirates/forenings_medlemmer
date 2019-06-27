@@ -55,18 +55,11 @@ class CreateAdultMutation(graphene.Mutation):
                 "Du skal være over 18 for at bliver oprettet som\
              frivillig/forældre"
             )
-        if (
-            len(input["password"]) < 8
-            or not any([char.isdigit() for char in input["password"]])
-            or not any([char.isalpha() for char in input["password"]])
-            or not any([not char.isalpha() for char in input["password"]])
-            or not any([char.isupper() for char in input["password"]])
-            or not any([char.islower() for char in input["password"]])
-        ):
-            raise GraphQLError(
-                "Ugyldigt kodeord, det skal være mindst 8 tegn, mindst et \
-                    tal, et tegn og både store og små bogstaver"
-            )
+        try:
+            django.contrib.auth.password_validation.validate_password(input["password"])
+        except django.core.exceptions.ValidationError as error:
+            raise GraphQLError(" ".join(err.messages))
+
         if len(input["phone"]) < 8:
             raise GraphQLError("Ugyldigt telefon nummer")
 

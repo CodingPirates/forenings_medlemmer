@@ -20,11 +20,11 @@ from sentry_sdk.integrations.django import DjangoIntegration
 env = Env()
 env.read_env()
 
-if env.str("SENTRY_DSN") != 'not set':
+if env.str("SENTRY_DSN") != "not set":
     sentry_sdk.init(
         dsn=env.str("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
-        environment=env.str("MODE")
+        environment=env.str("MODE"),
     )
 
 logger = logging.getLogger(__name__)
@@ -168,7 +168,14 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 AUTHENTICATION_BACKENDS = ("members.backends.CaseInsensitiveModelBackend",)
-
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
 
 CRON_CLASSES = [
     "members.jobs.EmailSendCronJob",
