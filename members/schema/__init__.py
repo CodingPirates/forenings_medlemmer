@@ -1,9 +1,11 @@
 import graphene
-from graphene_django.types import DjangoObjectType
 import graphql_jwt
+from graphene_django.types import DjangoObjectType
+from graphql_jwt.decorators import login_required
+
+from members.utils.user import user_to_person
 
 from .person_mutations import CreateAdultMutation
-
 
 from members.models import (
     Department,
@@ -11,12 +13,18 @@ from members.models import (
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
     DailyStatisticsUnion,
+    Person,
 )
 
 
 class StatisticsGeneral(DjangoObjectType):
     class Meta:
         model = DailyStatisticsGeneral
+
+
+class PersonType(DjangoObjectType):
+    class Meta:
+        model = Person
 
 
 class StatisticsRegion(DjangoObjectType):
@@ -53,6 +61,11 @@ class Query(graphene.ObjectType):
     general_daily_statistics = graphene.List(StatisticsGeneral)
     union_daily_statistics = graphene.List(StatisticsUnion)
     region_daily_statistics = graphene.List(StatisticsRegion)
+    me = graphene.Field(PersonType)
+
+    @login_required
+    def resolve_me(self, info, **kwargs):
+        return user_to_person(info.context.user)
 
     def resolve_general_daily_statistics(self, info, **kwargs):
         return DailyStatisticsGeneral.objects.all()
