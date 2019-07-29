@@ -52,6 +52,7 @@ class Department(models.Model):
         "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
     onMap = models.BooleanField("Skal den være på kortet?", default=True)
+    address_moved = models.BooleanField('Adresse flyttet', default=False)
 
     def no_members(self):
         return self.member_set.count()

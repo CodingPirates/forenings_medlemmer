@@ -54,6 +54,154 @@ def reverse_move_person(apps, schema_editor):
             person.save()
 
 
+def move_activity(apps, schema_editor):
+    Activity = apps.get_model('members', 'Activity')
+    Address = apps.get_model('members', 'Address')
+    for activity in Activity.objects.filter(address_moved=False):
+        if activity.dawa_id in Address.objects.values_list('dawa_id', flat=True):
+            address_obj = Address.objects.get(dawa_id=activity.dawa_id)
+            activity.postal_address = address_obj
+            activity.address_moved = True
+            activity.save()
+        else:
+            # Address not already in Address table. Create new record
+            new_address = Address.objects.create(
+                streetname = activity.streetname,
+                housenumber = activity.housenumber,
+                floor = activity.floor,
+                door = activity.door,
+                city = activity.city,
+                zipcode = activity.zipcode,
+                municipality = activity.municipality,
+                placename = activity.placename,
+                longitude = activity.longitude,
+                latitude = activity.latitude,
+                dawa_id = activity.dawa_id,
+                address_invalid = activity.address_invalid
+            )
+            activity.address_moved = True
+            activity.save()
+
+
+def reverse_move_activity(apps, schema_editor):
+    Activity = apps.get_model('members', 'Activity')
+    Address = apps.get_model('members', 'Address')
+    for address in Address.objects.all():
+        for activity in Activity.objects.filter(postal_address=activity.pk):
+            activity.streetname = address.streetname,
+            activity.housenumber = address.housenumber,
+            activity.floor = address.floor,
+            activity.door = address.door,
+            activity.city = address.city,
+            activity.zipcode = address.zipcode,
+            activity.municipality = address.municipality,
+            activity.placename = address.placename,
+            activity.longitude = address.longitude,
+            activity.latitude = address.latitude,
+            activity.dawa_id = address.dawa_id,
+            activity.address_invalid = address.address_invalid
+            activity.address_moved = False
+            activity.save()
+
+def move_department(apps, schema_editor):
+    Department = apps.get_model('members', 'Department')
+    Address = apps.get_model('members', 'Address')
+    for department in Department.objects.filter(address_moved=False):
+        if department.dawa_id in Address.objects.values_list('dawa_id', flat=True):
+            address_obj = Address.objects.get(dawa_id=department.dawa_id)
+            department.postal_address = address_obj
+            department.address_moved = True
+            department.save()
+        else:
+            # Address not already in Address table. Create new record
+            new_address = Address.objects.create(
+                streetname = department.streetname,
+                housenumber = department.housenumber,
+                floor = department.floor,
+                door = department.door,
+                city = department.city,
+                zipcode = department.zipcode,
+                municipality = department.municipality,
+                placename = department.placename,
+                longitude = department.longitude,
+                latitude = department.latitude,
+                dawa_id = department.dawa_id,
+                address_invalid = department.address_invalid
+            )
+            department.address_moved = True
+            department.save()
+
+
+def reverse_move_department(apps, schema_editor):
+    Department = apps.get_model('members', 'Department')
+    Address = apps.get_model('members', 'Address')
+    for address in Address.objects.all():
+        for department in Department.objects.filter(postal_address=address.pk):
+            department.streetname = address.streetname,
+            department.housenumber = address.housenumber,
+            department.floor = address.floor,
+            department.door = address.door,
+            department.city = address.city,
+            department.zipcode = address.zipcode,
+            department.municipality = address.municipality,
+            department.placename = address.placename,
+            department.longitude = address.longitude,
+            department.latitude = address.latitude,
+            department.dawa_id = address.dawa_id,
+            department.address_invalid = address.address_invalid
+            department.address_moved = False
+            department.save()
+
+def move_union(apps, schema_editor):
+    Union = apps.get_model('members', 'Union')
+    Address = apps.get_model('members', 'Address')
+    for union in Union.objects.filter(address_moved=False):
+        if union.dawa_id in Address.objects.values_list('dawa_id', flat=True):
+            address_obj = Address.objects.get(dawa_id=union.dawa_id)
+            union.postal_address = address_obj
+            union.address_moved = True
+            union.save()
+        else:
+            # Address not already in Address table. Create new record
+            new_address = Address.objects.create(
+                streetname = union.streetname,
+                housenumber = union.housenumber,
+                floor = union.floor,
+                door = union.door,
+                city = union.city,
+                zipcode = union.zipcode,
+                municipality = union.municipality,
+                placename = union.placename,
+                longitude = union.longitude,
+                latitude = union.latitude,
+                dawa_id = union.dawa_id,
+                address_invalid = union.address_invalid
+            )
+            union.address_moved = True
+            union.save()
+
+
+def reverse_move_union(apps, schema_editor):
+    Union = apps.get_model('members', 'Union')
+    Address = apps.get_model('members', 'Address')
+    for address in Address.objects.all():
+        for union in Person.objects.filter(postal_address=address.pk):
+            union.streetname = address.streetname,
+            union.housenumber = address.housenumber,
+            union.floor = address.floor,
+            union.door = address.door,
+            union.city = address.city,
+            union.zipcode = address.zipcode,
+            union.municipality = address.municipality,
+            union.placename = address.placename,
+            union.longitude = address.longitude,
+            union.latitude = address.latitude,
+            union.dawa_id = address.dawa_id,
+            union.address_invalid = address.address_invalid
+            union.address_moved = False
+            union.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -62,4 +210,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(move_person, reverse_move_person),
+        migrations.RunPython(move_activity, reverse_move_activity),
+        migrations.RunPython(move_department, reverse_move_department),
+        migrations.RunPython(move_union, reverse_move_union),
     ]

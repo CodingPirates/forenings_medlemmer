@@ -20,6 +20,21 @@ class Migration(migrations.Migration):
             name='address_moved',
             field=models.BooleanField(default=False, verbose_name='Adresse flyttet'),
         ),
+        migrations.AddField(
+            model_name='activity',
+            name='address_moved',
+            field=models.BooleanField(default=False, verbose_name='Adresse flyttet')
+        ),
+        migrations.AddField(
+            model_name='department',
+            name='address_moved',
+            field=models.BooleanField(default=False, verbose_name='Adresse flyttet')
+        ),
+        migrations.AddField(
+            model_name='union',
+            name='address_moved',
+            field=models.BooleanField(default=False, verbose_name='Adresse flyttet')
+        ),
         migrations.AlterField(
             model_name='person',
             name='city',
