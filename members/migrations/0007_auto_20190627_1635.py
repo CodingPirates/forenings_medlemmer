@@ -2,17 +2,14 @@
 
 from django.db import migrations
 
-
+dawa_ids = Address.objects.values_list('dawa_id', flat=True)
 
 def move_person(apps, schema_editor):
     Person = apps.get_model('members', 'Person')
     Address = apps.get_model('members', 'Address')
     for person in Person.objects.filter(address_moved=False):
-        if person.dawa_id in Address.objects.values_list('dawa_id', flat=True):
-            address_obj = Address.objects.get(dawa_id=person.dawa_id)
-            person.postal_address = address_obj
-            person.address_moved = True
-            person.save()
+        if person.dawa_id in dawa_ids:
+            person.postal_address = Address.objects.get(dawa_id=person.dawa_id)
         else:
             # Address not already in Address table. Create new record
             new_address = Address.objects.create(
@@ -29,8 +26,8 @@ def move_person(apps, schema_editor):
                 dawa_id = person.dawa_id,
                 address_invalid = person.address_invalid
             )
-            person.address_moved = True
-            person.save()
+        person.address_moved = True
+        person.save()
 
 
 def reverse_move_person(apps, schema_editor):
@@ -58,11 +55,8 @@ def move_activity(apps, schema_editor):
     Activity = apps.get_model('members', 'Activity')
     Address = apps.get_model('members', 'Address')
     for activity in Activity.objects.filter(address_moved=False):
-        if activity.dawa_id in Address.objects.values_list('dawa_id', flat=True):
-            address_obj = Address.objects.get(dawa_id=activity.dawa_id)
-            activity.postal_address = address_obj
-            activity.address_moved = True
-            activity.save()
+        if activity.dawa_id in dawa_ids:
+            activity.postal_address = Address.objects.get(dawa_id=activity.dawa_id)
         else:
             # Address not already in Address table. Create new record
             new_address = Address.objects.create(
@@ -79,8 +73,8 @@ def move_activity(apps, schema_editor):
                 dawa_id = activity.dawa_id,
                 address_invalid = activity.address_invalid
             )
-            activity.address_moved = True
-            activity.save()
+        activity.address_moved = True
+        activity.save()
 
 
 def reverse_move_activity(apps, schema_editor):
@@ -107,11 +101,8 @@ def move_department(apps, schema_editor):
     Department = apps.get_model('members', 'Department')
     Address = apps.get_model('members', 'Address')
     for department in Department.objects.filter(address_moved=False):
-        if department.dawa_id in Address.objects.values_list('dawa_id', flat=True):
-            address_obj = Address.objects.get(dawa_id=department.dawa_id)
-            department.postal_address = address_obj
-            department.address_moved = True
-            department.save()
+        if department.dawa_id in dawa_ids:
+            department.postal_address = Address.objects.get(dawa_id=department.dawa_id)
         else:
             # Address not already in Address table. Create new record
             new_address = Address.objects.create(
@@ -128,8 +119,8 @@ def move_department(apps, schema_editor):
                 dawa_id = department.dawa_id,
                 address_invalid = department.address_invalid
             )
-            department.address_moved = True
-            department.save()
+        department.address_moved = True
+        department.save()
 
 
 def reverse_move_department(apps, schema_editor):
@@ -156,11 +147,8 @@ def move_union(apps, schema_editor):
     Union = apps.get_model('members', 'Union')
     Address = apps.get_model('members', 'Address')
     for union in Union.objects.filter(address_moved=False):
-        if union.dawa_id in Address.objects.values_list('dawa_id', flat=True):
-            address_obj = Address.objects.get(dawa_id=union.dawa_id)
-            union.postal_address = address_obj
-            union.address_moved = True
-            union.save()
+        if union.dawa_id in dawa_ids:
+            union.postal_address = Address.objects.get(dawa_id=union.dawa_id)
         else:
             # Address not already in Address table. Create new record
             new_address = Address.objects.create(
@@ -177,8 +165,8 @@ def move_union(apps, schema_editor):
                 dawa_id = union.dawa_id,
                 address_invalid = union.address_invalid
             )
-            union.address_moved = True
-            union.save()
+        union.address_moved = True
+        union.save()
 
 
 def reverse_move_union(apps, schema_editor):
