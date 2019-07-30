@@ -2,13 +2,11 @@
 
 from django.db import migrations
 
-dawa_ids = Address.objects.values_list('dawa_id', flat=True)
-
 def move_person(apps, schema_editor):
     Person = apps.get_model('members', 'Person')
     Address = apps.get_model('members', 'Address')
     for person in Person.objects.filter(address_moved=False):
-        if person.dawa_id in dawa_ids:
+        if person.dawa_id in Address.objects.values_list('dawa_id', flat=True):
             person.postal_address = Address.objects.get(dawa_id=person.dawa_id)
         else:
             # Address not already in Address table. Create new record
@@ -55,7 +53,7 @@ def move_activity(apps, schema_editor):
     Activity = apps.get_model('members', 'Activity')
     Address = apps.get_model('members', 'Address')
     for activity in Activity.objects.filter(address_moved=False):
-        if activity.dawa_id in dawa_ids:
+        if activity.dawa_id in Address.objects.values_list('dawa_id', flat=True):
             activity.postal_address = Address.objects.get(dawa_id=activity.dawa_id)
         else:
             # Address not already in Address table. Create new record
@@ -101,7 +99,7 @@ def move_department(apps, schema_editor):
     Department = apps.get_model('members', 'Department')
     Address = apps.get_model('members', 'Address')
     for department in Department.objects.filter(address_moved=False):
-        if department.dawa_id in dawa_ids:
+        if department.dawa_id in Address.objects.values_list('dawa_id', flat=True):
             department.postal_address = Address.objects.get(dawa_id=department.dawa_id)
         else:
             # Address not already in Address table. Create new record
@@ -147,7 +145,7 @@ def move_union(apps, schema_editor):
     Union = apps.get_model('members', 'Union')
     Address = apps.get_model('members', 'Address')
     for union in Union.objects.filter(address_moved=False):
-        if union.dawa_id in dawa_ids:
+        if union.dawa_id in Address.objects.values_list('dawa_id', flat=True):
             union.postal_address = Address.objects.get(dawa_id=union.dawa_id)
         else:
             # Address not already in Address table. Create new record
