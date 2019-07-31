@@ -14,12 +14,12 @@ class Address(models.Model):
     class Meta:
         verbose_name = "Adresse"
         verbose_name_plural = "Adresser"
-    streetname = models.CharField("Vejnavn", max_length=200, blank=True)
-    housenumber = models.CharField("Husnummer", max_length=5, blank=True)
+    streetname = models.CharField("Vejnavn", max_length=200)
+    housenumber = models.CharField("Husnummer", max_length=5)
     floor = models.CharField("Etage", max_length=10, blank=True)
     door = models.CharField("Dør", max_length=5, blank=True)
-    city = models.CharField("By", max_length=200, blank=True)
-    zipcode = models.CharField("Postnummer", max_length=4, blank=True)
+    city = models.CharField("By", max_length=200)
+    zipcode = models.CharField("Postnummer", max_length=4)
     municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
     placename = models.CharField("Stednavn", max_length=200, blank=True)
     longitude = models.DecimalField(
@@ -29,7 +29,6 @@ class Address(models.Model):
         "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
-    address_invalid = models.BooleanField("Ugyldig adresse", default=False)
 
     def __str__(self):
         return format_address(self.streetname, self.housenumber, self.floor, self.door)
@@ -44,45 +43,33 @@ class Address(models.Model):
             or self.longitude is None
             or self.municipality is None
         ):
-            addressID = 0
-            dist = 0
-            req = "https://dawa.aws.dk/datavask/adresser?betegnelse="
-            req += quote_plus(self.addressWithZip())
             try:
-                washed = json.loads(requests.get(req).text)
-                addressID = washed["resultater"][0]["adresse"]["id"]
-                dist = washed["resultater"][0]["vaskeresultat"]["afstand"]
+                address = self.addressWithZip()
+                response = requests.request("GET", "https://dawa.aws.dk/datavask/adresser", data="", params={"betegnelse": address})
+                payload = json.loads(response.content)
             except Exception as error:
-                logger.error("Couldn't find addressID for " + self.name)
+                logger.error("Couldn't find dawa_id for " + self.name)
                 logger.error("Error " + str(error))
-            if addressID != 0 and dist < 10:
-                try:
-                    req = (
-                        "https://dawa.aws.dk/adresser/" + addressID + "?format=geojson"
-                    )
-                    address = json.loads(requests.get(req).text)
-                    if address["properties"]["etage"] is None:
-                        address["properties"]["etage"] = ""
-                    if address["properties"]["dør"] is None:
-                        address["properties"]["dør"] = ""
-                    if address["properties"]["supplerendebynavn"] is None:
-                        address["properties"]["supplerendebynavn"] = ""
-                    self.zipcode = address["properties"]["postnr"]
-                    self.city = address["properties"]["postnrnavn"]
-                    self.streetname = address["properties"]["vejnavn"]
-                    self.housenumber = address["properties"]["husnr"]
-                    self.floor = address["properties"]["etage"]
-                    self.door = address["properties"]["dør"]
-                    self.placename = address["properties"]["supplerendebynavn"]
-                    self.latitude = address["geometry"]["coordinates"][1]
-                    self.longitude = address["geometry"]["coordinates"][0]
-                    self.municipality = address["properties"]["kommunenavn"]
-                    self.dawa_id = address["properties"]["id"]
-                    self.save()
-                except Exception as error:
-                    logger.error("Couldn't find coordinates for " + self.name)
-                    logger.error("Error " + str(error))
-                    return None
-            else:
-                self.address_invalid = True
-                self.save()
+                return None
+            # A and B means a match
+            if payload['kategori'] < 'C':
+                match = payload['resultater'][0]['aktueladresse']
+                self.zipcode = match["postnr"]
+                self.city = match["postnrnavn"]
+                self.streetname = match["vejnavn"]
+                self.housenumber = match["husnr"]
+                self.floor = match["etage"]
+                self.door = match["dør"]
+                self.dawa_id = match["adgangsadresseid"]
+            try:
+                response = requests.request("GET", "https://dawa.aws.dk/adresser/" + match["adgangsadresseid"] + "?format=geojson")
+                addressPayload = json.loads(response.content)
+            except Exception as error:
+                logger.error("Couldn't find coordinates for " + self.name)
+                logger.error("Error " + str(error))
+            addressMatch = addressPayload
+            self.placename = addressPayload["properties"]["supplerendebynavn"]
+            self.latitude = addressPayload["geometry"]["coordinates"][1]
+            self.longitude = addressPayload["geometry"]["coordinates"][0]
+            self.municipality = addressPayload["properties"]["kommunenavn"]
+            self.save()

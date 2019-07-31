@@ -45,6 +45,7 @@ class Department(models.Model):
         null=False,
         on_delete=models.PROTECT,
     )
+    municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
@@ -128,6 +129,7 @@ class Department(models.Model):
                     address = json.loads(requests.get(req).text)
                     self.longitude = address["geometry"]["coordinates"][0]
                     self.latitude = address["geometry"]["coordinates"][1]
+                    self.dawa_id = address['properties']['id']
                     self.save()
                     print("Opdateret for " + self.name)
                     print("Updated coordinates for " + self.name)

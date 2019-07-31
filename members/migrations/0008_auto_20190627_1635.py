@@ -5,25 +5,39 @@ from django.db import migrations
 def move_person(apps, schema_editor):
     Person = apps.get_model('members', 'Person')
     Address = apps.get_model('members', 'Address')
+    dawa_ids = Address.objects.values_list('dawa_id', flat=True)
     for person in Person.objects.filter(address_moved=False):
-        if person.dawa_id in Address.objects.values_list('dawa_id', flat=True):
+        if person.dawa_id in dawa_ids:
             person.postal_address = Address.objects.get(dawa_id=person.dawa_id)
         else:
-            # Address not already in Address table. Create new record
-            new_address = Address.objects.create(
-                streetname = person.streetname,
-                housenumber = person.housenumber,
-                floor = person.floor,
-                door = person.door,
-                city = person.city,
-                zipcode = person.zipcode,
-                municipality = person.municipality,
-                placename = person.placename,
-                longitude = person.longitude,
-                latitude = person.latitude,
-                dawa_id = person.dawa_id,
-                address_invalid = person.address_invalid
-            )
+            if person.address_invalid:
+                person.streetname = ""
+                person.housenumber = ""
+                person.floor = ""
+                person.door = ""
+                person.city = ""
+                person.zipcode = ""
+                person.municipality = ""
+                person.placename = ""
+                person.longitude = ""
+                person.latitude = ""
+                person.dawa_id = ""
+                person.save()
+            else:
+                # Address not already in Address table. Create new record
+                new_address = Address.objects.create(
+                    streetname = person.streetname,
+                    housenumber = person.housenumber,
+                    floor = person.floor,
+                    door = person.door,
+                    city = person.city,
+                    zipcode = person.zipcode,
+                    municipality = person.municipality,
+                    placename = person.placename,
+                    longitude = person.longitude,
+                    latitude = person.latitude,
+                    dawa_id = person.dawa_id,
+                )
         person.address_moved = True
         person.save()
 
@@ -52,8 +66,9 @@ def reverse_move_person(apps, schema_editor):
 def move_activity(apps, schema_editor):
     Activity = apps.get_model('members', 'Activity')
     Address = apps.get_model('members', 'Address')
+    dawa_ids = Address.objects.values_list('dawa_id', flat=True)
     for activity in Activity.objects.filter(address_moved=False):
-        if activity.dawa_id in Address.objects.values_list('dawa_id', flat=True):
+        if activity.dawa_id in dawa_ids:
             activity.postal_address = Address.objects.get(dawa_id=activity.dawa_id)
         else:
             # Address not already in Address table. Create new record
@@ -69,7 +84,6 @@ def move_activity(apps, schema_editor):
                 longitude = activity.longitude,
                 latitude = activity.latitude,
                 dawa_id = activity.dawa_id,
-                address_invalid = activity.address_invalid
             )
         activity.address_moved = True
         activity.save()
@@ -98,8 +112,9 @@ def reverse_move_activity(apps, schema_editor):
 def move_department(apps, schema_editor):
     Department = apps.get_model('members', 'Department')
     Address = apps.get_model('members', 'Address')
+    dawa_ids = Address.objects.values_list('dawa_id', flat=True)
     for department in Department.objects.filter(address_moved=False):
-        if department.dawa_id in Address.objects.values_list('dawa_id', flat=True):
+        if department.dawa_id in dawa_ids:
             department.postal_address = Address.objects.get(dawa_id=department.dawa_id)
         else:
             # Address not already in Address table. Create new record
@@ -115,7 +130,6 @@ def move_department(apps, schema_editor):
                 longitude = department.longitude,
                 latitude = department.latitude,
                 dawa_id = department.dawa_id,
-                address_invalid = department.address_invalid
             )
         department.address_moved = True
         department.save()
@@ -144,9 +158,10 @@ def reverse_move_department(apps, schema_editor):
 def move_union(apps, schema_editor):
     Union = apps.get_model('members', 'Union')
     Address = apps.get_model('members', 'Address')
+    streetnames = Address.objects.values_list('streetname', flat=True)
     for union in Union.objects.filter(address_moved=False):
-        if union.dawa_id in Address.objects.values_list('dawa_id', flat=True):
-            union.postal_address = Address.objects.get(dawa_id=union.dawa_id)
+        if union.streetname in streetnames:
+            union.postal_address = Address.objects.get(streetname=union.streetname)
         else:
             # Address not already in Address table. Create new record
             new_address = Address.objects.create(
@@ -156,12 +171,7 @@ def move_union(apps, schema_editor):
                 door = union.door,
                 city = union.city,
                 zipcode = union.zipcode,
-                municipality = union.municipality,
                 placename = union.placename,
-                longitude = union.longitude,
-                latitude = union.latitude,
-                dawa_id = union.dawa_id,
-                address_invalid = union.address_invalid
             )
         union.address_moved = True
         union.save()
@@ -178,12 +188,7 @@ def reverse_move_union(apps, schema_editor):
             union.door = address.door,
             union.city = address.city,
             union.zipcode = address.zipcode,
-            union.municipality = address.municipality,
             union.placename = address.placename,
-            union.longitude = address.longitude,
-            union.latitude = address.latitude,
-            union.dawa_id = address.dawa_id,
-            union.address_invalid = address.address_invalid
             union.address_moved = False
             union.save()
 
@@ -191,7 +196,7 @@ def reverse_move_union(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0006_auto_20190627_1635'),
+        ('members', '0007_auto_20190731_0904'),
     ]
 
     operations = [

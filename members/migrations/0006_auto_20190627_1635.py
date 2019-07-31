@@ -16,6 +16,11 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, max_length=200, verbose_name='Stednavn'),
         ),
         migrations.AddField(
+            model_name='department',
+            name='municipality',
+            field=models.CharField(blank=True, null=True, max_length=100, verbose_name='Kommune')
+        ),
+        migrations.AddField(
             model_name='person',
             name='address_moved',
             field=models.BooleanField(default=False, verbose_name='Adresse flyttet'),
