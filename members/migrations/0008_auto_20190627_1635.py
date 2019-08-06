@@ -22,7 +22,6 @@ def move_person(apps, schema_editor):
                 person.longitude = ""
                 person.latitude = ""
                 person.dawa_id = ""
-                person.save()
             else:
                 # Address not already in Address table. Create new record
                 new_address = Address.objects.create(
@@ -38,6 +37,7 @@ def move_person(apps, schema_editor):
                     latitude = person.latitude,
                     dawa_id = person.dawa_id,
                 )
+                dawa_ids.append(person.dawa_id)
         person.address_moved = True
         person.save()
 
@@ -85,6 +85,7 @@ def move_activity(apps, schema_editor):
                 latitude = activity.latitude,
                 dawa_id = activity.dawa_id,
             )
+            dawa_ids.append(activity.dawa_id)
         activity.address_moved = True
         activity.save()
 
@@ -131,6 +132,7 @@ def move_department(apps, schema_editor):
                 latitude = department.latitude,
                 dawa_id = department.dawa_id,
             )
+            dawa_ids.append(department.dawa_id)
         department.address_moved = True
         department.save()
 
@@ -173,6 +175,7 @@ def move_union(apps, schema_editor):
                 zipcode = union.zipcode,
                 placename = union.placename,
             )
+            dawa_ids.append(union.dawa_id)
         union.address_moved = True
         union.save()
 
