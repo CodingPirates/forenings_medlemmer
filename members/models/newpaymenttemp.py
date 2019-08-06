@@ -19,35 +19,19 @@ class NewPaymentTemp(models.Model):
         (REFUND, "Refunderet"),
         (OTHER, "Andet"),
     )
-    NEW = "NE"
-    CANCELLED = "CA"
-    REFUNDED = "RE"
-    STATUSES = (
-        (NEW, "Ny transaktion"),
-        (CANCELLED, "Annulleret"),
-        (REFUNDED, "Refunderet"),
-    )
     old_pk = models.IntegerField("Gammel primær nøgle", blank=True, null=True)
     added = models.DateTimeField("Tilføjet", default=timezone.now)
     payment_type = models.CharField(
         "Type",
-        blank=False,
-        null=False,
         max_length=2,
         choices=PAYMENT_METHODS,
         default=CASH,
-    )
-    activity = models.ForeignKey(
-        "Activity", blank=True, null=True, on_delete=models.PROTECT
     )
     activityparticipant = models.ForeignKey(
         "ActivityParticipant", blank=True, null=True, on_delete=models.PROTECT
     )  # unlink if failed and new try is made
     person = models.ForeignKey(
         "Person", blank=True, null=True, on_delete=models.PROTECT
-    )
-    family = models.ForeignKey(
-        "Family", blank=False, null=False, on_delete=models.PROTECT
     )
     body_text = models.TextField("Beskrivelse", blank=False)
     amount_ore = models.IntegerField(
@@ -59,8 +43,12 @@ class NewPaymentTemp(models.Model):
     status = models.CharField(
         "Status",
         max_length=2,
-        choices=STATUSES,
         default=NEW,
+        choices=(
+                ("NEW", "Ny transaktion"),
+                ("CANCELLED", "Annulleret"),
+                ("REFUNDED", "Refunderet"),
+        ),
     )
     rejected_dtm = models.DateTimeField(
         "Afvist", blank=True, null=True
