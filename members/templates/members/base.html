@@ -12,10 +12,11 @@
       {% load bootstrap4 %}
       {% bootstrap_css %}
       {% bootstrap_javascript %}
+      <link rel="stylesheet" type ="text/css" href="{% static "members/css/application.css" %}"/>
       <link rel="stylesheet" type ="text/css" href="{% static "members/css/login.css" %}"/>
       <link rel="stylesheet" type ="text/css" href="{% static "members/css/base.css" %}"/>
       <link rel="stylesheet" type ="text/css" href="{% static "members/css/menu.css" %}"/>
-      {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" in request.path %}
+      {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
         {% load crispy_forms_tags %}
         <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
         <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
@@ -82,6 +83,15 @@
               {% else %}
                 <li class="nav-item">
                   <a class="nav-link" href="/family/">Familie</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/family/waitinglist">Ventelister</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/family/">Afdelinger</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/activities">Arrangementer</a>
                 </li>
               {% endif %}
             </ul>

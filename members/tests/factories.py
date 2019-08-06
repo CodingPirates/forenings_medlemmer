@@ -32,8 +32,14 @@ from members.models.equipmentloan import EquipmentLoan
 
 
 class CodingPiratesProvider(BaseProvider):
-    activity_types = ["Hackathon", "Gamejam", "Børne IT-konference", "Summercamp",
-                      "Forårssæson", "Efterårssæson"]
+    activity_types = [
+        "Hackathon",
+        "Gamejam",
+        "Børne IT-konference",
+        "Summercamp",
+        "Forårssæson",
+        "Efterårssæson",
+    ]
 
     def activity_type(self):
         """ Formatter for generating random activity types
@@ -51,10 +57,24 @@ class DanishProvider(BaseProvider):
     """
     Custom faker provider for Danish addresses.
     """
-    floor_formats = ["", "Stuen", "1. sal", "1", "1.", "2.",
-                     "0", "0.", "4.", "kl", "st", "kælder", "k2"]
 
-    door_formats = ["", "410", "th", "tv", "mf", "v28"] #, "værelse 17"]
+    floor_formats = [
+        "",
+        "Stuen",
+        "1. sal",
+        "1",
+        "1.",
+        "2.",
+        "0",
+        "0.",
+        "4.",
+        "kl",
+        "st",
+        "kælder",
+        "k2",
+    ]
+
+    door_formats = ["", "410", "th", "tv", "mf", "v28"]  # , "værelse 17"]
 
     city_suffixes = ["rød", "havn", "borg", "by", "bjerg", "ssund", "sværk", "ning"]
     street_suffixes = ["Vej", "Gade", "Vangen", "Stræde", "Plads"]
@@ -69,11 +89,10 @@ class DanishProvider(BaseProvider):
         """
         return random.choice(self.door_formats)
 
-
     def zipcode(self):
         """ Formatter for generating door names in danish
         """
-        return str(random.randint(1000,9999))
+        return str(random.randint(1000, 9999))
 
     def city_suffix(self):
         """
@@ -121,9 +140,9 @@ def datetime_after(dt):
     datetime.
     """
     END_OF_TIME = date.today() + timedelta(days=60 * 365)
-    return Faker("date_time_between", tzinfo=TIMEZONE,
-                 start_date=dt,
-                 end_date=END_OF_TIME).generate({})
+    return Faker(
+        "date_time_between", tzinfo=TIMEZONE, start_date=dt, end_date=END_OF_TIME
+    ).generate({})
 
 
 class ZipcodeRegionFactory(DjangoModelFactory):
@@ -144,8 +163,10 @@ class FamilyFactory(DjangoModelFactory):
         model = Family
 
     unique = Faker("uuid4")
-    #email = Faker("email")
-    email = factory.Sequence(lambda n: 'family{0}@example.com'.format(n)) #Faker("email")
+    # email = Faker("email")
+    email = factory.Sequence(
+        lambda n: "family{0}@example.com".format(n)
+    )  # Faker("email")
     # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
@@ -176,7 +197,9 @@ class PersonFactory(DjangoModelFactory):
     longitude = Faker("longitude")
     latitude = Faker("latitude")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    email = factory.Sequence(lambda n: 'person{0}@example.com'.format(n)) #Faker("email")
+    email = factory.Sequence(
+        lambda n: "person{0}@example.com".format(n)
+    )  # Faker("email")
     phone = Faker("phone_number")
     gender = FuzzyChoice(Person.MEMBER_GENDER_CHOICES)
     birthday = Faker("date")
@@ -185,9 +208,9 @@ class PersonFactory(DjangoModelFactory):
     notes = Faker("text")
     # added = Faker("date_time", tzinfo=TIMEZONE)
     # deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    user = SubFactory(UserFactory,
-                      username=SelfAttribute('..email'),
-                      email=SelfAttribute('..email'))
+    user = SubFactory(
+        UserFactory, username=SelfAttribute("..email"), email=SelfAttribute("..email")
+    )
     address_invalid = Faker("boolean")
 
 
@@ -258,6 +281,7 @@ class MemberFactory(DjangoModelFactory):
     # is_active = Faker("boolean")
     member_since = Faker("date_time", tzinfo=TIMEZONE)
     # member_until = LazyAttribute(lambda m: None if m.is_active else datetime_after(m.member_since))
+
 
 class VolunteerFactory(DjangoModelFactory):
     class Meta:

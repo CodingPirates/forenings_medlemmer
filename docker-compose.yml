@@ -25,6 +25,8 @@ services:
       - FORCE_HTTPS=$FORCE_HTTPS
       - EMAIL_URL=$EMAIL_URL
       - ADMINS=$ADMINS
+      - SENTRY_DSN=$SENTRY_DSN
+      - MODE=$MODE
 
   database:
     image: postgres:11.2-alpine

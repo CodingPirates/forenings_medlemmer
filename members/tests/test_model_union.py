@@ -5,7 +5,6 @@ from members.tests.factories import UnionFactory
 
 
 class TestModelUnion(TestCase):
-
     def test_defaults_to_having_an_account_at_main_org(self):
         union = UnionFactory()
         self.assertTrue(union.bank_main_org)
