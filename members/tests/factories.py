@@ -29,6 +29,7 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.notification import Notification
 from members.models.equipment import Equipment
 from members.models.equipmentloan import EquipmentLoan
+from members.models.address import Address
 
 
 class CodingPiratesProvider(BaseProvider):
@@ -377,6 +378,23 @@ class PaymentFactory(DjangoModelFactory):
     refunded_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_message = Faker("text")
+
+
+class AddressFactory(DjangoModelFactory):
+    class Meta:
+        model = Address
+
+    streetname = Faker("street_name")
+    housenumber = Faker("building_number")
+    floor = Faker("floor")
+    door = Faker("door")
+    city = Faker("city")
+    zipcode = Faker("zipcode")
+    municipality = Faker("municipality")
+    placename = Faker("city_suffix")
+    longitude = Faker("longitude")
+    latitude = Faker("latitude")
+    dawa_id = Faker("uuid4")
 
 
 class AdminUserInformationFactory(DjangoModelFactory):
