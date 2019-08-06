@@ -72,6 +72,37 @@ def convert_payments(apps, schema_editor):
 def reverse_convert_payments(apps, schema_editor):
     Payment = apps.get_model("members", "Payment")
     tempPay = apps.get_model("members", "NewPaymentTemp")
+    for temppayment in tempPay.objects.all():
+        # Reverse way
+        # Identify what type it is
+        # If it's NEW, then create payment with old pk
+        # If it's REFUNDED or CANCELLED set refunded_dtm
+        # or cancelled_dtm on the payment with the correct pk.
+        if temppayment.status == NEW:
+            new_pay = Payment.objects.create(
+                pk = temppayment.old_pk,
+                added = temppayment.added,
+                payment_type = temppayment.payment_type,
+                activity = temppayment.activity,
+                activityparticipant = temppayment.activityparticipant,
+                person = temppayment.person,
+                family = temppayment.family,
+                body_text = temppayment.body_text,
+                amount_ore = temppayment.amount_ore,
+                confirmed_dtm = temppayment.confirmed_dtm,
+                cancelled_dtm = None,
+                refunded_dtm = None,
+                rejected_dtm = temppayment.rejected_dtm,
+                rejected_message = temppayment.rejected_message,
+            )
+        elif temppayment.status == REFUNDED:
+            refund_trans = Payment.objects.get(pk=temppayment.old_pk)
+            refund_trans.refunded_dtm = temppayment.confirmed_dtm
+            refund_trans.save()
+        elif temppayment.status == CANCELLED:
+            cancel_trans = Payment.objects.get(pk=temppayment.old_pk)
+            cancel_trans.cancelled_dtm = temppayment.confirmed_dtm
+            cancel_trans.save()
 
 class Migration(migrations.Migration):
 
