@@ -25,7 +25,7 @@ def convert_payments(apps, schema_editor):
             body_text = pay.body_text,
             amount_ore = pay.amount_ore,
             confirmed_dtm = pay.confirmed_dtm,
-            status = NEW,
+            status = "NEW",
             rejected_dtm = pay.rejected_dtm,
             rejected_message = pay.rejected_message,
         )
@@ -43,7 +43,7 @@ def convert_payments(apps, schema_editor):
                 body_text = pay.body_text,
                 amount_ore = (pay.amount_ore*-1),
                 confirmed_dtm = pay.refunded_dtm,
-                status = REFUNDED,
+                status = "REFUNDED",
                 rejected_dtm = pay.rejected_dtm,
                 rejected_message = pay.rejected_message,
             )
@@ -64,7 +64,7 @@ def convert_payments(apps, schema_editor):
                     body_text = pay.body_text,
                     amount_ore = (pay.amount_ore*-1),
                     confirmed_dtm = pay.cancelled_dtm,
-                    status = CANCELLED,
+                    status = "CANCELLED",
                     rejected_dtm = pay.rejected_dtm,
                     rejected_message = pay.rejected_message,
                 )
@@ -78,7 +78,7 @@ def reverse_convert_payments(apps, schema_editor):
         # If it's NEW, then create payment with old pk
         # If it's REFUNDED or CANCELLED set refunded_dtm
         # or cancelled_dtm on the payment with the correct pk.
-        if temppayment.status == NEW:
+        if temppayment.status == "NEW":
             new_pay = Payment.objects.create(
                 pk = temppayment.old_pk,
                 added = temppayment.added,
@@ -95,11 +95,11 @@ def reverse_convert_payments(apps, schema_editor):
                 rejected_dtm = temppayment.rejected_dtm,
                 rejected_message = temppayment.rejected_message,
             )
-        elif temppayment.status == REFUNDED:
+        elif temppayment.status == "REFUNDED":
             refund_trans = Payment.objects.get(pk=temppayment.old_pk)
             refund_trans.refunded_dtm = temppayment.confirmed_dtm
             refund_trans.save()
-        elif temppayment.status == CANCELLED:
+        elif temppayment.status == "CANCELLED":
             cancel_trans = Payment.objects.get(pk=temppayment.old_pk)
             cancel_trans.cancelled_dtm = temppayment.confirmed_dtm
             cancel_trans.save()

@@ -43,11 +43,11 @@ class NewPaymentTemp(models.Model):
     status = models.CharField(
         "Status",
         max_length=9,
-        default=NEW,
+        default="NEW",
         choices=(
-                (NEW, "Ny transaktion"),
-                (CANCELLED, "Annulleret"),
-                (REFUNDED, "Refunderet"),
+                ("NEW", "Ny transaktion"),
+                ("CANCELLED", "Annulleret"),
+                ("REFUNDED", "Refunderet"),
         ),
     )
     rejected_dtm = models.DateTimeField(
