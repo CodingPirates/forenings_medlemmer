@@ -13,6 +13,18 @@ def convert_payments(apps, schema_editor):
         # If it is, we need to create another transaction for that. Before starting
         # we always note the original primary key in the old_pk field so we can
         # adjust quickpays id's afterwards
+        # In all cases create transaction
+        
+        if pay.refunded_dtm is not None:
+            # Transaction is refunded
+            # Create refund transaction
+            echo "Test"
+
+        if pay.cancelled_dtm is not None:
+            # Transaction has been cancelled.
+            # Check it has not been refunded.
+            # If it has not been refunded, create cancel transaction.
+            echo "Testing"
 
 def reverse_convert_payments(apps, schema_editor):
     Payment = apps.get_model("members", "Payment")
