@@ -14,17 +14,60 @@ def convert_payments(apps, schema_editor):
         # we always note the original primary key in the old_pk field so we can
         # adjust quickpays id's afterwards
         # In all cases create transaction
-        
+        new_pay = tempPay.objects.create(
+            old_pk = pay.pk,
+            added = pay.added,
+            payment_type = pay.payment_type,
+            activity = pay.activity,
+            activityparticipant = pay.activityparticipant,
+            person = pay.person,
+            family = pay.family,
+            body_text = pay.body_text,
+            amount_ore = pay.amount_ore,
+            confirmed_dtm = pay.confirmed_dtm,
+            status = NEW,
+            rejected_dtm = pay.rejected_dtm,
+            rejected_message = pay.rejected_message,
+        )
         if pay.refunded_dtm is not None:
             # Transaction is refunded
             # Create refund transaction
-            echo "Test"
+            new_refund = tempPay.objects.create(
+                old_pk = pay.pk,
+                added = pay.refunded_dtm,
+                payment_type = pay.payment_type,
+                activity = pay.activity,
+                activityparticipant = pay.activityparticipant,
+                person = pay.person,
+                family = pay.family,
+                body_text = pay.body_text,
+                amount_ore = (pay.amount_ore*-1),
+                confirmed_dtm = pay.refunded_dtm,
+                status = REFUNDED,
+                rejected_dtm = pay.rejected_dtm,
+                rejected_message = pay.rejected_message,
+            )
 
         if pay.cancelled_dtm is not None:
             # Transaction has been cancelled.
             # Check it has not been refunded.
             # If it has not been refunded, create cancel transaction.
-            echo "Testing"
+            if pay.refunded_dtm is None:
+                new_cancel = tempPay.objects.create(
+                    old_pk = pay.pk,
+                    added = pay.cancelled_dtm,
+                    payment_type = pay.payment_type,
+                    activity = pay.activity,
+                    activityparticipant = pay.activityparticipant,
+                    person = pay.person,
+                    family = pay.family,
+                    body_text = pay.body_text,
+                    amount_ore = (pay.amount_ore*-1),
+                    confirmed_dtm = pay.cancelled_dtm,
+                    status = CANCELLED,
+                    rejected_dtm = pay.rejected_dtm,
+                    rejected_message = pay.rejected_message,
+                )
 
 def reverse_convert_payments(apps, schema_editor):
     Payment = apps.get_model("members", "Payment")
