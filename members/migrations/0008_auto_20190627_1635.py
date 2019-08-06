@@ -126,7 +126,7 @@ def move_department(apps, schema_editor):
                 door = department.door,
                 city = department.city,
                 zipcode = department.zipcode,
-                municipality = department.municipality,
+                municipality = None,
                 placename = department.placename,
                 longitude = department.longitude,
                 latitude = department.latitude,

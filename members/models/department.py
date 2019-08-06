@@ -45,7 +45,6 @@ class Department(models.Model):
         null=False,
         on_delete=models.PROTECT,
     )
-    municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
