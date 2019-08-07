@@ -62,12 +62,14 @@ class Address(models.Model):
                 self.door = match["dør"]
                 self.dawa_id = match["adgangsadresseid"]
             try:
-                response = requests.request("GET", "https://dawa.aws.dk/adresser/" + match["adgangsadresseid"] + "?format=geojson")
-                addressPayload = json.loads(response.content)
+                req = (
+                    "https://dawa.aws.dk/adresser/" + match["adgangsadresseid"] + "?format=geojson"
+                )
+                addressPayload = json.loads(requests.get(req).text)
             except Exception as error:
                 logger.error("Couldn't find coordinates for " + self.name)
                 logger.error("Error " + str(error))
-            #self.placename = addressPayload["properties"]["supplerendebynavn"]
+            self.placename = addressPayload["properties"]["supplerendebynavn"]
             self.latitude = addressPayload["geometry"]["coordinates"][1]
             self.longitude = addressPayload["geometry"]["coordinates"][0]
             self.municipality = addressPayload["properties"]["kommunenavn"]
