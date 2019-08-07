@@ -21,7 +21,7 @@ class TestModelAddress(TestCase):
 
     def test_string_address(self):
         address = AddressFactory()
-        self.assertEqual(format_address(self.streetname, self.housenumber, self.floor, self.door), str(address))
+        self.assertEqual(format_address(address.streetname, address.housenumber, address.floor, address.door), str(address))
 
     def test_get_address_with_zip(self):
         address = AddressFactory()
@@ -46,10 +46,10 @@ class TestModelAddress(TestCase):
 
     def test_update_dawa_data(self):
         self.address.update_dawa_data()
-        self.latLon = "(" + self.address.latitude + ", " + self.address.longitude + ")"
+        latLon = "(" + self.address.latitude + ", " + self.address.longitude + ")"
         self.assertLess(
             self.util_calc_distance(
-                self.latLon, (55.67680271, 12.57994743)
+                latLon, (55.67680271, 12.57994743)
             ),
             1.0,  # Calculated distance from the returned value and the expected value can be no more than 1 km
         )
