@@ -67,8 +67,7 @@ class Address(models.Model):
             except Exception as error:
                 logger.error("Couldn't find coordinates for " + self.name)
                 logger.error("Error " + str(error))
-            addressMatch = addressPayload
-            self.placename = addressPayload["properties"]["supplerendebynavn"]
+            #self.placename = addressPayload["properties"]["supplerendebynavn"]
             self.latitude = addressPayload["geometry"]["coordinates"][1]
             self.longitude = addressPayload["geometry"]["coordinates"][0]
             self.municipality = addressPayload["properties"]["kommunenavn"]
