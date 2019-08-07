@@ -17,7 +17,7 @@ class TestModelAddress(TestCase):
 
     def test_get_housenumber(self):
         address = AddressFactory()
-        self.assertEqual(int(address.housenumber))
+        self.assertEqual(int(address.housenumber), address.housenumber)
 
     def test_string_address(self):
         address = AddressFactory()
