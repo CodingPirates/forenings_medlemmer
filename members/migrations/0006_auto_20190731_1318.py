@@ -4,6 +4,9 @@
 
 from django.db import migrations
 
+# This is a copy of the payment table. The thought is that we make sure to
+# change all relevant code so it use the new database and make a migration where
+# we delete the old database and change this tables name to Payment
 
 def convert_payments(apps, schema_editor):
     Payment = apps.get_model("members", "Payment")
@@ -18,10 +21,7 @@ def convert_payments(apps, schema_editor):
             old_pk = pay.pk,
             added = pay.added,
             payment_type = pay.payment_type,
-            activity = pay.activity,
-            activityparticipant = pay.activityparticipant,
             person = pay.person,
-            family = pay.family,
             body_text = pay.body_text,
             amount_ore = pay.amount_ore,
             confirmed_dtm = pay.confirmed_dtm,
@@ -36,10 +36,7 @@ def convert_payments(apps, schema_editor):
                 old_pk = pay.pk,
                 added = pay.refunded_dtm,
                 payment_type = pay.payment_type,
-                activity = pay.activity,
-                activityparticipant = pay.activityparticipant,
                 person = pay.person,
-                family = pay.family,
                 body_text = pay.body_text,
                 amount_ore = (pay.amount_ore*-1),
                 confirmed_dtm = pay.refunded_dtm,
@@ -57,10 +54,7 @@ def convert_payments(apps, schema_editor):
                     old_pk = pay.pk,
                     added = pay.cancelled_dtm,
                     payment_type = pay.payment_type,
-                    activity = pay.activity,
-                    activityparticipant = pay.activityparticipant,
                     person = pay.person,
-                    family = pay.family,
                     body_text = pay.body_text,
                     amount_ore = (pay.amount_ore*-1),
                     confirmed_dtm = pay.cancelled_dtm,
@@ -83,10 +77,8 @@ def reverse_convert_payments(apps, schema_editor):
                 pk = temppayment.old_pk,
                 added = temppayment.added,
                 payment_type = temppayment.payment_type,
-                activity = temppayment.activity,
-                activityparticipant = temppayment.activityparticipant,
                 person = temppayment.person,
-                family = temppayment.family,
+                family = temppayment.person.family,
                 body_text = temppayment.body_text,
                 amount_ore = temppayment.amount_ore,
                 confirmed_dtm = temppayment.confirmed_dtm,
@@ -105,7 +97,6 @@ def reverse_convert_payments(apps, schema_editor):
             cancel_trans.save()
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('members', '0005_auto_20190731_1407'),
     ]

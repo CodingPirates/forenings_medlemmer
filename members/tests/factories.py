@@ -29,6 +29,7 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.notification import Notification
 from members.models.equipment import Equipment
 from members.models.equipmentloan import EquipmentLoan
+from members.models.newpaymenttemp import NewPaymentTemp
 
 
 class CodingPiratesProvider(BaseProvider):
@@ -417,3 +418,16 @@ class EquipmentLoanFactory(DjangoModelFactory):
         model = EquipmentLoan
 
     # TODO
+
+class NewPaymentTempFactory(DjangoModelFactory):
+    class Meta:
+        model = NewPaymentTemp
+    added = Faker("date_time", tzinfo=TIMEZONE)
+    payment_type = FuzzyChoice(Payment.PAYMENT_METHODS)
+    person = SubFactory(PersonFactory)
+    body_text = Faker("text")
+    amount_ore = Faker("random_number")
+    confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
+    status = "NEW"
+    rejected_dtm = Faker("date_time", tzinfo=TIMEZONE)
+    rejected_message = Faker("text")

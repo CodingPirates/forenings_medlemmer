@@ -27,9 +27,6 @@ class NewPaymentTemp(models.Model):
         choices=PAYMENT_METHODS,
         default=CASH,
     )
-    activityparticipant = models.ForeignKey(
-        "ActivityParticipant", blank=True, null=True, on_delete=models.PROTECT
-    )  # unlink if failed and new try is made
     person = models.ForeignKey(
         "Person", blank=True, null=True, on_delete=models.PROTECT
     )
