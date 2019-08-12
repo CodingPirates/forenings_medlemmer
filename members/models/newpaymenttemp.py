@@ -19,7 +19,7 @@ class NewPaymentTemp(models.Model):
         (REFUND, "Refunderet"),
         (OTHER, "Andet"),
     )
-    old_pk = models.IntegerField("Gammel primær nøgle", blank=True, null=True)
+    external_id = models.IntegerField("Eksternt ID", blank=True, null=True)
     added = models.DateTimeField("Tilføjet", default=timezone.now)
     payment_type = models.CharField(
         "Type",

@@ -22,12 +22,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='newpaymenttemp',
-            name='old_pk',
-            field=models.IntegerField(blank=True, null=True, verbose_name='Gammel primær nøgle')
+            name='external_id',
+            field=models.IntegerField(blank=True, null=True, verbose_name='Eksternt ID')
         ),
         migrations.AlterField(
             model_name='newpaymenttemp',
             name='status',
-            field=models.CharField(choices=[('NE', 'Ny transaktion'), ('CA', 'Annulleret'), ('RE', 'Refunderet')], default='NE', max_length=2, verbose_name='Status'),
+            field=models.CharField(choices=[('NEW', 'Ny transaktion'), ('CANCELLED', 'Annulleret'), ('REFUNDED', 'Refunderet')], default='NEW', max_length=9, verbose_name='Status'),
         ),
     ]
