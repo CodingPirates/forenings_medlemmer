@@ -316,11 +316,10 @@ class PersonInline(admin.TabularInline):
     extra = 0
 
 
-"""class PaymentInline(admin.TabularInline):
+class PaymentInline(admin.TabularInline):
     model = Payment
     fields = ("added", "payment_type", "confirmed_dtm", "rejected_dtm", "amount_ore")
-    readonly_fields = ("family",)
-    extra = 0"""
+    extra = 0
 
 
 class VolunteerInline(admin.TabularInline):
@@ -436,10 +435,10 @@ admin.site.register(Family, FamilyAdmin)
 
 class ParticipantPaymentListFilter(admin.SimpleListFilter):
     # Title shown in filter view
-    #title = "Betaling"
+    title = "Betaling"
 
     # Parameter for the filter that will be used in the URL query.
-    #parameter_name = "payment_list"
+    parameter_name = "payment_list"
 
     def lookups(self, request, model_admin):
         """
@@ -450,15 +449,15 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        """activitys = [
+        activitys = [
             ("none", "Ikke betalt"),
             ("ok", "Betalt"),
             ("pending", "Afventende"),
             ("rejected", "Afvist"),
         ]
-        return activitys"""
+        return activitys
 
-    #def queryset(self, request, queryset):
+    def queryset(self, request, queryset):
         """
         Returns the filtered queryset based on the value
         provided in the query string and retrievable via
@@ -467,7 +466,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         # Compare the requested value (either '80s' or '90s')
         # to decide how to filter the queryset.
 
-        """if self.value() == "none":
+        if self.value() == "none":
             return queryset.filter(payment__isnull=True)
         elif self.value() == "ok":
             return queryset.filter(
@@ -480,7 +479,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         elif self.value() == "rejected":
             return queryset.filter(
                 payment__isnull=False, payment__rejected_dtm__isnull=False
-            )"""
+            )
 
 
 class ActivityParticipantListFilter(admin.SimpleListFilter):
@@ -523,7 +522,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity",
         "note",
     ]
-    #list_filter = (ActivityParticipantListFilter, ParticipantPaymentListFilter)
+    list_filter = (ActivityParticipantListFilter, ParticipantPaymentListFilter)
     list_display_links = ("member",)
     raw_id_fields = ("activity", "member")
     search_fields = ("member__person__name",)
@@ -908,7 +907,7 @@ class PersonAdmin(admin.ModelAdmin):
     raw_id_fields = ("family", "user")
 
     inlines = [
-        #PaymentInline,
+        PaymentInline,
         VolunteerInline,
         ActivityInviteInline,
         MemberInline,
