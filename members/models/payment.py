@@ -19,43 +19,37 @@ class Payment(models.Model):
         (REFUND, "Refunderet"),
         (OTHER, "Andet"),
     )
+    external_id = models.IntegerField("Eksternt ID", blank=True, null=True)
     added = models.DateTimeField("Tilføjet", default=timezone.now)
     payment_type = models.CharField(
         "Type",
-        blank=False,
-        null=False,
         max_length=2,
         choices=PAYMENT_METHODS,
         default=CASH,
     )
-    activity = models.ForeignKey(
-        "Activity", blank=True, null=True, on_delete=models.PROTECT
-    )
-    activityparticipant = models.ForeignKey(
-        "ActivityParticipant", blank=True, null=True, on_delete=models.PROTECT
-    )  # unlink if failed and new try is made
     person = models.ForeignKey(
         "Person", blank=True, null=True, on_delete=models.PROTECT
     )
-    family = models.ForeignKey(
-        "Family", blank=False, null=False, on_delete=models.PROTECT
-    )
     body_text = models.TextField("Beskrivelse", blank=False)
     amount_ore = models.IntegerField(
-        "Beløb i øre", blank=False, null=False, default=0
-    )  # payments to us is positive
+        "Beløb i øre", default=0
+    )
     confirmed_dtm = models.DateTimeField(
         "Bekræftet", blank=True, null=True
-    )  # Set when paid (and checked)
-    cancelled_dtm = models.DateTimeField(
-        "Annulleret", blank=True, null=True
-    )  # Set when transaction is cancelled
-    refunded_dtm = models.DateTimeField(
-        "Refunderet", blank=True, null=True
-    )  # Set when transaction is cancelled
+    ) # Set when transaction is confirmed
+    status = models.CharField(
+        "Status",
+        max_length=9,
+        default="NEW",
+        choices=(
+                ("NEW", "Ny transaktion"),
+                ("CANCELLED", "Annulleret"),
+                ("REFUNDED", "Refunderet"),
+        ),
+    )
     rejected_dtm = models.DateTimeField(
         "Afvist", blank=True, null=True
-    )  # Set if paiment failed
+    )
     rejected_message = models.TextField(
         "Afvist årsag", blank=True, null=True
     )  # message describing failure
@@ -75,7 +69,7 @@ class Payment(models.Model):
         return super_return
 
     def __str__(self):
-        return str(self.family.email) + " - " + self.body_text
+        return str(self.person.family.email) + " - " + self.body_text
 
     def get_quickpaytransaction(self):
         return self.quickpaytransaction_set.order_by("-payment__added")[0]

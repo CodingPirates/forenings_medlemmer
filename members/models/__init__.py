@@ -19,7 +19,6 @@ import members.models.family
 import members.models.member
 import members.models.notification
 import members.models.payment
-import members.models.newpaymenttemp
 import members.models.person
 import members.models.quickpaytransaction
 import members.models.union

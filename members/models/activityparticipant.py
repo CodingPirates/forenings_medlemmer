@@ -13,6 +13,7 @@ class ActivityParticipant(models.Model):
         verbose_name_plural = "Deltagere"
         unique_together = ("activity", "member")
 
+    payment = models.ForeignKey("Payment", on_delete=models.CASCADE, blank=True, null=True, default=None)
     added_dtm = models.DateField("Tilmeldt", default=timezone.now)
     activity = models.ForeignKey("Activity", on_delete=models.PROTECT)
     member = models.ForeignKey("Member", on_delete=models.CASCADE)

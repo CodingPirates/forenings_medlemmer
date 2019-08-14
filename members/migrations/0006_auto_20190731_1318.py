@@ -11,14 +11,15 @@ from django.db import migrations
 def convert_payments(apps, schema_editor):
     Payment = apps.get_model("members", "Payment")
     tempPay = apps.get_model("members", "NewPaymentTemp")
+    actPar = apps.get_model("members", "ActivityParticipant")
     for pay in Payment.objects.all():
         # We go through each object making sure it is not refunded or cancelled
         # If it is, we need to create another transaction for that. Before starting
-        # we always note the original primary key in the old_pk field so we can
+        # we always note the original primary key in the external_id field so we can
         # adjust quickpays id's afterwards
         # In all cases create transaction
         new_pay = tempPay.objects.create(
-            old_pk = pay.pk,
+            external_id = pay.pk,
             added = pay.added,
             payment_type = pay.payment_type,
             person = pay.person,
@@ -29,11 +30,15 @@ def convert_payments(apps, schema_editor):
             rejected_dtm = pay.rejected_dtm,
             rejected_message = pay.rejected_message,
         )
+        if pay.activityparticipant is not None:
+            act_par = actPar.objects.get(pk=pay.activityparticipant.pk)
+            act_par.payment = new_pay
+            act_par.save()
         if pay.refunded_dtm is not None:
             # Transaction is refunded
             # Create refund transaction
             new_refund = tempPay.objects.create(
-                old_pk = pay.pk,
+                external_id = pay.pk,
                 added = pay.refunded_dtm,
                 payment_type = pay.payment_type,
                 person = pay.person,
@@ -51,7 +56,7 @@ def convert_payments(apps, schema_editor):
             # If it has not been refunded, create cancel transaction.
             if pay.refunded_dtm is None:
                 new_cancel = tempPay.objects.create(
-                    old_pk = pay.pk,
+                    external_id = pay.pk,
                     added = pay.cancelled_dtm,
                     payment_type = pay.payment_type,
                     person = pay.person,
@@ -66,6 +71,7 @@ def convert_payments(apps, schema_editor):
 def reverse_convert_payments(apps, schema_editor):
     Payment = apps.get_model("members", "Payment")
     tempPay = apps.get_model("members", "NewPaymentTemp")
+    actPar = apps.get_model("members", "ActivityParticipant")
     for temppayment in tempPay.objects.all():
         # Reverse way
         # Identify what type it is
@@ -74,7 +80,7 @@ def reverse_convert_payments(apps, schema_editor):
         # or cancelled_dtm on the payment with the correct pk.
         if temppayment.status == "NEW":
             new_pay = Payment.objects.create(
-                pk = temppayment.old_pk,
+                pk = temppayment.external_id,
                 added = temppayment.added,
                 payment_type = temppayment.payment_type,
                 person = temppayment.person,
@@ -87,12 +93,18 @@ def reverse_convert_payments(apps, schema_editor):
                 rejected_dtm = temppayment.rejected_dtm,
                 rejected_message = temppayment.rejected_message,
             )
+            try:
+                act_par = actPar.objects.get(payment=temppayment)
+                act_par.payment = None
+                act_par.save()
+            except Exception:
+                pass
         elif temppayment.status == "REFUNDED":
-            refund_trans = Payment.objects.get(pk=temppayment.old_pk)
+            refund_trans = Payment.objects.get(pk=temppayment.external_id)
             refund_trans.refunded_dtm = temppayment.confirmed_dtm
             refund_trans.save()
         elif temppayment.status == "CANCELLED":
-            cancel_trans = Payment.objects.get(pk=temppayment.old_pk)
+            cancel_trans = Payment.objects.get(pk=temppayment.external_id)
             cancel_trans.cancelled_dtm = temppayment.confirmed_dtm
             cancel_trans.save()
 
