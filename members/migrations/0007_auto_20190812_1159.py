@@ -18,6 +18,12 @@ class Migration(migrations.Migration):
             new_name='Payment',
         ),
         migrations.RunSQL(
+            "CREATE SEQUENCE members_payment_id_seq;", "DROP SEQUENCE members_payment_id_seq;"
+        ),
+        migrations.RunSQL(
+            "ALTER TABLE members_payment ALTER id SET DEFAULT NEXTVAL('members_payment_id_seq');", migrations.RunSQL.noop
+        ),
+        migrations.RunSQL(
             "SELECT setval('members_payment_id_seq', (SELECT MAX(id)+1 FROM members_payment), false);", migrations.RunSQL.noop
         ),
     ]
