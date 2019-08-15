@@ -34,6 +34,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='activityparticipant',
             name='payment',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='members.NewPaymentTemp'),
+            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to='members.NewPaymentTemp'),
         ),
     ]

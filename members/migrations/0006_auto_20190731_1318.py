@@ -12,24 +12,42 @@ def convert_payments(apps, schema_editor):
     Payment = apps.get_model("members", "Payment")
     tempPay = apps.get_model("members", "NewPaymentTemp")
     actPar = apps.get_model("members", "ActivityParticipant")
+    cur_id = 1
     for pay in Payment.objects.all():
         # We go through each object making sure it is not refunded or cancelled
         # If it is, we need to create another transaction for that. Before starting
         # we always note the original primary key in the external_id field so we can
         # adjust quickpays id's afterwards
         # In all cases create transaction
-        new_pay = tempPay.objects.create(
-            external_id = pay.pk,
-            added = pay.added,
-            payment_type = pay.payment_type,
-            person = pay.person,
-            body_text = pay.body_text,
-            amount_ore = pay.amount_ore,
-            confirmed_dtm = pay.confirmed_dtm,
-            status = "NEW",
-            rejected_dtm = pay.rejected_dtm,
-            rejected_message = pay.rejected_message,
-        )
+        if pay.pk > cur_id:
+            new_pay = tempPay.objects.create(
+                pk = pay.pk,
+                external_id = pay.pk,
+                added = pay.added,
+                payment_type = pay.payment_type,
+                person = pay.person,
+                body_text = pay.body_text,
+                amount_ore = pay.amount_ore,
+                confirmed_dtm = pay.confirmed_dtm,
+                status = "NEW",
+                rejected_dtm = pay.rejected_dtm,
+                rejected_message = pay.rejected_message,
+            )
+            cur_id = pay.pk
+        else:
+            new_pay = tempPay.objects.create(
+                external_id = pay.pk,
+                added = pay.added,
+                payment_type = pay.payment_type,
+                person = pay.person,
+                body_text = pay.body_text,
+                amount_ore = pay.amount_ore,
+                confirmed_dtm = pay.confirmed_dtm,
+                status = "NEW",
+                rejected_dtm = pay.rejected_dtm,
+                rejected_message = pay.rejected_message,
+            )
+            cur_id += 1
         if pay.activityparticipant is not None:
             act_par = actPar.objects.get(pk=pay.activityparticipant.pk)
             act_par.payment = new_pay

@@ -1254,6 +1254,7 @@ class PaymentAdmin(admin.ModelAdmin):
         "added",
         "payment_type",
         "amount_ore",
+        "status",
         "confirmed_dtm",
         "rejected_dtm",
     ]

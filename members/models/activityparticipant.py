@@ -13,7 +13,7 @@ class ActivityParticipant(models.Model):
         verbose_name_plural = "Deltagere"
         unique_together = ("activity", "member")
 
-    payment = models.ForeignKey("Payment", on_delete=models.CASCADE, blank=True, null=True, default=None)
+    payment = models.ForeignKey("Payment", on_delete=models.PROTECT, blank=True, null=True, default=None)
     added_dtm = models.DateField("Tilmeldt", default=timezone.now)
     activity = models.ForeignKey("Activity", on_delete=models.PROTECT)
     member = models.ForeignKey("Member", on_delete=models.CASCADE)
@@ -39,14 +39,10 @@ class ActivityParticipant(models.Model):
 
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
-        return not members.models.payment.Payment.objects.filter(
-            activityparticipant=self, confirmed_dtm=None
-        )
+        return not self.payment.filter(confirmed_dtm=None, status="NEW")
 
     def get_payment_link(self):
-        payment = members.models.payment.Payment.objects.get(
-            activityparticipant=self, confirmed_dtm=None
-        )
+        payment = self.payment.filter(confirmed_dtm=None, status="NEW")
         if payment.payment_type == members.models.payment.Payment.CREDITCARD:
             return payment.get_quickpaytransaction().get_link_url()
         else:

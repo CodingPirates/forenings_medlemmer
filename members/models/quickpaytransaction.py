@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 from quickpay_api_client import QPClient
 from django.urls import reverse
+import members.models.activityparticipant
 
 
 class QuickpayTransaction(models.Model):
@@ -29,7 +30,7 @@ class QuickpayTransaction(models.Model):
                 prefix = "test"
             else:
                 prefix = "prod"
-            self.order_id = prefix + "%06d" % self.payment.pk
+            self.order_id = prefix + "%08d" % self.payment.pk
         return super(QuickpayTransaction, self).save(*args, **kwargs)
 
     # method requests payment URL from Quickpay.
@@ -39,24 +40,28 @@ class QuickpayTransaction(models.Model):
             # request only if not already requested
             client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
 
-            parent = self.payment.family.get_first_parent()
+            parent = self.payment.person.family.get_first_parent()
 
             address = {
                 "name": parent.name,
                 "street": parent.address(),
                 "city": parent.city,
                 "zip_code": parent.zipcode,
-                "att": self.payment.family.email,
+                "att": self.payment.person.family.email,
                 "country_code": "DNK",
             }
 
             variables = address.copy()
-            variables["family"] = self.payment.family.email
+            variables["family"] = self.payment.person.family.email
             if self.payment.person:
                 variables["person_name"] = self.payment.person.name
-            if self.payment.activity:
-                variables["activity_department"] = self.payment.activity.department.name
-                variables["activity_name"] = self.payment.activity.name
+            try:
+                activityparticipant = members.models.activityparticipant.ActivityParticipant.objects.get(payment=self.payment)
+            except ActivityParticipant.DoesNotExist:
+                pass
+            if activityparticipant:
+                variables["activity_department"] = activityparticipant.activity.department.name
+                variables["activity_name"] = activityparticipant.activity.name
 
             try:
                 if self.transaction_id is None:
@@ -80,7 +85,7 @@ class QuickpayTransaction(models.Model):
                     id=self.transaction_id,
                     continueurl=return_url,
                     cancelurl=return_url,
-                    customer_email=self.payment.family.email,
+                    customer_email=self.payment.person.family.email,
                     autocapture=True,
                 )
 
@@ -109,7 +114,7 @@ class QuickpayTransaction(models.Model):
 
     def __str__(self):
         return (
-            str(self.payment.family.email)
+            str(self.payment.person.family.email)
             + " - QuickPay orderid: '"
             + str(self.order_id)
             + "' confirmed: '"

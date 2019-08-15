@@ -162,10 +162,8 @@ def ActivitySignup(request, activity_id, person_id=None):
                 if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
                     payment = Payment(
                         payment_type=Payment.CREDITCARD,
-                        activity=activity,
-                        activityparticipant=participant,
                         person=person,
-                        family=family,
+                        status="NEW",
                         body_text=timezone.now().strftime("%Y-%m-%d")
                         + " Betaling for "
                         + activity.name
@@ -174,6 +172,8 @@ def ActivitySignup(request, activity_id, person_id=None):
                         amount_ore=int(activity.price_in_dkk * 100),
                     )
                     payment.save()
+                    participant.payment = payment
+                    participant.save()
 
                     return_link_url = payment.get_quickpaytransaction().get_link_url(
                         return_url=settings.BASE_URL

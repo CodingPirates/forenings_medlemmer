@@ -60,6 +60,12 @@ class Payment(models.Model):
         )  # set when calling super, which is needed before we can link to this
         super_return = super(Payment, self).save(*args, **kwargs)
 
+        """ Set external_id if it's a new transaction and not a refund or cancel
+            If it's refunded or cancelled, it should be set when doing the cancel
+            or refund - we don't have info to do it here """
+        if is_new and self.status == "NEW":
+            self.external_id = self.pk
+            self.save()
         """ On creation make quickpay transaction if paymenttype CREDITCARD """
         if is_new and self.payment_type == Payment.CREDITCARD:
             quickpay_transaction = members.models.quickpaytransaction.QuickpayTransaction(

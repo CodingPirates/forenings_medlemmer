@@ -17,4 +17,7 @@ class Migration(migrations.Migration):
             old_name='NewPaymentTemp',
             new_name='Payment',
         ),
+        migrations.RunSQL(
+            "SELECT setval('members_payment_id_seq', (SELECT MAX(id)+1 FROM members_payment), false);", migrations.RunSQL.noop
+        ),
     ]
