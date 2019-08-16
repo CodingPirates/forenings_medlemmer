@@ -365,16 +365,12 @@ class PaymentFactory(DjangoModelFactory):
         model = Payment
 
     added = Faker("date_time", tzinfo=TIMEZONE)
-    payment_type = FuzzyChoice(Payment.PAYMENT_METHODS)
-    activity = SubFactory(ActivityFactory)
-    activityparticipant = SubFactory(ActivityParticipantFactory)
+    payment_type = FuzzyChoice(["CA","BA","CC","RE","DE","OT"])
     person = SubFactory(PersonFactory)
-    family = SubFactory(FamilyFactory)
     body_text = Faker("text")
     amount_ore = Faker("random_number")
+    status = FuzzyChoice(["NEW","CANCELLED","REFUNDED"])
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    cancelled_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    refunded_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_message = Faker("text")
 
