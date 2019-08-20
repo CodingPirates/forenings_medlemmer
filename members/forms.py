@@ -690,3 +690,30 @@ class ActivivtyInviteDeclineForm(forms.Form):
                 '<a class="btn btn-link" href="{% url "family_detail" %}">Tilbage</a>'
             ),
         )
+
+
+class ActivityCancelForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ActivityCancelForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.action = ""
+        self.helper.html5_required = True
+        self.helper.layout = Layout(
+            Hidden("form_id", "cancel_activity", id="id_form_id"),
+            Fieldset(
+                "Afmeld aktivitet",
+                Div(
+                    Div(Field("cancel_note", aria_describedby="cancelHelp"),
+                    HTML(
+                        '<span class="cancelHelp"><p>Hvis du har lyst, kan du skrive en lille note ovenfor når du afmelder dit barn. Så kan vi blive bedre i fremtiden.</p></span>'
+                    ),
+                    css_class="col-md-12"),
+                ),
+            ),
+            Submit("submit", "Afmeld og få pengene tilbage", css_class="btn-danger"),
+        )
+
+    cancel_note = forms.CharField(
+        label="Note ifbm. afmelding", widget=forms.Textarea, required=False
+    )

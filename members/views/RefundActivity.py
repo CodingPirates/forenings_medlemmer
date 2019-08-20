@@ -1,13 +1,36 @@
 import datetime
 from django.conf import settings
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from members.utils.user import user_to_person, has_user
+from members.models.person import Person
+from members.models.activity import Activity
+from members.models.activityparticipant import ActivityParticipant
+from members.forms import ActivityCancelForm
 
 
 @login_required
 @user_passes_test(has_user, "/admin_signup/")
 def RefundActivity(request, activity_id, person_id):
-    return None
+    person = Person.objects.get(pk=person_id)
+    activity = Activity.objects.get(pk=activity_id)
+    if request.method == "POST":
+        form = ActivityCancelForm(request.POST)
+        if form.is_valid():
+            # mark cancelled, save note and refund
+            activityparticipant = ActivityParticipant.objects.get(activity=activity, person=person)
+            if activityparticipant.payment.refund():
+                return HttpResponse("Hej")
+            #activityparticipant.removed_dtm = timezone.now
+            #activityparticipant.removed_note = form.cleaned_data["cancel_note"]
+            #activityparticipant.save()
+    activity_cancel_form = ActivityCancelForm()
+    context = {
+        "person": person,
+        "activity": activity,
+        "activity_cancel_form": activity_cancel_form,
+    }
+    return render(request, "members/refund_activity.html", context)

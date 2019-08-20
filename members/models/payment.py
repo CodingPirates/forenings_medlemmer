@@ -19,7 +19,7 @@ class Payment(models.Model):
         (REFUND, "Refunderet"),
         (OTHER, "Andet"),
     )
-    external_id = models.IntegerField("Eksternt ID", blank=True, null=True)
+    external_id = models.IntegerField("Eksternt ID")
     added = models.DateTimeField("Tilføjet", default=timezone.now)
     payment_type = models.CharField(
         "Type",
@@ -79,6 +79,13 @@ class Payment(models.Model):
 
     def get_quickpaytransaction(self):
         return self.quickpaytransaction_set.order_by("-payment__added")[0]
+
+    def refund(self):
+        # We want to make sure it is actually refundable. For now, just call the
+        # function in activityparticipant. In the future, we should make a better
+        # way depending on conditions for different kinds of payments.
+        if members.models.activityparticipant.ActivityParticipant.objects.get(payment=self).refundable():
+            return True
 
     def set_confirmed(self):
         if self.confirmed_dtm is None:

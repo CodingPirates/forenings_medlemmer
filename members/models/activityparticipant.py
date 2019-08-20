@@ -15,10 +15,13 @@ class ActivityParticipant(models.Model):
         unique_together = ("activity", "member")
 
     payment = models.ForeignKey("Payment", on_delete=models.PROTECT, blank=True, null=True, default=None)
-    added_dtm = models.DateField("Tilmeldt", default=timezone.now)
+    added_dtm = models.DateTimeField("Tilmeldt", default=timezone.now)
     activity = models.ForeignKey("Activity", on_delete=models.PROTECT)
+    person = models.ForeignKey("Person", on_delete=models.PROTECT)
     member = models.ForeignKey("Member", on_delete=models.CASCADE)
     note = models.TextField("Besked / Note til arrangement", blank=True)
+    removed_dtm = models.DateTimeField("Afmeldt", blank=True, null=True)
+    removed_note = models.TextField("Afmeldingsnote", blank=True)
     PHOTO_OK = "OK"
     PHOTO_NOTOK = "NO"
     PHOTO_PERMISSION_CHOICES = (
