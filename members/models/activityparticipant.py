@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from django.db import models
-import members.models.payment
 import members.models.member
 import members.models.waitinglist
+import datetime
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class ActivityParticipant(models.Model):
@@ -39,14 +40,44 @@ class ActivityParticipant(models.Model):
 
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
-        return not self.payment.filter(confirmed_dtm=None, status="NEW")
+        return not members.models.payment.Payment.objects.filter(
+            confirmed_dtm=None, status="NEW"
+        )
 
     def get_payment_link(self):
-        payment = self.payment.filter(confirmed_dtm=None, status="NEW")
+        payment = members.models.payment.Payment.objects.get(
+            confirmed_dtm=None, status="NEW",
+            activityparticipant__payment=self.payment
+        )
         if payment.payment_type == members.models.payment.Payment.CREDITCARD:
             return payment.get_quickpaytransaction().get_link_url()
         else:
             return 'javascript:alert("Kan ikke betales her:  Kontakt Coding Pirates for hjælp");'
+
+    def refundable(self):
+        # if season, check if it's before 14 days after start
+        # if it's not a season, check    that it's no later than 14 days after payment
+        # and the activity_start date is before today.
+        # also check that there doesn't exist a refund transaction
+        payment = members.models.payment.Payment.objects.get(
+            status="NEW", activityparticipant__payment=self.payment,
+            confirmed_dtm__isnull=False)
+        if payment:
+            try:
+                refund_check = members.models.payment.Payment.objects.get(
+                    external_id=payment.external_id, status="REFUNDED",
+                    confirmed_dtm__isnull=False
+                )
+            except ObjectDoesNotExist:
+                # A payment has been made and no refund transaction exists
+                # Check the dates
+                season = members.models.activity.Activity.objects.get(
+                    activityparticipant__activity=self.activity)
+                if season.member_justified:
+                    return (payment.confirmed_dtm.date() - season.start_date).days <= 14
+                else:
+                    return (payment.confirmed_dtm.date() - timezone.now().date()).days <= 14 and (season.start_date > timezone.now().date())
+            return False
 
     def save(self, *args, **kwargs):
         """ On creation if seasonal - clear all waiting lists """

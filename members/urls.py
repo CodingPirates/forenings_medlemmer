@@ -16,6 +16,7 @@ from members.views import (
     departmentView,
     Activities,
     AdminSignup,
+    RefundActivity,
 )
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
@@ -94,6 +95,11 @@ urlpatterns = [
         r"family/(?P<unique>[\w-]+)/invitation_decline/(?P<invitation_id>[\d]+)/$",
         DeclineInvitation,
         name="invitation_decline",
+    ),
+    url(
+        r"family/activity/(?P<activity_id>[\d]+)/person/(?P<person_id>[\d]+)/refund/$",
+        RefundActivity,
+        name="refund_activity",
     ),
     url(r"family/waitinglist$", waitinglistView, name="family_waitinglist_view"),
     url(

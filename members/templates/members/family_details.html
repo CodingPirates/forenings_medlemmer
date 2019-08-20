@@ -97,7 +97,9 @@
                     {% if not participation.paid %}
                     <a class="btn btn-danger" role="button" href="{{participation.get_payment_link}}">Betal</a>
                     {%endif%}
-
+                    {% if participation.refundable %}
+                      <a class="btn btn-danger" role="button" href="{% url 'refund_activity' participation.activity_id participation.member.person.id %}">Afmeld og refundér</a>
+                    {%endif%}
                     </td>
                     <td>{{participation.activity.start_date}}</td>
                     <td>{{participation.activity.end_date}}</td>
