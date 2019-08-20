@@ -706,7 +706,7 @@ class ActivityCancelForm(forms.Form):
                 Div(
                     Div(Field("cancel_note", aria_describedby="cancelHelp"),
                     HTML(
-                        '<span class="cancelHelp"><p>Hvis du har lyst, kan du skrive en lille note ovenfor når du afmelder dit barn. Så kan vi blive bedre i fremtiden.</p></span>'
+                        '<span class="cancelHelp"><p>Hvis du har lyst, kan du skrive en begrundelse for hvorfor du afmelder aktiviteten ovenfor. Så kan vi blive bedre i fremtiden.</p></span>'
                     ),
                     css_class="col-md-12"),
                 ),
