@@ -14,6 +14,7 @@ from members.views.QuickpayCallback import QuickpayCallback
 from members.views.waitinglistView import waitinglistView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.paymentRefundErrorView import paymentRefundErrorView
+from members.views.paymentRefundSuccessView import paymentRefundSuccessView
 from members.views.departmentView import departmentView
 from members.views.Activities import Activities
 from members.views.AdminSignup import AdminSignup

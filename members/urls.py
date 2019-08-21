@@ -13,6 +13,7 @@ from members.views import (
     waitinglistView,
     paymentGatewayErrorView,
     paymentRefundErrorView,
+    paymentRefundSuccessView,
     volunteerSignup,
     departmentView,
     Activities,
