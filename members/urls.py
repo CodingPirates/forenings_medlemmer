@@ -12,6 +12,7 @@ from members.views import (
     ActivitySignup,
     waitinglistView,
     paymentGatewayErrorView,
+    paymentRefundErrorView,
     volunteerSignup,
     departmentView,
     Activities,
@@ -106,6 +107,16 @@ urlpatterns = [
         r"family/payment_gateway_error$",
         paymentGatewayErrorView,
         name="payment_gateway_error_view",
+    ),
+    url(
+        r"family/payment_refund_error$",
+        paymentRefundErrorView,
+        name="payment_refund_error_view",
+    ),
+    url(
+        r"family/payment_refund_success$",
+        paymentRefundSuccessView,
+        name="payment_refund_success_view",
     ),
     url(r"confirm_details/$", ConfirmFamily, name="confirm_details"),
     url(

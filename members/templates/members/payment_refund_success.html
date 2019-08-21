@@ -1,0 +1,17 @@
+{% extends "members/base.html" %}
+
+{% block content %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1>Din refusion er gennemført</h1>
+          <p>Afmeldingen og refusionen er nu gennemført.</p>
+          <p>Der går normalt et par bankdage før du kan se pengene på din konto igen.</p>
+          {% if unique %}
+            <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
+          {% endif%}
+          <p></p>
+        </div>
+      </div>
+    </div>
+{% endblock %}

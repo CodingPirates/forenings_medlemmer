@@ -5,6 +5,9 @@ from django.conf import settings
 from quickpay_api_client import QPClient
 from django.urls import reverse
 import members.models.activityparticipant
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class QuickpayTransaction(models.Model):
@@ -111,6 +114,24 @@ class QuickpayTransaction(models.Model):
                 self.payment.set_confirmed()
             if transaction["state"] == "rejected" and not transaction["accepted"]:
                 self.payment.set_rejected(repr(transaction))
+
+    def refund(self):
+        if members.models.activityparticipant.ActivityParticipant.objects.get(payment=self.payment).refundable():
+            try:
+                client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+
+                transactions = client.get("/payments", order_id=self.order_id)
+
+                if len(transactions) > 0:
+                    transaction = transactions[0]
+                    client.post(
+                        "/payments/{0}/refund".format(transaction["id"]),
+                        amount=self.payment.amount_ore,
+                    )
+                    return True
+            except Exception as e:
+                logger.error(e)
+                return False
 
     def __str__(self):
         return (

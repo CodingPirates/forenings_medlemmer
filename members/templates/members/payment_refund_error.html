@@ -1,0 +1,17 @@
+{% extends "members/base.html" %}
+
+{% block content %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1>Der er lige nu problemer med vores udbyder af betalingskortbetalinger!</h1>
+          <p>Der er desværre i øjeblikket et problem med vores vores betalingsudbyder (Quickpay.dk) - Vi kan derfor ikke refundere din betaling lige nu.</p>
+          <p>Vores tekniske pirater har fået besked, og vi fikser det hurtigst muligt. Du kan kigge tilbage om et par dage, eller kontakte os på <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a></p>
+          {% if unique %}
+            <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
+          {% endif%}
+          <p></p>
+        </div>
+      </div>
+    </div>
+{% endblock %}

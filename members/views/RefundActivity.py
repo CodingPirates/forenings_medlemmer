@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from members.utils.user import user_to_person, has_user
@@ -22,11 +23,14 @@ def RefundActivity(request, activity_id, person_id):
         if form.is_valid():
             # mark cancelled, save note and refund
             activityparticipant = ActivityParticipant.objects.get(activity=activity, person=person)
-            if activityparticipant.payment.refund():
-                return HttpResponse("Hej")
-            #activityparticipant.removed_dtm = timezone.now
-            #activityparticipant.removed_note = form.cleaned_data["cancel_note"]
-            #activityparticipant.save()
+            if activityparticipant.payment.get_quickpaytransaction().refund():
+                activityparticipant.removed_dtm = timezone.now
+                activityparticipant.removed_note = form.cleaned_data["cancel_note"]
+                activityparticipant.save()
+                return HttpResponseRedirect(reverse("payment_refund_success_view"))
+            else:
+                return HttpResponseRedirect(reverse("payment_refund_error_view"))
+
     activity_cancel_form = ActivityCancelForm()
     context = {
         "person": person,
