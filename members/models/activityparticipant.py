@@ -18,7 +18,7 @@ class ActivityParticipant(models.Model):
     added_dtm = models.DateTimeField("Tilmeldt", default=timezone.now)
     activity = models.ForeignKey("Activity", on_delete=models.PROTECT)
     person = models.ForeignKey("Person", on_delete=models.PROTECT, null=True)
-    member = models.ForeignKey("Member", on_delete=models.CASCADE)
+    member = models.ForeignKey("Member", on_delete=models.CASCADE) # this field will be dropped in the future when all references are moved to person
     note = models.TextField("Besked / Note til arrangement", blank=True)
     removed_dtm = models.DateTimeField("Afmeldt", blank=True, null=True)
     removed_note = models.TextField("Afmeldingsnote", blank=True)
@@ -44,7 +44,7 @@ class ActivityParticipant(models.Model):
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
         return not members.models.payment.Payment.objects.filter(
-            confirmed_dtm=None, status="NEW"
+            activityparticipant__payment=self.payment, confirmed_dtm=None, status="NEW"
         )
 
     def get_payment_link(self):
@@ -79,7 +79,7 @@ class ActivityParticipant(models.Model):
                 if season.member_justified:
                     return (payment.confirmed_dtm.date() - season.start_date).days <= 14
                 else:
-                    return (payment.confirmed_dtm.date() - timezone.now().date()).days <= 14 and (season.start_date > timezone.now().date())
+                    return ((payment.confirmed_dtm.date() - timezone.now().date()).days <= 14) and (season.start_date > timezone.now().date())
             return False
 
     def save(self, *args, **kwargs):

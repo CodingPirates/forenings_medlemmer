@@ -10,6 +10,7 @@ from members.utils.user import user_to_person, has_user
 from members.models.person import Person
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
+from members.models.payment import Payment
 from members.forms import ActivityCancelForm
 
 
@@ -23,10 +24,29 @@ def RefundActivity(request, activity_id, person_id):
         if form.is_valid():
             # mark cancelled, save note and refund
             activityparticipant = ActivityParticipant.objects.get(activity=activity, person=person)
+            if not Payment.objects.filter(
+                external_id=activityparticipant.payment.external_id,
+                status="REFUNDED"
+                ).exists():
+                payment = Payment(
+                    external_id=activityparticipant.payment.external_id,
+                    payment_type=Payment.CREDITCARD,
+                    person=person,
+                    status="REFUNDED",
+                    body_text=timezone.now().strftime("%Y-%m-%d")
+                    + " Refusion for "
+                    + activityparticipant.activity.name
+                    + " på "
+                    + activityparticipant.activity.department.name,
+                    amount_ore=int(activity.price_in_dkk * 100),
+                )
+                payment.save()
             if activityparticipant.payment.get_quickpaytransaction().refund():
-                activityparticipant.removed_dtm = timezone.now
+                activityparticipant.removed_dtm = timezone.now()
                 activityparticipant.removed_note = form.cleaned_data["cancel_note"]
                 activityparticipant.save()
+                payment.confirmed_dtm = timezone.now()
+                payment.save()
                 return HttpResponseRedirect(reverse("payment_refund_success_view"))
             else:
                 return HttpResponseRedirect(reverse("payment_refund_error_view"))

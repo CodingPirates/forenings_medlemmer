@@ -124,11 +124,15 @@ class QuickpayTransaction(models.Model):
 
                 if len(transactions) > 0:
                     transaction = transactions[0]
-                    client.post(
+                    status, body, headers = client.post(
                         "/payments/{0}/refund".format(transaction["id"]),
                         amount=self.payment.amount_ore,
+                        raw=True
                     )
-                    return True
+                    if status == "202":
+                        return True
+                    else:
+                        return False
             except Exception as e:
                 logger.error(e)
                 return False

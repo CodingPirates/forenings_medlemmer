@@ -137,7 +137,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
             # Make ActivityParticipant
             participant = ActivityParticipant(
-                member=member, activity=activity, note=signup_form.cleaned_data["note"]
+                member=member, person=person, activity=activity, note=signup_form.cleaned_data["note"]
             )
 
             # If conditions not accepted, make error
@@ -161,6 +161,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                 # using creditcard ?
                 if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
                     payment = Payment(
+                        external_id=0, # will be overwritten by save method
                         payment_type=Payment.CREDITCARD,
                         person=person,
                         status="NEW",
