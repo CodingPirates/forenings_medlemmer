@@ -532,6 +532,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return item.member.person.age_years()
 
     person_age_years.short_description = "Alder"
+    person_age_years.admin_order_field = '-member__person__birthday'
 
     # Only show participants to own departments
     def get_queryset(self, request):
