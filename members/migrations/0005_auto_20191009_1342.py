@@ -6,31 +6,63 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('members', '0004_auto_20190627_2153'),
-    ]
+    dependencies = [("members", "0004_auto_20190627_2153")]
 
     operations = [
         migrations.CreateModel(
-            name='DepartmentStatistics',
+            name="DepartmentStatistics",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp', models.DateTimeField(verbose_name='Kørsels tidspunkt')),
-                ('active_activities', models.IntegerField(verbose_name='Aktiviteter der er igang')),
-                ('activities', models.IntegerField(verbose_name='Aktiviteter i alt')),
-                ('current_activity_participants', models.IntegerField(verbose_name='Samlet antal deltagere på aktive aktiviteter')),
-                ('activity_participants', models.IntegerField(verbose_name='Samlet antal deltage på alle aktiviteter')),
-                ('members', models.IntegerField(verbose_name='Antal medlemmer')),
-                ('waitinglist', models.IntegerField(verbose_name='Antal på venteliste')),
-                ('waitingtime', models.DurationField(verbose_name='Ventetid')),
-                ('payments', models.IntegerField(verbose_name='Betalinger')),
-                ('volunteers_male', models.IntegerField(verbose_name='Frivillige Mænd')),
-                ('volunteers_female', models.IntegerField(verbose_name='Frivillige Kvinder')),
-                ('volunteers', models.IntegerField(verbose_name='Frivillige')),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='members.Department')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("timestamp", models.DateTimeField(verbose_name="Kørsels tidspunkt")),
+                (
+                    "active_activities",
+                    models.IntegerField(verbose_name="Aktiviteter der er igang"),
+                ),
+                ("activities", models.IntegerField(verbose_name="Aktiviteter i alt")),
+                (
+                    "current_activity_participants",
+                    models.IntegerField(
+                        verbose_name="Samlet antal deltagere på aktive aktiviteter"
+                    ),
+                ),
+                (
+                    "activity_participants",
+                    models.IntegerField(
+                        verbose_name="Samlet antal deltage på alle aktiviteter"
+                    ),
+                ),
+                ("members", models.IntegerField(verbose_name="Antal medlemmer")),
+                (
+                    "waitinglist",
+                    models.IntegerField(verbose_name="Antal på venteliste"),
+                ),
+                ("waitingtime", models.DurationField(verbose_name="Ventetid")),
+                ("payments", models.IntegerField(verbose_name="Betalinger")),
+                (
+                    "volunteers_male",
+                    models.IntegerField(verbose_name="Frivillige Mænd"),
+                ),
+                (
+                    "volunteers_female",
+                    models.IntegerField(verbose_name="Frivillige Kvinder"),
+                ),
+                ("volunteers", models.IntegerField(verbose_name="Frivillige")),
+                (
+                    "department",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="members.Department",
+                    ),
+                ),
             ],
         ),
-        migrations.DeleteModel(
-            name='DailyStatisticsDepartment',
-        ),
+        migrations.DeleteModel(name="DailyStatisticsDepartment"),
     ]
