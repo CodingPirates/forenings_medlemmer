@@ -28,7 +28,8 @@ class DepartmentStatistics(models.Model):
     volunteers = models.IntegerField("Frivillige")
 
     def save(self, *args, **kwargs):
-        self.timestamp = timezone.now()
+        if self.timestamp is None:
+            self.timestamp = timezone.now()
 
         # Get values
         active_activies = Activity.objects.filter(
@@ -37,18 +38,18 @@ class DepartmentStatistics(models.Model):
             end_date__gte=self.timestamp,
         )
         activities = Activity.objects.filter(department=self.department)
-        self.active_activities = len(active_activies)
-        self.activities = len(activities)
+        self.active_activities = active_activies.count()
+        self.activities = activities.count()
 
         self.activity_participants = sum(
             [
-                len(ActivityParticipant.objects.filter(activity=activity))
+                ActivityParticipant.objects.filter(activity=activity).count()
                 for activity in activities
             ]
         )
         self.current_activity_participants = sum(
             [
-                len(ActivityParticipant.objects.filter(activity=activity))
+                ActivityParticipant.objects.filter(activity=activity).distinct().count()
                 for activity in active_activies
             ]
         )
@@ -57,8 +58,8 @@ class DepartmentStatistics(models.Model):
         ]
         self.members = sum(
             [
-                len(ActivityParticipant.objects.filter(activity=activity))
-                for activity in activities
+                ActivityParticipant.objects.filter(activity=activity).distinct().count()
+                for activity in activities_members
             ]
         )
 
@@ -69,5 +70,52 @@ class DepartmentStatistics(models.Model):
         self.volunteers_male = 1
         self.volunteers_female = 1
         self.volunteers = 1
-
         super(DepartmentStatistics, self).save(*args, **kwargs)
+
+
+# OLD WAY
+# for department in departments:
+#     dailyStatisticsDepartment = (
+#         members.models.dailystatisticsdepartment.DailyStatisticsDepartment()
+#     )
+#
+#     dailyStatisticsDepartment.members = 0  # TODO: to loosely defined now
+#     dailyStatisticsDepartment.waitinglist = (
+#         Person.objects.filter(waitinglist__department=department)
+#         .distinct()
+#         .count()
+#     )
+#     firstWaitingListItem = (
+#         WaitingList.objects.filter(department=department)
+#         .order_by("on_waiting_list_since")
+#         .first()
+#     )
+#     if firstWaitingListItem:
+#         dailyStatisticsDepartment.waitingtime = (
+#             timestamp - firstWaitingListItem.on_waiting_list_since
+#         )
+#     else:
+#         dailyStatisticsDepartment.waitingtime = datetime.timedelta(days=0)
+#     dailyStatisticsDepartment.payments = Payment.objects.filter(
+#         activity__department=department,
+#         refunded_dtm=None,
+#         confirmed_dtm__isnull=False,
+#     ).aggregate(sum=Coalesce(Sum("amount_ore"), 0))["sum"]
+#     dailyStatisticsDepartment.volunteers_male = (
+#         Person.objects.filter(
+#             volunteer__department=department, gender=Person.MALE
+#         )
+#         .distinct()
+#         .count()
+#     )
+#     dailyStatisticsDepartment.volunteers_female = (
+#         Person.objects.filter(
+#             volunteer__department=department, gender=Person.FEMALE
+#         )
+#         .distinct()
+#         .count()
+#     )
+#     dailyStatisticsDepartment.volunteers = (
+#         dailyStatisticsDepartment.volunteers_male
+#         + dailyStatisticsDepartment.volunteers_female
+#     )

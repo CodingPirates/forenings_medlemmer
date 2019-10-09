@@ -2,9 +2,9 @@
 # TODO: tests for departments, members, volunteers, activities, equipment, equipmentloan, statistics
 
 import pytz
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import random
-
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 import factory
@@ -134,15 +134,12 @@ TIMEZONE = pytz.timezone("Europe/Copenhagen")
 Faker._DEFAULT_LOCALE = LOCALE
 
 
-def datetime_after(dt):
-    """
-    For use with lazy attribute to generate DateTime's after the given
-    datetime.
-    """
-    END_OF_TIME = date.today() + timedelta(days=60 * 365)
-    return Faker(
-        "date_time_between", tzinfo=TIMEZONE, start_date=dt, end_date=END_OF_TIME
-    ).generate({})
+def datetime_before(datetime):
+    return datetime - timedelta(days=random.randint(1, 4 * 365))
+
+
+def datetime_after(datetime):
+    return datetime + timedelta(days=random.randint(1, 4 * 365))
 
 
 class ZipcodeRegionFactory(DjangoModelFactory):
@@ -239,7 +236,7 @@ class UnionFactory(DjangoModelFactory):
     floor = Faker("floor")
     door = Faker("door")
     boardMembers = Faker("text")
-    # bank_main_org = Faker("boolean")
+    bank_main_org = Faker("boolean")
     bank_account = Faker("numerify", text="####-##########")
 
 
@@ -356,7 +353,9 @@ class ActivityParticipantFactory(DjangoModelFactory):
     activity = SubFactory(ActivityFactory)
     member = SubFactory(MemberFactory)
     note = Faker("text")
-    photo_permission = FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
+    photo_permission = (
+        "OK" if random.randint(0, 1) == 1 else "NO"
+    )  # Breaks it FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
     contact_visible = Faker("boolean")
 
 
