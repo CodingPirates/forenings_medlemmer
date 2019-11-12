@@ -64,13 +64,10 @@ urlpatterns = [
     ),
     url(
         r"^account/logout/$",
-        auth_views.LogoutView.as_view(
-            template_name="members/logout.html"
-        ),
+        auth_views.LogoutView.as_view(template_name="members/logout.html"),
         {"next_page": "/"},
         name="person_logout",
     ),
-
     url(r"activities/$", Activities, name="activities"),
     url(r"volunteer$", volunteerSignup, name="volunteer_signup"),
     url(r"user_created/$", userCreated, name="user_created"),

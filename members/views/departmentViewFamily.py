@@ -12,7 +12,7 @@ import json
 
 
 @login_required
-@user_passes_test(has_user, '/admin_signup')
+@user_passes_test(has_user, "/admin_signup")
 def departmentViewFamily(request, unique=None):
     depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
     deps = {}
@@ -21,15 +21,12 @@ def departmentViewFamily(request, unique=None):
 
     for department in depQuery:
         coordinates = department.getLatLon()
-        dep = {
-            'html': department.toHTML(),
-            'onMap': department.onMap
-        }
-        if not(coordinates is None):
-            dep['latitude'] = str(coordinates[0])
-            dep['longtitude'] = str(coordinates[1])
+        dep = {"html": department.toHTML(), "onMap": department.onMap}
+        if not (coordinates is None):
+            dep["latitude"] = str(coordinates[0])
+            dep["longtitude"] = str(coordinates[1])
         else:
-            dep['onMap'] = False
+            dep["onMap"] = False
         deps[department.union.get_region_display()].append(dep)
 
     # departments_json = json.dumps(list(Department.objects.all()))
@@ -50,10 +47,14 @@ def departmentViewFamily(request, unique=None):
 
     print(depQuery)
 
-    return render(request, "members/departments_family.html", {
-        'departments': depQuery,
-        'children': children,
-        'waiting_lists': waiting_lists,
-        'in_waiting_list': in_waiting_list,
-        'departments_json': json.dumps(departments_json)
-    })
+    return render(
+        request,
+        "members/departments_family.html",
+        {
+            "departments": depQuery,
+            "children": children,
+            "waiting_lists": waiting_lists,
+            "in_waiting_list": in_waiting_list,
+            "departments_json": json.dumps(departments_json),
+        },
+    )
