@@ -2,7 +2,6 @@
 
 {% block content %}
 <div class="container">
-<div class="row">
     <div class="alert alert-warning">
         <p>Kære bruger</p>
 
@@ -14,7 +13,7 @@
             <a href="mailto:kontakt@codingpirates.dk" title="kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.
         </p>
     </div>
-    <div class="center col-12">
+    <div class="center">
         <form class="col-lg-6 col-md-7 col-sm-8 col-11" method="post">
             {% if form.errors %}
             <div class="alert alert-danger">Dit brugernavn eller adgangskode var forkert. Prøv igen.</div>
@@ -43,6 +42,5 @@
             </div>
         </form>
     </div>
-</div>
 </div>
 {% endblock %}
