@@ -11,7 +11,6 @@
 <script type="text/javascript">
     var departments = {{ departments_json | safe }}
     var markers = [];
-    var infoElement;
     var activeMarkerIndex = 0;
     var activeIcon = L.icon({
         iconUrl: '{% static "members/icons/activeIcon.png" %}',
@@ -31,18 +30,31 @@
         shadowSize: [41, 41]
     });
 
-    function createHTML(department) {
-        return "<h4>Coding Pirates " + department["name"] + "</h4>" + "<p><table class=\"departmentTable\"><tbody><tr><td>Afdelingsleder: </td><td>" + department["responsible_name"] + "</td></tr><tr><td>Kontakt: </td><td>" + department["responsible_contact"] + "</td></tr><tr><td>Møde tid: </td><td>" + department["open_hours"] + "</td></tr><tr><td>Adresse: </td><td>" + department["streetname"] + " " + department["housenumber"] + ", " + department["zipcode"] + " " + department["city"] + "</td></tr></tbody></table></p>" + "<p>" + department["description"] + "</p>" + "<a style=\"color: white;\" href=\"" + department["website"] + "\">" + department["website"] + "</a>" + (department["isOpening"] ? "<p><i>Afdelingen åbner snart</i></p>" : "");
-    }
+
 
     // Når der trykkes på en afdeling, og der skal vises mere
     function show(e) {
         // Find den afdeling der skal vises, udfra latlng
-        var result = departments.filter(department => department.latitude == parseFloat(e["latlng"]["lat"]) && department.longitude == parseFloat(e["latlng"]["lng"]))[0]
+        var department = departments.filter(department => department.latitude == parseFloat(e["latlng"]["lat"]) && department.longitude == parseFloat(e["latlng"]["lng"]))[0]
         markers[activeMarkerIndex].setIcon(defaultIcon);
-        activeMarkerIndex = departments.indexOf(result);
+        activeMarkerIndex = departments.indexOf(department);
         e.target.setIcon(activeIcon);
-        infoElement.innerHTML = createHTML(result);
+
+        infoElement = document.querySelector("#infoElement")
+
+        if(infoElement.querySelector("span#know_more").style.display != "none") {
+            infoElement.querySelector("span#know_more").style.display = "none";
+            infoElement.querySelector("span#infoContainer").style.display = "block";
+        }
+
+        infoElement.querySelector("#name").innerText = department["name"];
+        infoElement.querySelector("#responsible_name").innerText = department["responsible_name"];
+        infoElement.querySelector("#responsible_contact").innerText = department["responsible_contact"];
+        infoElement.querySelector("#open_hours").innerText = department["open_hours"];
+        infoElement.querySelector("#adress").innerText = department["streetname"] + " " + department["housenumber"] + ", " + department["zipcode"] + " " + department["city"];
+        infoElement.querySelector("#description").innerText = department["description"];
+        infoElement.querySelector("#website").innerText = department["website"];
+        infoElement.querySelector("#website").href = department["website"];
     }
 
     $(document).ready(function () {
@@ -56,8 +68,6 @@
         }).addTo(kort);
 
         $('.searchAbleDropdowns').select2();
-
-        infoElement = document.getElementById("infoElement")
 
         for (var i = 0; i < departments.length; i++) {
             var row = departments[i];
@@ -165,8 +175,23 @@
 </div>
 <div id="wrapper">
     <div id="kort" class="first"></div>
-    <div class="second" id="infoElement" style="background-color: #2C8098; color: white">Vælg en afdeling på kortet for
-        at se mere</div>
+    <div class="second" id="infoElement" style="background-color: #2C8098; color: white">
+        <span id="know_more">Vælg en afdeling på kortet for at se mere</span>
+        <span id="infoContainer" style="display: none;">
+            <h4 id="name"></h4>
+            <table class="departmentTable">
+                <tbody>
+                    <tr><td>Afdelingsleder: </td><td id="responsible_name"></td></tr>
+                    <tr><td>Kontakt: </td><td id="responsible_contact"></td></tr>
+                    <tr><td>Møde tid: </td><td id="open_hours"></td></tr>
+                    <tr><td>Adresse: </td><td id="adress"></td></tr>
+                </tbody>
+            </table>
+            <p></p>
+            <p id="description"></p>
+            <a id="website" style="color: white;" href=""></a>
+        </span>
+    </div>
 </div>
 
 <div class="container">
