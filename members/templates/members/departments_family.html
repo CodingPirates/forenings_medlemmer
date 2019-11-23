@@ -77,12 +77,10 @@
             if (this.readyState == 4 && this.status == 200) {
                 // Typical action to be performed when the document is ready:
                 var ref = document.getElementById("person_table_" + personId);
-                
                 // Test for om <i>Endnu ikke på nogen ventelister</i> skal fjernes
-                if(ref.getElementsByTagName("tbody")[0].getElementsByTagName("tr")[0].getElementsByTagName("td")[0].getAttribute("colspan") > 1) {
+                if(ref.getElementsByTagName("tbody")[0].getElementsByTagName("tr") > 0 && ref.getElementsByTagName("tbody")[0].getElementsByTagName("tr")[0].getElementsByTagName("td")[0].classList.contains("none_yet") > 1) { //.getAttribute("colspan")
                     ref.getElementsByTagName("tbody")[0].removeChild(ref.getElementsByTagName("tbody")[0].getElementsByTagName("tr")[0]);
                 }
-
                 var data = departmentIds.filter(department => department.id == departmentId)
                 ref = ref.insertRow();
                 ref.insertCell().innerHTML = data[0]["name"];
@@ -184,7 +182,7 @@
             {% endfor %}
             {% else %}
             <tr>
-                <td colspan="3"><i>Endnu ikke på nogen ventelister</i></td>
+                <td class="none_yet" colspan="3"><i>Endnu ikke på nogen ventelister</i></td>
             </tr>
             {% endif %}
         </tbody>
