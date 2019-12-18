@@ -82,6 +82,27 @@ class UpdateDawaData(CronJobBase):
         for person in persons:
             person.update_dawa_data()
 
+# If it's the first day of the year, make sure to capture all payments that year
+class CaptureOutstandingPayments(CronJobBase):
+    RUN_AT_TIMES = ["01:00"]
+
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+
+    code="members.capture_oustanding_payments"
+
+    def do(self):
+        today = datetime.datetime.now()
+        if(datetime.date(year=today.year, month=1, day=1) == datetime.date(year=today.year, month=today.month, day=today.day)):
+            # get payments that are not confirmed and where activity starts this year
+            payments = Payment.objects.filter(
+                rejected_dtm__isnull=True,
+                confirmed_dtm__isnull=True,
+                payment_type=Payment.CREDITCARD,
+                added__lte=timezone.now(),
+            )
+
+            for payment in payments:
+                payment.get_quickpaytransaction().capture()
 
 # Find families, which needs to update their information
 class RequestConfirmationCronJob(CronJobBase):

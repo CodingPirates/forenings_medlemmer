@@ -74,15 +74,28 @@ class QuickpayTransaction(models.Model):
                 if self.transaction_id is None:
                     raise Exception("we did not get a transaction_id")
 
-                link = client.put(
-                    "/payments/{0}/link".format(self.transaction_id),
-                    amount=self.payment.amount_ore,
-                    id=self.transaction_id,
-                    continueurl=return_url,
-                    cancelurl=return_url,
-                    customer_email=self.payment.family.email,
-                    autocapture=True,
-                )
+                if self.payment.activity.start_date.year == now.year:
+                    # Enable auto-capture if the activity starts this year
+                    link = client.put(
+                        "/payments/{0}/link".format(self.transaction_id),
+                        amount=self.payment.amount_ore,
+                        id=self.transaction_id,
+                        continueurl=return_url,
+                        cancelurl=return_url,
+                        customer_email=self.payment.family.email,
+                        autocapture=True,
+                    )
+                else:
+                    # Disable auto-capture if the activity starts next year
+                    link = client.put(
+                        "/payments/{0}/link".format(self.transaction_id),
+                        amount=self.payment.amount_ore,
+                        id=self.transaction_id,
+                        continueurl=return_url,
+                        cancelurl=return_url,
+                        customer_email=self.payment.family.email,
+                        autocapture=False,
+                    )
 
                 self.link_url = link["url"]
                 self.save()
@@ -116,3 +129,17 @@ class QuickpayTransaction(models.Model):
             + str(self.payment.confirmed_dtm)
             + "'"
         )
+
+
+    # Capture uncaptured payment
+    def capture(self):
+        client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+
+        status, body, headers = client.post(
+            "/payments/{id}/capture".format(self.transaction_id),
+            amount=self.payment.amount_ore,
+        )
+
+        if status==202:
+            self.payment.confirmed_dtm = timezone.now()
+            self.payment.save()
