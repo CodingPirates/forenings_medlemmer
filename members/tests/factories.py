@@ -345,7 +345,7 @@ class ActivityParticipantFactory(DjangoModelFactory):
     activity = SubFactory(ActivityFactory)
     member = SubFactory(MemberFactory)
     note = Faker("text")
-    #photo_permission = FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
+    # photo_permission = FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
     contact_visible = Faker("boolean")
 
 
@@ -365,7 +365,7 @@ class PaymentFactory(DjangoModelFactory):
         model = Payment
 
     added = Faker("date_time", tzinfo=TIMEZONE)
-    #payment_type = FuzzyChoice(Payment.PAYMENT_METHODS)
+    # payment_type = FuzzyChoice(Payment.PAYMENT_METHODS)
     activity = SubFactory(ActivityFactory)
     activityparticipant = SubFactory(ActivityParticipantFactory)
     person = SubFactory(PersonFactory)
