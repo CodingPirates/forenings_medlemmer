@@ -1,0 +1,15 @@
+name: Running tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup Enviroment 
+        run: cp .env.example .env
+      - name: Builds the stack
+        run: docker-compose build
+      - name: Test
+        run: docker-compose run web ./manage.py test
