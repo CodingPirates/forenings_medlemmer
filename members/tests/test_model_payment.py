@@ -15,4 +15,4 @@ class TestModelPayment(TestCase):
         return mock
 
     def test_can_create_payment(self):
-        PaymentFactory() # should not throw errors
+        PaymentFactory()  # should not throw errors
