@@ -130,7 +130,6 @@ class QuickpayTransaction(models.Model):
             + "'"
         )
 
-
     # Capture uncaptured payment
     def capture(self):
         client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
@@ -140,6 +139,6 @@ class QuickpayTransaction(models.Model):
             amount=self.payment.amount_ore,
         )
 
-        if status==202:
+        if status == 202:
             self.payment.confirmed_dtm = timezone.now()
             self.payment.save()

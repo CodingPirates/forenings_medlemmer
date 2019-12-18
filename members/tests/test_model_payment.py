@@ -9,4 +9,4 @@ from members.tests.factories import PersonFactory, TIMEZONE
 
 class TestModelPayment(TestCase):
     def test_can_create_payment(self):
-        PaymentFactory() # should not throw errors
+        PaymentFactory()  # should not throw errors
