@@ -76,7 +76,7 @@ class QuickpayTransaction(models.Model):
 
                 # Enable auto-capture if the activity starts this year
                 link = client.put(
-                    f'/payments/{self.transaction_id}/link',
+                    f"/payments/{self.transaction_id}/link",
                     amount=self.payment.amount_ore,
                     id=self.transaction_id,
                     continueurl=return_url,

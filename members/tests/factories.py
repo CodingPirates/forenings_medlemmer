@@ -360,9 +360,7 @@ class ActivityParticipantFactory(DjangoModelFactory):
     activity = SubFactory(ActivityFactory)
     member = SubFactory(MemberFactory)
     note = Faker("text")
-    photo_permission = (
-        "OK" if random.randint(0, 1) == 1 else "NO"
-    )
+    photo_permission = "OK" if random.randint(0, 1) == 1 else "NO"
     contact_visible = Faker("boolean")
 
 

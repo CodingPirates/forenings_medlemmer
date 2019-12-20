@@ -93,8 +93,9 @@ class CaptureOutstandingPayments(CronJobBase):
 
     def do(self):
         today = datetime.date.today()
-        if(today.month, today.day) == (1, 1):
+        if (today.month, today.day) == (1, 1):
             Payment.capture_oustanding_payments()
+
 
 # Find families, which needs to update their information
 class RequestConfirmationCronJob(CronJobBase):
