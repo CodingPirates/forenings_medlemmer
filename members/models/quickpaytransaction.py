@@ -74,28 +74,16 @@ class QuickpayTransaction(models.Model):
                 if self.transaction_id is None:
                     raise Exception("we did not get a transaction_id")
 
-                if self.payment.activity.start_date.year == now.year:
-                    # Enable auto-capture if the activity starts this year
-                    link = client.put(
-                        "/payments/{0}/link".format(self.transaction_id),
-                        amount=self.payment.amount_ore,
-                        id=self.transaction_id,
-                        continueurl=return_url,
-                        cancelurl=return_url,
-                        customer_email=self.payment.family.email,
-                        autocapture=True,
-                    )
-                else:
-                    # Disable auto-capture if the activity starts next year
-                    link = client.put(
-                        "/payments/{0}/link".format(self.transaction_id),
-                        amount=self.payment.amount_ore,
-                        id=self.transaction_id,
-                        continueurl=return_url,
-                        cancelurl=return_url,
-                        customer_email=self.payment.family.email,
-                        autocapture=False,
-                    )
+                # Enable auto-capture if the activity starts this year
+                link = client.put(
+                    f'/payments/{self.transaction_id}/link',
+                    amount=self.payment.amount_ore,
+                    id=self.transaction_id,
+                    continueurl=return_url,
+                    cancelurl=return_url,
+                    customer_email=self.payment.family.email,
+                    autocapture=self.payment.activity.start_date.year == now.year,
+                )
 
                 self.link_url = link["url"]
                 self.save()

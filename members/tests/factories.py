@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 
 import factory
 from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
-from factory.fuzzy import FuzzyChoice
+from factory.fuzzy import FuzzyChoice, FuzzyInteger
 from faker.providers import BaseProvider
 
 from members.models.family import Family
@@ -51,6 +51,21 @@ class CodingPiratesProvider(BaseProvider):
         """
         pattern = "{{activity_type}} {{year}}"
         return self.generator.parse(pattern)
+
+    payment_types = ["CA", "BA", "CC", "RE", "OT"]
+
+    def payment_type(self):
+        return random.choice(self.payment_types)
+
+    member_type_choices = [
+        "PA",
+        "GU",
+        "CH",
+        "OT",
+    ]
+
+    def member_type_choice(self):
+        return random.choice(self.member_type_choices)
 
 
 class DanishProvider(BaseProvider):
@@ -183,7 +198,7 @@ class PersonFactory(DjangoModelFactory):
     class Meta:
         model = Person
 
-    # membertype = FuzzyChoice(Person.MEMBER_TYPE_CHOICES)
+    membertype = Faker("member_type_choice")
     name = Faker("name")
     placename = Faker("city_suffix")
     zipcode = Faker("zipcode")
@@ -345,7 +360,9 @@ class ActivityParticipantFactory(DjangoModelFactory):
     activity = SubFactory(ActivityFactory)
     member = SubFactory(MemberFactory)
     note = Faker("text")
-    # photo_permission = FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
+    photo_permission = (
+        "OK" if random.randint(0, 1) == 1 else "NO"
+    )
     contact_visible = Faker("boolean")
 
 
@@ -364,14 +381,13 @@ class PaymentFactory(DjangoModelFactory):
     class Meta:
         model = Payment
 
-    added = Faker("date_time", tzinfo=TIMEZONE)
-    # payment_type = FuzzyChoice(Payment.PAYMENT_METHODS)
+    payment_type = Faker("payment_type")
     activity = SubFactory(ActivityFactory)
     activityparticipant = SubFactory(ActivityParticipantFactory)
     person = SubFactory(PersonFactory)
     family = SubFactory(FamilyFactory)
     body_text = Faker("text")
-    amount_ore = Faker("random_number")
+    amount_ore = FuzzyInteger(100, 700)
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
     cancelled_dtm = Faker("date_time", tzinfo=TIMEZONE)
     refunded_dtm = Faker("date_time", tzinfo=TIMEZONE)
