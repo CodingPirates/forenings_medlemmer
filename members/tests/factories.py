@@ -57,16 +57,6 @@ class CodingPiratesProvider(BaseProvider):
     def payment_type(self):
         return random.choice(self.payment_types)
 
-    member_type_choices = [
-        "PA",
-        "GU",
-        "CH",
-        "OT",
-    ]
-
-    def member_type_choice(self):
-        return random.choice(self.member_type_choices)
-
 
 class DanishProvider(BaseProvider):
     """
@@ -198,7 +188,7 @@ class PersonFactory(DjangoModelFactory):
     class Meta:
         model = Person
 
-    membertype = Faker("member_type_choice")
+    membertype = "PA"
     name = Faker("name")
     placename = Faker("city_suffix")
     zipcode = Faker("zipcode")
