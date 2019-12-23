@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from django.db import models
 from django.conf import settings
 from quickpay_api_client import QPClient
@@ -82,7 +83,7 @@ class QuickpayTransaction(models.Model):
                     continueurl=return_url,
                     cancelurl=return_url,
                     customer_email=self.payment.family.email,
-                    autocapture=self.payment.activity.start_date.year == now.year,
+                    autocapture=self.payment.activity.start_date.year == datetime.now().year,
                 )
 
                 self.link_url = link["url"]
