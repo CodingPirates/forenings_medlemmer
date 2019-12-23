@@ -1,0 +1,1 @@
+from .department_statistic import DepartmentStatistics

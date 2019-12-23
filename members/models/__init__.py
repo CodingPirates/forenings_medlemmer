@@ -6,7 +6,6 @@
 import members.models.activity
 import members.models.activityinvite
 import members.models.activityparticipant
-import members.models.dailystatisticsdepartment
 import members.models.dailystatisticsgeneral
 import members.models.dailystatisticsregion
 import members.models.dailystatisticsunion
@@ -26,6 +25,7 @@ import members.models.volunteer
 import members.models.waitinglist
 import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
+import members.models.statistics
 
 # Export models not files
 from .activity import Activity
@@ -35,4 +35,3 @@ from .person import Person
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
-from .dailystatisticsdepartment import DailyStatisticsDepartment
