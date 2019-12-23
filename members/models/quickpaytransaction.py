@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.db import models
 from django.conf import settings
 from quickpay_api_client import QPClient
 from django.urls import reverse
+from datetime import datetime
 
 
 class QuickpayTransaction(models.Model):
