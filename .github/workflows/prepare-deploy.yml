@@ -1,6 +1,6 @@
-name: Running tests
+name: Prepare deploy
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
