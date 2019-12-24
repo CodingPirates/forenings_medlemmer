@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 from quickpay_api_client import QPClient
 from django.urls import reverse
-from datetime import datetime
+from django.utils import utils
 
 
 class QuickpayTransaction(models.Model):
@@ -83,7 +83,7 @@ class QuickpayTransaction(models.Model):
                     continueurl=return_url,
                     cancelurl=return_url,
                     customer_email=self.payment.family.email,
-                    autocapture=self.payment.activity.start_date.year == datetime.now().year,
+                    autocapture=self.payment.activity.start_date.year == django.utils.timezone.now.year,
                 )
 
                 self.link_url = link["url"]
