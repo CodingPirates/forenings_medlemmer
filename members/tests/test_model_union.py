@@ -2,11 +2,12 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from members.tests.factories import UnionFactory
+from members.models import Union
 
 
 class TestModelUnion(TestCase):
     def test_defaults_to_having_an_account_at_main_org(self):
-        union = UnionFactory()
+        union = Union()
         self.assertTrue(union.bank_main_org)
 
     def test_bank_account_not_required_if_account_at_main_org(self):
