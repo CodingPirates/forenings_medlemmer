@@ -1,15 +1,21 @@
 name: Running tests
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Setup Enviroment 
+      - name: Setup Enviroment
         run: cp .env.example .env
       - name: Builds the stack
         run: docker-compose build
       - name: Test
         run: docker-compose run web ./manage.py test
+      - name: Create Coverage
+        run: docker-compose run web coverage run --source='.' manage.py test
+      - name: Upload coverage
+        run: docker-compose run web coveralls
+        env:
+          repo_token: ${{ secrets.repo_token }}
