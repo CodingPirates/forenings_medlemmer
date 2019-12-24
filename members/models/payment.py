@@ -10,7 +10,6 @@ class Payment(models.Model):
     BANKTRANSFER = "BA"
     CREDITCARD = "CC"
     REFUND = "RE"
-    DEBIT = "DE"
     OTHER = "OT"
     PAYMENT_METHODS = (
         (CASH, "Kontant betaling"),
@@ -93,3 +92,16 @@ class Payment(models.Model):
             self.rejected_dtm = timezone.now()
             self.rejected_message = message
             self.save()
+
+    @staticmethod
+    def capture_oustanding_payments():
+        # get payments that are not confirmed and where activity starts this year
+        payments = Payment.objects.filter(
+            rejected_dtm__isnull=True,
+            confirmed_dtm__isnull=True,
+            payment_type=Payment.CREDITCARD,
+            added__lte=timezone.now(),
+        )
+
+        for payment in payments:
+            payment.get_quickpaytransaction().capture()
