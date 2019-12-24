@@ -6,14 +6,13 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 from members.models.person import Person
-from members.models.waitinglist import WaitingList
 from members.models.department import Department
 from members.models.union import Union
 from members.models.activity import Activity
 from members.models.dailystatisticsgeneral import DailyStatisticsGeneral
 from members.models.dailystatisticsregion import DailyStatisticsRegion
 from members.models.dailystatisticsunion import DailyStatisticsUnion
-from members.models.statistics import DepartmentStatistics
+from members.models.statistics import gatherDayliStatistics
 from members.models.zipcoderegion import ZipcodeRegion
 from members.models.family import Family
 from django.db.models import Q, F
@@ -149,13 +148,10 @@ class GenerateStatisticsCronJob(CronJobBase):
     code = "members.generate_statistics_cronjob"  # a unique code
 
     def do(self):
+        gatherDayliStatistics()
+
+        # Old code below
         timestamp = timezone.now()  # make sure all entries share same timestamp
-        [
-            DepartmentStatistics.objects.create(
-                department=department, timestamp=timestamp
-            )
-            for department in Department.objects.filter(closed_dtm=None)
-        ]
 
         # generate general statistics
         dailyStatisticsGeneral = DailyStatisticsGeneral()

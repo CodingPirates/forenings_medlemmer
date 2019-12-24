@@ -2,9 +2,19 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 
-from members.models import ActivityParticipant, Activity, Department
-import datetime
+
+from members.models import (
+    ActivityParticipant,
+    Activity,
+    Department,
+    WaitingList,
+    Payment,
+    Volunteer,
+    Person,
+)
 
 
 class DepartmentStatistics(models.Model):
@@ -61,69 +71,45 @@ class DepartmentStatistics(models.Model):
             ]
         )
 
-        # TODO Finish these
-        self.waitinglist = 1
-        self.waitingtime = datetime.timedelta(days=20, hours=10)
-        self.payments = 1
-        self.volunteers_male = 1
-        self.volunteers_female = 1
-        self.volunteers = 1
+        waitinglist = WaitingList.objects.filter(department=self.department).distinct()
+
+        self.waitinglist = waitinglist.count()
+
+        self.waitingtime = max(
+            [timezone.now() - wait.on_waiting_list_since for wait in waitinglist]
+        )
+        self.volunteers = Volunteer.objects.filter(department=self.department).count()
+
+        # TODO The three fields below does not have tests since we need to change
+        # paymetns and gender soon anyways
+        self.volunteers_male = (
+            Person.objects.filter(
+                volunteer__department=self.department, gender=Person.MALE
+            )
+            .distinct()
+            .count()
+        )
+        self.volunteers_female = (
+            Person.objects.filter(
+                volunteer__department=self.department, gender=Person.FEMALE
+            )
+            .distinct()
+            .count()
+        )
+
+        self.payments = Payment.objects.filter(
+            activity__department=self.department,
+            refunded_dtm=None,
+            confirmed_dtm__isnull=False,
+        ).aggregate(sum=Coalesce(Sum("amount_ore"), 0))["sum"]
+
         super(DepartmentStatistics, self).save(*args, **kwargs)
 
     @staticmethod
     def gatherStatistics(timestamp):
-        print(len(Department.objects.filter(closed_dtm=None)))
         [
             DepartmentStatistics.objects.create(
                 department=department, timestamp=timestamp
             )
             for department in Department.objects.filter(closed_dtm=None)
         ]
-
-
-# OLD WAY
-# for department in departments:
-#     dailyStatisticsDepartment = (
-#         members.models.dailystatisticsdepartment.DailyStatisticsDepartment()
-#     )
-#
-#     dailyStatisticsDepartment.members = 0  # TODO: to loosely defined now
-#     dailyStatisticsDepartment.waitinglist = (
-#         Person.objects.filter(waitinglist__department=department)
-#         .distinct()
-#         .count()
-#     )
-#     firstWaitingListItem = (
-#         WaitingList.objects.filter(department=department)
-#         .order_by("on_waiting_list_since")
-#         .first()
-#     )
-#     if firstWaitingListItem:
-#         dailyStatisticsDepartment.waitingtime = (
-#             timestamp - firstWaitingListItem.on_waiting_list_since
-#         )
-#     else:
-#         dailyStatisticsDepartment.waitingtime = datetime.timedelta(days=0)
-#     dailyStatisticsDepartment.payments = Payment.objects.filter(
-#         activity__department=department,
-#         refunded_dtm=None,
-#         confirmed_dtm__isnull=False,
-#     ).aggregate(sum=Coalesce(Sum("amount_ore"), 0))["sum"]
-#     dailyStatisticsDepartment.volunteers_male = (
-#         Person.objects.filter(
-#             volunteer__department=department, gender=Person.MALE
-#         )
-#         .distinct()
-#         .count()
-#     )
-#     dailyStatisticsDepartment.volunteers_female = (
-#         Person.objects.filter(
-#             volunteer__department=department, gender=Person.FEMALE
-#         )
-#         .distinct()
-#         .count()
-#     )
-#     dailyStatisticsDepartment.volunteers = (
-#         dailyStatisticsDepartment.volunteers_male
-#         + dailyStatisticsDepartment.volunteers_female
-#     )

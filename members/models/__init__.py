@@ -33,9 +33,26 @@ from .department import Department
 from .activityparticipant import ActivityParticipant
 from .union import Union
 from .person import Person
+from .payment import Payment
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
+from .waitinglist import WaitingList
+from .volunteer import Volunteer
 
+from members.models.statistics import gatherDayliStatistics
 
-import members.models.statistics
+__all__ = [
+    Activity,
+    Department,
+    ActivityParticipant,
+    Union,
+    Person,
+    Payment,
+    DailyStatisticsGeneral,
+    DailyStatisticsRegion,
+    DailyStatisticsUnion,
+    gatherDayliStatistics,
+    WaitingList,
+    Volunteer,
+]

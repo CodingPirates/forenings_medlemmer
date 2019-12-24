@@ -1,16 +1,18 @@
 import datetime
 from random import randint
 from django.test import TestCase
+from django.utils import timezone
 from members.models.statistics import (
     gatherDayliStatistics,
     DepartmentStatistics,
 )
-from members.models import Department
 
 from members.tests.factories import (
     DepartmentFactory,
     ActivityFactory,
     ActivityParticipantFactory,
+    WaitingListFactory,
+    VolunteerFactory,
 )
 
 
@@ -59,6 +61,20 @@ class TestDepartmentStatistics(TestCase):
                 if testDepartment["activities"][activityIndex].member_justified:
                     testDepartment["nr_members"] += 1
 
+            testDepartment["nr_waitinglist"] = randint(1, 100)
+            waitlist = WaitingListFactory.create_batch(
+                testDepartment["nr_waitinglist"],
+                department=testDepartment["department"],
+            )
+            testDepartment["waitingtime"] = timezone.now() - min(
+                [wait.on_waiting_list_since for wait in waitlist]
+            )
+            testDepartment["nr_volunteers"] = len(
+                VolunteerFactory.create_batch(
+                    randint(0, 50), department=testDepartment["department"]
+                )
+            )
+
             self.testDepartments.append(testDepartment)
 
     def test_stats_creation(self):
@@ -101,4 +117,17 @@ class TestDepartmentStatistics(TestCase):
                 stats.members,
                 "The number of members does not match",
             )
-        self.fail("Finish implementation and test!")
+            self.assertEqual(
+                testDepartment["nr_waitinglist"],
+                stats.waitinglist,
+                "The number of people on waitinglist does not match",
+            )
+            self.assertTrue(
+                testDepartment["waitingtime"] - stats.waitingtime
+                < datetime.timedelta(seconds=3)
+            )
+            self.assertEqual(
+                testDepartment["nr_volunteers"],
+                stats.volunteers,
+                "The number of volunteers does not match",
+            )

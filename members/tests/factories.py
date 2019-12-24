@@ -355,7 +355,7 @@ class ActivityParticipantFactory(DjangoModelFactory):
     note = Faker("text")
     photo_permission = (
         "OK" if random.randint(0, 1) == 1 else "NO"
-    )  # Breaks it FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
+    )  # Breaks FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
     contact_visible = Faker("boolean")
 
 
