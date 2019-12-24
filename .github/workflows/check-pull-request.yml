@@ -1,4 +1,4 @@
-name: Prepare deploy
+name: Run tests & Analyse code
 
 on: [push, pull_request]
 
