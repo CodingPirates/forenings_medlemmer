@@ -9,6 +9,7 @@ import members.models.activityparticipant
 import members.models.dailystatisticsgeneral
 import members.models.dailystatisticsregion
 import members.models.dailystatisticsunion
+
 import members.models.department
 import members.models.emailitem
 import members.models.emailtemplate
@@ -25,13 +26,16 @@ import members.models.volunteer
 import members.models.waitinglist
 import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
-import members.models.statistics
 
 # Export models not files
 from .activity import Activity
 from .department import Department
+from .activityparticipant import ActivityParticipant
 from .union import Union
 from .person import Person
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
+
+
+import members.models.statistics

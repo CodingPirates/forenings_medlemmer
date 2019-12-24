@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from ..activity import Activity
-from ..activityparticipant import ActivityParticipant
 
+from members.models import ActivityParticipant, Activity, Department
 import datetime
 
-# more stat ideas: age, region distribution
+
 class DepartmentStatistics(models.Model):
+    # more stat ideas: age, region distribution
     timestamp = models.DateTimeField("Kørsels tidspunkt")
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     active_activities = models.IntegerField("Aktiviteter der er igang")
@@ -30,8 +30,6 @@ class DepartmentStatistics(models.Model):
     def save(self, *args, **kwargs):
         if self.timestamp is None:
             self.timestamp = timezone.now()
-
-        # Get values
         active_activies = Activity.objects.filter(
             department=self.department,
             start_date__lte=self.timestamp,
@@ -71,6 +69,16 @@ class DepartmentStatistics(models.Model):
         self.volunteers_female = 1
         self.volunteers = 1
         super(DepartmentStatistics, self).save(*args, **kwargs)
+
+    @staticmethod
+    def gatherStatistics(timestamp):
+        print(len(Department.objects.filter(closed_dtm=None)))
+        [
+            DepartmentStatistics.objects.create(
+                department=department, timestamp=timestamp
+            )
+            for department in Department.objects.filter(closed_dtm=None)
+        ]
 
 
 # OLD WAY

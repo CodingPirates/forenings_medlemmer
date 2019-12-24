@@ -1,89 +1,104 @@
 import datetime
 from random import randint
-import factory.random
 from django.test import TestCase
-from members.models.statistics import DepartmentStatistics
+from members.models.statistics import (
+    gatherDayliStatistics,
+    DepartmentStatistics,
+)
+from members.models import Department
+
 from members.tests.factories import (
     DepartmentFactory,
     ActivityFactory,
-    UnionFactory,
     ActivityParticipantFactory,
 )
-from forenings_medlemmer.settings import TIME_ZONE
 
 
 class TestDepartmentStatistics(TestCase):
     def setUp(self):
-        self.departments = []
-        for i in range(10):
-            dep = {"department": DepartmentFactory()}
-            dep["nrActivities"] = randint(1, 30)
-            dep["isActive"] = [randint(0, 1) == 1 for _ in range(dep["nrActivities"])]
-            dep["nrActive"] = sum(dep["isActive"])
-            dep["nr_participants"] = randint(0, 100)
-            dep["activities"] = [
+        self.nr_closed_Departments = randint(1, 30)
+        DepartmentFactory.create_batch(self.nr_closed_Departments)
+
+        self.nr_departments = randint(1, 30)
+        departments = DepartmentFactory.create_batch(
+            self.nr_departments, closed_dtm=None
+        )
+
+        self.testDepartments = []
+        for department in departments:
+            testDepartment = {"department": department}
+
+            # creates activites
+            testDepartment["nrActivities"] = randint(1, 30)
+            testDepartment["isActive"] = [
+                randint(0, 1) == 1 for _ in range(testDepartment["nrActivities"])
+            ]
+            testDepartment["nrActive"] = sum(testDepartment["isActive"])
+            testDepartment["nr_participants"] = randint(0, 100)
+            testDepartment["activities"] = [
                 ActivityFactory(
-                    department=dep["department"],
-                    union=dep["department"].union,
+                    department=testDepartment["department"],
+                    union=testDepartment["department"].union,
                     active=active,
                 )
-                for active in dep["isActive"]
+                for active in testDepartment["isActive"]
             ]
-            dep["nr_active_participants"] = 0
-            dep["nr_members"] = 0
-            dep["participants"] = []
-            for i in range(dep["nr_participants"]):
-                activityIndex = randint(0, dep["nrActivities"] - 1)
-                dep["participants"].append(
+            testDepartment["nr_active_participants"] = 0
+            testDepartment["nr_members"] = 0
+            testDepartment["participants"] = []
+            for i in range(testDepartment["nr_participants"]):
+                activityIndex = randint(0, testDepartment["nrActivities"] - 1)
+                testDepartment["participants"].append(
                     ActivityParticipantFactory(
-                        activity=dep["activities"][activityIndex]
+                        activity=testDepartment["activities"][activityIndex]
                     )
                 )
-                if dep["isActive"][activityIndex]:
-                    dep["nr_active_participants"] += 1
+                if testDepartment["isActive"][activityIndex]:
+                    testDepartment["nr_active_participants"] += 1
 
-                if dep["activities"][activityIndex].member_justified:
-                    dep["nr_members"] += 1
+                if testDepartment["activities"][activityIndex].member_justified:
+                    testDepartment["nr_members"] += 1
 
-            self.departments.append(dep)
+            self.testDepartments.append(testDepartment)
 
     def test_stats_creation(self):
-        for department in self.departments:
-            stats = DepartmentStatistics.objects.create(
-                department=department["department"]
-            )
-        self.assertEqual(
-            stats.department, department["department"], "Departments does not match"
-        )
-        self.assertTrue(
-            stats.timestamp - datetime.datetime.now(stats.timestamp.tzinfo)
-            < datetime.timedelta(seconds=3),
-            "Timestamp does not match",
-        )
-        self.assertEqual(
-            len(department["activities"]),
-            stats.activities,
-            "The total number of activites does not match",
-        )
-        self.assertEqual(
-            department["nrActive"],
-            stats.active_activities,
-            "The number of active activites does not match",
-        )
-        self.assertEqual(
-            department["nr_participants"],
-            stats.activity_participants,
-            "The number of total participants does not match",
-        )
-        self.assertEqual(
-            department["nr_active_participants"],
-            stats.current_activity_participants,
-            "The number of active participants does not match",
-        )
-        self.assertEqual(
-            department["nr_members"],
-            stats.members,
-            "The number of members does not match",
-        )
+        gatherDayliStatistics()
+        allStats = DepartmentStatistics.objects.all()
+        self.assertEqual(len(self.testDepartments), len(allStats))
+        for testDepartment in self.testDepartments:
+            stats = DepartmentStatistics.objects.filter(
+                department=testDepartment["department"]
+            )[0]
 
+            self.assertTrue(
+                stats.timestamp - datetime.datetime.now(stats.timestamp.tzinfo)
+                < datetime.timedelta(seconds=3),
+                "Timestamp does not match",
+            )
+            self.assertEqual(
+                len(testDepartment["activities"]),
+                stats.activities,
+                "The total number of activites does not match",
+            )
+            self.assertEqual(
+                testDepartment["nrActive"],
+                stats.active_activities,
+                "The number of active activites does not match",
+            )
+
+            self.assertEqual(
+                testDepartment["nr_participants"],
+                stats.activity_participants,
+                "The number of total participants does not match",
+            )
+            self.assertEqual(
+                testDepartment["nr_active_participants"],
+                stats.current_activity_participants,
+                "The number of active participants does not match",
+            )
+            self.assertEqual(
+                testDepartment["nr_members"],
+                stats.members,
+                "The number of members does not match",
+            )
         self.fail("Finish implementation and test!")
