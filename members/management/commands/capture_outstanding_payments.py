@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from members.models.payment import Payment
-from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):

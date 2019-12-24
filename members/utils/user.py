@@ -1,7 +1,5 @@
 from members.models.person import Person
 
-from django.core.exceptions import ObjectDoesNotExist
-
 
 def user_to_person(user):
     try:

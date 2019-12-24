@@ -11,8 +11,6 @@ from members.models.department import Department
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person, has_user
-from django.shortcuts import redirect
-from django.urls import reverse
 
 
 @login_required
