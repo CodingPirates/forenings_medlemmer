@@ -13,7 +13,7 @@ from members.utils.user import user_to_person, has_user
 
 
 @login_required
-@user_passes_test(has_user, '/admin_signup/')
+@user_passes_test(has_user, "/admin_signup/")
 def PersonUpdate(request, id):
     person = Person.objects.get(pk=id)
     persons_in_family = Person.objects.filter(

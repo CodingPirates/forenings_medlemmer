@@ -16,7 +16,7 @@ from members.utils.user import user_to_person, has_user
 
 
 @login_required
-@user_passes_test(has_user, '/admin_signup/')
+@user_passes_test(has_user, "/admin_signup/")
 def ActivitySignup(request, activity_id, person_id=None):
     # TODO: is should be possible to view an activity without loggin in
     if person_id is None:

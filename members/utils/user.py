@@ -9,5 +9,6 @@ def user_to_person(user):
     except Person.DoesNotExist:
         return None
 
+
 def has_user(user):
     return user_to_person(user) is not None

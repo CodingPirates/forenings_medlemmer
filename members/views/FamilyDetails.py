@@ -16,7 +16,7 @@ from django.urls import reverse
 
 
 @login_required
-@user_passes_test(has_user, '/admin_signup/')
+@user_passes_test(has_user, "/admin_signup/")
 def FamilyDetails(request):
     family = user_to_person(request.user).family
     invites = ActivityInvite.objects.filter(
