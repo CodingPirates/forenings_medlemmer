@@ -13,3 +13,8 @@ jobs:
         run: docker-compose build
       - name: Test
         run: docker-compose run web ./manage.py test
+      - name: Check formatting
+        uses: lgeiger/black-action@v1.0.1
+      - name: Static error check (Flake8)
+        uses: cclauss/GitHub-Action-for-Flake8@v0.5.0
+      
