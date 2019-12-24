@@ -2,7 +2,7 @@
 # TODO: tests for departments, members, volunteers, activities, equipment, equipmentloan, statistics
 
 import pytz
-from datetime import date, timedelta, datetime
+from datetime import timedelta
 import random
 from django.utils import timezone
 from django.contrib.auth import get_user_model
