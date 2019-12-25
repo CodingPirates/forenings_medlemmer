@@ -88,6 +88,7 @@ INSTALLED_APPS = (
     "django.contrib.admin",
     "graphene_django",
     "fontawesome",
+    "django_extensions",
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
