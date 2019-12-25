@@ -18,9 +18,9 @@ jobs:
       - name: Static error check (Flake8)
         run: docker-compose run web flake8
       - name: Create and upload UML diagram
-        uses: actions/upload-artifact@v1
+        run: mkdir -p UML && docker-compose run web ./manage.py graph_models members -o UML/members_models.png
+      - uses: actions/upload-artifact@v1
         with:
-          name: my-artifact
-          path: path/to/artifact
-        run: "mkdir -p UML && docker-compose run web \
-          ./manage.py graph_models members -o UML/members_models.png"
+          name: members_models.png
+          path: UML
+
