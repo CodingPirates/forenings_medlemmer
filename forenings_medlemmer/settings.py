@@ -20,11 +20,11 @@ from sentry_sdk.integrations.django import DjangoIntegration
 env = Env()
 env.read_env()
 
-if env.str("SENTRY_DSN") != 'not set':
+if env.str("SENTRY_DSN") != "not set":
     sentry_sdk.init(
         dsn=env.str("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
-        environment=env.str("MODE")
+        environment=env.str("MODE"),
     )
 
 logger = logging.getLogger(__name__)
@@ -88,6 +88,7 @@ INSTALLED_APPS = (
     "django.contrib.admin",
     "graphene_django",
     "fontawesome",
+    "django_extensions",
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"

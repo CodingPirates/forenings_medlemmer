@@ -7,5 +7,5 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
     url(r"^admin/", admin.site.urls),
     url(r"^", include("members.urls")),
-    url('^sentry-debug/', lambda request: 1/0), # Test url, delete this 
+    url("^sentry-debug/", lambda request: 1 / 0),  # Test url, delete this
 ]
