@@ -75,8 +75,10 @@ class DepartmentStatistics(models.Model):
 
         self.waitinglist = waitinglist.count()
 
-        self.waitingtime = max(
-            [timezone.now() - wait.on_waiting_list_since for wait in waitinglist]
+        self.waitingtime = (
+            max([timezone.now() - wait.on_waiting_list_since for wait in waitinglist])
+            if len(waitinglist) > 0
+            else 0
         )
         self.volunteers = Volunteer.objects.filter(department=self.department).count()
 
