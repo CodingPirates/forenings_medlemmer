@@ -38,7 +38,7 @@ class QuickpayTransaction(models.Model):
     def get_link_url(self, return_url=""):
         if self.link_url == "":
             # request only if not already requested
-            client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+            client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
             parent = self.payment.family.get_first_parent()
 
@@ -96,7 +96,7 @@ class QuickpayTransaction(models.Model):
 
     # If callback was lost - we can get transaction status directly
     def update_status(self):
-        client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+        client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
         # get payment id from order id
         transactions = client.get("/payments", order_id=self.order_id)
@@ -121,11 +121,12 @@ class QuickpayTransaction(models.Model):
 
     # Capture uncaptured payment
     def capture(self):
-        client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+        client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
         status, body, headers = client.post(
-            "/payments/{id}/capture".format(self.transaction_id),
+            f"/payments/{self.transaction_id}/capture",
             amount=self.payment.amount_ore,
+            raw=True,
         )
 
         if status == 202:
