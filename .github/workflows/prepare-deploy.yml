@@ -21,4 +21,4 @@ jobs:
       - name: Upload coverage
         run: docker-compose run web coveralls
         env:
-          repo_token: ${{ secrets.repo_token }}
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
