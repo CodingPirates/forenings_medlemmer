@@ -2,9 +2,9 @@
 # TODO: tests for departments, members, volunteers, activities, equipment, equipmentloan, statistics
 
 import pytz
-from datetime import date, timedelta
+from datetime import timedelta
 import random
-
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 import factory
@@ -139,15 +139,12 @@ TIMEZONE = pytz.timezone("Europe/Copenhagen")
 Faker._DEFAULT_LOCALE = LOCALE
 
 
-def datetime_after(dt):
-    """
-    For use with lazy attribute to generate DateTime's after the given
-    datetime.
-    """
-    END_OF_TIME = date.today() + timedelta(days=60 * 365)
-    return Faker(
-        "date_time_between", tzinfo=TIMEZONE, start_date=dt, end_date=END_OF_TIME
-    ).generate({})
+def datetime_before(datetime):
+    return datetime - timedelta(days=random.randint(1, 4 * 365))
+
+
+def datetime_after(datetime):
+    return datetime + timedelta(days=random.randint(1, 4 * 365))
 
 
 class ZipcodeRegionFactory(DjangoModelFactory):
@@ -244,7 +241,7 @@ class UnionFactory(DjangoModelFactory):
     floor = Faker("floor")
     door = Faker("door")
     boardMembers = Faker("text")
-    # bank_main_org = Faker("boolean")
+    bank_main_org = Faker("boolean")
     bank_account = Faker("numerify", text="####-##########")
 
 
@@ -313,9 +310,14 @@ class WaitingListFactory(DjangoModelFactory):
 class ActivityFactory(DjangoModelFactory):
     class Meta:
         model = Activity
+        exclude = ("active", "now")
 
-    department = SubFactory(DepartmentFactory)
+    # Helper fields
+    active = Faker("boolean")
+    now = timezone.now()
+
     union = SubFactory(UnionFactory)
+    department = SubFactory(DepartmentFactory, union=factory.SelfAttribute("..union"))
     name = Faker("activity")
     open_hours = Faker("numerify", text="kl. ##:00-##:00")
     responsible_name = Faker("name")
@@ -331,11 +333,17 @@ class ActivityFactory(DjangoModelFactory):
     description = Faker("text")
     instructions = Faker("text")
     signup_closing = Faker("date_time", tzinfo=TIMEZONE)
-    start_date = LazyAttribute(lambda d: datetime_after(d.signup_closing))
-    end_date = LazyAttribute(lambda d: datetime_after(d.start_date))
+    start_date = LazyAttribute(
+        lambda d: datetime_before(d.now)
+        if d.active
+        else Faker("date_time", tzinfo=TIMEZONE).generate({})
+    )
+    end_date = LazyAttribute(
+        lambda d: datetime_after(d.now) if d.active else datetime_before(d.now)
+    )
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     open_invite = Faker("boolean")
-    price_in_dkk = Faker("random_number")
+    price_in_dkk = Faker("random_number", digits=4)
     max_participants = Faker("random_number")
     min_age = Faker("random_number")
     max_age = LazyAttribute(lambda a: a.min_age + Faker("random_number").generate({}))
