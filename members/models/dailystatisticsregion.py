@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from members.models.zipcoderegion import ZipcodeRegion
-from datetime import datetime
+from django.utils import timezone
 
 
 class DailyStatisticsRegion(models.Model):
     timestamp = models.DateTimeField(
-        "Kørsels tidspunkt", null=False, blank=False, default=datetime.now
+        "Kørsels tidspunkt", null=False, blank=False, default=timezone.now
     )
     region = models.CharField(
         "Region",

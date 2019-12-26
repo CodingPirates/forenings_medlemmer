@@ -83,7 +83,8 @@ class QuickpayTransaction(models.Model):
                     continueurl=return_url,
                     cancelurl=return_url,
                     customer_email=self.payment.family.email,
-                    autocapture=self.payment.activity.start_date.year == timezone.now().year,
+                    autocapture=self.payment.activity.start_date.year
+                    == timezone.now().year,
                 )
 
                 self.link_url = link["url"]
