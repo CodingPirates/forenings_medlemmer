@@ -375,7 +375,7 @@ class PaymentFactory(DjangoModelFactory):
     person = SubFactory(PersonFactory)
     family = SubFactory(FamilyFactory)
     body_text = Faker("text")
-    amount_ore = FuzzyInteger(100, 700)
+    amount_ore = FuzzyInteger(10000, 70000)
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
     cancelled_dtm = Faker("date_time", tzinfo=TIMEZONE)
     refunded_dtm = Faker("date_time", tzinfo=TIMEZONE)
