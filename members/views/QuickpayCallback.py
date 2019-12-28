@@ -29,9 +29,7 @@ def QuickpayCallback(request):
         callback = json.loads(str(request.body, "utf8"))
 
         # We only care about state = processed
-        if callback["state"] != "processed":
-            return HttpResponse("OK")  # processing stops here - but tell QuickPay we are OK
-        else:
+        if callback["state"] == "processed":
             quickpay_transaction = get_object_or_404(
                 QuickpayTransaction, order_id=callback["order_id"]
             )
@@ -41,7 +39,7 @@ def QuickpayCallback(request):
             else:
                 quickpay_transaction.payment.set_rejected(request.body)
 
-            return HttpResponse("OK")
+        return HttpResponse("OK")
     else:
         # Request is Not authenticated
         return HttpResponseForbidden("Invalid request")
