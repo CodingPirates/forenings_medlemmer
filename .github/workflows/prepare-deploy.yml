@@ -19,7 +19,7 @@ jobs:
       - name: Create Coverage
         run: docker-compose run web coverage run --source='.' manage.py test
       - name: Upload coverage
-        if: ${{ github.repository }} == "CodingPirates/forenings_medlemmer"
+        if: {{ github.repository }} == "CodingPirates/forenings_medlemmer"
         run: docker-compose run web coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
