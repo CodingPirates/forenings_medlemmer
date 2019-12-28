@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-
+from datetime import timedelta
 
 from members.models import (
     ActivityParticipant,
@@ -75,8 +75,10 @@ class DepartmentStatistics(models.Model):
 
         self.waitinglist = waitinglist.count()
 
-        self.waitingtime = max(
-            [timezone.now() - wait.on_waiting_list_since for wait in waitinglist]
+        self.waitingtime = (
+            max([timezone.now() - wait.on_waiting_list_since for wait in waitinglist])
+            if len(waitinglist) > 0
+            else timedelta(0)
         )
         self.volunteers = Volunteer.objects.filter(department=self.department).count()
 
