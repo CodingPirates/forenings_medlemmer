@@ -15,6 +15,7 @@ from members.models import (
     DailyStatisticsUnion,
     Person,
 )
+from members.models.statistics import DepartmentStatistics as DepStatModel
 
 
 class StatisticsGeneral(DjangoObjectType):
@@ -25,6 +26,11 @@ class StatisticsGeneral(DjangoObjectType):
 class PersonType(DjangoObjectType):
     class Meta:
         model = Person
+
+
+class DepartmentStatistics(DjangoObjectType):
+    class Meta:
+        model = DepStatModel
 
 
 class StatisticsRegion(DjangoObjectType):
@@ -61,11 +67,15 @@ class Query(graphene.ObjectType):
     general_daily_statistics = graphene.List(StatisticsGeneral)
     union_daily_statistics = graphene.List(StatisticsUnion)
     region_daily_statistics = graphene.List(StatisticsRegion)
+    department_statistics = graphene.List(DepartmentStatistics)
     me = graphene.Field(PersonType)
 
     @login_required
     def resolve_me(self, info, **kwargs):
         return user_to_person(info.context.user)
+
+    def resolve_department_statistics(self, info, **kwargs):
+        return DepStatModel.objects.all()
 
     def resolve_general_daily_statistics(self, info, **kwargs):
         return DailyStatisticsGeneral.objects.all()
