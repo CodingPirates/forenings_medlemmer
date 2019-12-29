@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from graphene_django.utils.testing import GraphQLTestCase
 from graphql_jwt.testcases import JSONWebTokenTestCase
 from members.tests.factories import PersonFactory

@@ -4,8 +4,6 @@ from graphene_django.utils.testing import GraphQLTestCase
 from members.schema import schema
 from members.tests.factories import PersonFactory
 
-from members.models import Person, Family
-
 
 class GraphQLTokenTest(GraphQLTestCase):
     def setUp(self):

@@ -128,7 +128,7 @@ class Department(models.Model):
                     self.longitude = address["geometry"]["coordinates"][0]
                     self.latitude = address["geometry"]["coordinates"][1]
                     self.save()
-                except Exception as error:
+                except Exception:
                     return None
 
         if self.latitude is not None and self.longitude is not None:

@@ -4,7 +4,7 @@ from graphene_django.utils.testing import GraphQLTestCase
 from members.schema import schema
 from members.tests.factories import PersonFactory
 
-from members.models import Person, Family
+from members.models import Person
 
 
 class PersonMutationsTest(GraphQLTestCase):
@@ -31,7 +31,7 @@ class PersonMutationsTest(GraphQLTestCase):
             """
             mutation createAdult($input: CreateAdultInput!) {
                 createAdult(input: $input) {
-		              name
+                      name
                       email
                 }
             }
@@ -57,7 +57,7 @@ class PersonMutationsTest(GraphQLTestCase):
             """
             mutation createAdult($input: CreateAdultInput!) {
                 createAdult(input: $input) {
-		              name
+                      name
                       email
                 }
             }
