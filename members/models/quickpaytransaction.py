@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 from quickpay_api_client import QPClient
 from django.urls import reverse
+from django.utils import timezone
 
 
 class QuickpayTransaction(models.Model):
@@ -37,7 +38,7 @@ class QuickpayTransaction(models.Model):
     def get_link_url(self, return_url=""):
         if self.link_url == "":
             # request only if not already requested
-            client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+            client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
             parent = self.payment.family.get_first_parent()
 
@@ -74,14 +75,16 @@ class QuickpayTransaction(models.Model):
                 if self.transaction_id is None:
                     raise Exception("we did not get a transaction_id")
 
+                # Enable auto-capture if the activity starts this year
                 link = client.put(
-                    "/payments/{0}/link".format(self.transaction_id),
+                    f"/payments/{self.transaction_id}/link",
                     amount=self.payment.amount_ore,
                     id=self.transaction_id,
                     continueurl=return_url,
                     cancelurl=return_url,
                     customer_email=self.payment.family.email,
-                    autocapture=True,
+                    autocapture=self.payment.activity.start_date.year
+                    == timezone.now().year,
                 )
 
                 self.link_url = link["url"]
@@ -94,7 +97,7 @@ class QuickpayTransaction(models.Model):
 
     # If callback was lost - we can get transaction status directly
     def update_status(self):
-        client = QPClient(":{0}".format(settings.QUICKPAY_API_KEY))
+        client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
         # get payment id from order id
         transactions = client.get("/payments", order_id=self.order_id)
@@ -116,3 +119,17 @@ class QuickpayTransaction(models.Model):
             + str(self.payment.confirmed_dtm)
             + "'"
         )
+
+    # Capture uncaptured payment
+    def capture(self):
+        client = QPClient(f":{settings.QUICKPAY_API_KEY}")
+
+        status, body, headers = client.post(
+            f"/payments/{self.transaction_id}/capture",
+            amount=self.payment.amount_ore,
+            raw=True,
+        )
+
+        if status == 202:
+            self.payment.confirmed_dtm = timezone.now()
+            self.payment.save()

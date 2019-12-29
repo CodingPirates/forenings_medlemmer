@@ -6,10 +6,10 @@
 import members.models.activity
 import members.models.activityinvite
 import members.models.activityparticipant
-import members.models.dailystatisticsdepartment
 import members.models.dailystatisticsgeneral
 import members.models.dailystatisticsregion
 import members.models.dailystatisticsunion
+
 import members.models.department
 import members.models.emailitem
 import members.models.emailtemplate
@@ -28,10 +28,33 @@ import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
 
 # Export models not files
+from .activity import Activity
 from .department import Department
+from .activityparticipant import ActivityParticipant
 from .union import Union
 from .person import Person
 from .family import Family
+from .payment import Payment
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
+from .waitinglist import WaitingList
+from .volunteer import Volunteer
+
+from members.models.statistics import gatherDayliStatistics
+
+__all__ = [
+    Activity,
+    ActivityParticipant,
+    Department,
+    Family,
+    Union,
+    Person,
+    Payment,
+    DailyStatisticsGeneral,
+    DailyStatisticsRegion,
+    DailyStatisticsUnion,
+    gatherDayliStatistics,
+    WaitingList,
+    Volunteer,
+]

@@ -3,8 +3,6 @@ from members.models.union import Union
 from members.models.department import Department
 from members.models.emailtemplate import EmailTemplate
 import math
-from django.core import mail
-from members.jobs import EmailSendCronJob
 
 
 class TestModelDepartment(TestCase):

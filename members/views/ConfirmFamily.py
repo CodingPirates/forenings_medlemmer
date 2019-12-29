@@ -10,7 +10,7 @@ from members.utils.user import user_to_person, has_user
 
 
 @login_required
-@user_passes_test(has_user, '/admin_signup/')
+@user_passes_test(has_user, "/admin_signup/")
 def ConfirmFamily(request):
     family = user_to_person(request.user).family
     persons = Person.objects.filter(family=family)
