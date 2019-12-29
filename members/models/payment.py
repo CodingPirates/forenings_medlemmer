@@ -98,6 +98,7 @@ class Payment(models.Model):
         # get payments that are not confirmed and where activity starts this year
         payments = Payment.objects.filter(
             rejected_dtm__isnull=True,
+            cancelled_dtm__isnull=True,
             confirmed_dtm__isnull=True,
             payment_type=Payment.CREDITCARD,
             added__lte=timezone.now(),
