@@ -9,11 +9,17 @@ from members.models import (
     DailyStatisticsRegion,
     DailyStatisticsUnion,
 )
+from members.models.statistics import DepartmentStatistics as DepStatModel
 
 
 class StatisticsGeneral(DjangoObjectType):
     class Meta:
         model = DailyStatisticsGeneral
+
+
+class DepartmentStatistics(DjangoObjectType):
+    class Meta:
+        model = DepStatModel
 
 
 class StatisticsRegion(DjangoObjectType):
@@ -44,6 +50,10 @@ class Query(graphene.ObjectType):
     general_daily_statistics = graphene.List(StatisticsGeneral)
     union_daily_statistics = graphene.List(StatisticsUnion)
     region_daily_statistics = graphene.List(StatisticsRegion)
+    department_statistics = graphene.List(DepartmentStatistics)
+
+    def resolve_department_statistics(self, info, **kwargs):
+        return DepStatModel.objects.all()
 
     def resolve_general_daily_statistics(self, info, **kwargs):
         return DailyStatisticsGeneral.objects.all()
