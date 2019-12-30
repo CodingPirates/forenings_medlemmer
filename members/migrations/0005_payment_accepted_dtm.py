@@ -5,30 +5,28 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     def set_accepted(apps, schema_editor):
-        Payment = apps.get_model('members', 'Payment')
+        Payment = apps.get_model("members", "Payment")
         for payment in Payment.objects.all().iterator():
             payment.accepted_dtm = payment.confirmed_dtm
             payment.save()
 
     def set_none(apps, schema_editor):
-        Payment = apps.get_model('members', 'Payment')
+        Payment = apps.get_model("members", "Payment")
         for payment in Payment.objects.all().iterator():
             payment.accepted_dtm = None
             payment.save()
 
     dependencies = [
-        ('members', '0004_auto_20191225_1237'),
+        ("members", "0004_auto_20191225_1237"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='payment',
-            name='accepted_dtm',
+            model_name="payment",
+            name="accepted_dtm",
             field=models.DateTimeField(
-                blank=True,
-                null=True,
-                verbose_name='Accepteret'
+                blank=True, null=True, verbose_name="Accepteret"
             ),
         ),
-        migrations.RunPython(set_accepted, set_none)
+        migrations.RunPython(set_accepted, set_none),
     ]
