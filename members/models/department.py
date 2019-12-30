@@ -128,8 +128,6 @@ class Department(models.Model):
                     self.longitude = address["geometry"]["coordinates"][0]
                     self.latitude = address["geometry"]["coordinates"][1]
                     self.save()
-                    print("Opdateret for " + self.name)
-                    print("Updated coordinates for " + self.name)
                 except Exception as error:
                     print("Couldn't find coordinates for " + self.name)
                     print("Error " + str(error))
