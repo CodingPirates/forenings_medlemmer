@@ -117,7 +117,6 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
         return union_list
 
     def queryset(self, request, queryset):
-        print(self.value())
         if self.value() is None:
             return queryset
         else:
