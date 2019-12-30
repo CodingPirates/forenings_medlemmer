@@ -29,7 +29,7 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        if self._state.adding:  # On first save:
+        if self._state.adding and self.longitude is None:  # On first save with no data
             self.get_dawa_data()
         super().save(*args, **kwargs)
 
@@ -65,3 +65,16 @@ class Address(models.Model):
         self.longitude = dawa_data["wgs84koordinat_længde"]
         self.latitude = dawa_data["wgs84koordinat_bredde"]
         return True
+
+    @staticmethod
+    def get_by_dawa_id(dawa_id):
+        addresses = Address.objects.filter(dawa_id=dawa_id)
+        if len(addresses) > 0:
+            return addresses[0]
+        else:
+            address = Address(dawa_id=dawa_id)
+            if address.get_dawa_data():
+                address.save()
+                return address
+            else:
+                return None

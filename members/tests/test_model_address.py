@@ -33,3 +33,23 @@ class TestModelAddress(TestCase):
             streetname="Sverigesgade", housenumber=20, zipcode="5000"
         )
         self.assertEqual(home.dawa_id, "7dd8edbb-370f-4cdf-836c-6b4969a0da9c")
+
+    def test_get_model_by_dawa_id(self):
+        dawa_id = "7dd8edbb-370f-4cdf-836c-6b4969a0da9c"  # CP headquarters
+
+        # No addresses in database yet
+        self.assertEqual(Address.objects.all().count(), 0)
+
+        addres = Address.get_by_dawa_id(dawa_id)
+        self.assertEqual(addres.zipcode, "5000")  # Got info from dawa
+        self.assertEqual(Address.objects.all().count(), 1)
+
+        # Get address again
+        addres = Address.get_by_dawa_id(dawa_id)
+        # Should still only be one in database
+        self.assertEqual(Address.objects.all().count(), 1)
+
+        # Invalid id should give None
+        addres = Address.get_by_dawa_id("invalid_id")
+        self.assertIsNone(addres)
+        self.assertEqual(Address.objects.all().count(), 1)
