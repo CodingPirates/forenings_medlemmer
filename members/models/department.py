@@ -3,9 +3,6 @@
 from django.db import models
 import members.models.emailtemplate
 from django.utils import timezone, html
-import requests
-import json
-from urllib.parse import quote_plus
 from django.conf import settings
 
 
