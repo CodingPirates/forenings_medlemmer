@@ -403,10 +403,8 @@ class AddressFactory(DjangoModelFactory):
     city = Faker("city")
     zipcode = Faker("zipcode")
     municipality = Faker("municipality")
-    placename = Faker("city_suffix")
     longitude = Faker("longitude")
     latitude = Faker("latitude")
-    dawa_id = Faker("uuid4")
 
 
 class AdminUserInformationFactory(DjangoModelFactory):
