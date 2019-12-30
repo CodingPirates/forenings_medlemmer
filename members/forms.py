@@ -671,7 +671,7 @@ class ActivitySignupForm(forms.Form):
         label="Vælg betalings metode",
         required=True,
         choices=(
-            (Payment.CREDITCARD, "Betalingskort / Mobilepay"),
+            (Payment.CREDITCARD, "Betalingskort / MobilePay"),
             (Payment.OTHER, "Andet er aftalt"),
         ),
     )
