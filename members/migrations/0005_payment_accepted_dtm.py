@@ -25,7 +25,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='payment',
             name='accepted_dtm',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Accepteret'),
+            field=models.DateTimeField(
+                blank=True,
+                null=True,
+                verbose_name='Accepteret'
+            ),
         ),
         migrations.RunPython(set_accepted, set_none)
     ]
