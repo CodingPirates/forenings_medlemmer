@@ -58,7 +58,7 @@ class Activity(models.Model):
         return (self.end_date - self.start_date).days > 30
 
     def will_reserve(self):
-        return self.start_date.year >= timezone.now().year
+        return self.start_date.year > timezone.now().year
 
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
