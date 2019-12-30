@@ -80,7 +80,7 @@ class Department(models.Model):
         if self.placename != "":
             myHTML += html.escape(self.placename) + "<br>"
         myHTML += (
-            html.escape(self.address())
+            html.escape(str(self))
             + "<br>"
             + html.escape(self.zipcode)
             + ", "
