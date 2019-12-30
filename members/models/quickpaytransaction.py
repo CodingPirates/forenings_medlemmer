@@ -107,6 +107,8 @@ class QuickpayTransaction(models.Model):
 
             if transaction["state"] == "processed" and transaction["accepted"]:
                 self.payment.set_confirmed()
+            if transaction["state"] == "new" and transaction["accepted"]:
+                self.payment.set_accepted()
             if transaction["state"] == "rejected" and not transaction["accepted"]:
                 self.payment.set_rejected(repr(transaction))
 
