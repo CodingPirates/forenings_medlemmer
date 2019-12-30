@@ -32,7 +32,7 @@ class SendActivitySignupConfirmationsCronJob(CronJobBase):
     def do(self):
         unannounced_signups = ActivityParticipant.objects.exclude(
             notification__isnull=False
-        ).filter(payment__confirmed_dtm__isnull=False)
+        ).filter(payment__accepted_dtm__isnull=False)
 
         for announcement in unannounced_signups:
             context = {
