@@ -125,6 +125,14 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for invite in invites %}
+                    <tr>
+                      <td>{{invite.person.name}}</td>
+                      <td><a href="{%url 'activity_signup' invite.activity.id invite.person.id %}">{{invite.activity.name}} - <h4><b>{{invite.activity.department.name}}</b></h4></a></td>
+                      <td><a class="btn btn-success" href="{%url 'activity_signup' invite.activity.id invite.person.id %}">Tilmeld aktivitet</a></td>
+                      <td><a class="btn btn-danger" href="{%url 'invitation_decline' family.unique invite.id %}">Afslå</a></td>
+                    </tr>
+                  {% endfor %}
 
                   {% for activity in open_activities %}
                       <tr>
@@ -137,15 +145,6 @@
                           </td>
                         <td></td>
                       </tr>
-                  {% endfor %}
-
-                  {% for invite in invites %}
-                    <tr>
-                      <td>{{invite.person.name}}</td>
-                      <td><a href="{%url 'activity_signup' invite.activity.id invite.person.id %}">{{invite.activity.name}} - <h4><b>{{invite.activity.department.name}}</b></h4></a></td>
-                      <td><a class="btn btn-success" href="{%url 'activity_signup' invite.activity.id invite.person.id %}">Tilmeld aktivitet</a></td>
-                      <td><a class="btn btn-danger" href="{%url 'invitation_decline' family.unique invite.id %}">Afslå</a></td>
-                    </tr>
                   {% endfor %}
 
                   </tbody>

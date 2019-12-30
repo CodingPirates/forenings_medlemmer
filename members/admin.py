@@ -117,7 +117,6 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
         return union_list
 
     def queryset(self, request, queryset):
-        print(self.value())
         if self.value() is None:
             return queryset
         else:
@@ -306,7 +305,7 @@ class PersonInline(admin.TabularInline):
             % (instance._meta.app_label, instance._meta.model_name),
             args=(instance.id,),
         )
-        return format_html(u'<a href="{}">{}</a>', url, instance.name)
+        return format_html('<a href="{}">{}</a>', url, instance.name)
 
     admin_link.short_description = "Navn"
 
@@ -532,6 +531,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return item.member.person.age_years()
 
     person_age_years.short_description = "Alder"
+    person_age_years.admin_order_field = "-member__person__birthday"
 
     # Only show participants to own departments
     def get_queryset(self, request):
@@ -917,7 +917,7 @@ class PersonAdmin(admin.ModelAdmin):
 
     def family_url(self, item):
         return format_html(
-            u'<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
+            '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
         )
 
     family_url.allow_tags = True
