@@ -77,6 +77,10 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "Adresse", "verbose_name_plural": "Adresser",},
+            options={
+                "ordering": ["zipcode"],
+                "verbose_name": "Adresse",
+                "verbose_name_plural": "Adresser",
+            },
         ),
     ]
