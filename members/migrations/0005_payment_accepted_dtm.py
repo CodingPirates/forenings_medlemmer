@@ -4,11 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('members', '0004_auto_20191225_1237'),
-    ]
-
     def set_accepted(apps, schema_editor):
         Payment = apps.get_model('members', 'Payment')
         for payment in Payment.objects.all().iterator():
@@ -20,6 +15,10 @@ class Migration(migrations.Migration):
         for payment in Payment.objects.all().iterator():
             payment.accepted_dtm = None
             payment.save()
+
+    dependencies = [
+        ('members', '0004_auto_20191225_1237'),
+    ]
 
     operations = [
         migrations.AddField(
