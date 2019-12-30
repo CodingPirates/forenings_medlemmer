@@ -452,7 +452,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         activitys = [
             ("none", "Ikke betalt"),
             ("ok", "Betalt"),
-            ("pending", "Afventende"),
+            ("confirmed", "Hævet")("pending", "Afventende"),
             ("rejected", "Afvist"),
         ]
         return activitys
@@ -469,6 +469,10 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         if self.value() == "none":
             return queryset.filter(payment__isnull=True)
         elif self.value() == "ok":
+            return queryset.filter(
+                payment__isnull=False, payment__accepted_dtm__isnull=False
+            )
+        elif self.value() == "confirmed":
             return queryset.filter(
                 payment__isnull=False, payment__confirmed_dtm__isnull=False
             )
