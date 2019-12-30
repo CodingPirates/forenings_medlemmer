@@ -6,6 +6,7 @@ class Address(models.Model):
     class Meta:
         verbose_name = "Adresse"
         verbose_name_plural = "Adresser"
+        ordering = ["zipcode"]
 
     streetname = models.CharField("Vejnavn", max_length=200)
     housenumber = models.CharField("Husnummer", max_length=5)
