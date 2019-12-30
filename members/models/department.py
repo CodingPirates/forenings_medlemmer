@@ -101,39 +101,6 @@ class Department(models.Model):
         myHTML += "Tidspunkt: " + html.escape(self.open_hours)
         return myHTML
 
-    def getLatLon(self):
-        # TODO: this needs to be put into a utility module for reuse - could also look up dawa-id.
-        if self.latitude is None or self.longitude is None:
-            addressID = 0
-            dist = 0
-            req = "https://dawa.aws.dk/datavask/adresser?betegnelse="
-            req += quote_plus(self.addressWithZip())
-            try:
-                washed = json.loads(requests.get(req).text)
-                addressID = washed["resultater"][0]["adresse"]["id"]
-                dist = washed["resultater"][0]["vaskeresultat"]["afstand"]
-            except Exception as error:
-                print("Couldn't find addressID for " + self.name)
-                print("Error " + str(error))
-            if addressID != 0 and dist < 10:
-                try:
-                    req = (
-                        "https://dawa.aws.dk/adresser/" + addressID + "?format=geojson"
-                    )
-                    address = json.loads(requests.get(req).text)
-                    self.longitude = address["geometry"]["coordinates"][0]
-                    self.latitude = address["geometry"]["coordinates"][1]
-                    self.save()
-                except Exception as error:
-                    print("Couldn't find coordinates for " + self.name)
-                    print("Error " + str(error))
-                    return None
-
-        if self.latitude is not None and self.longitude is not None:
-            return (self.latitude, self.longitude)
-        else:
-            return None
-
     def new_volunteer_email(self, volunteer_name):
         # First fetch department leaders email
         new_vol_email = members.models.emailtemplate.EmailTemplate.objects.get(
