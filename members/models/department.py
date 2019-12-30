@@ -127,7 +127,6 @@ class Department(models.Model):
                     address = json.loads(requests.get(req).text)
                     self.longitude = address["geometry"]["coordinates"][0]
                     self.latitude = address["geometry"]["coordinates"][1]
-                    self.dawa_id = address["properties"]["id"]
                     self.save()
                 except Exception as error:
                     print("Couldn't find coordinates for " + self.name)

@@ -36,9 +36,6 @@ class Person(models.Model):
         "Type", max_length=2, choices=MEMBER_TYPE_CHOICES, default=PARENT
     )
     name = models.CharField("Navn", max_length=200)
-    # postal_address = models.ForeignKey("Address", on_delete=models.PROTECT, null=True)
-    # Kept these fields on purpose to be able to migrate existing data. Once
-    # the data are converted, we can delete them.
     zipcode = models.CharField("Postnummer", max_length=4, blank=True)
     city = models.CharField("By", max_length=200, blank=True)
     streetname = models.CharField("Vejnavn", max_length=200, blank=True)
