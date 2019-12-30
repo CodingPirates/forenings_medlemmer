@@ -452,8 +452,12 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         activitys = [
             ("none", "Ikke betalt"),
             ("ok", "Betalt"),
+<<<<<<< HEAD
             ("confirmed", "Hævet"),
             ("pending", "Afventende"),
+=======
+            ("confirmed", "Hævet")("pending", "Afventende"),
+>>>>>>> master
             ("rejected", "Afvist"),
         ]
         return activitys
