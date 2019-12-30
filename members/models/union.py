@@ -50,7 +50,6 @@ class Union(models.Model):
             )
         ],
     )
-    address_moved = models.BooleanField('Adresse flyttet', default=False)
 
     def __str__(self):
         return "Foreningen for " + self.name

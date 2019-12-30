@@ -45,7 +45,6 @@ class Activity(models.Model):
     member_justified = models.BooleanField(
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
     )
-    address_moved = models.BooleanField('Adresse flyttet', default=False)
 
     def is_historic(self):
         return self.end_date < timezone.now()
