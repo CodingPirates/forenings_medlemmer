@@ -1,6 +1,8 @@
 from django.db import models
 import requests
 
+from members.models import Department
+
 
 class Address(models.Model):
     class Meta:
@@ -79,3 +81,15 @@ class Address(models.Model):
                 return address
             else:
                 return None
+
+    @staticmethod
+    def get_user_addresses(user):
+        if user.is_superuser:
+            return Address.objects.all()
+        address_ids = [
+            department.address.id
+            for department in Department.objects.filter(
+                adminuserinformation__user=user
+            ).exclude(address=None)
+        ]
+        return Address.objects.filter(pk__in=address_ids)
