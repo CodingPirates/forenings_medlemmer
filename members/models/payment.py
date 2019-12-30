@@ -88,6 +88,8 @@ class Payment(models.Model):
             self.save()
 
     def set_confirmed(self):
+        # Necessary if payment was autocaptured
+        self.set_accepted()
         if self.confirmed_dtm is None:
             self.confirmed_dtm = timezone.now()
             self.rejected_dtm = None
