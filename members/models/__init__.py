@@ -39,10 +39,12 @@ from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
 from .waitinglist import WaitingList
 from .volunteer import Volunteer
+from .address import Address
 
 from members.models.statistics import gatherDayliStatistics
 
 __all__ = [
+    Address,
     Activity,
     Department,
     ActivityParticipant,
