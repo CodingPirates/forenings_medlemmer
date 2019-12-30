@@ -43,6 +43,9 @@ class Payment(models.Model):
     amount_ore = models.IntegerField(
         "Beløb i øre", blank=False, null=False, default=0
     )  # payments to us is positive
+    accepted_dtm = models.DateTimeField(
+        "Accepteret", blank=True, null=True
+    )  # Set when card data entered and amount reserved
     confirmed_dtm = models.DateTimeField(
         "Bekræftet", blank=True, null=True
     )  # Set when paid (and checked)
@@ -79,6 +82,11 @@ class Payment(models.Model):
     def get_quickpaytransaction(self):
         return self.quickpaytransaction_set.order_by("-payment__added")[0]
 
+    def set_accepted(self):
+        if self.accepted_dtm is None:
+            self.accepted_dtm = timezone.now()
+            self.save()
+
     def set_confirmed(self):
         if self.confirmed_dtm is None:
             self.confirmed_dtm = timezone.now()
@@ -97,6 +105,7 @@ class Payment(models.Model):
     def capture_oustanding_payments():
         # get payments that are not confirmed and where activity starts this year
         payments = Payment.objects.filter(
+            accepted_dtm__isnull=False,
             rejected_dtm__isnull=True,
             cancelled_dtm__isnull=True,
             confirmed_dtm__isnull=True,
