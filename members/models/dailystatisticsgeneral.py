@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 
 
 class DailyStatisticsGeneral(models.Model):
     timestamp = models.DateTimeField(
-        "Kørsels tidspunkt", null=False, blank=False, default=datetime.now
+        "Kørsels tidspunkt", null=False, blank=False, default=timezone.now
     )
     persons = models.IntegerField("Personer", null=False, blank=False, default=0)
     children_male = models.IntegerField(

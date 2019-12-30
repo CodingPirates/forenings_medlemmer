@@ -1,0 +1,25 @@
+name: Prepare deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup Enviroment
+        run: cp .env.example .env
+      - name: Builds the stack
+        run: docker-compose build
+      - name: Test
+        run: docker-compose run web ./manage.py test
+      - name: Create Coverage
+        run: docker-compose run web coverage run --source='.' manage.py test
+      - name: Upload coverage
+        run: docker-compose run web coveralls
+        if: github.repository == 'CodingPirates/forenings_medlemmer'
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}

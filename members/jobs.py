@@ -6,14 +6,13 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 from members.models.person import Person
-from members.models.waitinglist import WaitingList
 from members.models.department import Department
 from members.models.union import Union
 from members.models.activity import Activity
 from members.models.dailystatisticsgeneral import DailyStatisticsGeneral
 from members.models.dailystatisticsregion import DailyStatisticsRegion
 from members.models.dailystatisticsunion import DailyStatisticsUnion
-import members.models.dailystatisticsdepartment
+from members.models.statistics import gatherDayliStatistics
 from members.models.zipcoderegion import ZipcodeRegion
 from members.models.family import Family
 from django.db.models import Q, F
@@ -83,6 +82,20 @@ class UpdateDawaData(CronJobBase):
             person.update_dawa_data()
 
 
+# If it's the first day of the year, make sure to capture all payments that year
+class CaptureOutstandingPayments(CronJobBase):
+    RUN_AT_TIMES = ["01:00"]
+
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+
+    code = "members.capture_oustanding_payments"
+
+    def do(self):
+        today = datetime.date.today()
+        if (today.month, today.day) == (1, 1):
+            Payment.capture_oustanding_payments()
+
+
 # Find families, which needs to update their information
 class RequestConfirmationCronJob(CronJobBase):
     RUN_AT_TIMES = ["15:00"]
@@ -145,11 +158,13 @@ class PollQuickpayPaymentsCronJob(CronJobBase):
 # Daily statistics job
 class GenerateStatisticsCronJob(CronJobBase):
     RUN_AT_TIMES = ["23:55"]
-
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = "members.generate_statistics_cronjob"  # a unique code
 
     def do(self):
+        gatherDayliStatistics()
+
+        # Old code below
         timestamp = timezone.now()  # make sure all entries share same timestamp
 
         # generate general statistics
@@ -235,78 +250,6 @@ class GenerateStatisticsCronJob(CronJobBase):
             refunded_dtm=None, confirmed_dtm__isnull=False
         ).count()
         dailyStatisticsGeneral.save()
-
-        # generate daily department statistics
-        departments = Department.objects.filter(closed_dtm=None)
-        for department in departments:
-            dailyStatisticsDepartment = (
-                members.models.dailystatisticsdepartment.DailyStatisticsDepartment()
-            )
-
-            dailyStatisticsDepartment.timestamp = timestamp
-            dailyStatisticsDepartment.department = department
-            dailyStatisticsDepartment.active_activities = Activity.objects.filter(
-                department=department,
-                start_date__lte=timestamp,
-                end_date__gte=timestamp,
-            ).count()
-            dailyStatisticsDepartment.activities = Activity.objects.filter(
-                department=department
-            ).count()
-            dailyStatisticsDepartment.current_activity_participants = (
-                Person.objects.filter(
-                    member__activityparticipant__activity__start_date__lte=timestamp,
-                    member__activityparticipant__activity__end_date__gte=timestamp,
-                    member__activityparticipant__activity__department=department,
-                )
-                .distinct()
-                .count()
-            )
-            dailyStatisticsDepartment.activity_participants = ActivityParticipant.objects.filter(
-                activity__department=department
-            ).count()
-            dailyStatisticsDepartment.members = 0  # TODO: to loosely defined now
-            dailyStatisticsDepartment.waitinglist = (
-                Person.objects.filter(waitinglist__department=department)
-                .distinct()
-                .count()
-            )
-            firstWaitingListItem = (
-                WaitingList.objects.filter(department=department)
-                .order_by("on_waiting_list_since")
-                .first()
-            )
-            if firstWaitingListItem:
-                dailyStatisticsDepartment.waitingtime = (
-                    timestamp - firstWaitingListItem.on_waiting_list_since
-                )
-            else:
-                dailyStatisticsDepartment.waitingtime = datetime.timedelta(days=0)
-            dailyStatisticsDepartment.payments = Payment.objects.filter(
-                activity__department=department,
-                refunded_dtm=None,
-                confirmed_dtm__isnull=False,
-            ).aggregate(sum=Coalesce(Sum("amount_ore"), 0))["sum"]
-            dailyStatisticsDepartment.volunteers_male = (
-                Person.objects.filter(
-                    volunteer__department=department, gender=Person.MALE
-                )
-                .distinct()
-                .count()
-            )
-            dailyStatisticsDepartment.volunteers_female = (
-                Person.objects.filter(
-                    volunteer__department=department, gender=Person.FEMALE
-                )
-                .distinct()
-                .count()
-            )
-            dailyStatisticsDepartment.volunteers = (
-                dailyStatisticsDepartment.volunteers_male
-                + dailyStatisticsDepartment.volunteers_female
-            )
-
-            dailyStatisticsDepartment.save()
 
         # generate daily union statistics
         unions = Union.objects.all()
