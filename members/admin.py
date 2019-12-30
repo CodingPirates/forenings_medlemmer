@@ -157,6 +157,7 @@ class DepartmentAdmin(admin.ModelAdmin):
                 )
             },
         ),
+        ("Adresse_ny", {"fields": ("address",)},),
         (
             "Længde og Breddegrad",
             {
@@ -180,8 +181,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             },
         ),
     ]
-
-    list_display = ("name",)
+    list_display = ("name", "address")
 
 
 admin.site.register(Department, DepartmentAdmin)

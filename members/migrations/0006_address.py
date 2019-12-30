@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 (
                     "door",
                     models.CharField(
-                        blank=True, max_length=5, null=True, verbose_name="Dør"
+                        blank=True, max_length=10, null=True, verbose_name="Dør"
                     ),
                 ),
                 ("city", models.CharField(max_length=200, verbose_name="By")),

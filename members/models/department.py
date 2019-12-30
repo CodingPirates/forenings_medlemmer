@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 import members.models.emailtemplate
-from members.utils.address import format_address
 from django.utils import timezone, html
 import requests
 import json
@@ -16,13 +15,16 @@ class Department(models.Model):
         verbose_name = "Afdeling"
         ordering = ["zipcode"]
 
-    help_dept = 'Vi tilføjer automatisk "Coding Pirates" foran navnet '
-    help_dept += "når vi nævner det de fleste steder på siden."
+    help_dept = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi
+    nævner det de fleste steder på siden."""
     name = models.CharField("Navn", max_length=200, help_text=help_dept)
     description = models.TextField("Beskrivelse af afdeling", blank=True)
     open_hours = models.CharField("Åbningstid", max_length=200, blank=True)
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
     responsible_contact = models.EmailField("E-mail", blank=True)
+    address = models.ForeignKey(
+        "Address", on_delete=models.PROTECT, null=True, blank=True
+    )
     placename = models.CharField("Stednavn", max_length=200, blank=True)
     zipcode = models.CharField("Postnummer", max_length=10)
     city = models.CharField("By", max_length=200)
@@ -60,12 +62,6 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
-
-    def address(self):
-        return format_address(self.streetname, self.housenumber, self.floor, self.door)
-
-    def addressWithZip(self):
-        return self.address() + ", " + self.zipcode + " " + self.city
 
     def toHTML(self):
         myHTML = ""
