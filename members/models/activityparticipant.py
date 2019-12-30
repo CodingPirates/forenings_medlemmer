@@ -39,7 +39,7 @@ class ActivityParticipant(models.Model):
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
         return not members.models.payment.Payment.objects.filter(
-            activityparticipant=self, confirmed_dtm=None
+            activityparticipant=self, accepted_dtm=None
         )
 
     def get_payment_link(self):
