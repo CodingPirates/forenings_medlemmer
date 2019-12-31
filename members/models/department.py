@@ -3,7 +3,6 @@
 from django.db import models
 import members.models.emailtemplate
 from django.utils import timezone, html
-from django.conf import settings
 
 
 class Department(models.Model):
@@ -105,11 +104,3 @@ class Department(models.Model):
         )
         context = {"department": self, "volunteer_name": volunteer_name}
         new_vol_email.makeEmail(self, context)
-
-
-class AdminUserInformation(models.Model):
-    def __str__(self):
-        return self.user.username + " user information"
-
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-    departments = models.ManyToManyField(Department)

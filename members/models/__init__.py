@@ -40,10 +40,12 @@ from .dailystatisticsunion import DailyStatisticsUnion
 from .waitinglist import WaitingList
 from .volunteer import Volunteer
 from .address import Address
+from .admin_user_information import AdminUserInformation
 
 from members.models.statistics import gatherDayliStatistics
 
 __all__ = [
+    AdminUserInformation,
     Address,
     Activity,
     Department,
