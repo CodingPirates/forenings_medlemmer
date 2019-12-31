@@ -5,7 +5,7 @@ from django.db import models
 from django.db import transaction
 from django.db.models import Q
 from members.models.person import Person
-from members.models.department import Department, AdminUserInformation
+from members.models.department import Department
 from members.models.union import Union
 from members.models.volunteer import Volunteer
 from members.models.member import Member
@@ -19,7 +19,6 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.payment import Payment
 from members.models.equipment import Equipment
 from members.models.equipmentloan import EquipmentLoan
-from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse
@@ -36,12 +35,17 @@ from members.models import Address
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
+from .union_admin import UnionAdmin
+from .user_admin import UserAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
 
 admin.site.register(Address, AddressAdmin)
 admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Union, UnionAdmin)
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 
 class EmailItemInline(admin.TabularInline):
@@ -57,60 +61,6 @@ class EmailItemInline(admin.TabularInline):
         return False
 
     extra = 0
-
-
-class UnionAdmin(admin.ModelAdmin):
-    list_filter = ("region",)
-    fieldsets = [
-        (
-            "Navn og Adresse",
-            {
-                "fields": (
-                    "name",
-                    "union_email",
-                    "region",
-                    "streetname",
-                    "housenumber",
-                    "floor",
-                    "door",
-                    "zipcode",
-                    "city",
-                    "placename",
-                ),
-                "description": "<p>Udfyld navnet på foreningen (f.eks København, \
-            vestjylland) og adressen<p>",
-            },
-        ),
-        (
-            "Bestyrelsen",
-            {
-                "fields": (
-                    "chairman",
-                    "chairman_email",
-                    "second_chair",
-                    "second_chair_email",
-                    "cashier",
-                    "cashier_email",
-                    "secretary",
-                    "secratary_email",
-                    "boardMembers",
-                )
-            },
-        ),
-        (
-            "Info",
-            {
-                "fields": ("bank_main_org", "bank_account", "statues", "founded"),
-                "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
-                generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
-            },
-        ),
-    ]
-
-    list_display = ("name",)
-
-
-admin.site.register(Union, UnionAdmin)
 
 
 class MemberAdmin(admin.ModelAdmin):
@@ -1157,27 +1107,27 @@ admin.site.register(EmailTemplate)
 
 
 # Define AdmingUserInformation as inline
-class AdminUserInformationInline(admin.StackedInline):
-    model = AdminUserInformation
-    filter_horizontal = ("departments",)
-    can_delete = False
-
-
-# Define PersonInline
-class PersonInline(admin.StackedInline):
-    model = Person
-    fields = ("name",)
-    readonly_fields = ("name",)
-
-
-# Define a new User admin
-class UserAdmin(UserAdmin):
-    inlines = (AdminUserInformationInline, PersonInline)
-
+# class AdminUserInformationInline(admin.StackedInline):
+#     model = AdminUserInformation
+#     filter_horizontal = ("departments", "unions")
+#     can_delete = False
+#
+#
+# # Define PersonInline
+# class PersonInline(admin.StackedInline):
+#     model = Person
+#     fields = ("name",)
+#     readonly_fields = ("name",)
+#
+#
+# # Define a new User admin
+# class UserAdmin(UserAdmin):
+#     inlines = (AdminUserInformationInline, PersonInline)
+#
 
 # Re-register UserAdmin
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+# admin.site.unregister(User)
+# admin.site.register(User, UserAdmin)
 
 
 class PaymentAdmin(admin.ModelAdmin):

@@ -1,7 +1,7 @@
 from django.db import models
 import requests
 
-from members.models import Department
+from members.models import Department, Union
 
 
 class Address(models.Model):
@@ -86,10 +86,17 @@ class Address(models.Model):
     def get_user_addresses(user):
         if user.is_superuser:
             return Address.objects.all()
-        address_ids = [
+        department_address_id = [
             department.address.id
             for department in Department.objects.filter(
                 adminuserinformation__user=user
             ).exclude(address=None)
         ]
+        union_address_id = [
+            union.address.id
+            for union in Union.objects.filter(adminuserinformation__user=user).exclude(
+                address=None
+            )
+        ]
+        address_ids = set(department_address_id + union_address_id)
         return Address.objects.filter(pk__in=address_ids)
