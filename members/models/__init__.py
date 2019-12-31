@@ -29,34 +29,53 @@ import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
 # Export models not files
 from .activity import Activity
-from .department import Department
+from .activityinvite import ActivityInvite
 from .activityparticipant import ActivityParticipant
-from .union import Union
-from .person import Person
-from .payment import Payment
+from .address import Address
+from .admin_user_information import AdminUserInformation
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
-from .waitinglist import WaitingList
+from .department import Department
+from .emailitem import EmailItem
+from .emailtemplate import EmailTemplate
+from .equipment import Equipment
+from .equipmentloan import EquipmentLoan
+from .family import Family
+from .member import Member
+from .notification import Notification
+from .payment import Payment
+from .person import Person
+from .union import Union
 from .volunteer import Volunteer
-from .address import Address
-from .admin_user_information import AdminUserInformation
+from .waitinglist import WaitingList
+from .zipcoderegion import ZipcodeRegion
 
-from members.models.statistics import gatherDayliStatistics
+
+from .statistics import gatherDayliStatistics
 
 __all__ = [
-    AdminUserInformation,
-    Address,
     Activity,
-    Department,
+    ActivityInvite,
     ActivityParticipant,
-    Union,
-    Person,
-    Payment,
+    Address,
+    AdminUserInformation,
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
     DailyStatisticsUnion,
+    Department,
+    EmailItem,
+    EmailTemplate,
+    Equipment,
+    EquipmentLoan,
+    Family,
     gatherDayliStatistics,
-    WaitingList,
+    Member,
+    Notification,
+    Payment,
+    Person,
+    Union,
     Volunteer,
+    WaitingList,
+    ZipcodeRegion,
 ]

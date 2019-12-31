@@ -1,7 +1,8 @@
 from django.db import models
 import requests
 
-from members.models import Department, Union
+from .department import Department
+from .union import Union
 
 
 class Address(models.Model):

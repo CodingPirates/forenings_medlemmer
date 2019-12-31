@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 
-from . import Union, Department
+from .union import Union
+from .department import Department
 
 
 class AdminUserInformation(models.Model):
