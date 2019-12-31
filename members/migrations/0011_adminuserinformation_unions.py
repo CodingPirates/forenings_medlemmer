@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0010_move_address_to_union'),
+        ("members", "0010_move_address_to_union"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='adminuserinformation',
-            name='unions',
-            field=models.ManyToManyField(to='members.Union'),
+            model_name="adminuserinformation",
+            name="unions",
+            field=models.ManyToManyField(to="members.Union"),
         ),
     ]
