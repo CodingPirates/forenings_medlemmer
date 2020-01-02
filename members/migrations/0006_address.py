@@ -22,10 +22,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                (
-                    "streetname",
-                    models.CharField(max_length=200, verbose_name="Vejnavn"),
-                ),
+                ("streetname",),
                 (
                     "housenumber",
                     models.CharField(max_length=5, verbose_name="Husnummer"),
