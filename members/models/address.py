@@ -1,6 +1,9 @@
 from django.db import models
 import requests
 
+from .department import Department
+from .union import Union
+
 
 class Address(models.Model):
     class Meta:
@@ -88,3 +91,22 @@ class Address(models.Model):
                 return address
             else:
                 return None
+
+    @staticmethod
+    def get_user_addresses(user):
+        if user.is_superuser:
+            return Address.objects.all()
+        department_address_id = [
+            department.address.id
+            for department in Department.objects.filter(
+                adminuserinformation__user=user
+            ).exclude(address=None)
+        ]
+        union_address_id = [
+            union.address.id
+            for union in Union.objects.filter(adminuserinformation__user=user).exclude(
+                address=None
+            )
+        ]
+        address_ids = set(department_address_id + union_address_id)
+        return Address.objects.filter(pk__in=address_ids)
