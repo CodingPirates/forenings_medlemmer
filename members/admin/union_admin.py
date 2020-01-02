@@ -20,23 +20,11 @@ class UnionAdmin(admin.ModelAdmin):
         (
             "Navn og Adresse",
             {
-                "fields": (
-                    "name",
-                    "union_email",
-                    "region",
-                    "streetname",
-                    "housenumber",
-                    "floor",
-                    "door",
-                    "zipcode",
-                    "city",
-                    "placename",
-                ),
+                "fields": ("name", "union_email", "address"),
                 "description": "<p>Udfyld navnet på foreningen (f.eks København, \
             vestjylland) og adressen<p>",
             },
         ),
-        ("Ny Adresse", {"fields": ("address",)}),
         (
             "Bestyrelsen",
             {
