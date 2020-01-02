@@ -55,10 +55,10 @@ from .zipcoderegion import ZipcodeRegion
 from .statistics import gatherDayliStatistics
 
 __all__ = [
-    Address,
     Activity,
     ActivityInvite,
     ActivityParticipant,
+    Address,
     AdminUserInformation,
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
