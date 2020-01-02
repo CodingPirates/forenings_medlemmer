@@ -10,7 +10,7 @@ class Address(models.Model):
     streetname = models.CharField("Vejnavn", max_length=200)
     housenumber = models.CharField("Husnummer", max_length=5)
     floor = models.CharField("Etage", max_length=10, blank=True, null=True)
-    door = models.CharField("Dør", max_length=5, blank=True, null=True)
+    door = models.CharField("Dør", max_length=10, blank=True, null=True)
     city = models.CharField("By", max_length=200)
     zipcode = models.CharField("Postnummer", max_length=4)
     municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
@@ -29,8 +29,7 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        if self._state.adding and self.longitude is None:  # On first save with no data
-            self.get_dawa_data()
+        self.get_dawa_data()
         super().save(*args, **kwargs)
 
     def get_dawa_data(self):

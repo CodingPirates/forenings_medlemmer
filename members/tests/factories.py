@@ -12,24 +12,27 @@ from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute, SelfAt
 from factory.fuzzy import FuzzyChoice, FuzzyInteger
 from faker.providers import BaseProvider
 
-from members.models.family import Family
-from members.models.zipcoderegion import ZipcodeRegion
-from members.models.person import Person
-from members.models.volunteer import Volunteer
-from members.models.union import Union
-from members.models.department import Department, AdminUserInformation
-from members.models.member import Member
-from members.models.waitinglist import WaitingList
-from members.models.activity import Activity
-from members.models.activityparticipant import ActivityParticipant
-from members.models.activityinvite import ActivityInvite
-from members.models.payment import Payment
-from members.models.emailitem import EmailItem
-from members.models.emailtemplate import EmailTemplate
-from members.models.notification import Notification
-from members.models.equipment import Equipment
-from members.models.equipmentloan import EquipmentLoan
-from members.models.address import Address
+from members.models import (
+    Activity,
+    ActivityInvite,
+    ActivityParticipant,
+    Address,
+    AdminUserInformation,
+    Department,
+    EmailItem,
+    EmailTemplate,
+    Equipment,
+    EquipmentLoan,
+    Family,
+    Member,
+    Notification,
+    Payment,
+    Person,
+    Union,
+    Volunteer,
+    WaitingList,
+    ZipcodeRegion,
+)
 
 
 class CodingPiratesProvider(BaseProvider):
@@ -403,10 +406,8 @@ class AddressFactory(DjangoModelFactory):
     city = Faker("city")
     zipcode = Faker("zipcode")
     municipality = Faker("municipality")
-    placename = Faker("city_suffix")
     longitude = Faker("longitude")
     latitude = Faker("latitude")
-    dawa_id = Faker("uuid4")
 
 
 class AdminUserInformationFactory(DjangoModelFactory):
