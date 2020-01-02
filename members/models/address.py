@@ -33,8 +33,7 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        if self._state.adding and self.longitude is None:  # On first save with no data
-            self.get_dawa_data()
+        self.get_dawa_data()
         super().save(*args, **kwargs)
 
     def get_dawa_data(self):
