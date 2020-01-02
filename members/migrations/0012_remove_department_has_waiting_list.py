@@ -6,12 +6,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0011_adminuserinformation_unions'),
+        ("members", "0011_adminuserinformation_unions"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='department',
-            name='has_waiting_list',
-        ),
+        migrations.RemoveField(model_name="department", name="has_waiting_list",),
     ]
