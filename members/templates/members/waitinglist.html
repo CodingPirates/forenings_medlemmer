@@ -1,62 +1,40 @@
-{% extends 'members/base.html' %}
-
-{% block content %}
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <h1 id="top">Venteliste i alle Coding Pirates-afdelinger</h1>
-
-          <p>Tryk på en afdeling for at springe til den</p>
-
-          {% if family %}
-            <p><a href="{% url 'family_detail' %}">Tilbage til familie oversigt</a></p>
-          {% else %}
-            <p>Listerne er anonymiserede. Log ind på "min familie side" for at se dine børns navne på listerne.</p>
-          {% endif %}
-
-          <p>
-          {% for key, department in department_children_waiting.departments.items %}
-              [<a href="#dep{{ key }}">{{ department.name }}</a>]
-          {% endfor  %}
-          </p>
+{% extends 'members/base.html' %} {% block content %}
+<div class="container">
+    <h2>Ventelister i Coding Pirates</h2>
+    <p>Alle afdelinger i Coding Pirates har en "venteliste" man kan skrive sig på,
+    ved opskrivning markerer du over for afdelingslederen at du gerne vil kontaktes
+    når de åbner for tilmedling.</p>
 
 
-          {% for key, department in department_children_waiting.departments.items %}
+    <p>Din plads i ventelisten bliver beregnet ud fra hvornår du oprettede dig i
+    systemet. Så hvis du skriver dig op på andre afdeling vil du få en plads som
+    om du altid havde stået på listen</p>
 
-            <h2 id="dep{{ key }}">Afdeling: {{department.name}}</h2>
-              <a href="#top">Gå tilbage til toppen</a>
 
-              {% if department.waiting.items %}
-            <table class="table">
+    <p><a class="btn btn-primary" href="{% url 'family_detail' %}">Skriv dig på flere ventelister</a><p/>
+
+    {% for child in children %}
+        <div style="margin:50px 5px">
+        <h4>Venteliste Oversigt for: {{child.person.name}}</h4>
+        <table class="table table-hover table-striped">
+        <thead>
             <tr>
-                <th>#</th>
-                <th>Navn</th>
-                <th>Postnummer</th>
-                <th>Har ventet (ancienitet)</th>
+                <th scope="col">Afdeling</th>
+                <th scope="col">Adresse</th>
+                <th scope="col">Plads på venteliste</th>
             </tr>
-            {% for key, child in department.waiting.items %}
-            {% if child.color %}
-              <tr class="success">
-            {% else %}
-              <tr>
-            {% endif %}
-                <td>{{ key }}</td>
-
-                <td>{{child.firstname}}</td>
-
-                <td>{{child.zipcode}}</td>
-                <td>{{ child.added|timesince }}</td>
-
+        </thead>
+        <tbody>
+        {% for department, waitinglist_place in child.waitinglists %}
+            <tr>
+                <td>{{department}}</td>
+                <td>{{department.address}}</td>
+                <td>{{waitinglist_place}}</td>
             </tr>
-            {% endfor %}
-            </table>
-              {% else %}
-                  <p>Der er ingen opskrevet på ventelisten til denne afdeling</p>
-              {% endif %}
-
-          {% endfor %}
-
-        </div>
-      </div>
+        {% endfor %}
+        <tbody>
+        </table>
     </div>
+    {% endfor %}
+</div>
 {% endblock %}

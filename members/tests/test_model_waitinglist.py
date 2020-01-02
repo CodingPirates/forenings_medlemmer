@@ -86,3 +86,31 @@ class TestModelWaitinglist(TestCase):
 
         # We are placed last on the second waiting list
         self.assertEqual(n + 1, subscription1.number_on_waiting_list())
+
+    def test_get_by_child(self):
+        departments = [DepartmentFactory(), DepartmentFactory()]
+        persons = [PersonFactory(), PersonFactory()]
+
+        # Not on wainting list yet
+        self.assertEqual(len(WaitingList.get_by_child(persons[0])), 0)
+
+        # Sign up for waiting LIst
+        WaitingListFactory(person=persons[0], department=departments[0])
+        WaitingListFactory(person=persons[1], department=departments[0])
+
+        self.assertEqual(WaitingList.get_by_child(persons[0]), [(departments[0], 1)])
+        self.assertEqual(WaitingList.get_by_child(persons[1]), [(departments[0], 2)])
+
+        # Sign up for more
+        WaitingListFactory(person=persons[1], department=departments[1])
+        WaitingListFactory(person=persons[0], department=departments[1])
+
+        # Checks for Ordering
+        self.assertEqual(
+            WaitingList.get_by_child(persons[0]),
+            [(departments[0], 1), (departments[1], 1)],
+        )
+        self.assertEqual(
+            WaitingList.get_by_child(persons[1]),
+            [(departments[0], 2), (departments[1], 2)],
+        )

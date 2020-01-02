@@ -482,59 +482,6 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 admin.site.register(ActivityInvite, ActivityInviteAdmin)
 
 
-class PersonWaitinglistListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
-    title = "Venteliste"
-
-    # Parameter for the filter that will be used in the URL query.
-    parameter_name = "waiting_list"
-
-    def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            department_queryset = Department.objects.filter(
-                has_waiting_list=True
-            ).order_by("zipcode")
-        else:
-            department_queryset = Department.objects.filter(
-                has_waiting_list=True, adminuserinformation__user=request.user
-            ).order_by("zipcode")
-
-        departments = [
-            ("any", "Alle opskrevne samlet"),
-            ("none", "Ikke skrevet på venteliste"),
-        ]
-        for department in department_queryset:
-            departments.append((str(department.pk), department.name))
-
-        return departments
-
-    def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
-
-        if self.value() == "any":
-            return queryset.exclude(waitinglist__isnull=True)
-        elif self.value() == "none":
-            return queryset.filter(waitinglist__isnull=True)
-        elif self.value() is None:
-            return queryset
-        else:
-            return queryset.filter(waitinglist__department__pk=self.value())
-
-
 admin.site.register(EmailTemplate)
 
 
