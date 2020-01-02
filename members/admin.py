@@ -2,19 +2,16 @@ from uuid import uuid4
 from django import forms
 from django.contrib import admin
 from django.db import models
-from django.db import transaction
 from django.db.models import Q
 from members.models.person import Person
 from members.models.department import Department, AdminUserInformation
 from members.models.union import Union
-from members.models.volunteer import Volunteer
 from members.models.member import Member
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
 from members.models.family import Family
 from members.models.emailitem import EmailItem
-from members.models.waitinglist import WaitingList
 from members.models.emailtemplate import EmailTemplate
 from members.models.payment import Payment
 from members.models.equipment import Equipment
@@ -22,9 +19,7 @@ from members.models.equipmentloan import EquipmentLoan
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
-from django.http import HttpResponse
 from django.utils import timezone
-from datetime import timedelta
 from django.urls import reverse
 from django.utils.html import format_html
 from django.forms import Textarea
@@ -293,8 +288,6 @@ class ActivityAdmin(admin.ModelAdmin):
         ),
     )
 
-    # inlines = [ActivityParticipantInline, ActivityInviteInline]
-
 
 admin.site.register(Activity, ActivityAdmin)
 
@@ -313,64 +306,6 @@ class PersonInline(admin.TabularInline):
     model = Person
     fields = ("admin_link", "membertype", "zipcode", "added", "notes")
     readonly_fields = fields
-    extra = 0
-
-
-class PaymentInline(admin.TabularInline):
-    model = Payment
-    fields = ("added", "payment_type", "confirmed_dtm", "rejected_dtm", "amount_ore")
-    readonly_fields = ("family",)
-    extra = 0
-
-
-class VolunteerInline(admin.TabularInline):
-    model = Volunteer
-    fields = ("department", "added", "confirmed", "removed")
-    extra = 0
-
-
-class ActivityParticipantInline(admin.TabularInline):
-    model = ActivityParticipant
-    extra = 0
-
-    def get_queryset(self, request):
-        return ActivityParticipant.objects.all()
-
-
-class ActivityInviteInline(admin.TabularInline):
-    model = ActivityInvite
-    extra = 0
-    can_delete = False
-    raw_id_fields = ("activity",)
-
-    # Limit the activity possible to invite to: Not finished and belonging to user
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "activity" and not request.user.is_superuser:
-            departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
-            kwargs["queryset"] = Activity.objects.filter(
-                end_date__gt=timezone.now(), department__in=departments
-            )
-        return super(ActivityInviteInline, self).formfield_for_foreignkey(
-            db_field, request, **kwargs
-        )
-
-    # Only view invites it would be possible for user to give out
-    def get_queryset(self, request):
-        qs = super(ActivityInviteInline, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        departments = Department.objects.filter(adminuserinformation__user=request.user)
-        return qs.filter(
-            activity__end_date__gt=timezone.now(), activity__department__in=departments
-        )
-
-
-class MemberInline(admin.TabularInline):
-    fields = ["department", "member_since", "member_until"]
-    readonly_fields = fields
-    model = Member
     extra = 0
 
 
