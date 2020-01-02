@@ -5,7 +5,7 @@ from django.db import models
 from django.db import transaction
 from django.db.models import Q
 from members.models.person import Person
-from members.models.department import Department, AdminUserInformation
+from members.models.department import Department
 from members.models.union import Union
 from members.models.volunteer import Volunteer
 from members.models.member import Member
@@ -19,7 +19,6 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.payment import Payment
 from members.models.equipment import Equipment
 from members.models.equipmentloan import EquipmentLoan
-from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse
@@ -32,8 +31,21 @@ from django.shortcuts import render
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib import messages
 
+from members.models import Address
+
+from .address_admin import AddressAdmin
+from .department_admin import DepartmentAdmin
+from .union_admin import UnionAdmin
+from .user_admin import UserAdmin
+
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
+
+admin.site.register(Address, AddressAdmin)
+admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Union, UnionAdmin)
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 
 class EmailItemInline(admin.TabularInline):
@@ -49,142 +61,6 @@ class EmailItemInline(admin.TabularInline):
         return False
 
     extra = 0
-
-
-class UnionAdmin(admin.ModelAdmin):
-    list_filter = ("region",)
-    fieldsets = [
-        (
-            "Navn og Adresse",
-            {
-                "fields": (
-                    "name",
-                    "union_email",
-                    "region",
-                    "streetname",
-                    "housenumber",
-                    "floor",
-                    "door",
-                    "zipcode",
-                    "city",
-                    "placename",
-                ),
-                "description": "<p>Udfyld navnet på foreningen (f.eks København, \
-            vestjylland) og adressen<p>",
-            },
-        ),
-        (
-            "Bestyrelsen",
-            {
-                "fields": (
-                    "chairman",
-                    "chairman_email",
-                    "second_chair",
-                    "second_chair_email",
-                    "cashier",
-                    "cashier_email",
-                    "secretary",
-                    "secratary_email",
-                    "boardMembers",
-                )
-            },
-        ),
-        (
-            "Info",
-            {
-                "fields": ("bank_main_org", "bank_account", "statues", "founded"),
-                "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
-                generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
-            },
-        ),
-    ]
-
-    list_display = ("name",)
-
-
-admin.site.register(Union, UnionAdmin)
-
-
-class UnionDepartmentFilter(admin.SimpleListFilter):
-    title = "Forening"
-    parameter_name = "Union"
-
-    def lookups(self, request, model_admin):
-        unions = Union.objects.all()
-        union_list = []
-        for union in unions:
-            union_list.append((str(union.pk), str(union)))
-        return union_list
-
-    def queryset(self, request, queryset):
-        if self.value() is None:
-            return queryset
-        else:
-            return queryset.filter(union=self.value())
-
-
-class DepartmentAdmin(admin.ModelAdmin):
-    list_filter = (UnionDepartmentFilter,)
-    raw_id_fields = ("union",)
-    # Only show own departments
-
-    def get_queryset(self, request):
-        qs = super(DepartmentAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(adminuserinformation__user=request.user)
-
-    fieldsets = [
-        (
-            "Beskrivelse",
-            {
-                "fields": ("name", "union", "description", "open_hours"),
-                "description": "<p>Lav en beskrivelse af jeres aktiviteter, teknologier og tekniske niveau.</p><p>Åbningstid er ugedag samt tidspunkt<p>",
-            },
-        ),
-        ("Ansvarlig", {"fields": ("responsible_name", "responsible_contact")}),
-        (
-            "Adresse",
-            {
-                "fields": (
-                    "streetname",
-                    "housenumber",
-                    "floor",
-                    "door",
-                    "zipcode",
-                    "city",
-                    "placename",
-                )
-            },
-        ),
-        (
-            "Længde og Breddegrad",
-            {
-                "fields": ("longitude", "latitude"),
-                "description": "<p>Hvis de ikke er sat opdateres de automatisk på et tidspunkt",
-            },
-        ),
-        (
-            "Afdelingssiden",
-            {
-                "fields": ("website", "isOpening", "isVisible"),
-                "description": "<p>Har kan du vælge om afdeling skal vises på codingpirates.dk/afdelinger og om der skal være et link til en underside</p>",
-            },
-        ),
-        (
-            "Yderlige data",
-            {
-                "fields": ("has_waiting_list", "created", "closed_dtm"),
-                "description": "<p>Venteliste betyder at børn har mulighed for at skrive sig på ventelisten (tilkendegive interesse for denne afdeling). Den skal typisk altid være krydset af.</p>",
-                "classes": ("collapse",),
-            },
-        ),
-    ]
-
-    list_display = ("name",)
-
-
-admin.site.register(Department, DepartmentAdmin)
 
 
 class MemberAdmin(admin.ModelAdmin):
@@ -1228,30 +1104,6 @@ class PersonAdmin(admin.ModelAdmin):
 admin.site.register(Person, PersonAdmin)
 
 admin.site.register(EmailTemplate)
-
-
-# Define AdmingUserInformation as inline
-class AdminUserInformationInline(admin.StackedInline):
-    model = AdminUserInformation
-    filter_horizontal = ("departments",)
-    can_delete = False
-
-
-# Define PersonInline
-class PersonInline(admin.StackedInline):
-    model = Person
-    fields = ("name",)
-    readonly_fields = ("name",)
-
-
-# Define a new User admin
-class UserAdmin(UserAdmin):
-    inlines = (AdminUserInformationInline, PersonInline)
-
-
-# Re-register UserAdmin
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
 
 
 class PaymentAdmin(admin.ModelAdmin):
