@@ -9,7 +9,6 @@ class Department(models.Model):
     class Meta:
         verbose_name_plural = "Afdelinger"
         verbose_name = "Afdeling"
-        ordering = ["zipcode"]
 
     help_dept = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi
     nævner det de fleste steder på siden."""
