@@ -15,7 +15,6 @@ class UnionAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(adminuserinformation__user=request.user)
 
-    list_filter = ("region",)
     fieldsets = [
         (
             "Navn og Adresse",
