@@ -18,17 +18,7 @@ class Department(models.Model):
     open_hours = models.CharField("Åbningstid", max_length=200, blank=True)
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
     responsible_contact = models.EmailField("E-mail", blank=True)
-    address = models.ForeignKey(
-        "Address", on_delete=models.PROTECT, null=True, blank=True
-    )
-    placename = models.CharField("Stednavn", max_length=200, blank=True)
-    zipcode = models.CharField("Postnummer", max_length=10)
-    city = models.CharField("By", max_length=200)
-    streetname = models.CharField("Vejnavn", max_length=200)
-    housenumber = models.CharField("Husnummer", max_length=10)
-    floor = models.CharField("Etage", max_length=10, blank=True)
-    door = models.CharField("Dør", max_length=10, blank=True)
-    dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
+    address = models.ForeignKey("Address", on_delete=models.PROTECT)
     has_waiting_list = models.BooleanField("Venteliste", default=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField("Oprettet", blank=False, default=timezone.now)
@@ -38,12 +28,6 @@ class Department(models.Model):
     website = models.URLField("Hjemmeside", blank=True)
     union = models.ForeignKey(
         "Union", verbose_name="Lokalforening", on_delete=models.PROTECT,
-    )
-    longitude = models.DecimalField(
-        "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
-    )
-    latitude = models.DecimalField(
-        "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
     onMap = models.BooleanField("Skal den være på kortet?", default=True)
 
