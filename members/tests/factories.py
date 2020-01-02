@@ -236,7 +236,6 @@ class DepartmentFactory(DjangoModelFactory):
     floor = Faker("floor")
     door = Faker("door")
     dawa_id = Faker("uuid4")
-    has_waiting_list = Faker("boolean")
     created = Faker("date_time", tzinfo=TIMEZONE)
     updated_dtm = LazyAttribute(lambda d: datetime_after(d.created))
     closed_dtm = LazyAttribute(lambda d: datetime_after(d.created))

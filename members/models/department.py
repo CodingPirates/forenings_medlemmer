@@ -31,7 +31,6 @@ class Department(models.Model):
     floor = models.CharField("Etage", max_length=10, blank=True)
     door = models.CharField("Dør", max_length=10, blank=True)
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
-    has_waiting_list = models.BooleanField("Venteliste", default=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField("Oprettet", blank=False, default=timezone.now)
     closed_dtm = models.DateField("Lukket", blank=True, null=True, default=None)
