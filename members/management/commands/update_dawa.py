@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 
 class Command(BaseCommand):
-    help = "Gathers daily statistics"
+    help = "Updates dawa data"
 
     def handle(self, *args, **options):
         for addres in tqdm(Address.objects.all(), desc="Updating address"):
