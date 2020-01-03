@@ -123,11 +123,11 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         """
 
         if request.user.is_superuser:
-            department_queryset = Department.objects.all().order_by("zipcode")
+            department_queryset = Department.objects.all().order_by("address__zipcode")
         else:
             department_queryset = Department.objects.filter(
                 adminuserinformation__user=request.user
-            ).order_by("zipcode")
+            ).order_by("address__zipcode")
 
         departments = [
             ("any", "Alle opskrevne samlet"),
@@ -174,11 +174,11 @@ class VolunteerListFilter(admin.SimpleListFilter):
         """
 
         if request.user.is_superuser:
-            department_queryset = Department.objects.filter().order_by("zipcode")
+            department_queryset = Department.objects.filter()
         else:
             department_queryset = Department.objects.filter(
                 adminuserinformation__user=request.user
-            ).order_by("zipcode")
+            )
 
         departments = [("any", "Alle frivillige samlet"), ("none", "Ikke frivillig")]
         for department in department_queryset:
