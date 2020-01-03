@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 import logging
 from environs import Env
 import dj_database_url
@@ -28,6 +29,10 @@ if env.str("SENTRY_DSN") != "not set":
     )
 
 logger = logging.getLogger(__name__)
+
+
+TESTING = os.path.basename(sys.argv[0]) in ("pytest", "py.test")
+USE_DAWA_ON_SAVE = not TESTING
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

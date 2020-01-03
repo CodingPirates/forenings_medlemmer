@@ -1,5 +1,7 @@
-from django.db import models
 import requests
+
+from django.db import models
+from django.conf import settings
 
 from .department import Department
 from .union import Union
@@ -9,6 +11,7 @@ class Address(models.Model):
     class Meta:
         verbose_name = "Adresse"
         verbose_name_plural = "Adresser"
+        ordering = ["zipcode"]
 
     streetname = models.CharField("Vejnavn", max_length=200)
     housenumber = models.CharField("Husnummer", max_length=5)
@@ -42,7 +45,8 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        self.get_dawa_data()
+        if settings.USE_DAWA_ON_SAVE:
+            self.get_dawa_data()
         super().save(*args, **kwargs)
 
     def get_dawa_data(self):

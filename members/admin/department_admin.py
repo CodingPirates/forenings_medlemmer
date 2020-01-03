@@ -57,7 +57,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         (
             "Yderlige data",
             {
-                "fields": ("has_waiting_list", "created", "closed_dtm"),
+                "fields": ("created", "closed_dtm"),
                 "description": "<p>Venteliste betyder at børn har mulighed for at skrive sig på ventelisten (tilkendegive interesse for denne afdeling). Den skal typisk altid være krydset af.</p>",
                 "classes": ("collapse",),
             },

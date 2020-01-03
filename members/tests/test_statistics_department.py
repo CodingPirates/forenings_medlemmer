@@ -18,10 +18,10 @@ from members.tests.factories import (
 
 class TestDepartmentStatistics(TestCase):
     def setUp(self):
-        self.nr_closed_Departments = randint(1, 30)
+        self.nr_closed_Departments = randint(1, 10)
         DepartmentFactory.create_batch(self.nr_closed_Departments)
 
-        self.nr_departments = randint(1, 30)
+        self.nr_departments = randint(1, 10)
         departments = DepartmentFactory.create_batch(
             self.nr_departments, closed_dtm=None
         )
