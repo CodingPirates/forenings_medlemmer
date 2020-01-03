@@ -2,8 +2,6 @@ from django.test import TestCase, override_settings
 from members.models.emailtemplate import EmailTemplate
 from members.models.family import Family
 from members.models.person import Person
-from members.models.union import Union
-from members.models.department import Department
 from django.core import mail
 from members.jobs import EmailSendCronJob
 
