@@ -301,23 +301,15 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Efter aktivitet"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
         activitys = []
-        if request.user.is_superuser:
-            departments = Department.objects.all()
-        else:
-            departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
-
         for activity in (
-            Activity.objects.filter(department__in=departments)
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user)
+            )
             .order_by("start_date")
             .order_by("zipcode")
         ):
@@ -373,45 +365,19 @@ class ActivityInviteAdminForm(forms.ModelForm):
 
 
 class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Aktiviteter"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            departments = Department.objects.all()
-        else:
-            departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
-
         activitys = []
-        for activity in Activity.objects.filter(department__in=departments).order_by(
-            "zipcode"
-        ):
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user)
+        ).order_by("zipcode"):
             activitys.append((str(activity.pk), activity))
 
         return activitys
 
     def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
-
         if self.value() is None:
             return queryset
         else:
