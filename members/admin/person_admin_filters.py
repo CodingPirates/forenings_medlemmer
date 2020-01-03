@@ -1,5 +1,5 @@
 from django.contrib import admin
-from members.models import Department, Activity
+from members.models import Activity
 
 from members.models import AdminUserInformation
 

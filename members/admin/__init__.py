@@ -22,7 +22,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.utils.html import format_html
 from django.forms import Textarea
-from members.models import Address
+from members.models import Address, AdminUserInformation
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
