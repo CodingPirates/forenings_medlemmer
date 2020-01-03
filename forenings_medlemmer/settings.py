@@ -30,8 +30,7 @@ if env.str("SENTRY_DSN") != "not set":
 
 logger = logging.getLogger(__name__)
 
-
-TESTING = os.path.basename(sys.argv[0]) in ("pytest", "py.test")
+TESTING = os.path.basename(sys.argv[1]) == "test"
 USE_DAWA_ON_SAVE = not TESTING
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
