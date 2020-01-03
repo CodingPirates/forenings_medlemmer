@@ -12,6 +12,7 @@ from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute, SelfAt
 from factory.fuzzy import FuzzyChoice, FuzzyInteger
 from faker.providers import BaseProvider
 
+
 from members.models import (
     Activity,
     ActivityInvite,
@@ -160,6 +161,21 @@ class ZipcodeRegionFactory(DjangoModelFactory):
     city = Faker("city")
     municipalname = Faker("municipality")
     municipalcode = Faker("numerify", text="###")
+    longitude = Faker("longitude")
+    latitude = Faker("latitude")
+
+
+class AddressFactory(DjangoModelFactory):
+    class Meta:
+        model = Address
+
+    streetname = Faker("street_name")
+    housenumber = Faker("building_number")
+    floor = Faker("floor")
+    door = Faker("door")
+    city = Faker("city")
+    zipcode = Faker("zipcode")
+    municipality = Faker("municipality")
     longitude = Faker("longitude")
     latitude = Faker("latitude")
 
@@ -392,21 +408,6 @@ class PaymentFactory(DjangoModelFactory):
     refunded_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_message = Faker("text")
-
-
-class AddressFactory(DjangoModelFactory):
-    class Meta:
-        model = Address
-
-    streetname = Faker("street_name")
-    housenumber = Faker("building_number")
-    floor = Faker("floor")
-    door = Faker("door")
-    city = Faker("city")
-    zipcode = Faker("zipcode")
-    municipality = Faker("municipality")
-    longitude = Faker("longitude")
-    latitude = Faker("latitude")
 
 
 class AdminUserInformationFactory(DjangoModelFactory):
