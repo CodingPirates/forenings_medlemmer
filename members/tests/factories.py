@@ -2,38 +2,48 @@
 # TODO: tests for departments, members, volunteers, activities, equipment, equipmentloan, statistics
 
 import pytz
-from datetime import date, timedelta
+from datetime import timedelta
 import random
-
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 import factory
 from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
-from factory.fuzzy import FuzzyChoice
+from factory.fuzzy import FuzzyChoice, FuzzyInteger
 from faker.providers import BaseProvider
 
-from members.models.family import Family
-from members.models.zipcoderegion import ZipcodeRegion
-from members.models.person import Person
-from members.models.volunteer import Volunteer
-from members.models.union import Union
-from members.models.department import Department, AdminUserInformation
-from members.models.member import Member
-from members.models.waitinglist import WaitingList
-from members.models.activity import Activity
-from members.models.activityparticipant import ActivityParticipant
-from members.models.activityinvite import ActivityInvite
-from members.models.payment import Payment
-from members.models.emailitem import EmailItem
-from members.models.emailtemplate import EmailTemplate
-from members.models.notification import Notification
-from members.models.equipment import Equipment
-from members.models.equipmentloan import EquipmentLoan
+from members.models import (
+    Activity,
+    ActivityInvite,
+    ActivityParticipant,
+    Address,
+    AdminUserInformation,
+    Department,
+    EmailItem,
+    EmailTemplate,
+    Equipment,
+    EquipmentLoan,
+    Family,
+    Member,
+    Notification,
+    Payment,
+    Person,
+    Union,
+    Volunteer,
+    WaitingList,
+    ZipcodeRegion,
+)
 
 
 class CodingPiratesProvider(BaseProvider):
-    activity_types = ["Hackathon", "Gamejam", "Børne IT-konference", "Summercamp",
-                      "Forårssæson", "Efterårssæson"]
+    activity_types = [
+        "Hackathon",
+        "Gamejam",
+        "Børne IT-konference",
+        "Summercamp",
+        "Forårssæson",
+        "Efterårssæson",
+    ]
 
     def activity_type(self):
         """ Formatter for generating random activity types
@@ -46,15 +56,34 @@ class CodingPiratesProvider(BaseProvider):
         pattern = "{{activity_type}} {{year}}"
         return self.generator.parse(pattern)
 
+    payment_types = ["CA", "BA", "CC", "RE", "OT"]
+
+    def payment_type(self):
+        return random.choice(self.payment_types)
+
 
 class DanishProvider(BaseProvider):
     """
     Custom faker provider for Danish addresses.
     """
-    floor_formats = ["", "Stuen", "1. sal", "1", "1.", "2.",
-                     "0", "0.", "4.", "kl", "st", "kælder", "k2"]
 
-    door_formats = ["", "410", "th", "tv", "mf", "v28"] #, "værelse 17"]
+    floor_formats = [
+        "",
+        "Stuen",
+        "1. sal",
+        "1",
+        "1.",
+        "2.",
+        "0",
+        "0.",
+        "4.",
+        "kl",
+        "st",
+        "kælder",
+        "k2",
+    ]
+
+    door_formats = ["", "410", "th", "tv", "mf", "v28"]  # , "værelse 17"]
 
     city_suffixes = ["rød", "havn", "borg", "by", "bjerg", "ssund", "sværk", "ning"]
     street_suffixes = ["Vej", "Gade", "Vangen", "Stræde", "Plads"]
@@ -69,11 +98,10 @@ class DanishProvider(BaseProvider):
         """
         return random.choice(self.door_formats)
 
-
     def zipcode(self):
         """ Formatter for generating door names in danish
         """
-        return str(random.randint(1000,9999))
+        return str(random.randint(1000, 9999))
 
     def city_suffix(self):
         """
@@ -115,15 +143,12 @@ TIMEZONE = pytz.timezone("Europe/Copenhagen")
 Faker._DEFAULT_LOCALE = LOCALE
 
 
-def datetime_after(dt):
-    """
-    For use with lazy attribute to generate DateTime's after the given
-    datetime.
-    """
-    END_OF_TIME = date.today() + timedelta(days=60 * 365)
-    return Faker("date_time_between", tzinfo=TIMEZONE,
-                 start_date=dt,
-                 end_date=END_OF_TIME).generate({})
+def datetime_before(datetime):
+    return datetime - timedelta(days=random.randint(1, 4 * 365))
+
+
+def datetime_after(datetime):
+    return datetime + timedelta(days=random.randint(1, 4 * 365))
 
 
 class ZipcodeRegionFactory(DjangoModelFactory):
@@ -144,8 +169,10 @@ class FamilyFactory(DjangoModelFactory):
         model = Family
 
     unique = Faker("uuid4")
-    #email = Faker("email")
-    email = factory.Sequence(lambda n: 'family{0}@example.com'.format(n)) #Faker("email")
+    # email = Faker("email")
+    email = factory.Sequence(
+        lambda n: "family{0}@example.com".format(n)
+    )  # Faker("email")
     # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
@@ -162,7 +189,7 @@ class PersonFactory(DjangoModelFactory):
     class Meta:
         model = Person
 
-    # membertype = FuzzyChoice(Person.MEMBER_TYPE_CHOICES)
+    membertype = "PA"
     name = Faker("name")
     placename = Faker("city_suffix")
     zipcode = Faker("zipcode")
@@ -176,7 +203,9 @@ class PersonFactory(DjangoModelFactory):
     longitude = Faker("longitude")
     latitude = Faker("latitude")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    email = factory.Sequence(lambda n: 'person{0}@example.com'.format(n)) #Faker("email")
+    email = factory.Sequence(
+        lambda n: "person{0}@example.com".format(n)
+    )  # Faker("email")
     phone = Faker("phone_number")
     gender = FuzzyChoice(Person.MEMBER_GENDER_CHOICES)
     birthday = Faker("date")
@@ -185,9 +214,9 @@ class PersonFactory(DjangoModelFactory):
     notes = Faker("text")
     # added = Faker("date_time", tzinfo=TIMEZONE)
     # deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    user = SubFactory(UserFactory,
-                      username=SelfAttribute('..email'),
-                      email=SelfAttribute('..email'))
+    user = SubFactory(
+        UserFactory, username=SelfAttribute("..email"), email=SelfAttribute("..email")
+    )
     address_invalid = Faker("boolean")
 
 
@@ -216,7 +245,7 @@ class UnionFactory(DjangoModelFactory):
     floor = Faker("floor")
     door = Faker("door")
     boardMembers = Faker("text")
-    # bank_main_org = Faker("boolean")
+    bank_main_org = Faker("boolean")
     bank_account = Faker("numerify", text="####-##########")
 
 
@@ -258,6 +287,7 @@ class MemberFactory(DjangoModelFactory):
     member_since = Faker("date_time", tzinfo=TIMEZONE)
     # member_until = LazyAttribute(lambda m: None if m.is_active else datetime_after(m.member_since))
 
+
 class VolunteerFactory(DjangoModelFactory):
     class Meta:
         model = Volunteer
@@ -283,9 +313,14 @@ class WaitingListFactory(DjangoModelFactory):
 class ActivityFactory(DjangoModelFactory):
     class Meta:
         model = Activity
+        exclude = ("active", "now")
 
-    department = SubFactory(DepartmentFactory)
+    # Helper fields
+    active = Faker("boolean")
+    now = timezone.now()
+
     union = SubFactory(UnionFactory)
+    department = SubFactory(DepartmentFactory, union=factory.SelfAttribute("..union"))
     name = Faker("activity")
     open_hours = Faker("numerify", text="kl. ##:00-##:00")
     responsible_name = Faker("name")
@@ -301,11 +336,17 @@ class ActivityFactory(DjangoModelFactory):
     description = Faker("text")
     instructions = Faker("text")
     signup_closing = Faker("date_time", tzinfo=TIMEZONE)
-    start_date = LazyAttribute(lambda d: datetime_after(d.signup_closing))
-    end_date = LazyAttribute(lambda d: datetime_after(d.start_date))
+    start_date = LazyAttribute(
+        lambda d: datetime_before(d.now)
+        if d.active
+        else Faker("date_time", tzinfo=TIMEZONE).generate({})
+    )
+    end_date = LazyAttribute(
+        lambda d: datetime_after(d.now) if d.active else datetime_before(d.now)
+    )
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     open_invite = Faker("boolean")
-    price_in_dkk = Faker("random_number")
+    price_in_dkk = Faker("random_number", digits=4)
     max_participants = Faker("random_number")
     min_age = Faker("random_number")
     max_age = LazyAttribute(lambda a: a.min_age + Faker("random_number").generate({}))
@@ -320,7 +361,7 @@ class ActivityParticipantFactory(DjangoModelFactory):
     activity = SubFactory(ActivityFactory)
     member = SubFactory(MemberFactory)
     note = Faker("text")
-    photo_permission = FuzzyChoice(ActivityParticipant.PHOTO_PERMISSION_CHOICES)
+    photo_permission = "OK" if random.randint(0, 1) == 1 else "NO"
     contact_visible = Faker("boolean")
 
 
@@ -339,19 +380,33 @@ class PaymentFactory(DjangoModelFactory):
     class Meta:
         model = Payment
 
-    added = Faker("date_time", tzinfo=TIMEZONE)
-    payment_type = FuzzyChoice(Payment.PAYMENT_METHODS)
+    payment_type = Faker("payment_type")
     activity = SubFactory(ActivityFactory)
     activityparticipant = SubFactory(ActivityParticipantFactory)
     person = SubFactory(PersonFactory)
     family = SubFactory(FamilyFactory)
     body_text = Faker("text")
-    amount_ore = Faker("random_number")
+    amount_ore = FuzzyInteger(10000, 70000)
     confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
     cancelled_dtm = Faker("date_time", tzinfo=TIMEZONE)
     refunded_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_dtm = Faker("date_time", tzinfo=TIMEZONE)
     rejected_message = Faker("text")
+
+
+class AddressFactory(DjangoModelFactory):
+    class Meta:
+        model = Address
+
+    streetname = Faker("street_name")
+    housenumber = Faker("building_number")
+    floor = Faker("floor")
+    door = Faker("door")
+    city = Faker("city")
+    zipcode = Faker("zipcode")
+    municipality = Faker("municipality")
+    longitude = Faker("longitude")
+    latitude = Faker("latitude")
 
 
 class AdminUserInformationFactory(DjangoModelFactory):

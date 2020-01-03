@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 
 
 class DailyStatisticsUnion(models.Model):
     timestamp = models.DateTimeField(
-        "Kørsels tidspunkt", null=False, blank=False, default=datetime.now
+        "Kørsels tidspunkt", null=False, blank=False, default=timezone.now
     )
     union = models.ForeignKey("Union", on_delete=models.CASCADE)
     departments = models.IntegerField("Afdelinger", null=False, blank=False, default=0)
