@@ -310,7 +310,7 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         activitys = []
         if request.user.is_superuser:
-            departments = Department.objects.filter()
+            departments = Department.objects.all()
         else:
             departments = Department.objects.filter(
                 adminuserinformation__user=request.user
@@ -389,7 +389,7 @@ class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
         """
 
         if request.user.is_superuser:
-            departments = Department.objects.filter()
+            departments = Department.objects.all()
         else:
             departments = Department.objects.filter(
                 adminuserinformation__user=request.user
