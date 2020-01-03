@@ -10,5 +10,5 @@ class AdminUserInformation(models.Model):
         return self.user.username + " admin data"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-    departments = models.ManyToManyField(Department)
-    unions = models.ManyToManyField(Union)
+    departments = models.ManyToManyField(Department, blank=True)
+    unions = models.ManyToManyField(Union, blank=True)
