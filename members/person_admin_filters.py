@@ -19,7 +19,7 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
         """
 
         if request.user.is_superuser:
-            my_departments = Department.objects.filter()
+            my_departments = Department.objects.all()
         else:
             my_departments = Department.objects.filter(
                 adminuserinformation__user=request.user
@@ -71,7 +71,7 @@ class PersonInvitedListFilter(admin.SimpleListFilter):
         """
 
         if request.user.is_superuser:
-            my_departments = Department.objects.filter()
+            my_departments = Department.objects.all()
         else:
             my_departments = Department.objects.filter(
                 adminuserinformation__user=request.user
@@ -174,7 +174,7 @@ class VolunteerListFilter(admin.SimpleListFilter):
         """
 
         if request.user.is_superuser:
-            department_queryset = Department.objects.filter()
+            department_queryset = Department.objects.all()
         else:
             department_queryset = Department.objects.filter(
                 adminuserinformation__user=request.user
