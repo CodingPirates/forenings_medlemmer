@@ -18,7 +18,6 @@ class Department(models.Model):
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
     responsible_contact = models.EmailField("E-mail", blank=True)
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
-    has_waiting_list = models.BooleanField("Venteliste", default=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField("Oprettet", blank=False, default=timezone.now)
     closed_dtm = models.DateField("Lukket", blank=True, null=True, default=None)

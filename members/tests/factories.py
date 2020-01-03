@@ -267,7 +267,6 @@ class DepartmentFactory(DjangoModelFactory):
     open_hours = Faker("numerify", text="kl. ##:##-##:##")
     responsible_name = Faker("name")
     responsible_contact = Faker("email")
-    has_waiting_list = Faker("boolean")
     created = Faker("date_time", tzinfo=TIMEZONE)
     updated_dtm = LazyAttribute(lambda d: datetime_after(d.created))
     closed_dtm = LazyAttribute(lambda d: datetime_after(d.created))
