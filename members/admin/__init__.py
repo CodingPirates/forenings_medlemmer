@@ -32,7 +32,6 @@ from .person_admin import PersonAdmin
 
 from .inlines import PaymentInline
 
-
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
 
