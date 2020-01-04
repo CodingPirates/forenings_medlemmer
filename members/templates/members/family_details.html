@@ -201,17 +201,6 @@
                     </tr>
                   {% endfor %}
 
-                  {%for department in departments_with_no_waiting_list%}
-                    <tr>
-                      <td>{{department.name}}</td>
-                      <td>{{department.address}}, {{department.zipcode}} {{department.city}}</td>
-                      <td>{{department.open_hours}}</td>
-                      <td>
-                          <i>Ingen venteliste, tilmeld blot aktiviteter, når de optræder i aktivitets listen nedenfor.</i>
-                      </td>
-                      <td></td>
-                    </tr>
-                  {%endfor%}
                   </tbody>
               </table>
             {% else %}
