@@ -13,9 +13,9 @@ def departmentView(request, unique=None):
         deps[region[1]] = []
 
     for department in depQuery:
-        coordinates = department.getLatLon()
+        coordinates = (department.address.latitude, department.address.longitude)
         dep = {"html": department.toHTML(), "onMap": department.onMap}
-        if not (coordinates is None):
+        if None not in coordinates:
             dep["latitude"] = str(coordinates[0])
             dep["longtitude"] = str(coordinates[1])
         else:

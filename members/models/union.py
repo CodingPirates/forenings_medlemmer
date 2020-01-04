@@ -25,7 +25,9 @@ class Union(models.Model):
     founded = models.DateField("Stiftet", blank=True, null=True)
     regions = (("S", "Sjælland"), ("J", "Jylland"), ("F", "Fyn"), ("Ø", "Øer"))
     region = models.CharField("region", max_length=1, choices=regions)
-
+    address = models.ForeignKey(
+        "Address", on_delete=models.PROTECT, null=True, blank=True
+    )
     placename = models.CharField("Stednavn", max_length=200, blank=True)
     zipcode = models.CharField("Postnummer", max_length=10)
     city = models.CharField("By", max_length=200)
