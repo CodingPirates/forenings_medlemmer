@@ -35,3 +35,13 @@ class WaitingList(models.Model):
         if not self.id:
             self.on_waiting_list_since = self.person.added
         return super(WaitingList, self).save(*args, **kwargs)
+
+    @staticmethod
+    def get_by_child(child):
+        """ Returns a list of (department, waitinglist_tuple) tuples """
+        waitlists = [
+            (waitinglist.department, waitinglist.number_on_waiting_list())
+            for waitinglist in WaitingList.objects.filter(person=child)
+        ]
+        waitlists.sort(key=lambda tup: tup[1])
+        return waitlists
