@@ -1,3 +1,5 @@
+from random import randint
+
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from django.core import mail
@@ -67,6 +69,17 @@ class TestModelFamily(TestCase):
     def test_string_representation(self):
         family = FamilyFactory(email="test@example.com")
         self.assertEqual("test@example.com", str(family))
+
+    def test_get_children(self):
+        family = FamilyFactory()
+        kids = [
+            PersonFactory(membertype=Person.CHILD, family=family)
+            for i in range(randint(1, 10))
+        ]
+        family_kids = family.get_children()
+        for kid in kids:
+            self.assertTrue(kid in family_kids)
+        self.assertEqual(len(kids), len(family_kids))
 
     # TODO: fix get_abosolute_url(), it causes an error (but is not used in the codebase)
     # def test_get_abosolute_url(self):
