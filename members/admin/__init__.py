@@ -562,12 +562,10 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         """
 
         if request.user.is_superuser:
-            department_queryset = Department.objects.filter(
-                has_waiting_list=True
-            ).order_by("zipcode")
+            department_queryset = Department.objects.filter().order_by("zipcode")
         else:
             department_queryset = Department.objects.filter(
-                has_waiting_list=True, adminuserinformation__user=request.user
+                adminuserinformation__user=request.user
             ).order_by("zipcode")
 
         departments = [

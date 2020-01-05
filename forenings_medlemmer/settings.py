@@ -182,7 +182,6 @@ CRON_CLASSES = [
     #   'members.jobs.RequestConfirmationCronJob',
     "members.jobs.SendActivitySignupConfirmationsCronJob",
     "members.jobs.PollQuickpayPaymentsCronJob",
-    "members.jobs.GenerateStatisticsCronJob",
     "members.jobs.UpdateDawaData",
     "members.jobs.CaptureOutstandingPayments",
 ]
