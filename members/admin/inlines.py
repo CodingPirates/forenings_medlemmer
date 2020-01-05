@@ -5,6 +5,7 @@ from members.models import (
     Activity,
     ActivityInvite,
     ActivityParticipant,
+    AdminUserInformation,
     Department,
     Member,
     Payment,
@@ -72,7 +73,9 @@ class ActivityInviteInline(admin.TabularInline):
         qs = super(ActivityInviteInline, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
-        departments = Department.objects.filter(adminuserinformation__user=request.user)
         return qs.filter(
-            activity__end_date__gt=timezone.now(), activity__department__in=departments
+            activity__end_date__gt=timezone.now(),
+            activity__department__in=AdminUserInformation.get_departments_admin(
+                request.user
+            ),
         )

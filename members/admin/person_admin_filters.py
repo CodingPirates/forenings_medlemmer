@@ -5,10 +5,7 @@ from members.models import AdminUserInformation
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Deltager på"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "participant_list"
 
     def lookups(self, request, model_admin):
@@ -36,10 +33,7 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
 
 
 class PersonInvitedListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Inviteret til"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity_invited_list"
 
     def lookups(self, request, model_admin):
@@ -56,14 +50,6 @@ class PersonInvitedListFilter(admin.SimpleListFilter):
         return activitys
 
     def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
-
         if self.value() == "none":
             return queryset.filter(activityinvite__isnull=True)
         elif self.value() == "any":

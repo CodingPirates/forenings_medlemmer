@@ -613,31 +613,15 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
 
 
 class PersonInvitedListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Inviteret til"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity_invited_list"
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            my_departments = Department.objects.filter()
-        else:
-            my_departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
-
         activitys = [("none", "Ikke inviteret til noget"), ("any", "Alle inviterede")]
         for activity in (
-            Activity.objects.filter(department__in=my_departments)
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user)
+            )
             .order_by("start_date")
             .order_by("zipcode")
         ):
