@@ -1,67 +1,14 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    {% load staticfiles %}
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    {% load bootstrap3 %}
-    {% load crispy_forms_tags %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-    <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
-    <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
-    <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
-    <script>
-     $(function() {
-      $( ".datepicker" ).datepicker({
-        format: "dd-mm-yyyy",
-        autoclose: true,
-        weekStart: 1,
-        language: 'da'
-      });
-      $('#search-address').dawaautocomplete({
-      select: function(event, adresse) {
-        // denne funktion bliver kaldt når brugeren vælger en adresse.
-        // Udfyld adressefelterne
-        $("#id_streetname").val(adresse.adresse.vejnavn);
-        $("#id_housenumber").val(adresse.adresse.husnr);
-        $("#id_floor").val(adresse.adresse.etage);
-        $("#id_door").val(adresse.adresse.dør);
-        $("#id_placename").val(adresse.adresse.supplerendebynavn);
-        $("#id_zipcode").val(adresse.adresse.postnr);
-        $("#id_city").val(adresse.adresse.postnrnavn);
-        $("#id_dawa_id").val(adresse.adresse.id);
-      }});
-      $("#manual-entry").click(function() {
-        $("#id_streetname").val('');
-        $("#id_housenumber").val('');
-        $("#id_floor").val('');
-        $("#id_door").val('');
-        $("#id_placename").val('');
-        $("#id_zipcode").val('');
-        $("#id_city").val('');
-        $("#id_dawa_id").val(null);
-        $("#search-address").val(null);
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
 
-        var checked = $("#manual-entry").get(0).checked;
-        $(".autofilled-address").attr("readonly", !checked);
-        $("#search-address").attr("readonly", checked);
-      });
-    });
-    </script>
-  </head>
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-xs-12">
-          <section class="panel panel-defualt">
-            {% load crispy_forms_tags %}
-            {% crispy form %}
-          </section>
-        </div>
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <section>
+          {% crispy form %}
+        </section>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+{% endblock %}
