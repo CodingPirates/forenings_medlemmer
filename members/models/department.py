@@ -55,16 +55,7 @@ class Department(models.Model):
             )
         if self.isOpening:
             myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
-        if self.placename != "":
-            myHTML += html.escape(self.placename) + "<br>"
-        myHTML += (
-            html.escape(str(self))
-            + "<br>"
-            + html.escape(self.zipcode)
-            + ", "
-            + html.escape(self.city)
-            + "<br>"
-        )
+        myHTML += html.escape(str(self.address))
         myHTML += "Afdelingsleder: " + html.escape(self.responsible_name) + "<br>"
         myHTML += (
             'E-mail: <a href="mailto:'
