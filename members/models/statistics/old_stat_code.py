@@ -175,49 +175,55 @@ def old_stat_code(timestamp):
         dailyStatisticsRegion.region = region
         # No unions - since unions may span regions
         dailyStatisticsRegion.departments = (
-            Department.objects.annotate().filter(zipcode__in=zipsInRegion).count()
+            Department.objects.annotate()
+            .filter(address__zipcode__in=zipsInRegion)
+            .count()
         )
         dailyStatisticsRegion.active_activities = Activity.objects.filter(
-            department__zipcode__in=zipsInRegion,
+            department__address__zipcode__in=zipsInRegion,
             start_date__lte=timestamp,
             end_date__gte=timestamp,
         ).count()
         dailyStatisticsRegion.activities = Activity.objects.filter(
-            department__zipcode__in=zipsInRegion
+            department__address__zipcode__in=zipsInRegion
         ).count()
         dailyStatisticsRegion.current_activity_participants = (
             Person.objects.filter(
                 member__activityparticipant__activity__start_date__lte=timestamp,
                 member__activityparticipant__activity__end_date__gte=timestamp,
-                member__activityparticipant__activity__department__zipcode__in=zipsInRegion,
+                member__activityparticipant__activity__department__address__zipcode__in=zipsInRegion,
             )
             .distinct()
             .count()
         )
         dailyStatisticsRegion.activity_participants = ActivityParticipant.objects.filter(
-            activity__department__zipcode__in=zipsInRegion
+            activity__department__address__zipcode__in=zipsInRegion
         ).count()
         dailyStatisticsRegion.members = 0  # TODO: to loosely defined now
         dailyStatisticsRegion.waitinglist = (
-            Person.objects.filter(waitinglist__department__zipcode__in=zipsInRegion)
+            Person.objects.filter(
+                waitinglist__department__address__zipcode__in=zipsInRegion
+            )
             .distinct()
             .count()
         )
         dailyStatisticsRegion.payments = Payment.objects.filter(
-            activity__department__zipcode__in=zipsInRegion,
+            activity__department__address__zipcode__in=zipsInRegion,
             refunded_dtm=None,
             confirmed_dtm__isnull=False,
         ).aggregate(sum=Coalesce(Sum("amount_ore"), 0))["sum"]
         dailyStatisticsRegion.volunteers_male = (
             Person.objects.filter(
-                volunteer__department__zipcode__in=zipsInRegion, gender=Person.MALE
+                volunteer__department__address__zipcode__in=zipsInRegion,
+                gender=Person.MALE,
             )
             .distinct()
             .count()
         )
         dailyStatisticsRegion.volunteers_female = (
             Person.objects.filter(
-                volunteer__department__zipcode__in=zipsInRegion, gender=Person.FEMALE,
+                volunteer__department__address__zipcode__in=zipsInRegion,
+                gender=Person.FEMALE,
             )
             .distinct()
             .count()

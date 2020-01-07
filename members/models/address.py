@@ -1,5 +1,7 @@
-from django.db import models
 import requests
+
+from django.db import models
+from django.conf import settings
 
 from .department import Department
 from .union import Union
@@ -17,6 +19,16 @@ class Address(models.Model):
     door = models.CharField("Dør", max_length=10, blank=True, null=True)
     city = models.CharField("By", max_length=200)
     zipcode = models.CharField("Postnummer", max_length=4)
+    REGION_CHOICES = (
+        ("Region Syddanmark", "Region Syddanmark"),
+        ("Region Hovedstaden", "Region Hovedstaden"),
+        ("Region Nordjylland", "Region Nordjylland"),
+        ("Region Midtjylland", "Region Midtjylland"),
+        ("Region Sjælland", "Region Sjælland"),
+    )
+    region = models.CharField(
+        "Region", choices=REGION_CHOICES, max_length=20, null=True
+    )
     municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
@@ -33,7 +45,8 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        self.get_dawa_data()
+        if settings.USE_DAWA_ON_SAVE:
+            self.get_dawa_data()
         super().save(*args, **kwargs)
 
     def get_dawa_data(self):
@@ -67,6 +80,7 @@ class Address(models.Model):
         self.municipality = dawa_data["kommunenavn"]
         self.longitude = dawa_data["wgs84koordinat_længde"]
         self.latitude = dawa_data["wgs84koordinat_bredde"]
+        self.region = dawa_data["regionsnavn"]
         return True
 
     @staticmethod
