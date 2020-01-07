@@ -14,6 +14,7 @@
             </p>
         </div>
     </div>
+	<div class="center col-12">
     <form class="col-md-8 col-md-offset-1" method="post">
         {% if form.errors %}
         <div class="row"><blockquote class="error">Dit brugernavn eller adgangskode var forkert. Prøv igen.</blockquote></div>
@@ -35,10 +36,11 @@
                 <a href="{% url 'password_reset' %}" title="Opret adgangskode" class="btn btn-info float-right">
                     Opret adgangskode
                 </a>
-                <a href="{% url 'password_reset' %}" title="Glemt kode?">
+                <a href="{% url 'password_reset' %}" title="Glemt kode?" class="btn btn-info float-right">
                     Glemt adgangskode?
                 </a>
             </div>
         </div></div>
     </form>
+	</div>
 {% endblock %}
