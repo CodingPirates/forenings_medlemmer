@@ -59,7 +59,7 @@ def FamilyDetails(request):
 
     department_children_waiting = {"departments": {}}
     loop_counter = 0
-    for department in Department.objects.filter(closed_dtm=None).order_by("zipcode"):
+    for department in Department.objects.filter(closed_dtm=None):
         department_children_waiting["departments"][loop_counter] = {}
         department_children_waiting["departments"][loop_counter]["object"] = department
         department_children_waiting["departments"][loop_counter]["children_status"] = {}

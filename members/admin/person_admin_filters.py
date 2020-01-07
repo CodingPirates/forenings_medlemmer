@@ -1,5 +1,7 @@
 from django.contrib import admin
-from members.models import Activity, AdminUserInformation
+from members.models import Activity
+
+from members.models import AdminUserInformation
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
