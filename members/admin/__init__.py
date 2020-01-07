@@ -31,7 +31,7 @@ from django.shortcuts import render
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib import messages
 
-from members.models import Address
+from members.models import Address, AdminUserInformation
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
@@ -372,17 +372,8 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        if request.user.is_superuser:
-            departments = Department.objects.filter()
-        else:
-            departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
-
-        for activity in (
-            Activity.objects.filter(department__in=departments)
-            .order_by("start_date")
-            .order_by("zipcode")
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user)
         ):
             activitys.append((str(activity.pk), str(activity)))
         return activitys
@@ -436,45 +427,19 @@ class ActivityInviteAdminForm(forms.ModelForm):
 
 
 class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Aktiviteter"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            departments = Department.objects.filter()
-        else:
-            departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
-
         activitys = []
-        for activity in Activity.objects.filter(department__in=departments).order_by(
-            "zipcode"
-        ):
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user)
+        ).order_by("zipcode"):
             activitys.append((str(activity.pk), activity))
 
         return activitys
 
     def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
-
         if self.value() is None:
             return queryset
         else:
@@ -546,33 +511,16 @@ admin.site.register(ActivityInvite, ActivityInviteAdmin)
 
 
 class PersonWaitinglistListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Venteliste"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "waiting_list"
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            department_queryset = Department.objects.filter().order_by("zipcode")
-        else:
-            department_queryset = Department.objects.filter(
-                adminuserinformation__user=request.user
-            ).order_by("zipcode")
 
         departments = [
             ("any", "Alle opskrevne samlet"),
             ("none", "Ikke skrevet på venteliste"),
         ]
-        for department in department_queryset:
+        for department in AdminUserInformation.get_departments_admin(request.user):
             departments.append((str(department.pk), department.name))
 
         return departments
@@ -597,30 +545,12 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
 
 
 class VolunteerListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "frivillig i"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "volunteer"
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            department_queryset = Department.objects.filter().order_by("zipcode")
-        else:
-            department_queryset = Department.objects.filter(
-                adminuserinformation__user=request.user
-            ).order_by("zipcode")
-
         departments = [("any", "Alle frivillige samlet"), ("none", "Ikke frivillig")]
-        for department in department_queryset:
+        for department in AdminUserInformation.get_departments_admin(request.user):
             departments.append((str(department.pk), department.name))
 
         return departments
@@ -654,31 +584,16 @@ class VolunteerListFilter(admin.SimpleListFilter):
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Deltager på"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "participant_list"
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            my_departments = Department.objects.filter()
-        else:
-            my_departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
 
         activitys = [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
         for activity in (
-            Activity.objects.filter(department__in=my_departments)
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user)
+            )
             .order_by("start_date")
             .order_by("zipcode")
         ):
@@ -687,14 +602,6 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
         return activitys
 
     def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
-
         if self.value() == "none":
             return queryset.filter(member__activityparticipant__isnull=True)
         elif self.value() == "any":
@@ -706,31 +613,15 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
 
 
 class PersonInvitedListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
     title = "Inviteret til"
-
-    # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity_invited_list"
 
     def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-
-        if request.user.is_superuser:
-            my_departments = Department.objects.filter()
-        else:
-            my_departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
-
         activitys = [("none", "Ikke inviteret til noget"), ("any", "Alle inviterede")]
         for activity in (
-            Activity.objects.filter(department__in=my_departments)
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user)
+            )
             .order_by("start_date")
             .order_by("zipcode")
         ):
