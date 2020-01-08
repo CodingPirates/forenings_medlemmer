@@ -1,7 +1,5 @@
 from django.test import TestCase
 from datetime import datetime, timedelta
-from members.models.union import Union
-from members.models.department import Department
 from members.models.activity import Activity
 from members.models.person import Person
 from members.models.family import Family
@@ -9,15 +7,13 @@ from members.models.member import Member
 from members.models.waitinglist import WaitingList
 from members.models.activityparticipant import ActivityParticipant
 
+from .factories import DepartmentFactory
+
 
 class TestModelActivityParticipant(TestCase):
     # ToDo: Maybe test payment
     def setUp(self):
-        self.union = Union()
-        self.union.save()
-
-        self.department = Department(union=self.union)
-        self.department.save()
+        self.department = DepartmentFactory()
 
         self.activity = Activity(
             start_date=datetime.now(),

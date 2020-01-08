@@ -8,7 +8,7 @@ class Activity(models.Model):
     class Meta:
         verbose_name = "Aktivitet"
         verbose_name_plural = "Aktiviteter"
-        ordering = ["department__zipcode", "start_date"]
+        ordering = ["department__address__zipcode", "start_date"]
 
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1)
