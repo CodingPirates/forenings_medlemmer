@@ -9,7 +9,7 @@ class Department(models.Model):
     class Meta:
         verbose_name_plural = "Afdelinger"
         verbose_name = "Afdeling"
-        ordering = ["zipcode"]
+        ordering = ["address__zipcode"]
 
     help_dept = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi
     nævner det de fleste steder på siden."""
@@ -18,17 +18,7 @@ class Department(models.Model):
     open_hours = models.CharField("Åbningstid", max_length=200, blank=True)
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
     responsible_contact = models.EmailField("E-mail", blank=True)
-    address = models.ForeignKey(
-        "Address", on_delete=models.PROTECT, null=True, blank=True
-    )
-    placename = models.CharField("Stednavn", max_length=200, blank=True)
-    zipcode = models.CharField("Postnummer", max_length=10)
-    city = models.CharField("By", max_length=200)
-    streetname = models.CharField("Vejnavn", max_length=200)
-    housenumber = models.CharField("Husnummer", max_length=10)
-    floor = models.CharField("Etage", max_length=10, blank=True)
-    door = models.CharField("Dør", max_length=10, blank=True)
-    dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
+    address = models.ForeignKey("Address", on_delete=models.PROTECT)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField("Oprettet", blank=False, default=timezone.now)
     closed_dtm = models.DateField("Lukket", blank=True, null=True, default=None)
@@ -37,12 +27,6 @@ class Department(models.Model):
     website = models.URLField("Hjemmeside", blank=True)
     union = models.ForeignKey(
         "Union", verbose_name="Lokalforening", on_delete=models.PROTECT,
-    )
-    longitude = models.DecimalField(
-        "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
-    )
-    latitude = models.DecimalField(
-        "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
     onMap = models.BooleanField("Skal den være på kortet?", default=True)
 
@@ -71,16 +55,7 @@ class Department(models.Model):
             )
         if self.isOpening:
             myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
-        if self.placename != "":
-            myHTML += html.escape(self.placename) + "<br>"
-        myHTML += (
-            html.escape(str(self))
-            + "<br>"
-            + html.escape(self.zipcode)
-            + ", "
-            + html.escape(self.city)
-            + "<br>"
-        )
+        myHTML += html.escape(str(self.address))
         myHTML += "Afdelingsleder: " + html.escape(self.responsible_name) + "<br>"
         myHTML += (
             'E-mail: <a href="mailto:'
