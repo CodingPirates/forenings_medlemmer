@@ -26,7 +26,7 @@ from members.models import (
     EmailItem,
     Payment,
     Equipment,
-    EquipmentLoan
+    EquipmentLoan,
 )
 
 from .address_admin import AddressAdmin
@@ -308,7 +308,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
             ("rejected", "Afvist"),
             ("ok", "Betalt"),
             ("none", "Ikke betalt"),
-            ("confirmed", "Hævet")
+            ("confirmed", "Hævet"),
         ]
         return activitys
 
@@ -350,12 +350,9 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for activity in (
-            Activity.objects.filter(
-                department__in=AdminUserInformation.get_departments_admin(request.user)
-            )
-            .order_by("department__name", "-start_date")
-        ):
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user)
+        ).order_by("department__name", "-start_date"):
             activitys.append((str(activity.pk), str(activity)))
         return activitys
 
@@ -413,11 +410,9 @@ class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for activity in (
-            Activity.objects.filter(
-                department__in=AdminUserInformation.get_departments_admin(request.user)
-            ).order_by("department__name")
-        ):
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user)
+        ).order_by("department__name"):
             activitys.append((str(activity.pk), activity))
 
         return activitys
