@@ -1,7 +1,5 @@
 from django.contrib import admin
-from members.models import Activity
-
-from members.models import AdminUserInformation
+from members.models import Activity, AdminUserInformation
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
@@ -14,8 +12,7 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
             Activity.objects.filter(
                 department__in=AdminUserInformation.get_departments_admin(request.user)
             )
-            .order_by("start_date")
-            .order_by("zipcode")
+            .order_by("department__name", "-start_date")
         ):
             activitys.append((str(activity.pk), str(activity)))
 
@@ -42,8 +39,7 @@ class PersonInvitedListFilter(admin.SimpleListFilter):
             Activity.objects.filter(
                 department__in=AdminUserInformation.get_departments_admin(request.user)
             )
-            .order_by("start_date")
-            .order_by("zipcode")
+            .order_by("department__name", "-start_date")
         ):
             activitys.append((str(activity.pk), str(activity)))
 
@@ -69,7 +65,7 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
             ("any", "Alle opskrevne samlet"),
             ("none", "Ikke skrevet på venteliste"),
         ]
-        for department in AdminUserInformation.get_departments_admin(request.user):
+        for department in AdminUserInformation.get_departments_admin(request.user).order_by("name"):
             departments.append((str(department.pk), department.name))
 
         return departments
@@ -91,7 +87,7 @@ class VolunteerListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         departments = [("any", "Alle frivillige samlet"), ("none", "Ikke frivillig")]
-        for department in AdminUserInformation.get_departments_admin(request.user):
+        for department in AdminUserInformation.get_departments_admin(request.user).order_by("name"):
             departments.append((str(department.pk), department.name))
 
         return departments

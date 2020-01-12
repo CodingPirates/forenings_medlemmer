@@ -304,11 +304,11 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         """
 
         activitys = [
-            ("none", "Ikke betalt"),
-            ("ok", "Betalt"),
-            ("confirmed", "Hævet"),
             ("pending", "Afventende"),
             ("rejected", "Afvist"),
+            ("ok", "Betalt"),
+            ("none", "Ikke betalt"),
+            ("confirmed", "Hævet")
         ]
         return activitys
 
@@ -350,8 +350,11 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for activity in Activity.objects.filter(
-            department__in=AdminUserInformation.get_departments_admin(request.user)
+        for activity in (
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user)
+            )
+            .order_by("department__name", "-start_date")
         ):
             activitys.append((str(activity.pk), str(activity)))
         return activitys
@@ -410,9 +413,11 @@ class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for activity in Activity.objects.filter(
-            department__in=AdminUserInformation.get_departments_admin(request.user)
-        ).order_by("zipcode"):
+        for activity in (
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user)
+            ).order_by("department__name")
+        ):
             activitys.append((str(activity.pk), activity))
 
         return activitys
