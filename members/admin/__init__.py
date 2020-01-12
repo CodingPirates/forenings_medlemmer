@@ -34,6 +34,7 @@ from .department_admin import DepartmentAdmin
 from .union_admin import UnionAdmin
 from .user_admin import UserAdmin
 from .person_admin import PersonAdmin
+from .member_admin import MemberAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
@@ -44,6 +45,7 @@ admin.site.register(Union, UnionAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Person, PersonAdmin)
+admin.site.register(Member, MemberAdmin)
 
 
 class EmailItemInline(admin.TabularInline):
@@ -59,28 +61,6 @@ class EmailItemInline(admin.TabularInline):
         return False
 
     extra = 0
-
-
-class MemberAdmin(admin.ModelAdmin):
-    list_display = ("name", "department", "member_since", "is_active")
-    list_filter = ["department"]
-    list_per_page = 20
-    raw_id_fields = ("department", "person")
-
-    # Only view mebers related to users department
-    def get_queryset(self, request):
-        qs = super(MemberAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        departments = Department.objects.filter(
-            adminuserinformation__user=request.user
-        ).values("id")
-        return qs.filter(
-            activityparticipant__activity__department__in=departments
-        ).distinct()
-
-
-admin.site.register(Member, MemberAdmin)
 
 
 class ActivityAdmin(admin.ModelAdmin):
