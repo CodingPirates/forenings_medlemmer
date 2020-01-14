@@ -14,6 +14,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN apt-get install -y graphviz
+RUN apt-get install -y node-less
 
 EXPOSE 8000
 

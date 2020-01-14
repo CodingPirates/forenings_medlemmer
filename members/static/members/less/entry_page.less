@@ -1,0 +1,45 @@
+@import "base.less";
+
+#user-action-container {
+    padding: 5%;
+    margin: auto;
+    max-width: 1300px;
+    display: grid;
+    justify-content: stretch;
+    /* Actions is 2x2 grid on desktop */
+    @media (min-width: @phonewidth) {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-gap: 5%;
+    }
+    /* Actions is list on phones */
+    @media (max-width: @phonewidth) {
+        grid-template-columns: auto;
+        grid-template-rows: repeat(auto);
+        grid-gap: 5px;
+    }
+}
+
+.user-action {
+    .bg-primary();
+    .rounded-rect();
+    display: flex;
+    padding: 10%;
+    justify-content: flex-start;
+    color: white !important;
+
+    > i {
+        margin-right: 10px;
+    }
+
+    div {
+        width: 100%;
+        text-align: center;
+    }
+
+    a {
+        width: 80%;
+        display: block;
+        margin: auto;
+    }
+}
