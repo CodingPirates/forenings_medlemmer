@@ -70,9 +70,6 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggleMenu">
             <ul class="navbar-nav mr-auto">
-              <li class="nav-item">
-                {% include "members/login_logout.html" %}
-              </li>
               {% if not user.is_authenticated %}
                 <li class="nav-item">
                   <a class="nav-link" href="/">Tilmeld barn</a>
@@ -97,6 +94,9 @@
                   <a class="nav-link" href="/activities">Arrangementer</a>
                 </li>
               {% endif %}
+              <li class="nav-item" style="padding-left: 10px; margin-left: 10px; border-left: 2px solid white">
+                {% include "members/login_logout.html" %}
+              </li>
             </ul>
           </div>
           <a href="https://codingpirates.dk" class="navbar-brand" style="height: 48px; padding: 0px; margin: 0px;" title="Coding Pirates">
