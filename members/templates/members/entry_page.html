@@ -4,7 +4,7 @@
 <link
   rel="stylesheet"
   type="text/css"
-  href="{% static 'members/css/compiled_less.css' %}"
+  href="{% static "members/css/compiled_less.css" %}"
 />
 
 {% if user.is_authenticated %}
@@ -22,7 +22,7 @@
         <i class="fa-list-ol fa fa-4x"></i>
         <div>
           <h4>Se plads på ventelister</h4>
-          <a <a class="button-accent" href="{% url 'waitinglist_view' %}">
+          <a <a class="button-accent" href="{% url "waitinglist_view" %}">
             Ventelister <i class="fa fa-long-arrow-right"></i>
           </a>
         </div>
@@ -31,7 +31,7 @@
         <i class="fa-map fa fa-4x"></i>
         <div>
           <h4>Find en afdeling</h4>
-          <a <a class="button-accent" href="{% url 'family_detail' %}">
+          <a <a class="button-accent" href="{% url "family_detail" %}">
             Afdelinger <i class="fa fa-long-arrow-right"></i>
           </a>
         </div>
@@ -40,7 +40,7 @@
         <i class="fa-calendar fa fa-4x"></i>
         <div>
           <h4>Tilmeld arrangementer</h4>
-          <a <a class="button-accent" href="{% url 'activities' %}">
+          <a <a class="button-accent" href="{% url "activities" %}">
             Arrangementer <i class="fa fa-long-arrow-right"></i>
           </a>
         </div>

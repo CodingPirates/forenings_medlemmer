@@ -1,0 +1,21 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "members/css/compiled_less.css" %}" />
+
+<nav>
+    {% if user.is_authenticated %}
+        <a href="{% url "entry_page" %}">Oversigt</a>
+        <a href="{% url "family_detail" %}">Familie</a>
+        <a href="{% url "waitinglist_view" %}">Ventelister</a>
+        <a href="{% url "family_detail" %}">Afdelinger</a>
+        <a href="{% url "activities" %}">Arrangementer</a>
+        <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
+    {% else %}
+        <a href="/">Tilmeld barn</a>
+        <a href="{% url "volunteer_signup" %}">Bliv frivillig</a>
+        <a id="login-logout" href="{% url 'person_login' %}">Log ind</a>
+    {% endif %}
+    <a href="https://codingpirates.dk">
+        <img src="{% static "Coding Pirates Hack Logo.png" %}" style="height: 100%; width: 50px;
+        display: inline-block; vertical-align: middle;" />
+    </a>
+</nav>
