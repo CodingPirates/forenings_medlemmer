@@ -12,6 +12,7 @@ from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute, SelfAt
 from factory.fuzzy import FuzzyChoice, FuzzyInteger
 from faker.providers import BaseProvider
 
+
 from members.models import (
     Activity,
     ActivityInvite,
@@ -164,6 +165,21 @@ class ZipcodeRegionFactory(DjangoModelFactory):
     latitude = Faker("latitude")
 
 
+class AddressFactory(DjangoModelFactory):
+    class Meta:
+        model = Address
+
+    streetname = Faker("street_name")
+    housenumber = Faker("building_number")
+    floor = Faker("floor")
+    door = Faker("door")
+    city = Faker("city")
+    zipcode = Faker("zipcode")
+    municipality = Faker("municipality")
+    longitude = Faker("longitude")
+    latitude = Faker("latitude")
+
+
 class FamilyFactory(DjangoModelFactory):
     class Meta:
         model = Family
@@ -224,9 +240,7 @@ class UnionFactory(DjangoModelFactory):
     class Meta:
         model = Union
 
-    city = Faker("city")
-    placename = Faker("city")
-    name = factory.LazyAttribute(lambda u: "Coding Pirates {}".format(u.city))
+    name = factory.LazyAttribute(lambda u: "Coding Pirates {}".format(u.address.city))
     chairman = Faker("name")
     chairman = Faker("email")
     second_chair = Faker("name")
@@ -239,11 +253,7 @@ class UnionFactory(DjangoModelFactory):
     statues = Faker("url")
     founded = Faker("date_time", tzinfo=TIMEZONE)
     region = FuzzyChoice([r[0] for r in Union.regions])
-    zipcode = Faker("zipcode")
-    streetname = Faker("street_name")
-    housenumber = Faker("building_number")
-    floor = Faker("floor")
-    door = Faker("door")
+    address = SubFactory(AddressFactory)
     boardMembers = Faker("text")
     bank_main_org = Faker("boolean")
     bank_account = Faker("numerify", text="####-##########")
@@ -258,14 +268,6 @@ class DepartmentFactory(DjangoModelFactory):
     open_hours = Faker("numerify", text="kl. ##:##-##:##")
     responsible_name = Faker("name")
     responsible_contact = Faker("email")
-    zipcode = Faker("zipcode")
-    city = Faker("city")
-    streetname = Faker("street_name")
-    housenumber = Faker("building_number")
-    floor = Faker("floor")
-    door = Faker("door")
-    dawa_id = Faker("uuid4")
-    has_waiting_list = Faker("boolean")
     created = Faker("date_time", tzinfo=TIMEZONE)
     updated_dtm = LazyAttribute(lambda d: datetime_after(d.created))
     closed_dtm = LazyAttribute(lambda d: datetime_after(d.created))
@@ -273,8 +275,7 @@ class DepartmentFactory(DjangoModelFactory):
     isOpening = Faker("boolean")
     website = Faker("url")
     union = SubFactory(UnionFactory)
-    longitude = Faker("longitude")
-    latitude = Faker("latitude")
+    address = SubFactory(AddressFactory)
     onMap = Faker("boolean")
 
 

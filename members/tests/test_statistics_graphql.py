@@ -26,11 +26,11 @@ class TestQueryDailyStatisticsGeneral(TestCase):
     def test_general_stats(self):
         client = Client(schema)
         executed = client.execute(
-            """ { generalDailyStatistics {id persons childrenMale } }"""
+            """ { generalDailyStatistics { persons childrenMale } }"""
         )
         data = executed["data"]["generalDailyStatistics"]
         self.assertEqual(len(data), 1, "Should only be one record")
-        assert dict(data[0]) == {"id": "2", "persons": 42, "childrenMale": 1337}
+        assert dict(data[0]) == {"persons": 42, "childrenMale": 1337}
 
     def test_region_stats(self):
         client = Client(schema)
