@@ -6,14 +6,14 @@
     max-width: 1300px;
     display: grid;
     justify-content: stretch;
+
     /* Actions is 2x2 grid on desktop */
-    @media (min-width: @phonewidth) {
+    @media (min-width: @phone_width) {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
         grid-gap: 5%;
     }
-    /* Actions is list on phones */
-    @media (max-width: @phonewidth) {
+    @media (max-width: @phone_width) {
         grid-template-columns: auto;
         grid-template-rows: repeat(auto);
         grid-gap: 5px;

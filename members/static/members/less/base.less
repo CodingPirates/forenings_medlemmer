@@ -1,9 +1,13 @@
 @import url('https://fonts.googleapis.com/css?family=Pirata+One');
-@import url('https://fonts.googleapis.com/css?family=Gill+Sans');
-@phonewidth: 640px;
+@phone_width: 640px;
+@max_width: 1300px;
 @accent: #EFB422;
 
 @primary:#25A2CE;
+
+@main_font: 'Lato', sans-serif;
+@header_font: 'Bungee', cursive;
+
 
 .bg-primary {
     background-color: @primary;
@@ -13,29 +17,6 @@
 .bg-accent {
     background-color: @accent;
 }
-
-.nav-link {
-    font-family: 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS', sans-serif !important;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.navbar-dark .navbar-nav .nav-link {
-    color: white;
-}
-
-body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-section.main {
-    padding-top: 75px;
-    padding-bottom: 20px;
-}
-
 
 .button {
     .rounded-rect();
@@ -56,10 +37,11 @@ section.main {
     line-height: 1.5;
     border-radius: 0.25rem;
     color: white;
-    transition: color 0.15s ease-in-out,background-color 0.15s ease-in-out,border-color 0.15s ease-in-out,box-shadow 0.15s ease-in-out;
+
 
     &:hover {
         background-color: #ED9224 !important;
+        color: black;
     }
 }
 
