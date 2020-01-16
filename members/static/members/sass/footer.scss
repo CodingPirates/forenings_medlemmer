@@ -1,7 +1,7 @@
-@import "base.less";
+@use "base";
 
 footer {
-    .bg-primary();
+    @extend .bg-primary;
     width: 100%;
     padding: 1.5em;
     color: white !important;

@@ -1,31 +1,35 @@
+$phone_width: 640px;
+$primary-color: #25A2CE;
+$accent-color: #EFB422;
+$max_width: 1300px;
+$main_font: 'Lato', sans-serif;
+$header_font: 'Bungee', cursive;
+
 @import url('https://fonts.googleapis.com/css?family=Pirata+One');
-@phone_width: 640px;
-@max_width: 1300px;
-@accent: #EFB422;
-
-@primary:#25A2CE;
-
-@main_font: 'Lato', sans-serif;
-@header_font: 'Bungee', cursive;
-
 
 .bg-primary {
-    background-color: @primary;
+    background-color: $primary-color;
     color: white !important;
 }
-
 .bg-accent {
-    background-color: @accent;
+    background-color: $accent-color;
+}
+
+@mixin rounded-rect {
+    border-radius: 0.25rem;
+}
+%rounded-rect {
+    @include rounded-rect
 }
 
 .button {
-    .rounded-rect();
+    @extend %rounded-rect;
     text-align: center;
     display: inline-block;
     font-weight: 400;
     text-align: center;
     white-space: nowrap;
-    background-color: @accent !important;
+    background-color: $accent-color !important;
     vertical-align: middle;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -45,11 +49,7 @@
     }
 }
 
-.rounded-rect {
-    border-radius: 0.25rem;
-}
-
 .button-accent {
-    .button();
-    .bg-accent();
+    @extend .button;
+    @extend .bg-accent;
 }

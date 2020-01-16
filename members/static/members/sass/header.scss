@@ -1,39 +1,43 @@
-@import "base.less";
+@use 'base';
 
 nav {
-    .bg-primary();
+    @extend .bg-primary;
     font-weight: 600;
     font-size: 20px;
-    padding: 0% 5%;
+    padding: 0 5%;
     display: flex;
     justify-content: space-around;
     align-items: center;
+
     img {
         width: 50px;
     }
+    // Desktop horizontal nav bar
+    @media (min-width: base.$phone_width) {
+        flex-direction: row;
+    }
+    // Mobile vertical nav bar
+    @media (max-width: base.$phone_width) {
+        flex-direction: column;
+    }
+
     > a {
         color: white;
-        padding: 0px 10px;
+        padding: 0 10px;
+
         &:hover {
             color: #CCCCCC;
             text-decoration: none;
         }
-        @media (max-width: @phone_width) { // Bigger buttons on phone
+        @media (max-width: base.$phone_width) {
+            // Bigger buttons on phone
             padding: 15px 0;
             margin: 15px 0;
             width: 100%;
             border: 1px solid white;
             text-align: center !important;
-            .rounded-rect();
+            @include base.rounded-rect;
         }
-    }
-    // Desktop horizontal nav bar
-    @media (min-width: @phone_width) {
-        flex-direction: row;
-    }
-    // Mobile vertical nav bar
-    @media (max-width: @phone_width) {
-        flex-direction: column;
     }
 }
 #login-logout {
@@ -45,10 +49,10 @@ nav {
 }
 
 #toggle {
-    @media (min-width: @phone_width) {
+    @media (min-width: base.$phone_width) {
         display: none;
     }
-    @media (max-width: @phone_width) {
+    @media (max-width: base.$phone_width) {
         display: inline;
     }
 }
