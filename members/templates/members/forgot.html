@@ -1,6 +1,7 @@
 {% extends 'members/base.html' %}
 
 {% block content %}
+    <div>
     {% if form.errors %}
     <p>Du skal skrive en rigtig email.</p>
     {% endif %}
@@ -20,4 +21,5 @@
             </div>
         </div>
     </form>
+    <div>
 {% endblock %}
