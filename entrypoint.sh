@@ -10,8 +10,8 @@ then
     echo "PostgreSQL started"
 fi
 
-# Compile less
-lessc members/static/members/less/main.less members/static/members/css/compiled_less.css
+# Compile sass
+sass --update members/static/members/sass:members/static/members/css
 
 python manage.py migrate
 python manage.py collectstatic --no-input --clear

@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.8
 
 # Force stdin, stdout and stderr to be totally unbuffered.
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -14,7 +14,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN apt-get install -y graphviz
-RUN apt-get install -y node-less
+RUN apt-get install -y ruby-sass
 
 EXPOSE 8000
 
