@@ -1,6 +1,5 @@
 *.pyc
 __pycache__
-.sass-cache/
 .env
 /db.sqlite3*
 staticfiles
@@ -15,5 +14,5 @@ notes.txt
 gamle_db/
 test-results
 .coverage
-*compiled_less.css
 members/static/members/css
+.sass-cache/

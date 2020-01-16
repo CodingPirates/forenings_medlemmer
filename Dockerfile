@@ -15,7 +15,6 @@ RUN pip install -r requirements.txt
 
 RUN apt-get install -y graphviz
 
-
 EXPOSE 8000
 
 COPY entrypoint.sh app/entrypoint.sh

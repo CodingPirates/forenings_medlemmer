@@ -6,7 +6,6 @@ nav {
     font-size: 20px;
     padding: 0 5%;
     display: flex;
-    justify-content: space-around;
     align-items: center;
 
     img {
@@ -19,6 +18,10 @@ nav {
     // Mobile vertical nav bar
     @media (max-width: base.$phone_width) {
         flex-direction: column;
+    }
+    > span {
+        display: block;
+        flex-grow: 2;
     }
 
     > a {
