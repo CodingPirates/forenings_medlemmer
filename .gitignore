@@ -1,6 +1,5 @@
 *.pyc
 __pycache__
-dart-sass*
 .sass-cache/
 .env
 /db.sqlite3*
