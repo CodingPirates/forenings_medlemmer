@@ -35,6 +35,7 @@ from .union_admin import UnionAdmin
 from .user_admin import UserAdmin
 from .person_admin import PersonAdmin
 from .member_admin import MemberAdmin
+from .payment_admin import PaymentAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
@@ -46,6 +47,7 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Member, MemberAdmin)
+admin.site.register(Payment, PaymentAdmin)
 
 
 class EmailItemInline(admin.TabularInline):
