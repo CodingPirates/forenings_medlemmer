@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap');
+
 $phone_width: 640px;
 $primary-color: #25A2CE;
 $accent-color: #EFB422;
@@ -5,7 +7,6 @@ $max_width: 1300px;
 $main_font: 'Lato', sans-serif;
 $header_font: 'Bungee', cursive;
 
-@import url('https://fonts.googleapis.com/css?family=Pirata+One');
 
 .bg-primary {
     background-color: $primary-color;
