@@ -12,56 +12,18 @@
     {% load bootstrap4 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/compiled_less.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "members/css/application.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "members/css/login.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "members/css/base.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "members/css/base_layout.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "members/css/footer.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "members/css/menu.css" %}" />
     {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
-    {% load crispy_forms_tags %}
-    <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
-    <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
-    <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
-    <script>
-        $(function() {
-            $(".datepicker").datepicker({
-                format: "dd-mm-yyyy",
-                autoclose: true,
-                weekStart: 1,
-                language: 'da'
-            });
-            $('#search-address').dawaautocomplete({
-                select: function(event, adresse) {
-                    // denne funktion bliver kaldt når brugeren vælger en adresse.
-                    // Udfyld adressefelterne
-                    $("#id_streetname").val(adresse.adresse.vejnavn);
-                    $("#id_housenumber").val(adresse.adresse.husnr);
-                    $("#id_floor").val(adresse.adresse.etage);
-                    $("#id_door").val(adresse.adresse.dør);
-                    $("#id_placename").val(adresse.adresse.supplerendebynavn);
-                    $("#id_zipcode").val(adresse.adresse.postnr);
-                    $("#id_city").val(adresse.adresse.postnrnavn);
-                    $("#id_dawa_id").val(adresse.adresse.id);
-                }
-            });
-            $("#manual-entry").click(function() {
-                $("#id_streetname").val('');
-                $("#id_housenumber").val('');
-                $("#id_floor").val('');
-                $("#id_door").val('');
-                $("#id_placename").val('');
-                $("#id_zipcode").val('');
-                $("#id_city").val('');
-                $("#id_dawa_id").val(null);
-                $("#search-address").val(null);
-
-                var checked = $("#manual-entry").get(0).checked;
-                $(".autofilled-address").attr("readonly", !checked);
-                $("#search-address").attr("readonly", checked);
-            });
-        });
-    </script>
+        {% load crispy_forms_tags %}
+        <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
+        <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
+        <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
+        <script src="{% static "members/js/dawa-form-fill.js" %}"></script>
     {% endif %}
 </head>
 

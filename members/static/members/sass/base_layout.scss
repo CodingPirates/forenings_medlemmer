@@ -1,0 +1,10 @@
+body {
+    display: grid;
+    align-content: space-between;
+    grid-template-rows: 1fr 10fr 1fr
+}
+
+html,
+body {
+    height: 100%;
+}

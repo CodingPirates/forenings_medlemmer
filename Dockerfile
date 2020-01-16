@@ -14,7 +14,11 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN apt-get install -y graphviz
-RUN apt-get install -y ruby-sass
+
+# GET SASS
+RUN wget https://github.com/sass/dart-sass/releases/download/1.24.4/dart-sass-1.24.4-linux-x64.tar.gz
+RUN tar xf dart-sass-1.24.4-linux-x64.tar.gz
+RUN rm dart-sass-1.24.4-linux-x64.tar.gz
 
 EXPOSE 8000
 
