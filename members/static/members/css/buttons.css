@@ -1,19 +1,21 @@
 .btn-accent {
-	color: white;
-	background-color: #EFB422;
+  color: white;
+  background-color: #EFB422;
 }
 
 .btn-accent:hover {
-	color: white;
-	background-color: #ED9224;
+  color: white;
+  background-color: #ED9224;
 }
 
 .btn-primary {
-	color: white;
-	background-color: #25A2CE;
+  color: white;
+  background-color: #25A2CE;
 }
 
 .btn-primary:hover {
-	color: white;
-	background-color: #2C8098;
+  color: white;
+  background-color: #2C8098;
 }
+
+/*# sourceMappingURL=buttons.css.map */

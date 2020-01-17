@@ -1,0 +1,62 @@
+@use 'base';
+
+nav {
+    @extend .bg-primary;
+    font-weight: 600;
+    font-size: 20px;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    font-family: base.$header_font;
+
+    img {
+        width: 50px;
+    }
+    // Desktop horizontal nav bar
+    @media (min-width: base.$phone_width) {
+        flex-direction: row;
+    }
+    // Mobile vertical nav bar
+    @media (max-width: base.$phone_width) {
+        flex-direction: column;
+    }
+    > span {
+        display: block;
+        flex-grow: 2;
+    }
+
+    > a {
+        color: white;
+        padding: 0 10px;
+
+        &:hover {
+            color: #CCCCCC;
+            text-decoration: none;
+        }
+        @media (max-width: base.$phone_width) {
+            // Bigger buttons on phone
+            padding: 15px 0;
+            margin: 15px 0;
+            width: 100%;
+            border: 1px solid white;
+            text-align: center !important;
+            @include base.rounded-rect;
+        }
+    }
+}
+#login-logout {
+    text-align: right;
+}
+
+.inactive {
+    display: none;
+}
+
+#toggle {
+    @media (min-width: base.$phone_width) {
+        display: none;
+    }
+    @media (max-width: base.$phone_width) {
+        display: inline;
+    }
+}
