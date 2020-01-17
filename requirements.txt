@@ -43,7 +43,7 @@ query-string==2019.4.13
 quickpay-api-client==1.0.1
 request==2019.4.13
 requests==2.22.0
-Rx==1.6.1
+Rx==3.0.1
 sentry-sdk==0.9.0
 singledispatch==3.4.0.3
 six==1.12.0
