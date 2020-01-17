@@ -40,7 +40,7 @@ python-dotenv==0.10.3
 pytz==2019.3
 PyYAML==5.3
 query-string==2019.4.13
-quickpay-api-client==1.0.1
+quickpay-api-client==2.0.0
 request==2019.4.13
 requests==2.22.0
 Rx==1.6.1
