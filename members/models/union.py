@@ -25,14 +25,7 @@ class Union(models.Model):
     founded = models.DateField("Stiftet", blank=True, null=True)
     regions = (("S", "Sjælland"), ("J", "Jylland"), ("F", "Fyn"), ("Ø", "Øer"))
     region = models.CharField("region", max_length=1, choices=regions)
-
-    placename = models.CharField("Stednavn", max_length=200, blank=True)
-    zipcode = models.CharField("Postnummer", max_length=10)
-    city = models.CharField("By", max_length=200)
-    streetname = models.CharField("Vejnavn", max_length=200)
-    housenumber = models.CharField("Husnummer", max_length=10)
-    floor = models.CharField("Etage", max_length=10, blank=True)
-    door = models.CharField("Dør", max_length=10, blank=True)
+    address = models.ForeignKey("Address", on_delete=models.PROTECT)
     boardMembers = models.TextField("Menige medlemmer", blank=True)
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",

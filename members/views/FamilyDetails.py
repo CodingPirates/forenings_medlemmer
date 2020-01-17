@@ -26,7 +26,6 @@ def FamilyDetails(request):
     participating = ActivityParticipant.objects.filter(
         member__person__family=family
     ).order_by("-activity__start_date")
-    departments_with_no_waiting_list = Department.objects.filter(has_waiting_list=False)
     waiting_lists = WaitingList.objects.filter(person__family=family)
     children = family.person_set.filter(membertype=Person.CHILD)
     ordered_persons = family.person_set.order_by("membertype").all()
@@ -60,9 +59,7 @@ def FamilyDetails(request):
 
     department_children_waiting = {"departments": {}}
     loop_counter = 0
-    for department in Department.objects.filter(
-        has_waiting_list=True, closed_dtm=None
-    ).order_by("zipcode"):
+    for department in Department.objects.filter(closed_dtm=None):
         department_children_waiting["departments"][loop_counter] = {}
         department_children_waiting["departments"][loop_counter]["object"] = department
         department_children_waiting["departments"][loop_counter]["children_status"] = {}
@@ -105,7 +102,6 @@ def FamilyDetails(request):
         "request_parents": family.person_set.exclude(membertype=Person.CHILD).count()
         < 1,
         "department_children_waiting": department_children_waiting,
-        "departments_with_no_waiting_list": departments_with_no_waiting_list,
         "children": children,
         "ordered_persons": ordered_persons,
     }

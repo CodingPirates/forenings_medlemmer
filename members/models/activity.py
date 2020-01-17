@@ -8,7 +8,7 @@ class Activity(models.Model):
     class Meta:
         verbose_name = "Aktivitet"
         verbose_name_plural = "Aktiviteter"
-        ordering = ["department__zipcode", "start_date"]
+        ordering = ["department__address__zipcode", "start_date"]
 
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1)
@@ -56,6 +56,9 @@ class Activity(models.Model):
 
     def is_season(self):
         return (self.end_date - self.start_date).days > 30
+
+    def will_reserve(self):
+        return self.start_date.year > timezone.now().year
 
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
