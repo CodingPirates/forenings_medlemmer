@@ -50,5 +50,5 @@ six==1.12.0
 sqlparse==0.3.0
 text-unidecode==1.3
 unittest-xml-reporting==2.5.1
-urllib3==1.25.2
+urllib3==1.25.7
 whitenoise==4.1.2
