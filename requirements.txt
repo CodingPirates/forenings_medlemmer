@@ -30,7 +30,7 @@ graphql-relay==0.4.5
 gunicorn==19.9.0
 idna==2.8
 tqdm==4.41.0
-marshmallow==2.19.2
+marshmallow==3.3.0
 post==2019.4.13
 promise==2.2.1
 psycopg2==2.8.4
