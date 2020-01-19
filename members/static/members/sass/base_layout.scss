@@ -3,11 +3,11 @@
 body {
     display: grid;
     align-content: space-between;
-    @media (min-width: base.$phone_width) {
-        grid-template-rows: 1fr 10fr 1fr
+    @include base.for-phone {
+        grid-template-rows: 1fr 12fr 1fr
     }
     // Desktop horizontal nav bar
-    @media (min-width: base.$phone_width) {
+    @include base.for-desktop {
         grid-template-rows: 50px 10fr 1fr
     }
 

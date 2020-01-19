@@ -6,17 +6,16 @@ nav {
     display: flex;
     align-items: center;
     font-family: base.$header_font;
-
     img {
         width: 50px;
     }
     // Desktop horizontal nav bar
-    @media (min-width: base.$phone_width) {
-        flex-direction: row;
-    }
-    // Mobile vertical nav bar
-    @media (max-width: base.$phone_width) {
+    @include base.for-phone {
         flex-direction: column;
+        justify-content:center;
+    }
+    @include base.for-desktop {
+        flex-direction: row;
     }
     > span {
         display: block;
@@ -26,13 +25,13 @@ nav {
     > a {
         color: white;
         padding: 0 10px;
-
         &:hover {
             color: #CCCCCC;
             text-decoration: none;
         }
-        @media (max-width: base.$phone_width) {
+        @include base.for-phone {
             // Bigger buttons on phone
+            font-size: 24px;
             padding: 15px 0;
             margin: 15px 0;
             width: 100%;
@@ -51,10 +50,10 @@ nav {
 }
 
 #toggle {
-    @media (min-width: base.$phone_width) {
+    @include base.for-desktop {
         display: none;
     }
-    @media (max-width: base.$phone_width) {
+    @include base.for-phone {
         display: inline;
     }
 }
