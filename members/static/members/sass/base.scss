@@ -8,12 +8,12 @@ $header_font: 'Bungee', cursive;
 
 
 @mixin for-phone {
-  @media only screen and (max-device-width: 667px)  {
+  @media only screen and (max-width: 667px)  {
        @content;
    }
 }
 @mixin for-desktop {
-  @media (min-device-width: 668px) { @content; }
+  @media (min-width: 668px) { @content; }
 }
 
 
