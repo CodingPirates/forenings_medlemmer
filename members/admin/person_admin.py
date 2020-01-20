@@ -39,6 +39,7 @@ class PersonAdmin(admin.ModelAdmin):
         "name",
         "membertype",
         "family_url",
+        "gender",
         "age_years",
         "zipcode",
         "added",
