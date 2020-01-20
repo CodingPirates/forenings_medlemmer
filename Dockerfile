@@ -4,15 +4,14 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y graphviz
 
-COPY requirements.txt requirements.txt
-
-#RUN pip install --upgrade pip && \
-#    pip install -r requirements.txt
 
 COPY pyproject.toml  pyproject.toml
 COPY poetry.lock poetry.lock
 
-RUN pip install poetry \
+ENV POETRY_VIRTUALENVS_CREATE false
+
+RUN pip install --upgrade pip \
+    && pip install poetry \
     && poetry install
 
 
@@ -32,4 +31,4 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Set the default command to be executed.
-CMD poetry run gunicorn forenings_medlemmer.wsgi:application --bind 0.0.0.0:$PORT
+CMD gunicorn forenings_medlemmer.wsgi:application --bind 0.0.0.0:$PORT

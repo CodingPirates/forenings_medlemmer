@@ -13,6 +13,6 @@ fi
 # Compile sass
 /bin/dart-sass/sass members/static/members/sass:members/static/members/css
 
-poetry run python manage.py migrate
-poetry run python manage.py collectstatic --no-input --clear
+python manage.py migrate
+python manage.py collectstatic --no-input --clear
 exec "$@"
