@@ -8,12 +8,12 @@
     justify-content: stretch;
 
     /* Actions is 2x2 grid on desktop */
-    @media (min-width: base.$phone_width) {
+    @include base.for-desktop {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
         grid-gap: 5%;
     }
-    @media (max-width: base.$phone_width) {
+    @include base.for-phone {
         grid-template-columns: auto;
         grid-template-rows: repeat(auto);
         grid-gap: 5px;

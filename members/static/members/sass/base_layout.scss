@@ -3,7 +3,14 @@
 body {
     display: grid;
     align-content: space-between;
-    grid-template-rows: 1fr 10fr 1fr
+    @include base.for-phone {
+        grid-template-rows: 1fr 12fr 1fr
+    }
+    // Desktop horizontal nav bar
+    @include base.for-desktop {
+        grid-template-rows: 50px 10fr 1fr
+    }
+
 }
 
 html,
