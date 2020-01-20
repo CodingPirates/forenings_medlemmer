@@ -4,11 +4,6 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y graphviz
 
-COPY requirements.txt requirements.txt
-
-#RUN pip install --upgrade pip && \
-#    pip install -r requirements.txt
-
 COPY pyproject.toml  pyproject.toml
 COPY poetry.lock poetry.lock
 
