@@ -1,6 +1,7 @@
 @use 'base';
 
 nav {
+    @extend .container;
     @extend .bg-primary;
     padding: 0 5%;
     display: flex;
