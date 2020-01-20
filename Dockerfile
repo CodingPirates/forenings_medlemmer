@@ -4,7 +4,6 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y graphviz
 
-
 COPY pyproject.toml  pyproject.toml
 COPY poetry.lock poetry.lock
 
