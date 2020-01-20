@@ -36,7 +36,7 @@
    "CORS_LIST" : {
       "required": true,
       "description": "The hosts that are allowed to acces cros origin",
-      "value": "members.codingpirates.dk"
+      "value": "https://members.codingpirates.dk"
     },
 
     "SECRET_KEY": {
