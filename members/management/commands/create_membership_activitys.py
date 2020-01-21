@@ -10,7 +10,7 @@ class Command(BaseCommand):
     output_transaction = True
 
     def handle(self, *args, **options):
-        mainDepartment = Department.objects.get(pk=2)
+        mainDepartment = Department.objects.get(pk=30)
 
         for curUnion in Union.objects.all():
             if curUnion.id == 1:
