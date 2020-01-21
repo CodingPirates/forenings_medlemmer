@@ -25,6 +25,14 @@ $header_font: 'Bungee', cursive;
     background-color: $accent-color;
 }
 
+.container {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @mixin rounded-rect {
     border-radius: 0.25rem;
 }
