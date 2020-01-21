@@ -17,6 +17,7 @@ class Address(models.Model):
     housenumber = models.CharField("Husnummer", max_length=5)
     floor = models.CharField("Etage", max_length=10, blank=True, null=True)
     door = models.CharField("Dør", max_length=10, blank=True, null=True)
+    placename = models.CharField("Stednavn", max_length=200, blank=True, null=True)
     city = models.CharField("By", max_length=200)
     zipcode = models.CharField("Postnummer", max_length=4)
     REGION_CHOICES = (
@@ -42,6 +43,9 @@ class Address(models.Model):
         address = f"{self.streetname} {self.housenumber}"
         address = f"{address} {self.floor}" if self.floor is not None else address
         address = f"{address} {self.door}" if self.door is not None else address
+        address = (
+            f"{address}, {self.placename}" if self.placename is not None else address
+        )
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):

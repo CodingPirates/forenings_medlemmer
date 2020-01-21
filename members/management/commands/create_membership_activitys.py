@@ -10,7 +10,7 @@ class Command(BaseCommand):
     output_transaction = True
 
     def handle(self, *args, **options):
-        mainDepartment = Department.objects.get(pk=30)
+        mainDepartment = Department.objects.get(pk=2)
 
         for curUnion in Union.objects.all():
             if curUnion.id == 1:
@@ -64,13 +64,13 @@ class Command(BaseCommand):
                 open_hours=open_hours,
                 responsible_name=curUnion.chairman,
                 responsible_contact=curUnion.chairman_email,
-                placename=curUnion.placename,
-                zipcode=curUnion.zipcode,
-                city=curUnion.city,
-                streetname=curUnion.streetname,
-                housenumber=curUnion.housenumber,
-                floor=curUnion.floor,
-                door=curUnion.door,
+                placename=curUnion.address.placename,
+                zipcode=curUnion.address.zipcode,
+                city=curUnion.address.city,
+                streetname=curUnion.address.streetname,
+                housenumber=curUnion.address.housenumber,
+                floor=curUnion.address.floor,
+                door=curUnion.address.door,
                 dawa_id=dawa_id,
                 description=description,
                 instructions=instructions,
@@ -82,7 +82,7 @@ class Command(BaseCommand):
                 max_participants=max_participants,
                 max_age=max_age,
                 min_age=min_age,
-                membership_activity=True,
+                member_justified=True,
             )
 
             activity.save()
