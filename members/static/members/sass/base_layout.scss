@@ -18,3 +18,16 @@ body {
     height: 100%;
     font-family: base.$main_font;
 }
+
+section {
+    @extend .container;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: base.$max_width;
+
+    @include base.for-desktop {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
