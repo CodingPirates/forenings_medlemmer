@@ -6,23 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0015_address_placename'),
+        ("members", "0015_address_placename"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='activity',
-            name='door',
-            field=models.CharField(blank=True, max_length=200, null=True, verbose_name='Dør'),
+            model_name="activity",
+            name="door",
+            field=models.CharField(
+                blank=True, max_length=200, null=True, verbose_name="Dør"
+            ),
         ),
         migrations.AlterField(
-            model_name='activity',
-            name='floor',
-            field=models.CharField(blank=True, max_length=200, null=True, verbose_name='Etage'),
+            model_name="activity",
+            name="floor",
+            field=models.CharField(
+                blank=True, max_length=200, null=True, verbose_name="Etage"
+            ),
         ),
         migrations.AlterField(
-            model_name='activity',
-            name='placename',
-            field=models.CharField(blank=True, max_length=200, null=True, verbose_name='Stednavn'),
+            model_name="activity",
+            name="placename",
+            field=models.CharField(
+                blank=True, max_length=200, null=True, verbose_name="Stednavn"
+            ),
         ),
     ]
