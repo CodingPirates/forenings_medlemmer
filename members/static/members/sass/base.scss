@@ -1,11 +1,20 @@
 @import url('https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap');
 
-$phone_width: 640px;
 $primary-color: #25A2CE;
 $accent-color: #EFB422;
 $max_width: 1300px;
 $main_font: 'Lato', sans-serif;
 $header_font: 'Bungee', cursive;
+
+
+@mixin for-phone {
+  @media only screen and (max-width: 667px)  {
+       @content;
+   }
+}
+@mixin for-desktop {
+  @media (min-width: 668px) { @content; }
+}
 
 
 .bg-primary {
@@ -14,6 +23,14 @@ $header_font: 'Bungee', cursive;
 }
 .bg-accent {
     background-color: $accent-color;
+}
+
+.container {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @mixin rounded-rect {
