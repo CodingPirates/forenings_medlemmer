@@ -36,10 +36,18 @@
         }
 
         a {
+            @extend .button-accent;
             width: 80%;
             display: block;
             margin: auto;
             font-weight: 800;
         }
     }
+}
+
+#signup-form {
+    border: 1px solid rgba(0,0,0,.125);
+    padding: 1.25rem;
+    background-clip: border-box;
+    border-radius: .25rem;
 }
