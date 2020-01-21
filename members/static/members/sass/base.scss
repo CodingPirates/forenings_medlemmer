@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap');
 
 $primary-color: #25A2CE;
+$primary-color-muted: #2C8098;
 $accent-color: #EFB422;
+$accent-color-muted: #ED9224;
 $max_width: 1300px;
 $main_font: 'Lato', sans-serif;
 $header_font: 'Bungee', cursive;
@@ -59,7 +61,7 @@ $header_font: 'Bungee', cursive;
     color: white;
     &:hover {
         color: white;
-        background-color: #2C8098;
+        background-color: $primary-color-muted;
     }
 
 
@@ -68,9 +70,8 @@ $header_font: 'Bungee', cursive;
 .button-accent {
     @extend .button;
     @extend .bg-accent;
-    background-color: $accent-color;
     &:hover {
-        background-color: #ED9224;
+        background-color: $accent-color-muted;
         color: black;
     }
 }

@@ -24,7 +24,7 @@ section {
     margin-top: 20px;
     margin-bottom: 20px;
     max-width: base.$max_width;
-    // Desktop
+
     @include base.for-desktop {
         width: 90%;
         margin-left: auto;
