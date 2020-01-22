@@ -223,7 +223,7 @@ class PersonFactory(DjangoModelFactory):
         lambda n: "person{0}@example.com".format(n)
     )  # Faker("email")
     phone = Faker("phone_number")
-    gender = FuzzyChoice(Person.MEMBER_GENDER_CHOICES)
+    gender = FuzzyChoice([code for (code, name) in Person.MEMBER_GENDER_CHOICES])
     birthday = Faker("date")
     # has_certificate = Faker("date")
     family = SubFactory(FamilyFactory, email=email)
