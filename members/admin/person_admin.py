@@ -38,6 +38,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "membertype",
+        "gender",
         "family_url",
         "age_years",
         "zipcode",
