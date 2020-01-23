@@ -6,7 +6,6 @@
     <link href="https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css" />
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/style.css" %}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     {% load fontawesome %}
     {% fontawesome_stylesheet %}
@@ -15,8 +14,7 @@
     {% bootstrap_javascript %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="{% static "members/css/application.css" %}" />
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/login.css" %}" />
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/base.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "members/css/style.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "members/css/base_layout.css" %}" />
     <link rel="stylesheet" type="text/css" href="{% static "members/css/footer.css" %}" />
     {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
@@ -30,7 +28,7 @@
 
 <body>
     {% include "members/header.html" %}
-    <section class="main">
+    <section>
         {% block content %}{% endblock %}
     </section>
     <footer>
