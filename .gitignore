@@ -16,3 +16,4 @@ test-results
 .coverage
 members/static/members/css
 .sass-cache/
+public_data.zip
