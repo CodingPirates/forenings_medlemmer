@@ -1,13 +1,10 @@
 import zipfile
+import json
+from io import StringIO
 
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
-from io import StringIO
-import os
-import json
 
-
-TEMP_DIR = "./dump_temp"
 MODELS_TO_DUMP = ["department", "union", "address"]
 
 
@@ -19,9 +16,6 @@ class Command(BaseCommand):
 
 
 def get_dump():
-    if not os.path.exists(TEMP_DIR):
-        os.makedirs(TEMP_DIR)
-
     dumps = {}
     for model in MODELS_TO_DUMP:
         dump = StringIO()
@@ -41,8 +35,6 @@ def get_dump():
 
 
 def save_dump(dump):
-    if not os.path.exists(TEMP_DIR):
-        os.makedirs(TEMP_DIR)
     with zipfile.ZipFile(
         "members/static/public_data.zip", "w", compression=zipfile.ZIP_DEFLATED
     ) as zip:
