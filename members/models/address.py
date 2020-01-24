@@ -79,6 +79,7 @@ class Address(models.Model):
         self.housenumber = dawa_data["husnr"]
         self.floor = dawa_data["etage"]
         self.door = dawa_data["dør"]
+        self.placename = dawa_data["supplerendebynavn"]
         self.city = dawa_data["postnrnavn"]
         self.zipcode = dawa_data["postnr"]
         self.municipality = dawa_data["kommunenavn"]
