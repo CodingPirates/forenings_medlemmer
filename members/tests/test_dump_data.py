@@ -5,7 +5,6 @@ from members.models import Department, Union
 
 
 class TestDumpData(TestCase):
-
     def setup(self):
         self.departments = DepartmentFactory.create_batch(20)
         self.unions = UnionFactory.create_batch(20)
