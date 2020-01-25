@@ -27,25 +27,24 @@ class Command(BaseCommand):
         temp_dir = "temp_dump"
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
-        get_dump(temp_dir)
-        load_data(temp_dir)
+
+        print("Downloading data File")
+        response = requests.get(
+            "http://members.codingpirates.dk/static/public_data.zip"
+        )
+        if response.status_code != 200:
+            raise ConnectionError("Could not get zip file")
+
+        print("Unzipping")
+        with open(f"{dir}/dump.zip", "wb+") as zip:
+            zip.write(response.content)
+
+        with ZipFile(f"{dir}/dump.zip", "r") as zipObj:
+            zipObj.extractall(dir)
+
+        print("Reading dumps files")
+        for model in MODELS_TO_LOAD:
+            call_command("loaddata", f"{dir}/{model}.json")
+
+        # Remove temp dir
         shutil.rmtree(temp_dir)
-
-
-def get_dump(dir):
-    print("Downloading data File")
-    response = requests.get("http://members.codingpirates.dk/static/public_data.zip")
-    if response.status_code != 200:
-        raise ConnectionError("Could not get zip file")
-
-    print("Unzipping")
-    with open(f"{dir}/dump.zip", "wb+") as zip:
-        zip.write(response.content)
-
-    with ZipFile(f"{dir}/dump.zip", "r") as zipObj:
-        zipObj.extractall(dir)
-
-
-def load_data(dir):
-    for model in MODELS_TO_LOAD:
-        call_command("loaddata", f"{dir}/{model}.json")
