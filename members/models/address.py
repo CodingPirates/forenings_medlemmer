@@ -39,11 +39,9 @@ class Address(models.Model):
 
     def __str__(self):
         address = f"{self.streetname} {self.housenumber}"
-        address = f"{address} {self.floor}" if self.floor is not None else address
-        address = f"{address} {self.door}" if self.door is not None else address
-        address = (
-            f"{address}, {self.placename}" if self.placename is not None else address
-        )
+        address = f"{address} {self.floor}" if self.floor != "" else address
+        address = f"{address} {self.door}" if self.door != "" else address
+        address = f"{address}, {self.placename}" if self.placename != "" else address
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
@@ -104,15 +102,11 @@ class Address(models.Model):
             return Address.objects.all()
         department_address_id = [
             department.address.id
-            for department in Department.objects.filter(
-                adminuserinformation__user=user
-            ).exclude(address=None)
+            for department in Department.objects.filter(adminuserinformation__user=user)
         ]
         union_address_id = [
             union.address.id
-            for union in Union.objects.filter(adminuserinformation__user=user).exclude(
-                address=None
-            )
+            for union in Union.objects.filter(adminuserinformation__user=user)
         ]
         address_ids = set(department_address_id + union_address_id)
         return Address.objects.filter(pk__in=address_ids)
