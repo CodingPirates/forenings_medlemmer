@@ -15,9 +15,9 @@ class Address(models.Model):
 
     streetname = models.CharField("Vejnavn", max_length=200)
     housenumber = models.CharField("Husnummer", max_length=5)
-    floor = models.CharField("Etage", max_length=10, blank=True, null=True)
-    door = models.CharField("Dør", max_length=10, blank=True, null=True)
-    placename = models.CharField("Stednavn", max_length=200, blank=True, null=True)
+    floor = models.CharField("Etage", max_length=10, blank=True)
+    door = models.CharField("Dør", max_length=10, blank=True)
+    placename = models.CharField("Stednavn", max_length=200, blank=True)
     city = models.CharField("By", max_length=200)
     zipcode = models.CharField("Postnummer", max_length=4)
     REGION_CHOICES = (
@@ -27,10 +27,8 @@ class Address(models.Model):
         ("Region Midtjylland", "Region Midtjylland"),
         ("Region Sjælland", "Region Sjælland"),
     )
-    region = models.CharField(
-        "Region", choices=REGION_CHOICES, max_length=20, null=True
-    )
-    municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
+    region = models.CharField("Region", choices=REGION_CHOICES, max_length=20)
+    municipality = models.CharField("Kommune", max_length=100, blank=True)
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
