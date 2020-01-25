@@ -71,6 +71,8 @@ class Address(models.Model):
             return False
 
         dawa_data = data_resp.json()["properties"]
+        for key in dawa_data.keys():
+            dawa_data[key] = "" if dawa_data[key] is None else dawa_data[key]
         self.streetname = dawa_data["vejnavn"]
         self.housenumber = dawa_data["husnr"]
         self.floor = dawa_data["etage"]
