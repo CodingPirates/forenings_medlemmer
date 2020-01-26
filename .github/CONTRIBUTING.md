@@ -1,8 +1,6 @@
 ## Contributing
 
-You are more than welcome to contribute to the system. This guide documents:
-how to create a local development setup, the tools/frameworks used, and the
-steps required to get a pull request approved.
+You are more than welcome to contribute to the system. This guide documents how to create a local development setup, the tools/frameworks used, and the steps required to get a pull request approved.
 
 ## Getting a local setup.
 
