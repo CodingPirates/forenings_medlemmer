@@ -36,15 +36,15 @@ class Command(BaseCommand):
             raise ConnectionError("Could not get zip file")
 
         print("Unzipping")
-        with open(f"{dir}/dump.zip", "wb+") as zip:
+        with open(f"{temp_dir}/dump.zip", "wb+") as zip:
             zip.write(response.content)
 
-        with ZipFile(f"{dir}/dump.zip", "r") as zipObj:
-            zipObj.extractall(dir)
+        with ZipFile(f"{temp_dir}/dump.zip", "r") as zipObj:
+            zipObj.extractall(temp_dir)
 
         print("Reading dumps files")
         for model in MODELS_TO_LOAD:
-            call_command("loaddata", f"{dir}/{model}.json")
+            call_command("loaddata", f"{temp_dir}/{model}.json")
 
         # Remove temp dir
         shutil.rmtree(temp_dir)
