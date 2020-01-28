@@ -81,7 +81,7 @@ class EmailTemplate(models.Model):
                 destination_address = reciever.email
             elif type(reciever) is members.models.department.Department:
                 context["department"] = reciever
-                destination_address = reciever.responsible_contact
+                destination_address = reciever.department_email
 
             # figure out Person and Family is applicable
             if type(reciever) is members.models.person.Person:
