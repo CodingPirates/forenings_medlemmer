@@ -15,9 +15,9 @@ class Address(models.Model):
 
     streetname = models.CharField("Vejnavn", max_length=200)
     housenumber = models.CharField("Husnummer", max_length=5)
-    floor = models.CharField("Etage", max_length=10, blank=True, null=True)
-    door = models.CharField("Dør", max_length=10, blank=True, null=True)
-    placename = models.CharField("Stednavn", max_length=200, blank=True, null=True)
+    floor = models.CharField("Etage", max_length=10, blank=True)
+    door = models.CharField("Dør", max_length=10, blank=True)
+    placename = models.CharField("Stednavn", max_length=200, blank=True)
     city = models.CharField("By", max_length=200)
     zipcode = models.CharField("Postnummer", max_length=4)
     REGION_CHOICES = (
@@ -27,10 +27,8 @@ class Address(models.Model):
         ("Region Midtjylland", "Region Midtjylland"),
         ("Region Sjælland", "Region Sjælland"),
     )
-    region = models.CharField(
-        "Region", choices=REGION_CHOICES, max_length=20, null=True
-    )
-    municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
+    region = models.CharField("Region", choices=REGION_CHOICES, max_length=20)
+    municipality = models.CharField("Kommune", max_length=100, blank=True)
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
@@ -41,11 +39,9 @@ class Address(models.Model):
 
     def __str__(self):
         address = f"{self.streetname} {self.housenumber}"
-        address = f"{address} {self.floor}" if self.floor is not None else address
-        address = f"{address} {self.door}" if self.door is not None else address
-        address = (
-            f"{address}, {self.placename}" if self.placename is not None else address
-        )
+        address = f"{address} {self.floor}" if self.floor != "" else address
+        address = f"{address} {self.door}" if self.door != "" else address
+        address = f"{address}, {self.placename}" if self.placename != "" else address
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
@@ -75,6 +71,8 @@ class Address(models.Model):
             return False
 
         dawa_data = data_resp.json()["properties"]
+        for key in dawa_data.keys():
+            dawa_data[key] = "" if dawa_data[key] is None else dawa_data[key]
         self.streetname = dawa_data["vejnavn"]
         self.housenumber = dawa_data["husnr"]
         self.floor = dawa_data["etage"]
@@ -107,15 +105,11 @@ class Address(models.Model):
             return Address.objects.all()
         department_address_id = [
             department.address.id
-            for department in Department.objects.filter(
-                adminuserinformation__user=user
-            ).exclude(address=None)
+            for department in Department.objects.filter(adminuserinformation__user=user)
         ]
         union_address_id = [
             union.address.id
-            for union in Union.objects.filter(adminuserinformation__user=user).exclude(
-                address=None
-            )
+            for union in Union.objects.filter(adminuserinformation__user=user)
         ]
         address_ids = set(department_address_id + union_address_id)
         return Address.objects.filter(pk__in=address_ids)
