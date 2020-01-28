@@ -56,7 +56,9 @@ class Department(models.Model):
         if self.isOpening:
             myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
         myHTML += html.escape(str(self.address))
-        myHTML += "<br>Afdelingsleder: " + html.escape(self.department_leader.name) + "<br>"
+        myHTML += (
+            "<br>Afdelingsleder: " + html.escape(self.department_leader.name) + "<br>"
+        )
         myHTML += (
             'E-mail: <a href="mailto:'
             + html.escape(self.department_email)
