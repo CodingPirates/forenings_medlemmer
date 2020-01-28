@@ -37,7 +37,10 @@ class DepartmentAdmin(admin.ModelAdmin):
                 "description": "<p>Lav en beskrivelse af jeres aktiviteter, teknologier og tekniske niveau.</p><p>Åbningstid er ugedag samt tidspunkt<p>",
             },
         ),
-        ("Ansvarlig", {"fields": ("responsible_name", "department_email")}),
+        (
+            "Ansvarlig",
+            {"fields": ("responsible_name", "department_email", "department_leader")},
+        ),
         ("Adresse", {"fields": ("address",)},),
         (
             "Afdelingssiden",
