@@ -7,23 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0017_auto_20200125_1457'),
+        ("members", "0017_auto_20200125_1457"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='department',
-            old_name='responsible_contact',
-            new_name='department_email',
+            model_name="department",
+            old_name="responsible_contact",
+            new_name="department_email",
         ),
-        migrations.RemoveField(
-            model_name='department',
-            name='onMap',
-        ),
+        migrations.RemoveField(model_name="department", name="onMap",),
         migrations.AddField(
-            model_name='department',
-            name='department_leader',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='members.Person'),
+            model_name="department",
+            name="department_leader",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="members.Person",
+            ),
             preserve_default=False,
         ),
     ]
