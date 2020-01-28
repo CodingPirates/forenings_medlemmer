@@ -104,7 +104,6 @@ def EntryPage(request):
                     request, "members/entry_page.html", {"signupform": signup}
                 )
 
-
     # initial load (if we did not return above)
     signup = signupForm()
     return render(request, "members/entry_page.html", {"signupform": signup})
