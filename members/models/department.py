@@ -18,7 +18,9 @@ class Department(models.Model):
     open_hours = models.CharField("Åbningstid", max_length=200, blank=True)
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
     department_email = models.EmailField("E-mail", blank=True)
-    department_leader = models.ForeignKey("Person", on_delete=models.PROTECT)
+    department_leaders = models.ManyToManyField(
+        "Person", limit_choices_to={"user__is_staff": True}
+    )
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField("Oprettet", blank=False, default=timezone.now)
@@ -57,7 +59,13 @@ class Department(models.Model):
             myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
         myHTML += html.escape(str(self.address))
         myHTML += (
-            "<br>Afdelingsleder: " + html.escape(self.department_leader.name) + "<br>"
+            "<br>Afdelingsleder: "
+            + html.escape(
+                self.department_leaders.all()[0]
+                if len(self.department_leaders.all())
+                else self.responsible_name
+            )
+            + "<br>"
         )
         myHTML += (
             'E-mail: <a href="mailto:'

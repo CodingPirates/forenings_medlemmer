@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from members.models import Union, Address, Person, Member, AdminUserInformation
+from members.models import Union, Address, Person, Department
 
 
 class UnionDepartmentFilter(admin.SimpleListFilter):
@@ -17,19 +17,7 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 class DepartmentAdmin(admin.ModelAdmin):
     list_filter = (UnionDepartmentFilter,)
     raw_id_fields = ("union",)
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "department_leader":
-            department = []
-            for d in AdminUserInformation.get_departments_admin(request.user):
-                department.append(d)
-            department_users = []
-            for du in Member.objects.filter(department__in=department):
-                department_users.append(du.person)
-            kwargs["queryset"] = Person.objects.filter(
-                user__is_staff=True, name__in=department_users
-            )
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    filter_horizontal = ["department_leaders"]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(DepartmentAdmin, self).get_form(request, obj, **kwargs)
@@ -52,7 +40,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         ),
         (
             "Ansvarlig",
-            {"fields": ("responsible_name", "department_email", "department_leader")},
+            {"fields": ("responsible_name", "department_email", "department_leaders")},
         ),
         ("Adresse", {"fields": ("address",)},),
         (
