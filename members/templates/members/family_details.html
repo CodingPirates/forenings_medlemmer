@@ -160,7 +160,7 @@
                   {% for key, department in department_children_waiting.departments.items %}
                     <tr>
                       <td>Coding Pirates {{department.object.name}}</td>
-                      <td><p>{{department.object.address}}</p> <p>{{department.object.zipcode}} {{department.object.city}}</p></td>
+                      <td>{{department.object.address}}<br/>{{department.object.zipcode}} {{department.object.city}}</td>
                       <td>{{department.object.open_hours}}</td>
                       <td>
                       {%for key, child in department.children_status.items %}
@@ -187,6 +187,5 @@
                   Der er ingen aktuelle ventelister.
                 </div>
             {% endif %}
-    </div>
   </div>
 {% endblock %}
