@@ -10,6 +10,7 @@ HTML:
     - Pretty Diff
     - JS-Beautify
   indent_size: 2
+  wrap_line_length: 80
   end_with_newline: true
   wrap_attributes: auto
 Markdown:
