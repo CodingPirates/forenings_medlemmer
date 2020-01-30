@@ -1,0 +1,26 @@
+CSS:
+  beautifiers:
+    - Prettier
+    - Pretty Diff
+    - JS-Beautify
+  wrap_line_length: 80
+  end_with_newline: true
+HTML:
+  beautifiers:
+    - Pretty Diff
+    - JS-Beautify
+  indent_size: 2
+  end_with_newline: true
+  indent_inner_html: !<tag:yaml.org,2002:js/undefined> ""
+  wrap_attributes: force
+Markdown:
+  beautifiers:
+    - Prettier
+SCSS:
+  beautifiers:
+    - Prettier
+    - Pretty Diff
+
+Python:
+  beautifiers:
+    - Black
