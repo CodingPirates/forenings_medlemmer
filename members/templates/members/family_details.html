@@ -8,9 +8,8 @@
 
       <h2>Personer</h2>
       <p>Tryk på <kbd>Opret</kbd>-knapperne, for at tilføje flere personer. Opret gerne begge forældre, så vi kan få fat i jer nemt.</p>
-      <div class="border">
         {% if family.person_set.count > 0 %}
-            <table class="table table-striped table-responsive" style="display: table; table-layout: fixed;">
+            <table class="table table-striped table-responsive border" style="display: table; table-layout: fixed;">
               <thead>
                 <tr>
                   <th class="col-1">Opskrevet</th>
@@ -51,7 +50,6 @@
               </tbody>
             </table>
           {% endif %}
-          </div>
           <br>
           <a class="btn btn-primary" role="button" href="{% url 'person_add' 'CH' %}">Opret barn</a>
           <a class="btn btn-primary" role="button" href="{% url 'person_add' 'PA' %}">Opret forælder</a>
