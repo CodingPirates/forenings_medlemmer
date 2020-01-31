@@ -12,7 +12,7 @@
     <select style="width: 95%;" onchange="go_from_select(this.options[this.selectedIndex].value)">
       {% for choice in choices %}
       <option {% selected="selected" {% endif %} value="{{ choice.query_string|iriencode }}"
-        if choice.selected %}>{{ choice.display }}</option>
+        if="if" choice.selected="choice.selected" %}="%}">{{ choice.display }}</option>
       {% endfor %}
     </select>
   </li>
