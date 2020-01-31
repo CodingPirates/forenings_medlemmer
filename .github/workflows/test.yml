@@ -19,13 +19,11 @@ jobs:
         run: docker-compose run web flake8
       - name: Generating coverage
         run: docker-compose run web coverage run --source='.' manage.py test
-      - name: Generating coverage
-        run: docker-compose run web coverage run --source='.' manage.py test
       - name: Upload coverage to Codecov
-          uses: codecov/codecov-action@v1
-          with:
-            token: ${{ secrets.CODECOV_TOKEN }}
-            file: ./.coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Create and upload UML diagram
         run: mkdir -p UML && docker-compose run web ./manage.py graph_models members -o UML/UML_diagram.png
       - uses: actions/upload-artifact@v1
