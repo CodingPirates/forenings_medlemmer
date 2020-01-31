@@ -73,21 +73,21 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th class="col-sm-3">Navn</th>
+                  <th>Navn</th>
                   <th>Aktivitet</th>
-                  <th class="col-sm-2">Start</th>
-                  <th class="col-sm-2">Slut</th>
+                  <th>Start</th>
+                  <th>Slut</th>
                 </tr>
               </thead>
               <tbody>
                 {% for participation in participating %}
                   <tr>
                     <td>{{participation.member.person.name}}</td>
-                    <td><a href="{%url 'activity_view_person' participation.activity.id participation.member.person.id %}">{{participation.activity.name}} - {{participation.activity.department.name}}</a>
-                    {% if not participation.paid %}
-                    <a class="btn btn-danger" role="button" href="{{participation.get_payment_link}}">Betal</a>
-                    {%endif%}
-
+                    <td>
+                      <a href="{%url 'activity_view_person' participation.activity.id participation.member.person.id %}">{{participation.activity.name}} - {{participation.activity.department.name}}</a>
+                      {% if not participation.paid %}
+                      <a class="btn btn-danger" role="button" href="{{participation.get_payment_link}}">Betal</a>
+                      {%endif%}
                     </td>
                     <td>{{participation.activity.start_date}}</td>
                     <td>{{participation.activity.end_date}}</td>
