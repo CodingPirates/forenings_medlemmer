@@ -63,7 +63,7 @@ urlpatterns = [
     ),
     url(
         r"^account/logout/$",
-        auth_views.LogoutView.as_view(),
+        auth_views.LogoutView.as_view(template_name="members/logout.html"),
         {"next_page": "/"},
         name="person_logout",
     ),
