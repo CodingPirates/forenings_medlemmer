@@ -2,33 +2,37 @@
 
 {% block content %}
 <div class="center col-12">
-    <form class="col-md-8 col-md-offset-1" method="post">
-        {% if form.errors %}
-        <div class="row">
-            <blockquote class="error">Dit brugernavn eller adgangskode var forkert. Prøv igen.</blockquote>
+  <form class="col-md-8 col-md-offset-1" method="post">
+    {% if form.errors %}
+    <div class="row">
+      <blockquote class="error">Dit brugernavn eller adgangskode var forkert.
+        Prøv igen.</blockquote>
+    </div>
+    {% endif %}
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="row center">
+      <div class="loginBox col-lg-6 col-md-7 col-sm-8 col-11 ">
+        <div class="loginTitle">
+          <span>Log ind</span></div>
+        <div class="field">
+          <label for="id_username">E-mail-adresse:</label>
+          <br />
+          {{ form.username }}
         </div>
-        {% endif %}
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}">
-        <div class="row center">
-            <div class="loginBox col-lg-6 col-md-7 col-sm-8 col-11 ">
-                <div class="loginTitle"><span>Log ind</span></div>
-                <div class="field">
-                    <label for="id_username">E-mail-adresse:</label> <br />
-                    {{ form.username }}
-                </div>
-                <div class="field">
-                    {{ form.password.label_tag }} <br />
-                    {{ form.password }}
-                </div>
-                <div class="field" style="margin-top: 1.2em;">
-                    <input type="submit" class="form-control btn-success" value="Log ind" />
-                    <a href="{% url 'password_reset' %}" title="Glemt kode?" class="btn btn-info float-right">
-                        Glemt adgangskode?
-                    </a>
-                </div>
-            </div>
+        <div class="field">
+          {{ form.password.label_tag }}
+          <br />
+          {{ form.password }}
         </div>
-    </form>
+        <div class="field" style="margin-top: 1.2em;">
+          <input type="submit" class="form-control btn-success" value="Log ind" />
+          <a href="{% url 'password_reset' %}" title="Glemt kode?" class="btn btn-info float-right">
+            Glemt adgangskode?
+          </a>
+        </div>
+      </div>
+    </div>
+  </form>
 </div>
 {% endblock %}
