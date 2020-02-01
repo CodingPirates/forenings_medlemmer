@@ -16,7 +16,7 @@ class ActivitySignupForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Div(
-                Div(HTML("<h2>Tilmelding</h2>"), css_class="card-header"),
+                Div(HTML("<h2>Tilmelding</h2>"), css_class="card-header bg-primary"),
                 Div(
                     Div(
                         Div(
@@ -56,15 +56,16 @@ class ActivitySignupForm(forms.Form):
                             '<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen.{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
                         ),
                         FormActions(
-                            Submit(
-                                "submit", "Tilmeld og betal", css_class="btn-success"
+                            Submit("submit", "Tilmeld og betal"),
+                            HTML(
+                                """<a href='{% url 'family_detail' %}' class="btn btn-outline-primary">Tilbage</a>"""
                             ),
-                            HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
                     ),
                     css_class="card-body",
                 ),
-                css_class="card bg-success",
+                css_class="card",
+                css_id="signup",
             )
         )
 

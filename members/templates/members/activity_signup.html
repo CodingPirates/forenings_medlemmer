@@ -102,7 +102,7 @@
         {% if family %}
           {% if applicablePersons %}
             {% for applicablePerson in applicablePersons %}
-              <a class="btn btn-success"  href="{%url 'activity_signup' activity.id applicablePerson.id %}">Tilmeld {{ applicablePerson.name }}</a>
+              <a class="btn btn-success"  href="{%url 'activity_signup' activity.id applicablePerson.id %}#signup">Tilmeld {{ applicablePerson.name }}</a>
             {% endfor %}
             <br /><br />
           {% endif %}
