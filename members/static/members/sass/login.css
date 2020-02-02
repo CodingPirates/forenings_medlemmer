@@ -4,26 +4,33 @@
     margin-top: 26px;
     margin-bottom: 26px;
 }
+
 .loginTitle {
     text-align: center;
     margin-top: -7px;
     margin-bottom: 2px;
 }
-.loginTitle > span {
+
+.loginTitle>span {
     margin-bottom: 0.3em;
     font-size: 2.5em;
     font-weight: 100;
     font-family: Calibri;
 }
+
 .center {
     justify-content: center;
     display: flex;
 }
-label[for="id_username"], label[for="id_password"] {
+
+label[for="id_username"],
+label[for="id_password"] {
     margin-bottom: initial;
     font-weight: bold;
 }
-.field > input, .field > a.btn {
+
+.field>a.btn,
+.field>input {
     width: 100%;
     font-size: 1.4em;
     padding: 0.3em;
@@ -32,9 +39,11 @@ label[for="id_username"], label[for="id_password"] {
     height: initial;
     margin-top: 5px;
 }
+
 .field:not(:last-child) {
     margin-bottom: 0.8em;
 }
+
 .error {
     background-color: #ff5e5e;
     color: white;
