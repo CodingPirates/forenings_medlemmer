@@ -2,6 +2,9 @@
 line-length = 88
 target-version = ['py37', 'py38']
 
+[tool.coverage.run]
+omit = ["*/tests/*"]
+
 [tool.poetry]
 name = "forenings_medlemmer"
 version = "1.2"
@@ -33,5 +36,4 @@ quickpay-api-client = "1.0.1"
 sentry-sdk = "0.14.0"
 tqdm = "4.41.1"
 whitenoise = "5.0.1"
-unittest-xml-reporting = "2.5.2"
 pydotplus = "2.0.2"
