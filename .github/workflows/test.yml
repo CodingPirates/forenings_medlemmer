@@ -1,6 +1,6 @@
 name: Run tests & Analyse code
 
-on: [push]
+on: [push,  pull_request]
 
 jobs:
   Test:
