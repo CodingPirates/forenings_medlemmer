@@ -3,7 +3,7 @@ line-length = 88
 target-version = ['py37', 'py38']
 
 [tool.coverage.run]
-omit = ["*/tests/*"]
+omit = ["*/tests/*", "members/migrations"]
 
 [tool.poetry]
 name = "forenings_medlemmer"
