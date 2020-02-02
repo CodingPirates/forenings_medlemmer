@@ -22,5 +22,4 @@ For more info, see our [contributing guide](./github/CONTRIBUTING.md) or ask on
 <!-- Links -->
 
 [cpdk]: https://codingpirates.dk
-
 [slack]: https://slackinvite.codingpirates.dk/
