@@ -1,23 +1,23 @@
-@import url('https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap");
 
-$primary-color: #25A2CE;
-$primary-color-muted: #2C8098;
-$accent-color: #EFB422;
-$accent-color-muted: #ED9224;
+$primary-color: #25a2ce;
+$primary-color-muted: #2c8098;
+$accent-color: #efb422;
+$accent-color-muted: #ed9224;
 $max_width: 1300px;
-$main_font: 'Lato', sans-serif;
-$header_font: 'Bungee', cursive;
-
+$main_font: "Lato", sans-serif;
+$header_font: "Bungee", cursive;
 
 @mixin for-phone {
-  @media only screen and (max-width: 667px)  {
-       @content;
-   }
+    @media only screen and (max-width: 667px) {
+        @content;
+    }
 }
 @mixin for-desktop {
-  @media (min-width: 668px) { @content; }
+    @media (min-width: 668px) {
+        @content;
+    }
 }
-
 
 .bg-primary {
     background-color: $primary-color;
@@ -39,7 +39,7 @@ $header_font: 'Bungee', cursive;
     border-radius: 0.25rem;
 }
 %rounded-rect {
-    @include rounded-rect
+    @include rounded-rect;
 }
 
 .button {
@@ -63,8 +63,6 @@ $header_font: 'Bungee', cursive;
         color: white;
         background-color: $primary-color-muted;
     }
-
-
 }
 
 .button-accent {
@@ -78,5 +76,5 @@ $header_font: 'Bungee', cursive;
 
 table {
     word-wrap: break-word;
-    border: 1px solid #dee2e6!important;
+    border: 1px solid #dee2e6 !important;
 }
