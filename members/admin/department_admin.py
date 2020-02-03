@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from members.models import Union, Address, Person, Department
+from members.models import Union, Address
 
 
 class UnionDepartmentFilter(admin.SimpleListFilter):
