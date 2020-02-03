@@ -12,7 +12,7 @@ footer {
     text-align: center;
     font-size: 20px;
     > p > a {
-        color: white
+        color: white;
     }
     @include base.for-desktop {
         max-height: 75px;
