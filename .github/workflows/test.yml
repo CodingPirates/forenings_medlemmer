@@ -24,9 +24,9 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: a3618d89-999c-4144-a2c3-c45faa3ebb55
           file: ./coverage.xml
-  
+
       - name: Create and upload UML diagram
         run: mkdir -p UML && docker-compose run web ./manage.py graph_models members -o UML/UML_diagram.png
       - uses: actions/upload-artifact@v1

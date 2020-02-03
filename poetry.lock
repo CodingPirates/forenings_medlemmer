@@ -663,17 +663,6 @@ version = "1.4.1"
 
 [[package]]
 category = "main"
-description = "unittest-based test runner with Ant/JUnit like XML reporting."
-name = "unittest-xml-reporting"
-optional = false
-python-versions = "*"
-version = "2.5.2"
-
-[package.dependencies]
-six = ">=1.4.0"
-
-[[package]]
-category = "main"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
 optional = false
@@ -697,7 +686,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "3d3887fbeb8ceefc94e4c1fecb9343bad89df03e6909de998665eed5e56cc892"
+content-hash = "08c211464f402ff293dda5a7eb2e9bbeb1c7725498d73377204907e79cee8496"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -1019,10 +1008,6 @@ typed-ast = [
     {file = "typed_ast-1.4.1-cp38-cp38-win_amd64.whl", hash = "sha256:fc0fea399acb12edbf8a628ba8d2312f583bdbdb3335635db062fa98cf71fca4"},
     {file = "typed_ast-1.4.1-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:d43943ef777f9a1c42bf4e552ba23ac77a6351de620aa9acf64ad54933ad4d34"},
     {file = "typed_ast-1.4.1.tar.gz", hash = "sha256:8c8aaad94455178e3187ab22c8b01a3837f8ee50e09cf31f1ba129eb293ec30b"},
-]
-unittest-xml-reporting = [
-    {file = "unittest-xml-reporting-2.5.2.tar.gz", hash = "sha256:9d28ddf6524cf0ff9293f61bd12e792de298f8561a5c945acea63fb437789e0e"},
-    {file = "unittest_xml_reporting-2.5.2-py2.py3-none-any.whl", hash = "sha256:358bbdaf24a26d904cc1c26ef3078bca7fc81541e0a54c8961693cc96a6f35e0"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.8-py2.py3-none-any.whl", hash = "sha256:2f3db8b19923a873b3e5256dc9c2dedfa883e33d87c690d9c7913e1f40673cdc"},
