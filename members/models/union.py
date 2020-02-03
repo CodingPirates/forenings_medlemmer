@@ -12,21 +12,42 @@ class Union(models.Model):
         ordering = ["name"]
 
     name = models.CharField("Foreningens navn", max_length=200)
-    chairman = models.CharField("Formand", max_length=200, blank=True)
-    chairman_email = models.EmailField("Formandens email", blank=True)
-    second_chair = models.CharField("Næstformand", max_length=200, blank=True)
-    second_chair_email = models.EmailField("Næstformandens email", blank=True)
-    cashier = models.CharField("Kasserer", max_length=200, blank=True)
-    cashier_email = models.EmailField("Kassererens email", blank=True)
-    secretary = models.CharField("Sekretær", max_length=200, blank=True)
-    secratary_email = models.EmailField("Sekretærens email", blank=True)
+    chairman = models.ForeignKey(
+        "Person", on_delete=models.PROTECT, related_name="chairman"
+    )
+    chairman_old = models.CharField("Formand", max_length=200, blank=True)
+    chairman_email_old = models.EmailField("Formandens email", blank=True)
+    second_chair = models.ForeignKey(
+        "Person",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="second_chair",
+    )
+    second_chair_old = models.CharField("Næstformand", max_length=200, blank=True)
+    second_chair_email_old = models.EmailField("Næstformandens email", blank=True)
+    cashier = models.ForeignKey(
+        "Person", on_delete=models.PROTECT, related_name="cashier"
+    )
+    cashier_old = models.CharField("Kasserer", max_length=200, blank=True)
+    cashier_email_old = models.EmailField("Kassererens email", blank=True)
+    secretary = models.ForeignKey(
+        "Person",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="secretary",
+    )
+    secretary_old = models.CharField("Sekretær", max_length=200, blank=True)
+    secretary_email_old = models.EmailField("Sekretærens email", blank=True)
     union_email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
     founded = models.DateField("Stiftet", blank=True, null=True)
     regions = (("S", "Sjælland"), ("J", "Jylland"), ("F", "Fyn"), ("Ø", "Øer"))
     region = models.CharField("region", max_length=1, choices=regions)
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
-    boardMembers = models.TextField("Menige medlemmer", blank=True)
+    boardMembers = models.ManyToManyField("Person", blank=True)
+    boardMembers_old = models.TextField("Menige medlemmer", blank=True)
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",
         default=True,
