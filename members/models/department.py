@@ -17,7 +17,10 @@ class Department(models.Model):
     description = models.TextField("Beskrivelse af afdeling", blank=True)
     open_hours = models.CharField("Åbningstid", max_length=200, blank=True)
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
-    responsible_contact = models.EmailField("E-mail", blank=True)
+    department_email = models.EmailField("E-mail", blank=True)
+    department_leaders = models.ManyToManyField(
+        "Person", limit_choices_to={"user__is_staff": True}
+    )
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField("Oprettet", blank=False, default=timezone.now)
@@ -28,7 +31,6 @@ class Department(models.Model):
     union = models.ForeignKey(
         "Union", verbose_name="Lokalforening", on_delete=models.PROTECT,
     )
-    onMap = models.BooleanField("Skal den være på kortet?", default=True)
 
     def no_members(self):
         return self.member_set.count()
@@ -56,12 +58,20 @@ class Department(models.Model):
         if self.isOpening:
             myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
         myHTML += html.escape(str(self.address))
-        myHTML += "<br>Afdelingsleder: " + html.escape(self.responsible_name) + "<br>"
+        myHTML += (
+            "<br>Afdelingsleder: "
+            + html.escape(
+                self.department_leaders.all()[0]
+                if len(self.department_leaders.all())
+                else self.responsible_name
+            )
+            + "<br>"
+        )
         myHTML += (
             'E-mail: <a href="mailto:'
-            + html.escape(self.responsible_contact)
+            + html.escape(self.department_email)
             + '">'
-            + html.escape(self.responsible_contact)
+            + html.escape(self.department_email)
             + "</a><br>"
         )
         myHTML += "Tidspunkt: " + html.escape(self.open_hours)
