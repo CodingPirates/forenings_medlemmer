@@ -17,6 +17,7 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 class DepartmentAdmin(admin.ModelAdmin):
     list_filter = (UnionDepartmentFilter,)
     raw_id_fields = ("union",)
+    filter_horizontal = ["department_leaders"]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(DepartmentAdmin, self).get_form(request, obj, **kwargs)
@@ -37,7 +38,10 @@ class DepartmentAdmin(admin.ModelAdmin):
                 "description": "<p>Lav en beskrivelse af jeres aktiviteter, teknologier og tekniske niveau.</p><p>Åbningstid er ugedag samt tidspunkt<p>",
             },
         ),
-        ("Ansvarlig", {"fields": ("responsible_name", "responsible_contact")}),
+        (
+            "Ansvarlig",
+            {"fields": ("responsible_name", "department_email", "department_leaders")},
+        ),
         ("Adresse", {"fields": ("address",)},),
         (
             "Afdelingssiden",
