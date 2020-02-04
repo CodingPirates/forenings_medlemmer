@@ -28,7 +28,7 @@ class TestEmailTemplate(TestCase):
 
         self.union = UnionFactory()
         self.department = DepartmentFactory(
-            union=self.union, responsible_contact="department@example.com"
+            union=self.union, department_email="department@example.com"
         )
 
     def util_check_email(self, receivers):
