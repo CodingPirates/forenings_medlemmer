@@ -39,6 +39,11 @@ class TestModelAddress(TestCase):
         self.assertEqual(home.streetname, "Sverigesgade")
         self.assertAlmostEqual(home.longitude, 10.38138591)
 
+    def test_fetch_data_placename(self):
+        home = Address.objects.create(dawa_id="0a3f50ab-e8f7-32b8-e044-0003ba298018")
+        home.get_dawa_data()
+        self.assertEqual(home.placename, "Himmelev")
+
     def test_fetch_data_by_wash(self):
         home = Address.objects.create(
             streetname="Sverigesgade", housenumber=20, zipcode="5000"
