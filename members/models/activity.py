@@ -74,4 +74,4 @@ class Activity(models.Model):
         ).exclude(member__activityparticipant__activity=activity)
 
     def get_applicable_persons(self):
-        return self.get_applicable_persons(self)
+        return self.get_applicable_persons()
