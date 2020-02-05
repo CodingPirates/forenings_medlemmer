@@ -14,8 +14,6 @@ from members.models.payment import Payment
 from members.models.person import Person
 from members.utils.user import user_to_person, has_user
 
-import datetime
-
 
 @login_required
 @user_passes_test(has_user, "/admin_signup/")
@@ -204,13 +202,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
         signup_form = ActivitySignupForm()
 
-    applicablePersons = Person.objects.filter(
-        family=family,  # only members of this family
-        birthday__lte=timezone.now()
-        - datetime.timedelta(days=activity.min_age * 365),  # old enough
-        birthday__gt=timezone.now()
-        - datetime.timedelta(days=activity.max_age * 365),  # not too old
-    ).exclude(member__activityparticipant__activity=activity)
+    applicablePersons = activity.get_applicable_persons()
 
     participatingPersons = Person.objects.filter(
         member__activityparticipant__activity=activity

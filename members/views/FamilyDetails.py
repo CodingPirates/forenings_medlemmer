@@ -33,15 +33,7 @@ def FamilyDetails(request):
     open_activities_with_persons = []
     # augment open invites with the persons who could join it in the family
     for curActivity in open_activities:
-        applicablePersons = Person.objects.filter(
-            family=family,  # only members of this family
-            birthday__lte=timezone.now()
-            - datetime.timedelta(days=curActivity.min_age * 365),  # old enough
-            birthday__gt=timezone.now()
-            - datetime.timedelta(days=curActivity.max_age * 365),  # not too old
-        ).exclude(
-            member__activityparticipant__activity=curActivity
-        )  # not already participating
+        applicablePersons = curActivity.get_applicable_persons()
 
         if applicablePersons.exists():
             open_activities_with_persons.append(

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from members.models.person import Person
+import datetime
 
 
 class Activity(models.Model):
@@ -62,3 +64,14 @@ class Activity(models.Model):
 
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
+
+    def get_applicable_persons(activity):
+        return Person.objects.filter(
+            birthday__lte=timezone.now()
+            - datetime.timedelta(days=activity.min_age * 365),  # Old enough
+            birthday__gt=timezone.now()
+            - datetime.timedelta(days=activity.max_age * 365 + 365),  # Not too old
+        ).exclude(member__activityparticipant__activity=activity)
+
+    def get_applicable_persons(self):
+        return self.get_applicable_persons(self)
