@@ -20,9 +20,9 @@
             <span class="col-xs-12 col-sm-12 col-md-6"><i class="fa fa-hourglass-end"></i> {{ activity.signup_closing }} (om {{ activity.signup_closing|timeuntil }})</span>
             <span class="col-xs-12 col-sm-12 col-md-6"><i class="fa fa-list"></i> Venteliste:
               {% if activity.open_invite %}
-                Åben invitation uden venteliste
+                Nej, enhver kan tilmelde sig
               {% else %}
-                Kræver invitation igennem ventelisten
+                Ja, vi sender en e-mail, hvis du får en plads
               {%endif%}</span>
           </div>
           <br />
