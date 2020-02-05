@@ -2,14 +2,7 @@
 
 {% block content %}
 <div class="container">
-  <!-- Notifications -->
-  <div>
-    {% for invitation in invites %}
-    <div class="alert alert-info" role="alert">
-        {{ invitation.person.name }} er blevet inviteret til "{{ invitation.activity.name }}" hos Coding Pirates {{invitation.activity.department.name}}. <a href="{% url 'activity_signup' invitation.activity.id invitation.person.id %}">Åben aktiviteten her</a>
-    </div>
-    {% endfor %}
-  </div>
+      {% include 'members/notifications.html' %}
       <h1>Familiedetaljer</h1>
       <p>Velkommen til Coding Pirates' medlemssystem. Du ser nu oversigten over de oplysninger vi har registreret om jeres familie. Det er vigtigt du sikrer dig at oplysningerne er korrekte. Din familie er registreret på e-mail-adressen <a class="text-info">{{family.email}}</a>, hvilket også er denne vi sender informationer til dig om tilmeding til hold og aktiviteter.</p>
       <p>For yderligere hjælp med at bruge denne side - se på <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores medlemssystem"</a> eller skriv til os på <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.</p>
