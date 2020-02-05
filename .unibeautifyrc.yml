@@ -1,0 +1,19 @@
+CSS:
+  beautifiers:
+    - Prettier
+    - Pretty Diff
+    - JS-Beautify
+  wrap_line_length: 80
+  end_with_newline: true
+
+Markdown:
+  beautifiers:
+    - Prettier
+SCSS:
+  beautifiers:
+    - Prettier
+    - Pretty Diff
+
+Python:
+  beautifiers:
+    - Black

@@ -4,17 +4,16 @@ body {
     display: grid;
     align-content: space-between;
     @include base.for-phone {
-        grid-template-rows: 1fr 12fr 1fr
+        grid-template-rows: 1fr 12fr 1fr;
     }
     // Desktop horizontal nav bar
     @include base.for-desktop {
-        grid-template-rows: 50px 10fr 1fr
+        grid-template-rows: 50px 10fr 1fr;
     }
-
 }
 
-html,
-body {
+body,
+html {
     height: 100%;
     font-family: base.$main_font;
 }

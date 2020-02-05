@@ -13,7 +13,7 @@ nav {
     // Desktop horizontal nav bar
     @include base.for-phone {
         flex-direction: column;
-        justify-content:center;
+        justify-content: center;
     }
     @include base.for-desktop {
         flex-direction: row;
@@ -27,7 +27,7 @@ nav {
         color: white;
         padding: 0 10px;
         &:hover {
-            color: #CCCCCC;
+            color: #cccccc;
             text-decoration: none;
         }
         @include base.for-phone {

@@ -1,0 +1,11 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+    <div class="alert alert-primary">
+        Du er nu logget ud
+    </div>
+    <div class="alert alert-warning">
+        Husk, at du vil modtage invitationer til aktiviteter og afdelinger du har skrevet dig op til fra <u>kontakt@codingpirates.dk</u>. Vær' derfor opmærksom på, at de ikke havner i spam, du kan evt. tilføje e-mailadressen til din kontaktbog.
+    </div>
+    <a class="btn btn-primary" href="{% url 'person_login' %}">Log ind</a>
+{% endblock %}

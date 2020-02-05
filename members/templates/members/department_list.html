@@ -22,7 +22,7 @@
         }).addTo(kort);
         {% for region, depList in departments.items %}
             {% for dep in depList %}
-                {% if dep.onMap == True %}
+                {% if dep.isVisible == True %}
             var marker{{forloop.counter}} = L.marker([{{dep.latitude}},{{dep.longtitude}}]).addTo(kort);
             marker{{forloop.counter}}.bindPopup('{{dep.html | safe}}');
                 {% endif %}
