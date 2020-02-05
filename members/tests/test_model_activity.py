@@ -23,9 +23,6 @@ class TestModelActivity(TestCase):
             for i in range(0, 50)
         ]
 
-        print("-" + str(int((self.activity.max_age + 1) * 365.24 - 1)) + "d")
-        print("-" + str(self.activity.min_age) + "y")
-
         self.not_applicablePersons_tooYoung = [
             PersonFactory(
                 birthday=fake.date_time_between(
@@ -35,9 +32,6 @@ class TestModelActivity(TestCase):
             )
             for i in range(0, 50)
         ]
-
-        print("-" + str(int(self.activity.min_age * 365.24 + 1)) + "d")
-        print("+2y",)
 
         self.not_applicablePersons_tooOld = [
             PersonFactory(
