@@ -44,27 +44,27 @@ class TestModelActivity(TestCase):
         ]
 
     # Modified from django.test.testcases.TransactionTestCase.assertQuerysetEqual
-    def assertQuerysetDiffernt(
+    def assertQuerysetDifferent(
         self, qs, values, transform=repr, ordered=True, msg=None
     ):
         items = map(transform, qs)
         if not ordered:
             return self.assertNotEqual(Counter(items), Counter(values), msg=msg)
 
-    def test_get_applicable_persons_dynamic(self):
+    def test_get_applicable_persons(self):
         self.assertQuerysetEqual(
             self.applicablePersons,
             self.activity.get_applicable_persons(),
             transform=lambda x: x,
             ordered=False,
         )
-        self.assertQuerysetDiffernt(
+        self.assertQuerysetDifferent(
             self.not_applicablePersons_tooYoung,
             self.activity.get_applicable_persons(),
             transform=lambda x: x,
             ordered=False,
         )
-        self.assertQuerysetDiffernt(
+        self.assertQuerysetDifferent(
             self.not_applicablePersons_tooOld,
             self.activity.get_applicable_persons(),
             transform=lambda x: x,

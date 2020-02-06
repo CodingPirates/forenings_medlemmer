@@ -7,19 +7,21 @@ from members.models.member import Member
 from members.models.waitinglist import WaitingList
 from members.models.activityparticipant import ActivityParticipant
 
-from .factories import DepartmentFactory
+from .factories import DepartmentFactory, UnionFactory
 
 
 class TestModelActivityParticipant(TestCase):
     # ToDo: Maybe test payment
     def setUp(self):
         self.department = DepartmentFactory()
+        self.union = UnionFactory()
 
         self.activity = Activity(
             start_date=datetime.now(),
             end_date=datetime.now()
             + timedelta(days=365),  # Has to be long enough to be a season
             department=self.department,
+            union=self.union,
         )
         self.activity.save()
         self.assertTrue(self.activity.is_season())  # If this fail increase the end_date
