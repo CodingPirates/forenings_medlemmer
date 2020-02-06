@@ -39,7 +39,10 @@ class Migration(migrations.Migration):
             model_name="union", old_name="second_chair", new_name="second_chair_old",
         ),
         migrations.RenameField(
-            model_name="union", old_name="secratary", new_name="secretary_old",
+            model_name="union", old_name="secretary", new_name="secretary_old",
+        ),
+        migrations.RenameField(
+            model_name="union", old_name="boardMembers", new_name="boardMembers_old",
         ),
         migrations.AddField(
             model_name="union",
