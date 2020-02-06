@@ -39,6 +39,11 @@ class UnionAdmin(admin.ModelAdmin):
                     "secretary_old",
                     "secretary_email_old",
                     "boardMembers_old",
+                    "chairman",
+                    "second_chair",
+                    "cashier",
+                    "secretary",
+                    "boardMembers",
                 )
             },
         ),

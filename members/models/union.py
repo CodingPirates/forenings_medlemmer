@@ -13,7 +13,11 @@ class Union(models.Model):
 
     name = models.CharField("Foreningens navn", max_length=200)
     chairman = models.ForeignKey(
-        "Person", on_delete=models.PROTECT, related_name="chairman"
+        "Person",
+        on_delete=models.PROTECT,
+        related_name="chairman",
+        null=True,
+        blank=True,
     )
     chairman_old = models.CharField("Formand", max_length=200, blank=True)
     chairman_email_old = models.EmailField("Formandens email", blank=True)
@@ -27,7 +31,11 @@ class Union(models.Model):
     second_chair_old = models.CharField("Næstformand", max_length=200, blank=True)
     second_chair_email_old = models.EmailField("Næstformandens email", blank=True)
     cashier = models.ForeignKey(
-        "Person", on_delete=models.PROTECT, related_name="cashier"
+        "Person",
+        on_delete=models.PROTECT,
+        related_name="cashier",
+        null=True,
+        blank=True,
     )
     cashier_old = models.CharField("Kasserer", max_length=200, blank=True)
     cashier_email_old = models.EmailField("Kassererens email", blank=True)

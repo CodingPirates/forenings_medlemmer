@@ -53,6 +53,8 @@ class Migration(migrations.Migration):
             model_name="union",
             name="cashier",
             field=models.ForeignKey(
+                blank=True,
+                null=True,
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="cashier",
                 to="members.Person",
@@ -62,6 +64,8 @@ class Migration(migrations.Migration):
             model_name="union",
             name="chairman",
             field=models.ForeignKey(
+                blank=True,
+                null=True,
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="chairman",
                 to="members.Person",
