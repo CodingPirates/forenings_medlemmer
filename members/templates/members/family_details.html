@@ -32,14 +32,15 @@
                     <td></td>
                     {%endif%}
 
-                <td><p><b>{{person.name}}</b></p>
+                    <td><p><b>{{person.name}}</b></p>
 
-                {%if person.membertype == 'PA' %} <p class="text-muted">(Forælder)</p> {%endif%}
-                {%if person.membertype == 'GU' %} <p class="text-muted">(Værge)</p> {%endif%}
-                {%if person.membertype == 'CH' %} <p class="text-muted">(Barn, {{person.age_years}} år)</p> {%endif%}
-                {%if person.membertype == 'NA' %} <p class="text-muted">(Frivillig)</p> {%endif%}
+                    {%if person.membertype == 'PA' %} <p class="text-muted">(Forælder)</p> {%endif%}
+                    {%if person.membertype == 'GU' %} <p class="text-muted">(Værge)</p> {%endif%}
+                    {%if person.membertype == 'CH' %} <p class="text-muted">(Barn, {{person.age_years}} år)</p> {%endif%}
+                    {%if person.membertype == 'NA' %} <p class="text-muted">(Frivillig)</p> {%endif%}
 
-                </td>
+                    </td>
+
                     <td><p>{{person.address}}</p></td>
                     <td><p>{{person.zipcode}} {{person.city}}</p></td>
                     <td><p>{{person.email}}</p></td>
