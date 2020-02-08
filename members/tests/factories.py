@@ -267,7 +267,7 @@ class DepartmentFactory(DjangoModelFactory):
     description = Faker("text")
     open_hours = Faker("numerify", text="kl. ##:##-##:##")
     responsible_name = Faker("name")
-    responsible_contact = Faker("email")
+    department_email = Faker("email")
     created = Faker("date_time", tzinfo=TIMEZONE)
     updated_dtm = LazyAttribute(lambda d: datetime_after(d.created))
     closed_dtm = LazyAttribute(lambda d: datetime_after(d.created))
@@ -276,7 +276,6 @@ class DepartmentFactory(DjangoModelFactory):
     website = Faker("url")
     union = SubFactory(UnionFactory)
     address = SubFactory(AddressFactory)
-    onMap = Faker("boolean")
 
 
 class MemberFactory(DjangoModelFactory):
