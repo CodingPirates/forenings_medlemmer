@@ -16,7 +16,7 @@
         flex-wrap: wrap;
     }
     a {
-        @extend .button
+        @extend .button;
     }
     div {
         font-size: 1.2em;
@@ -24,10 +24,10 @@
 }
 
 @keyframes fadeIn {
-  from {
+    from {
         transform: scale(0.5);
     }
-  to {
-        transform: scale(1.0);
+    to {
+        transform: scale(1);
     }
 }
