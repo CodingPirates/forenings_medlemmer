@@ -1,7 +1,19 @@
+{% load static %}
+
+<link href="{% static "members/css/notification.css" %}" rel="stylesheet"
+type="text/css"/>
+
 <div>
-    {% for invitation in invites %}
-    <div class="alert alert-info" role="alert">
-        {{ invitation.person.name }} er blevet inviteret til "{{ invitation.activity.name }}" hos Coding Pirates {{invitation.activity.department.name}}. <a href="{% url 'activity_signup' invitation.activity.id invitation.person.id %}">Åben aktiviteten her</a>
+  {% for invitation in invites %}
+  <div class="notification">
+    <div>{{ invitation.person.name }} er blevet inviteret til
+    "{{ invitation.activity.name }}" hos Coding Pirates
+    {{invitation.activity.department.name}}.
     </div>
-    {% endfor %}
+    <a
+      href="{% url 'activity_signup' invitation.activity.id invitation.person.id %}"
+      >Åben aktiviteten her</a
+    >
+  </div>
+  {% endfor %}
 </div>

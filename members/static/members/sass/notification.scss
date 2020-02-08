@@ -1,0 +1,33 @@
+@use "base";
+
+.notification {
+    @extend .bg-accent;
+    @extend %rounded-rect;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    animation-duration: 1s;
+    animation-name: fadeIn;
+    @include base.for-desktop {
+        flex-wrap: nowrap;
+    }
+    @include base.for-phone {
+        flex-wrap: wrap;
+    }
+    a {
+        @extend .button
+    }
+    div {
+        font-size: 1.2em;
+    }
+}
+
+@keyframes fadeIn {
+  from {
+        transform: scale(0.5);
+    }
+  to {
+        transform: scale(1.0);
+    }
+}
