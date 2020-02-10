@@ -37,7 +37,7 @@
     <ul class="nav nav-pills nav-fill">
     {% for region, depList in departments.items %}
     <li  class="nav-item">
-        {% if region == 'Sjælland' %}
+        {% if region == 'Hovedstaden' %}
            <a class="nav-link active" data-toggle="pill" href="#{{region}}">{{region}}
          </a>
         {% else %}
@@ -50,7 +50,7 @@
     <div class="container">
       <div class="tab-content">
         {% for region, depList in departments.items %}
-          {% if region == 'Sjælland'%}
+          {% if region == 'Hovedstaden'%}
             <div id="{{region}}" class="tab-pane fade in active show">
           {% else %}
             <div id="{{region}}" class="tab-pane fade in">

@@ -2,14 +2,14 @@ from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from members.models.department import Department
-from members.models.union import Union
+from members.models.address import Address
 
 
 @xframe_options_exempt
 def departmentView(request, unique=None):
     depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
     deps = {}
-    for region in Union.regions:
+    for region in Address.REGION_CHOICES:
         deps[region[1]] = []
 
     for department in depQuery:
@@ -20,5 +20,5 @@ def departmentView(request, unique=None):
             dep["longtitude"] = str(coordinates[1])
         else:
             dep["isVisible"] = False
-        deps[department.union.get_region_display()].append(dep)
+        deps[department.address.get_region_display()].append(dep)
     return render(request, "members/department_list.html", {"departments": deps})

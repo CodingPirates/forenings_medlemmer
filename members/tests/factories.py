@@ -178,6 +178,7 @@ class AddressFactory(DjangoModelFactory):
     municipality = Faker("municipality")
     longitude = Faker("longitude")
     latitude = Faker("latitude")
+    region = FuzzyChoice([r[0] for r in Address.REGION_CHOICES])
 
 
 class FamilyFactory(DjangoModelFactory):
@@ -252,7 +253,6 @@ class UnionFactory(DjangoModelFactory):
     union_email = Faker("email")
     statues = Faker("url")
     founded = Faker("date_time", tzinfo=TIMEZONE)
-    region = FuzzyChoice([r[0] for r in Union.regions])
     address = SubFactory(AddressFactory)
     boardMembers = Faker("text")
     bank_main_org = Faker("boolean")
