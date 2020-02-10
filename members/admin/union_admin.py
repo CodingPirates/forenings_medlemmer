@@ -4,6 +4,8 @@ from members.models import Address
 
 
 class UnionAdmin(admin.ModelAdmin):
+    list_filter = ("address__region",)
+
     def get_form(self, request, obj=None, **kwargs):
         form = super(UnionAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields["address"].queryset = Address.get_user_addresses(request.user)
