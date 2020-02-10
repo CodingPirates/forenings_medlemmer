@@ -5,6 +5,7 @@ from members.models import Address
 
 class UnionAdmin(admin.ModelAdmin):
     filter_horizontal = ["boardMembers"]
+    raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(UnionAdmin, self).get_form(request, obj, **kwargs)
