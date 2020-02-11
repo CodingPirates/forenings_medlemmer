@@ -31,6 +31,9 @@ def get_dump():
     dumps["address"] = [
         address for address in dumps["address"] if address["pk"] in public_addresses
     ]
+
+    for department in dumps["department"]:
+        department["fields"]["department_leaders"] = []
     return dumps
 
 
