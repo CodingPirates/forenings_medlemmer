@@ -35,7 +35,7 @@ class StatisticsUnion(DjangoObjectType):
 class UnionType(DjangoObjectType):
     class Meta:
         model = Union
-        exclude_fields = ("region", "bank_main_org", "bank_account")
+        exclude_fields = ("bank_main_org", "bank_account")
 
 
 class DepartmentType(DjangoObjectType):
