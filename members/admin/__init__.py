@@ -78,7 +78,8 @@ class ActivityAdmin(admin.ModelAdmin):
     search_fields = ("name", "department__name")
     list_per_page = 20
     raw_id_fields = ("department",)
-    # list_filter = ('department','open_invite')
+    list_filter = ("department", "open_invite")
+    save_as = True
 
     # Only view activities on own department
     def get_queryset(self, request):
