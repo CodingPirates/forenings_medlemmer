@@ -181,7 +181,13 @@
                 <tbody>
                   {% for key, department in department_children_waiting.departments.items %}
                     <tr>
-                      <td>Coding Pirates {{department.object.name}}</td>
+                      <td>
+                        {% if department.object.website == "" %}
+                          <strong>Coding Pirates {{department.object.name}}</strong>
+                        {% else %}
+                        <a href="{{department.object.website}}" target="_blank"><strong>Coding Pirates {{department.object.name}}</strong></a>
+                        {% endif %}
+                        <br/> <a href="mailto:{{department.object.department_email}}">{{department.object.department_email}}</a></td>
                       <td>{{department.object.address}}<br/>{{department.object.zipcode}} {{department.object.city}}</td>
                       <td>{{department.object.open_hours}}</td>
                       <td>
