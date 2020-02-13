@@ -14,6 +14,7 @@
     }
     @include base.for-phone {
         flex-wrap: wrap;
+        justify-content: center;
     }
     a {
         @extend .button
