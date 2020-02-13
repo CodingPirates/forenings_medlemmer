@@ -19,7 +19,7 @@ class Department(models.Model):
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
     department_email = models.EmailField("E-mail", blank=True)
     department_leaders = models.ManyToManyField(
-        "Person", limit_choices_to={"user__is_staff": True}
+        "Person", limit_choices_to={"user__is_staff": True}, blank=True
     )
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
