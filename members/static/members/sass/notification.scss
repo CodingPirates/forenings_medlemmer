@@ -1,34 +1,20 @@
 @use "base";
 
-.notification {
-    @extend .bg-accent;
-    @extend %rounded-rect;
-    padding: 10px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    animation-duration: 1s;
-    animation-name: fadeIn;
-    @include base.for-desktop {
-        flex-wrap: nowrap;
-    }
-    @include base.for-phone {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    a {
-        @extend .button
-    }
-    div {
-        font-size: 1.2em;
-    }
-}
 
-@keyframes fadeIn {
-  from {
-        transform: scale(0.5);
+.notification {
+    @include base.for-desktop {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
-  to {
-        transform: scale(1.0);
+    
+    @include base.for-phone {
+        > div:first-child {
+            margin-bottom: 0.5em;
+        }
+
+        > div > .btn {
+            width: 100%;
+        }
     }
 }

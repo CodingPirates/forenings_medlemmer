@@ -2,6 +2,9 @@
 
 $primary-color: #25a2ce;
 $primary-color-muted: #2c8098;
+$primary-color-tint75: #33c8ff;
+$primary-color-tint50: #77daff;
+$primary-color-tint25: #bbecff;
 $accent-color: #efb422;
 $accent-color-muted: #ed9224;
 $max_width: 1300px;
@@ -78,4 +81,10 @@ $header_font: "Bungee", cursive;
 table {
     word-wrap: break-word;
     border: 1px solid #dee2e6 !important;
+}
+
+.background-muted, .alert-info {
+    background-color: $primary-color-tint25 !important;
+    border-color: $primary-color-tint50 !important;
+    color: $primary-color-muted !important;
 }
