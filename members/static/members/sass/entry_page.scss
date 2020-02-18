@@ -1,4 +1,4 @@
-@use "base";
+@use "_definitions";
 
 #user-action-container {
     padding: 5%;
@@ -8,18 +8,18 @@
     justify-content: stretch;
 
     /* Actions is 2x2 grid on desktop */
-    @include base.for-desktop {
+    @include _definitions.for-desktop {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
         grid-gap: 5%;
     }
-    @include base.for-phone {
+    @include _definitions.for-phone {
         grid-template-columns: auto;
         grid-template-rows: repeat(auto);
         grid-gap: 5px;
     }
     > div {
-        @extend .bg-primary;
+        @extend %bg-primary;
         @extend %rounded-rect;
         display: flex;
         padding: 10%;
@@ -36,7 +36,7 @@
         }
 
         a {
-            @extend .button-accent;
+            @extend %button-accent;
             width: 80%;
             display: block;
             margin: auto;

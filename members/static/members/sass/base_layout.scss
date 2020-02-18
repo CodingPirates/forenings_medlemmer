@@ -1,13 +1,13 @@
-@use "base";
+@use "_definitions";
 
 body {
     display: grid;
     align-content: space-between;
-    @include base.for-phone {
+    @include _definitions.for-phone {
         grid-template-rows: 1fr 12fr 1fr;
     }
     // Desktop horizontal nav bar
-    @include base.for-desktop {
+    @include _definitions.for-desktop {
         grid-template-rows: 50px 10fr 1fr;
     }
 }
@@ -15,16 +15,16 @@ body {
 body,
 html {
     height: 100%;
-    font-family: base.$main_font;
+    font-family: _definitions.$main_font;
 }
 
 section {
-    @extend .container;
+    @extend %container;
     margin-top: 20px;
     margin-bottom: 20px;
-    max-width: base.$max_width;
+    max-width: _definitions.$max_width;
 
-    @include base.for-desktop {
+    @include _definitions.for-desktop {
         width: 90%;
         margin-left: auto;
         margin-right: auto;

@@ -13,13 +13,9 @@
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/application.css" %}" />
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/style.css" %}" />
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/base_layout.css" %}" />
-    <link rel="stylesheet" type="text/css" href="{% static "members/css/footer.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "members/css/main.css" %}" />
     {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
         {% load crispy_forms_tags %}
-        <link rel="stylesheet" href="{% static "members/css/datepicker.css" %}">
         <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
         <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
         <script src="{% static "members/js/dawa-form-fill.js" %}"></script>
