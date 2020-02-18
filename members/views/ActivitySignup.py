@@ -202,7 +202,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
         signup_form = ActivitySignupForm()
 
-    applicablePersons = activity.get_applicable_persons()
+    applicablePersons = activity.get_applicable_persons(family=family)
 
     participatingPersons = Person.objects.filter(
         member__activityparticipant__activity=activity

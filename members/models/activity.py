@@ -65,10 +65,15 @@ class Activity(models.Model):
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
 
-    def get_applicable_persons(self):
-        return Person.objects.filter(
+    def get_applicable_persons(self, family=None):
+        applicable_persons = Person.objects.filter(
             birthday__lte=timezone.now()
             - datetime.timedelta(days=self.min_age * 365.24),  # Old enough
             birthday__gt=timezone.now()
             - datetime.timedelta(days=self.max_age * 365.24 + 365.24),  # Not too old
         ).exclude(member__activityparticipant__activity=self)
+
+        if family is not None:
+            return applicable_persons.filter(family=family)
+        else:
+            return applicable_persons
