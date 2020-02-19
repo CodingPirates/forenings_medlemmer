@@ -1,0 +1,51 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+  <div class="container">
+      <h1>Foreningen for {{union.name}}</h1>
+
+      {% if union %}
+      {% for year in years %}
+        <li  class="nav-item">
+            {% if year == years[0] %}
+               <a class="nav-link active" data-toggle="pill" href="#{{year}}">{{year}}
+             </a>
+            {% else %}
+              <a  class="nav-link" data-toggle="pill" href="#{{year}}">{{year}}</a>
+            {% endif %}
+        </li>
+      {% endfor %}
+      <div class="container">
+        <div class="tab-content">
+          {% for year in years %}
+            {% if year == years[0] %}
+              <div id="{{year}}" class="tab-pane fade in active show">
+            {% else %}
+              <div id="{{year}}" class="tab-pane fade in">
+            {% endif %}
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Navn</th>
+                  <th>Email</th>
+                  <th>Adresse</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for member in members[year]%}
+                  <tr>
+                    <td>{{member.membertype}}</td>
+                    <td>{{member.name}}</td>
+                    <td><a href="mailto:{{member.email}}">{{member.email}}</a></td>
+                    <td>{{member.address}}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
