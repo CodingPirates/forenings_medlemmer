@@ -1,9 +1,6 @@
 {% extends 'members/base.html' %}
 
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
       <h1>&nbsp;</h1>
       <div class="jumbotron">
         <h1>Brugeren er oprettet!</h1>
@@ -12,7 +9,4 @@
         <p>Hvis du klikker væk fra denne side, kan du kun få koden igen ved nulstilning.</p>
         <a class="btn btn-primary" href="{% url 'person_login' %}">Gå til log ind →</a>
       </div>
-    </div>
-  </div>
-</div>
 {% endblock %}

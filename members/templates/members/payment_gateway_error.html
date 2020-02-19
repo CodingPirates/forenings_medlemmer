@@ -1,9 +1,6 @@
 {% extends "members/base.html" %}
 
 {% block content %}
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-lg-12">
           <h1>Der er lige nu problemer med vores udbyder af betalingskortbetalinger!</h1>
           <p>Der er desværre i øjeblikket et problem med vores vores betalingsudbyder (Quickpay.dk) - Vi kan derfor ikke modtage din betaling lige nu.</p>
           <p>Der er ikke blevet trukket penge på dit betalingskort og der mangler fortsat betaling for din tilmelding.</p>
@@ -12,8 +9,4 @@
           {% if unique %}
             <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
           {% endif%}
-          <p></p>
-        </div>
-      </div>
-    </div>
 {% endblock %}
