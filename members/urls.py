@@ -16,6 +16,7 @@ from members.views import (
     departmentView,
     Activities,
     AdminSignup,
+    unionMembersView,
 )
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
@@ -110,6 +111,7 @@ urlpatterns = [
     url(r"quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     url(r"waitinglist$", waitinglistView, name="waitinglist_view"),
     url(r"departments$", departmentView, name="department_view"),
+    url(r"union_overview$", unionMembersView, name="union_members_view"),
 ]
 
 # Redirect all old urls containing family unique values
