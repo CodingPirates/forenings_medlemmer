@@ -4,10 +4,10 @@
   <div class="container">
       <h1>Foreningen for {{union.name}}</h1>
 
-      {% if union %}
+      <ul class="nav nav-pills nav-fill">
       {% for year in years %}
         <li  class="nav-item">
-            {% if year == years[0] %}
+            {% if year == current_year %}
                <a class="nav-link active" data-toggle="pill" href="#{{year}}">{{year}}
              </a>
             {% else %}
@@ -15,10 +15,11 @@
             {% endif %}
         </li>
       {% endfor %}
+      </ul>
       <div class="container">
         <div class="tab-content">
-          {% for year in years %}
-            {% if year == years[0] %}
+          {% for year, memberList in members.items %}
+            {% if year == current_year %}
               <div id="{{year}}" class="tab-pane fade in active show">
             {% else %}
               <div id="{{year}}" class="tab-pane fade in">
@@ -33,7 +34,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for member in members[year]%}
+                {% for member in memberList%}
                   <tr>
                     <td>{{member.membertype}}</td>
                     <td>{{member.name}}</td>
@@ -43,9 +44,9 @@
                 {% endfor %}
               </tbody>
             </table>
+            </div>
           {% endfor %}
         </div>
       </div>
     </div>
-  </div>
 {% endblock %}
