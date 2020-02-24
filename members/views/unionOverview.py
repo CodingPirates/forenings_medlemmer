@@ -8,6 +8,6 @@ from members.utils.user import has_user
 @user_passes_test(has_user, "/admin_signup/")
 def unionOverview(request):
     # get unions
-    unions = Union.object.all()
+    unions = Union.objects.all()
 
     return render(request, "members/union_overview.html", {"unions": unions})
