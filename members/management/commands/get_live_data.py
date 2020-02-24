@@ -24,7 +24,7 @@ class Command(BaseCommand):
                 "Du forsøgte at indsætte data i en ikke tom database. Det må man ikke "
             )
 
-        temp_dir = "temp_dump"
+        temp_dir = "live_data_dump"
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
