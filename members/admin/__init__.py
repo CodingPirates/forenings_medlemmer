@@ -27,6 +27,7 @@ from members.models import (
     Payment,
     Equipment,
     EquipmentLoan,
+    EmailTemplate,
 )
 
 from .address_admin import AddressAdmin
@@ -50,6 +51,7 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Member, MemberAdmin)
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Activity, ActivityAdmin)
+admin.site.register(EmailTemplate)
 
 
 class EmailItemInline(admin.TabularInline):
