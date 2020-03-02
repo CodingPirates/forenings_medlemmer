@@ -2,14 +2,10 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="container-fluid">
-      <div class="row">
-        <div class="col-lg-12">
           <h1>{{activity.department.name}} <small>{{activity.name}}</small></h1>
           <p>
             {{ activity.description|linebreaksbr }}
           </p>
-          </div>
-      </div>
       <div class="row">
         <div class="col-lg-6">
           <strong>Sted:</strong><br>
@@ -102,10 +98,9 @@
         {% endif %}
         {% if signup_closed and not participating %}
           <hr>
-            <blockquote class="bg-warning">
-              <p >Arrangementet er desværre udsolgt!</p>
-              <footer>Det er ikke længere muligt at tilmelde sig.</footer>
-            </blockquote>
+            <div class="alert alert-primary">
+              <p>Arrangementet er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
+            </div>
         {% endif %}
         {% if family %}
           <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
