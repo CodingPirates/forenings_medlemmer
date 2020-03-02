@@ -3,25 +3,33 @@
 {% block content %}
   <div class="container">
       <h1>Foreningen for {{union.name}}</h1>
-
+      <strong>Adresse: </strong>{{union.address}}
+      {% if union.statues %}
+      <br>
+      <a href="{{union.statues}}"><strong>Vedtægter</strong></a>
+      {% endif %}
+      <br>
+      <br>
+      <h4>Bestyrelse</h4>
       <div class="row" style="border:2px solid black;">
         <div class="col-sm-6 col-centered">
           Formand: <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a><br>
           Næstformand: <a href="mailto:{{union.second_chair_email}}">{{union.second_chair}}</a><br>
           Kasserer: <a href="mailto:{{union.cashier_email}}">{{union.cashier}}</a><br>
           Sekretær: <a href="mailto:{{union.secratary_email}}">{{union.secretary}}</a><br>
-          Forenings Email: <a href="mailto:{{union.union_email}}">{{union.union_email}}</a><br>
+          Foreningsmail: <a href="mailto:{{union.union_email}}">{{union.union_email}}</a><br>
         </div>
         <div class="col-sm-6 col-centered">
-          <strong>Menige Medlemmer</strong>
+          <strong>Menige medlemmer</strong>
           <div class="container" style="border:2px solid black;">
-            {{union.boardMembers}}
+            {{union.boardMembers|linebreaks}}
             <!--{% for boardMember in union.boardMembers %}
               <a href="mailto:{{boardMember.email}}">{{boardMember.name}}</a><br>
             {% endfor %}-->
           </div>
         </div>
       </div>
+      <br>
 
       <ul class="nav nav-pills nav-fill">
       {% for year in years %}
