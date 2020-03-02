@@ -1,7 +1,6 @@
 {% extends 'members/base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="container">
     <div class="jumbotron">
         <h1>Til frivillige der ikke tidligere er oprettet som forælder</h1>
         <p>Hvis du har børn der er tilmeldt i systemet og allerede er oprettet som familie, så log blot på jeres familie side med den email du opskrev dig med, da du tilmeldte dig. Her kan du også tilføje flere personer, hvis det f.eks. er din partner der har tilmeldt børnene men du nu selv vil være med som frivillig.</p>
@@ -15,12 +14,9 @@
             På sigt kommer der flere funktioner, der er relevante for de frivillige.
         </p>
       </div>
-      <div class="col-md-12">
         <div class="card">
           <div class="card-body">
             {% crispy vol_signupform %}
           </div>
         </div>
-    </div>
-</div>
 {% endblock %}
