@@ -16,8 +16,8 @@ jobs:
       - uses: actions/upload-artifact@v1
         if: always()
         with:
-          name: test-screens
-          path: test-screens
+          name: selenium-screens
+          path: ./test-screens
 
       - name: Check formatting (Black)
         run: docker-compose run web black --check .
