@@ -13,6 +13,10 @@ jobs:
         run: docker-compose build
       - name: Test
         run: docker-compose run web ./manage.py test
+      - uses: actions/upload-artifact@v1
+        with:
+          name: test-screens
+
       - name: Check formatting (Black)
         run: docker-compose run web black --check .
       - name: Static error check (Flake8)
