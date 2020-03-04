@@ -14,7 +14,6 @@ jobs:
       - name: Test
         run: docker-compose run web ./manage.py test
       - uses: actions/upload-artifact@v1
-      - name: Uploading test screens
         if: always()
         with:
           name: test-screens
