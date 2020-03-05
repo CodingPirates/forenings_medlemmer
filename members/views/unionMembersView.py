@@ -7,9 +7,12 @@ from members.utils.user import has_user
 
 @login_required
 @user_passes_test(has_user, "/admin_signup/")
-def unionMembersView(request, id):
+def unionMembersView(request, union_id):
+    p = Person.filter(user=request.user)
+    has_permisson = union_id in DepartmentLeader.filter(Person=p)
+
     # get user union
-    union = Union.objects.filter(pk=id)
+    union = Union.objects.filter(pk=union_id)
     # get members of union
     members = union[0].members()
     # get years union has been active

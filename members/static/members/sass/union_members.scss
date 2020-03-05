@@ -1,0 +1,26 @@
+@use "_definitions";
+
+#union_info {
+    border: 1px solid black;
+    margin-bottom: 40px;
+    > div {
+        font-size: 1.2em;
+        display: flex;
+        justify-content: space-around;
+        > div {
+            ul {
+                list-style-type: none;
+                margin: 10px 0px;
+            }
+        }
+    }
+}
+
+#union-documents{
+    display: flex;
+    margin-bottom: 40px;
+    justify-content: space-around;
+    a {
+        @extend %button;
+    }
+}
