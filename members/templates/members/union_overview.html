@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% extends 'members/base.html' %}
+{% block content %}
+    <div class="container">
+      <h1>Foreninger</h1>
+      <div class="row">
+        {% for union in unions %}
+          <div class="col-sm-4 col-centered">
+
+            <a href="members.codingpirates.dk/union_overview/{{union.id}}" ><strong>{{union.name}}</strong></a><br>
+            {{union.address}}
+            <br>Foreningsleder: <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a><br>
+            <br>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+{% endblock %}

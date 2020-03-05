@@ -3,6 +3,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from .person import Person
 
 
 class Union(models.Model):
@@ -52,3 +53,10 @@ class Union(models.Model):
             raise ValidationError(
                 "Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal bankkonto udfyldes."
             )
+
+    def members(self):
+        years = range(self.founded.year, 2021)
+        members = {}
+        for year in years:
+            members[year] = Person.objects.all()
+        return members

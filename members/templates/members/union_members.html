@@ -1,0 +1,79 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+  <div class="container">
+      <h1>Foreningen for {{union.name}}</h1>
+      <strong>Adresse: </strong>{{union.address}}
+      {% if union.statues %}
+      <br>
+      <a href="{{union.statues}}"><strong>Vedtægter</strong></a>
+      {% endif %}
+      <br>
+      <br>
+      <h4>Bestyrelse</h4>
+      <div class="row" style="border:2px solid black;">
+        <div class="col-sm-6 col-centered">
+          Formand: <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a><br>
+          Næstformand: <a href="mailto:{{union.second_chair_email}}">{{union.second_chair}}</a><br>
+          Kasserer: <a href="mailto:{{union.cashier_email}}">{{union.cashier}}</a><br>
+          Sekretær: <a href="mailto:{{union.secratary_email}}">{{union.secretary}}</a><br>
+          Foreningsmail: <a href="mailto:{{union.union_email}}">{{union.union_email}}</a><br>
+        </div>
+        <div class="col-sm-6 col-centered">
+          <strong>Menige medlemmer</strong>
+          <div class="container" style="border:2px solid black;">
+            {{union.boardMembers|linebreaks}}
+            <!--{% for boardMember in union.boardMembers %}
+              <a href="mailto:{{boardMember.email}}">{{boardMember.name}}</a><br>
+            {% endfor %}-->
+          </div>
+        </div>
+      </div>
+      <br>
+
+      <ul class="nav nav-pills nav-fill">
+      {% for year in years %}
+        <li  class="nav-item">
+            {% if year == current_year %}
+               <a class="nav-link active" data-toggle="pill" href="#{{year}}">{{year}}
+             </a>
+            {% else %}
+              <a  class="nav-link" data-toggle="pill" href="#{{year}}">{{year}}</a>
+            {% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+      <div class="container">
+        <div class="tab-content">
+          {% for year, memberList in members.items %}
+            {% if year == current_year %}
+              <div id="{{year}}" class="tab-pane fade in active show">
+            {% else %}
+              <div id="{{year}}" class="tab-pane fade in">
+            {% endif %}
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Navn</th>
+                  <th>Email</th>
+                  <th>Adresse</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for member in memberList%}
+                  <tr>
+                    <td>{{member.membertype}}</td>
+                    <td>{{member.name}}</td>
+                    <td><a href="mailto:{{member.email}}">{{member.email}}</a></td>
+                    <td>{{member.address}}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+{% endblock %}
