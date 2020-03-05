@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap");
-
 $primary-color: #25a2ce;
 $primary-color-muted: #2c8098;
 $accent-color: #efb422;
@@ -19,15 +17,16 @@ $header_font: "Bungee", cursive;
     }
 }
 
-.bg-primary {
+%bg-primary {
     background-color: $primary-color;
     color: white;
 }
-.bg-accent {
+
+%bg-accent {
     background-color: $accent-color !important;
 }
 
-.container {
+%container {
     width: 100%;
     padding-left: 15px;
     padding-right: 15px;
@@ -35,15 +34,12 @@ $header_font: "Bungee", cursive;
     margin-right: auto;
 }
 
-@mixin rounded-rect {
+%rounded-rect {
     border-radius: 0.25rem;
 }
-%rounded-rect {
-    @include rounded-rect;
-}
 
-.button {
-    @include rounded-rect();
+%button {
+    @extend %rounded-rect;
     text-align: center;
     display: inline-block;
     text-align: center;
@@ -65,16 +61,11 @@ $header_font: "Bungee", cursive;
     }
 }
 
-.button-accent {
-    @extend .button;
-    @extend .bg-accent;
+%button-accent {
+    @extend %button;
+    @extend %bg-accent;
     &:hover {
         background-color: $accent-color-muted;
         color: black;
     }
-}
-
-table {
-    word-wrap: break-word;
-    border: 1px solid #dee2e6 !important;
 }
