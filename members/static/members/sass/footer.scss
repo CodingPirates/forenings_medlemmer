@@ -1,7 +1,7 @@
-@use "base";
+@use "_definitions";
 
 footer {
-    @extend .bg-primary;
+    @extend %bg-primary;
     align-self: flex-end;
     display: flex;
     align-items: center;
@@ -14,7 +14,7 @@ footer {
     > p > a {
         color: white;
     }
-    @include base.for-desktop {
+    @include _definitions.for-desktop {
         max-height: 75px;
     }
 }
