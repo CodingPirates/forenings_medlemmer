@@ -254,7 +254,7 @@ class UnionFactory(DjangoModelFactory):
     founded = Faker("date_time", tzinfo=TIMEZONE)
     region = FuzzyChoice([r[0] for r in Union.regions])
     address = SubFactory(AddressFactory)
-    boardMembers_old = Faker("text")
+    board_members_old = Faker("text")
     bank_main_org = Faker("boolean")
     bank_account = Faker("numerify", text="####-##########")
 

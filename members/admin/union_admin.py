@@ -4,7 +4,7 @@ from members.models import Address
 
 
 class UnionAdmin(admin.ModelAdmin):
-    filter_horizontal = ["boardMembers"]
+    filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
     def get_form(self, request, obj=None, **kwargs):
@@ -39,12 +39,12 @@ class UnionAdmin(admin.ModelAdmin):
                     "cashier_email_old",
                     "secretary_old",
                     "secretary_email_old",
-                    "boardMembers_old",
+                    "board_members_old",
                     "chairman",
                     "second_chair",
                     "cashier",
                     "secretary",
-                    "boardMembers",
+                    "board_members",
                 )
             },
         ),

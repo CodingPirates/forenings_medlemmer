@@ -54,8 +54,8 @@ class Union(models.Model):
     regions = (("S", "Sjælland"), ("J", "Jylland"), ("F", "Fyn"), ("Ø", "Øer"))
     region = models.CharField("region", max_length=1, choices=regions)
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
-    boardMembers = models.ManyToManyField("Person", blank=True)
-    boardMembers_old = models.TextField("Menige medlemmer", blank=True)
+    board_members = models.ManyToManyField("Person", blank=True)
+    board_members_old = models.TextField("Menige medlemmer", blank=True)
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",
         default=True,
