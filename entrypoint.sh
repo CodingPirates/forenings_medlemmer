@@ -11,7 +11,8 @@ then
 fi
 
 # Compile sass
-/bin/dart-sass/sass members/static/members/sass:members/static/members/css
+/bin/dart-sass/sass \
+    members/static/members/sass/main.scss members/static/members/css/main.css
 
 python manage.py migrate
 python manage.py dump_public_data

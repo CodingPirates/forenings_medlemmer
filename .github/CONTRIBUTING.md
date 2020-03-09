@@ -41,7 +41,7 @@ You are more than welcome to contribute to the system. This guide documents how 
     Compilation happens during each build, during local development run the
     following command in a separate terminal:
     ```bash
-    docker-compose run web /bin/dart-sass/sass --watch members/static/members/sass:members/static/members/css`
+    docker-compose run web /bin/dart-sass/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
     ```
     It will compile SASS when you save a file.
 
