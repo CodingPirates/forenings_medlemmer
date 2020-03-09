@@ -60,3 +60,17 @@ class Union(models.Model):
         for year in years:
             members[year] = Person.objects.all()
         return members
+
+    def user_union_leader(user, self):
+        if user.is_superuser:
+            return True
+        elif (
+            user == self.chairman.user
+            or user == self.second_chair.user
+            or user == self.cashier.user
+            or user == self.secretary.user
+            or self.board_members.objects.filter(user=user) != 0
+        ):
+            return True
+        else:
+            return False
