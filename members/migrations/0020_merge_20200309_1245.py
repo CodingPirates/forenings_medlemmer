@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0019_remove_union_region'),
-        ('members', '0019_auto_20200211_1457'),
+        ("members", "0019_remove_union_region"),
+        ("members", "0019_auto_20200211_1457"),
     ]
 
-    operations = [
-    ]
+    operations = []
