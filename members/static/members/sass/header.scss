@@ -1,21 +1,21 @@
-@use 'base';
+@use '_definitions';
 
 nav {
-    @extend .container;
-    @extend .bg-primary;
+    @extend %container;
+    @extend %bg-primary;
     padding: 0 5%;
     display: flex;
     align-items: center;
-    font-family: base.$header_font;
+    font-family: _definitions.$header_font;
     img {
         width: 50px;
     }
     // Desktop horizontal nav bar
-    @include base.for-phone {
+    @include _definitions.for-phone {
         flex-direction: column;
         justify-content: center;
     }
-    @include base.for-desktop {
+    @include _definitions.for-desktop {
         flex-direction: row;
     }
     > span {
@@ -24,13 +24,14 @@ nav {
     }
 
     > a {
+        @extend %rounded-rect;
         color: white;
         padding: 0 10px;
         &:hover {
             color: #cccccc;
             text-decoration: none;
         }
-        @include base.for-phone {
+        @include _definitions.for-phone {
             // Bigger buttons on phone
             font-size: 24px;
             padding: 15px 0;
@@ -38,7 +39,6 @@ nav {
             width: 100%;
             border: 1px solid white;
             text-align: center !important;
-            @include base.rounded-rect;
         }
     }
 }
@@ -51,10 +51,10 @@ nav {
 }
 
 #toggle {
-    @include base.for-desktop {
+    @include _definitions.for-desktop {
         display: none;
     }
-    @include base.for-phone {
+    @include _definitions.for-phone {
         display: inline;
     }
 }

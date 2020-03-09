@@ -10,6 +10,7 @@ services:
       - "${PORT}:${PORT}"
     depends_on:
       - database
+      - selenium
     networks:
       - webnet
     environment:
@@ -40,6 +41,13 @@ services:
       - POSTGRES_DB=$POSTGRES_DB
     ports:
       - "5432${DB_PORT}"
+
+  selenium:
+    image: selenium/standalone-chrome
+    networks:
+      - webnet
+    ports:
+      - 4444
 
 volumes:
   database:
