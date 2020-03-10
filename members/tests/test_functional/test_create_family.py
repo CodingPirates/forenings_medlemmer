@@ -87,8 +87,8 @@ class SignUpTest(StaticLiveServerTestCase):
 
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
 
-        # Check that we were redirectet to family page
+        # Check that we were redirectet to overview page
         elements = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'Jeres famile')]]"
-        )[0].text.split(" ")[-1]
+            "//*[text()[contains(.,'For yderligere hjælp med at bruge denne side')]]"
+        )
         self.assertGreater(len(elements), 0)
