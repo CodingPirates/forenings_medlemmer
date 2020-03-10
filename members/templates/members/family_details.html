@@ -1,72 +1,55 @@
 {% extends 'members/base.html' %} {% load static %} {% block content %}
 
-<link rel="stylesheet" type="text/css" href="{% static "members/css/family_details.css" %}" />
-
 <h1>Familiedetaljer</h1>
 <p>
-  Velkommen til Coding Pirates' medlemssystem. Du ser nu oversigten over de
-  oplysninger vi har registreret om jeres familie. Det er vigtigt du sikrer dig
-  at oplysningerne er korrekte. Din familie er registreret på e-mail-adressen
+  Din familie er registreret på e-mail-adressen
   <a class="text-info">{{family.email}}</a>, hvilket også er denne vi sender
   informationer til dig om tilmeding til hold og aktiviteter.
 </p>
-<p>
-  For yderligere hjælp med at bruge denne side - se på
-  <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores
-  medlemssystem"</a> eller skriv til os på
-  <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.
-</p>
-
 <section>
-    <h2>Personer</h2>
-    <p>
-      Tryk på <kbd>Opret</kbd>-knapperne, for at tilføje flere personer. Opret
-      gerne begge forældre, så vi kan få fat i jer nemt.
-    </p>
-    {% if family.person_set.count > 0 %}
-    <table class="table table-striped">
+  <h2>Personer</h2>
+  <p>
+    Tryk på <kbd>Opret</kbd>-knapperne, for at tilføje flere personer. Opret
+    gerne begge forældre, så vi kan få fat i jer nemt.
+  </p>
+  {% if family.person_set.count > 0 %}
+    <table>
       <thead>
         <tr>
-          <th class="col">Opskrevet</th>
-          <th class="col">Navn</th>
-          <th class="col">Adresse</th>
-          <th class="col">Postnr./by</th>
-          <th class="col">E-mail</th>
-          <th class="col">Telefon</th>
-          <th class="col">Handlinger</th>
+          <th>Navn</th>
+          <th>Adresse</th>
+          <th>E-mail</th>
+          <th>Telefon</th>
+          <th>Handlinger</th>
         </tr>
       </thead>
       <tbody>
         {% for person in ordered_persons %}
         <tr>
-            <td>
-                {%if person.membertype == 'CH' %}
-                    <p>{{person.added|date:"d M Y"}}</p>
-                    <p class="text-muted">({{person.added|timesince}} siden)</p>
-                {%endif%}
-            </td>
-            <td>
-                <p><b>{{person.name}}</b></p>
-                {%if person.membertype == 'PA' %}
-                    <p class="text-muted">(Forælder)</p>
+          <td data-label="navn">
+            {{person.name}}<br>
+            <span class="text-muted">
+              {%if person.membertype == 'PA' %}
+                    Forælder
                 {%endif%}
                 {%if person.membertype == 'GU' %}
-                    <p class="text-muted">(Værge)</p>
+                    Værge
                 {%endif%}
                 {%if person.membertype == 'CH' %}
-                    <p class="text-muted">(Barn, {{person.age_years}} år)</p>
+                    Barn, {{person.age_years}} år
                 {%endif%}
                 {%if person.membertype == 'NA' %}
-                    <p class="text-muted">(Frivillig)</p>
+                    Frivillig
                 {%endif%}
+              </span>
           </td>
-
-          <td>{{person.address}}</td>
-          <td>{{person.zipcode}} {{person.city}}</td>
-          <td>{{person.email}}</td>
-          <td>{{person.phone}}</td>
-          <td>
-              <a href="{% url 'person_update' person.id %}" class="btn btn-info">
+          <td data-label="adresse">
+            {{person.address}}, {{person.zipcode}} {{person.city}}
+          </td>
+          <td data-label="email">{{person.email}}</td>
+          <td data-label="telefon">{{person.phone}}</td>
+          <td data-label="Handling">
+              <a href="{% url 'person_update' person.id %}" class="button">
                 Redigér
               </a>
           </td>
@@ -76,270 +59,40 @@
     </table>
     {% endif %}
 
-    <a class="btn btn-primary" href="{% url 'person_add' 'CH' %}">
-      Opret barn
-    </a>
-    <a class="btn btn-primary" href="{% url 'person_add' 'PA' %}">
-      Opret forælder
-    </a>
-    <a class="btn btn-primary" href="{% url 'person_add' 'GU' %}">
-      Opret værge
-    </a>
+    <div class="action-list">
+      <p>Tilføj personer:</p>
+      <ul>
+        <li>
+          <a href="{% url 'person_add' 'CH' %}">
+            Opret barn
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'person_add' 'PA' %}">
+            Opret forælder
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'person_add' 'GU' %}">
+            Opret værge
+          </a>
+        </li>
+      </ul>
+    </div>
 
     {%if request_parents %}
-        <div class="alert alert-danger">
+        <div class="info-box">
           Opret mindst 1 forælder / værge med kontaktoplysninger, så vi i Coding
           Pirates nemt kan få fat i jer.
         </div>
     {%endif%}
     {% if need_confirmation %}
-        <div class="alert alert-danger">
+        <div class="info-box">
           Det er længe siden du sidst bekræftede dine oplysninger.
-          <a class="btn btn-success" href="{% url 'confirm_details' %}">
+          <a class="button-success" href="{% url 'confirm_details' %}">
               Bekræft oplysninger
            </a>
         </div>
     {%endif%}
 </section>
-{% if participating %}
-<section>
-    <h2>Tilmeldte aktiviteter</h2>
-    <p>
-      Dette er de aktiviteter jeres børn er tilmeldt. I kan klikke på navnet for
-      hvert arrangement, for at se flere detaljer om hvor og hvornår det foregår. I
-      kan også se deltagerlisten for arrangementet.
-    </p>
-    <p>
-      Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
-      registreret. Tryk på knappen for at betale.
-    </p>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Navn</th>
-          <th>Aktivitet</th>
-          <th>Start</th>
-          <th>Slut</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for participation in participating %}
-        <tr>
-          <td>{{participation.member.person.name}}</td>
-          <td>
-            <a
-              href="{%url 'activity_view_person' participation.activity.id participation.member.person.id %}"
-              >{{participation.activity.name}} - {{participation.activity.department.name}}
-             </a>
-                {% if not participation.paid %}
-                    <a
-                      class="btn btn-danger"
-                      role="button"
-                      href="{{participation.get_payment_link}}"
-                      >Betal
-                     </a>
-                {%endif%}
-          </td>
-          <td>{{participation.activity.start_date}}</td>
-          <td>{{participation.activity.end_date}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-</section>
-{% endif %}
-
-<section>
-    <h2>Invitationer</h2>
-    <p>
-      Denne liste indeholder invitationer til aktiviteter, hvor der enten er fri
-      tilmelding (først til mølle) eller invitationer til aktiviteter I har
-      stået på venteliste til. I vil modtage en e-mail på e-mail-adressen
-      {{family.email}} når der er aktiviteter, som I kan tilmelde jer.
-    </p>
-<p><i>Vær opmærksom på, at du tilmelder dig den rigtige afdeling!</i></p>
-{% if invites %}
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Navn</th>
-          <th>Aktivitet</th>
-          <th>Reaktion</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for invite in invites %}
-        <tr>
-          <td>{{invite.person.name}}</td>
-          <td>
-            <a href="{%url 'activity_signup' invite.activity.id invite.person.id %}"
-              >{{invite.activity.name}} hos Coding Pirates
-              {{invite.activity.department.name}}</a
-            >
-          </td>
-          <td>
-            <a
-              class="btn btn-success"
-              href="{%url 'activity_signup' invite.activity.id invite.person.id %}"
-              >Tilmeld aktivitet</a
-            >
-            <a
-              class="btn btn-danger"
-              href="{%url 'invitation_decline' family.unique invite.id %}"
-              >Afslå</a
-            >
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-        <div class="alert alert-primary">
-          Der er endnu ikke åbnet for tilmelding til aktiviteter. Vi sender en
-          e-mail til {{family.email}} når vi er klar til at modtage tilmeldinger.
-        </div>
-    {% endif %}
-</section>
-
-<section>
-<h2>Åbne aktiviteter</h2>
-<p>Denne liste indeholder åbne aktiviteter, hvor der er fri tilmelding</p>
-{% if open_activities %}
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Afdeling</th>
-      <th>Aktivitet</th>
-      <th>Reaktion</th>
-      <th>Beskrivelse</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for activity in open_activities %}
-    <tr>
-      <td>Coding Pirates {{activity.department.name}}</td>
-      <td>{{activity.name}}</td>
-      <td>
-        {% for person in activity.persons %}
-        <a
-          class="btn btn-success"
-          href="{%url 'activity_signup' activity.id person.id %}"
-          >Tilmeld {{ person.firstname }} aktivitet</a
-        >
-        {% endfor %}
-      </td>
-      <td>
-        <a
-          class="btn btn-primary"
-          href="{%url 'activity_view_family' activity.id %}"
-          target="_blank"
-          >Læs mere</a
-        >
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<div class="alert alert-primary">
-  Der er ikke nogen aktiviteter.
-</div>
-{% endif %}
-</section>
-
-<section>
-<h2>Ventelister</h2>
-<p>
-  Tryk på <kbd>Opskriv</kbd> knapperne for hver afdeling der har interesse for
-  jer. Bemærk at jeres position på ventelisten afgøres ud fra barnets
-  oprettelses tidspunkt i systemet (datoen "Opskrevet" i Personer) -
-  <i> ikke tidspunktet i melder jeg på ventelisterne nedenfor! - </i> I kan
-  derfor frit tilmelde og framelde jer ventelisterne uden at frygte i mister
-  jeres position på listen.
-</p>
-<p>
-  Tryk på <kbd>Afmeld</kbd> knapperne for at forlade en afdelings ventelisten
-  igen.
-</p>
-<p>
-  Opret jer kun på de lister der har interesse for jer. Det er en god ide at
-  kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye afdelinger
-  efterhånden som vi får bekræftet de åbner og børnene får kun tilbud om at
-  komme med på de afdelinger de har skrevet sig op til.
-</p>
-<h3>
-    Skriv på Ventelister
-</h3>
-
-<a class="btn btn-primary" href="{% url 'family_waitinglist_view' %}">
-    Se jeres nuværende position på ventelisterne
-</a>
-{% if department_children_waiting %}
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Navn</th>
-      <th>Adresse</th>
-      <th>Åbningstid</th>
-      <th>Tilmeld ventelister</th>
-      <th>Afmeld ventelister</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for key, department in department_children_waiting.departments.items %}
-    <tr>
-      <td>
-          <strong>
-            {% if department.object.website == "" %}
-                    Coding Pirates {{department.object.name}}
-            {% else %}
-                <a href="{{department.object.website}}" target="_blank">
-                    {{department.object.name}}
-                </a>
-            {% endif %}
-        </strong>
-        <br/>
-        <a href="mailto:{{department.object.department_email}}">
-            {{department.object.department_email}}
-        </a>
-      </td>
-      <td>
-        {{department.object.address}}<br />{{department.object.zipcode}}
-        {{department.object.city}}
-      </td>
-      <td>{{department.object.open_hours}}</td>
-      <td>
-        {%for key, child in department.children_status.items %}
-            {%if not child.waiting %}
-            <a
-              class="btn btn-success"
-              href="{% url 'waiting_list_subscription' child.object.id department.object.id 'subscribe' %}"
-            >
-              Opskriv: {{child.firstname}}
-            </a>
-            {%endif%}
-        {%endfor%}
-      </td>
-      <td>
-        {%for key, child in department.children_status.items %}
-            {%if child.waiting %}
-            <a
-              class="btn btn-danger"
-              href="{% url 'waiting_list_subscription' child.object.id department.object.id 'unsubscribe' %}"
-              >
-              Afmeld: {{child.firstname}}
-              </a>
-            {%endif%}
-        {%endfor%}
-      </td>
-      <td></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<div class="alert alert-primary">
-  Der er ingen aktuelle ventelister.
-</div>
-</section>
-{% endif %} {% endblock %}
+{% endblock %}

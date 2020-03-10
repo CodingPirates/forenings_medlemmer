@@ -1,0 +1,32 @@
+@use "_definitions";
+
+.tabs {
+    > ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0px;
+    border: 1px solid #eee;
+        li {
+            width: 100%;
+            @extend %rounded-rect;
+            cursor: pointer;
+            background-color: #eee;
+            display: inline-block;
+            text-align: center;
+            padding: 20px 0px;
+            font-size: 1.5em;
+            &.tab-active {
+                @extend %bg-accent;
+                box-shadow: 0px 0px 5px black inset;
+                text-decoration: underline;
+            }
+        }
+    }
+    > section {
+        display: none;
+        &.tab-section-active {
+            display: block;
+        }
+
+    }
+}

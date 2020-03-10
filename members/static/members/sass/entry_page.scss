@@ -1,4 +1,6 @@
 @use "_definitions";
+@use "buttons";
+
 
 #user-action-container {
     padding: 5%;
@@ -22,7 +24,7 @@
         @extend %bg-primary;
         @extend %rounded-rect;
         display: flex;
-        padding: 10%;
+        padding: 10% 10px;
         justify-content: flex-start;
         color: white !important;
 
@@ -36,7 +38,7 @@
         }
 
         a {
-            @extend %button-accent;
+            @extend .button-accent;
             width: 80%;
             display: block;
             margin: auto;
