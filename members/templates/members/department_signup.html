@@ -33,7 +33,7 @@
         {% endfor %}
       </ul>
         {% for region in departments_region%}
-        <section>
+          <section>
           <table>
             <thead>
               <tr>
@@ -85,58 +85,8 @@
             </tbody>
           </table>
         </section>
-        {% endfor %}
+      {% endfor %}
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Afdeling</th>
-          <th>Kontaktperson</th>
-          <th>Adresse</th>
-          <th>Åbningstid</th>
-          <th>Tilmeld ventelister</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for department in departments %}
-          <tr>
-            <td>
-              {% if department.website != "" %}
-                <a href="{{department.website}}" target="_blank">
-                  {{department}}
-                          </a>
-                      {% else %}
-                          {{department}}
-                      {% endif %}
-                  </td>
-                  <td>
-                    {{department.responsible_name}} <br>
-                    <a href="mailto:{{department.object.department_email}}">
-                      {{department.department_email}}
-                    </a>
-                  </td>
-                  <td>{{department.address}}</td>
-                  <td>{{department.open_hours}}</td>
-                  <td>
-                    {% for child in children %}
-                      <div>
-                        {% if department in child.departments_is_waiting %}
-                          {{child.person.firstname}} er opskrevet
-                        {% else %}
-                            <a
-                              class="button"
-                              href= "{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
-                            >
-                              Opskriv: {{child.person.firstname}}
-                            </a>
-                          {% endif %}
-                      </div>
-                      {% endfor %}
-                  </td>
-              </tr>
-          {% endfor%}
-      </tbody>
-    </table>
   </section>
   <section>
 
