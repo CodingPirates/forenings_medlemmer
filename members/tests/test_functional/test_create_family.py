@@ -89,6 +89,6 @@ class SignUpTest(StaticLiveServerTestCase):
 
         # Check that we were redirectet to family page
         elements = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'Familiedetaljer')]]"
+            "//*[text()[contains(.,'Jeres famile')]]"
         )[0].text.split(" ")[-1]
         self.assertGreater(len(elements), 0)
