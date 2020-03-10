@@ -15,6 +15,7 @@
     {% bootstrap_javascript %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="{% static "members/css/main.css" %}" />
+    <script src="{% static "members/js/date-input-polyfill.js" %}"></script>
     {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
         {% load crispy_forms_tags %}
         <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
