@@ -89,7 +89,9 @@ class Department(models.Model):
     def get_open_departments():
         result = []
         a_year_ago = (timezone.now() - timedelta(days=366)).date()
-        for department in Department.objects.filter(closed_dtm=None).order_by("name"):
+        for department in Department.objects.filter(closed_dtm=None).order_by(
+            "address__region", "name"
+        ):
             department_activties = Activity.objects.filter(
                 department=department
             ).order_by("-end_date")

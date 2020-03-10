@@ -6,6 +6,9 @@
         list-style-type: none;
         padding: 0;
         border: 1px solid #eee;
+        @include _definitions.for-phone {
+            flex-wrap: wrap;
+        }
         li {
             width: 100%;
             @extend %rounded-rect;

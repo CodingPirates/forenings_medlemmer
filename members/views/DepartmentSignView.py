@@ -26,7 +26,9 @@ def DepartmentSignView(request):
             for department in departments
             if department not in child["departments_is_waiting"]
         ]
-
+    departments = [
+        department for department in departments if department.address.region != ""
+    ]
     return render(
         request,
         "members/department_signup.html",
