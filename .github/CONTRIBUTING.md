@@ -44,6 +44,7 @@ You are more than welcome to contribute to the system. This guide documents how 
     docker-compose run web /bin/dart-sass/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
     ```
     It will compile SASS when you save a file.
+    If you create a new `.scss` file rembmer to add it to [main.scss][main.scss]. 
     
 - [Selenium][selenium]: is used to run the functional tests. To only run a specific test run 
     ```bash 
@@ -100,3 +101,5 @@ You are more than welcome to contribute to the system. This guide documents how 
 [factories]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/tests/factories.py
 
 [selenium]: https://www.selenium.dev
+
+[main.scss]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/static/members/sass/main.scss
