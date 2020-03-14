@@ -6,7 +6,7 @@
     display: inline-block;
     text-align: center;
     white-space: nowrap;
-    background-color: _definitions.$primary-color;
+    background-color: _definitions.$accent-color;
     vertical-align: middle;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -20,7 +20,7 @@
     margin: 10px;
     &:hover {
         color: white;
-        background-color: _definitions.$primary-color-muted;
+        background-color: _definitions.$accent-color-muted;
     }
 }
 

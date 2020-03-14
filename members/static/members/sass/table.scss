@@ -6,7 +6,7 @@ table {
     @extend %card;
     /* Zebra striping */
     tr:nth-of-type(odd) {
-        background: #eee;
+        background: _definitions.$light-grey;
     }
     thead > tr > th {
         @extend %bg-primary;
@@ -16,6 +16,7 @@ table {
         padding: 10px;
         border: 1px solid #ccc;
         text-align: left;
+        color: white;
     }
     td {
         padding: 10px;

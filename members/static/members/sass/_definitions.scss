@@ -1,6 +1,6 @@
-$primary-color: #25a2ce;
-$primary-color-muted: #2c8098;
-$accent-color: #efb422;
+$primary-color: #00AEEF;
+$primary-color-muted: #00A0E0;
+$accent-color: #ff9900;
 $accent-color-muted: #ed9224;
 $danger-color: #dc3545;
 $danger-color-muted: #a01525;
@@ -9,6 +9,9 @@ $success-color-muted: #288745;
 $max_width: 1300px;
 $main_font: "Lato", sans-serif;
 $header_font: "Bungee", cursive;
+$light-grey: #dedfe0;
+$dark-grey: #6d6e71;
+$yellow: #ffff00;
 
 @mixin for-phone {
     @media only screen and (max-width: 667px) {
@@ -22,7 +25,8 @@ $header_font: "Bungee", cursive;
 }
 
 %card {
-    border: 1px solid #dee2e6;
+    border: 1px solid $light-grey;
+    padding: 5px;
 }
 
 %bg-primary {

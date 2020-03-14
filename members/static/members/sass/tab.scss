@@ -4,23 +4,26 @@
     > ul {
         display: flex;
         list-style-type: none;
-        padding: 0;
-        border: 1px solid #eee;
+        padding: 0 10px;
+        @extend %bg-primary;
+
         @include _definitions.for-phone {
             flex-wrap: wrap;
         }
         li {
             width: 100%;
-            @extend %rounded-rect;
+            border-radius: 0.5em;
             cursor: pointer;
-            background-color: #eee;
+            background-color: _definitions.$primary-color-muted;
             display: inline-block;
             text-align: center;
             padding: 20px 0;
             font-size: 1.5em;
+            box-shadow: 0 0 2px black inset;
+            margin: 10px 5px;
             &.tab-active {
-                @extend %bg-accent;
-                box-shadow: 0 0 5px black inset;
+                color: black;
+                background-color: _definitions.$yellow;
                 text-decoration: underline;
             }
         }
