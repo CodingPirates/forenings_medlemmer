@@ -1,13 +1,14 @@
 {% extends 'members/base.html' %} {% block content %}
 <h2>Aktiviteter i Coding Pirates</h2>
 <p>
-  På denne side kan du se de aktiviteter du er tilmeldt, de aktiviter du er
-  inviteret til og de aktiviter som ikke kræve at man er skrevet op ved en
-  afdeling.
+  Her kan du tilmelde dit barn en aktivitet. Det kan enten være en åben
+  aktivitet der ikke kræver opskrivning på venteliste eller hvis I har modtaget
+  en invitation vil den kunne ses her. De aktiviteter som I allerede er tilmeldt
+  vil også fremgå på denne side.
 <p>
   Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye
   events kan du gøre det på afdelingssiden.
-  <a class="button" href="{% url "activities" %}">
+  <a class="button" href="{% url "department_signup" %}">
     Gå til Afdelings opskrivninger
   </a>
 </p>
