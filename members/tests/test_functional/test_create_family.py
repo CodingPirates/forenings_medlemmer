@@ -7,6 +7,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+"""
+This test goes to the root signup page and creates a child and parent.
+It uses the address Autocomplete widget to fill the address.
+
+Once the form is filled it uses the generated password and checks that it can be
+used to log in.
+"""
+
 
 class SignUpTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
