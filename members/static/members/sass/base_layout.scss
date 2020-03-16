@@ -26,15 +26,6 @@ section {
     @extend %card;
 }
 
-.info-box {
-    @extend %rounded-rect;
-    background-color: _definitions.$light-grey;
-    padding: 10px;
-    margin: 10px auto;
-    width: 66%;
-    text-align: center;
-}
-
 main {
     @extend %container;
     margin-top: 20px;

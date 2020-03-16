@@ -1,110 +1,132 @@
 {% extends "members/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="container-fluid">
-          <h1>{{activity.department.name}} <small>{{activity.name}}</small></h1>
-          <p>
-            {{ activity.description|linebreaksbr }}
-          </p>
-      <div class="row">
-        <div class="col-lg-6">
-          <strong>Sted:</strong><br>
-            <address>
-              {{activity.streetname}} {{activity.housenumber}}{%if activity.floor or activity.door%}, {%endif%}
-              {%if activity.floor %}{{activity.floor}}.{%endif%}
-              {%if activity.door%}{{activity.door}}{%endif%}
-              <br>
-              {%if activity.placename%}{{activity.placename}}<br>{%endif%}
-              {{activity.zipcode}} {{activity.city}}<br>
-              {{activity.placenave}}<br>
-            </address>
-        </div>
-        <div class="col-lg-6">
-          <p>
-          <strong>Tidspunkt:</strong><br>
-          {{ activity.open_hours}}
-          </p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <p>
-          <strong>Ansvarlig:</strong><br>
-          {{ activity.responsible_name}}<br>
-          <a href="mailto:{{activity.responsible_contact}}">{{activity.responsible_contact}}</a>
-          </p>
-        </div>
-        <div class="col-lg-6">
-          <p>
-          <strong>Pris:</strong><br>
-          {{ price | floatformat:2}} kr<br>
-          </p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <p>
-          <strong>Tilmeldingsfrist:</strong><br>
-            {{ activity.signup_closing}} (om {{ activity.signup_closing|timeuntil}})
-          </p>
-        </div>
-        <div class="col-lg-6">
-          <p>
-          <strong>Periode:</strong><br>
-            {{ activity.start_date|date:"j. F"}} - {{ activity.end_date|date:"j. F"}}
-          </p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <p>
-          <strong>Pladser:</strong><br>
-            {{ seats_left }} af {{ activity.max_participants}} pladser ledige.
-          </p>
-        </div>
-        <div class="col-lg-6">
-          <p>
-          <strong>Venteliste:</strong><br>
-            {% if activity.open_invite %}
-              Nej. Åben invitation uden venteliste
-            {% else %}
-              Ja. Kræver invitation igennem ventelisten
-            {%endif%}
-          </p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <p>
-            <strong>Lokalforening:</strong><br>
-            {{ union.name }}
-          </p>
-        </div>
-      </div>
-      {% if not view_only_mode %}
-      <hr>
-      {% crispy signupform %}
+<h2>Coding Pirates: {{activity.department}}</h2>
+
+<section>
+  <h3>{{activity.name}}</h3>
+  <p>
+    {{ activity.description| linebreaksbr }}
+  </p>
+</section>
+<section>
+  <h3>Praktisk information:</h3>
+  <div class="information-container">
+    <div>
+      <h4>Sted:</h4>
+      <p>{{activity.address}}</p>
+    </div>
+
+    <div>
+      <h4>Tidspunkt:</h4>
+      <p>{{ activity.open_hours}}</p>
+    </div>
+
+    <div>
+      <h4>Ansvarlig:</h4>
+      <p>
+        {{ activity.responsible_name}} -
+        <a href="mailto:{{activity.responsible_contact}}">
+          {{activity.responsible_contact}}
+        </a>
+      </p>
+    </div>
+
+    <div>
+      <h4>Pris:</h4>
+      <p>{{ activity.price_in_dkk | floatformat:2}} kr<br></p>
+    </div>
+
+    <div>
+      <h4>Tilmeldingsfrist:</h4>
+      <p>
+        {{ activity.signup_closing}} (om {{ activity.signup_closing|timeuntil}})
+      </p>
+    </div>
+
+    <div>
+      <h4>Periode:</h4>
+      <p>
+        {{ activity.start_date| date:"j. F"}} - {{ activity.end_date|date:"j. F"}}
+      </p>
+    </div>
+
+    <div>
+      <h4>Pladser:</h4>
+      <p>
+        {{ activity.seats_left }} af {{ activity.max_participants}} pladser ledige.
+      </p>
+    </div>
+
+    <div>
+      <h4>Venteliste:</h4>
+      <p>
+        {% if activity.open_invite %}
+          Nej. Åben invitation uden venteliste
+        {% else %}
+          Ja. Kræver invitation igennem ventelisten
+        {%endif%}
+      </p>
+    </div>
+
+    <div>
+      <h4>Lokalforening:</h4>
+      <p>
+        {{ union.name }}
+      </p>
+    </div>
+
+    <div>
+      <h4>For aldre:</h4>
+      <p>
+        Fra {{ activity.min_age }} år til {{ activity.max_age }} år.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Tilmelding</h2>
+  {% if is_logged_in %}
+    {% if can_sign_up %}
+    <p>
+      Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten
+      {{activity.name}} på <strong>{{activity.department.name}}</strong>.
+      Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til
+      {{ activity.end_date|date:"j. F"}} og det koster
+      <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
+      <em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit">
+      </form>
 
       {% else %}
-        {% if participating %}
-
-          <hr/>
-
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">{{person.name}} er tilmeldt dette arrangement</h2>
-            </div>
-          </div>
-        {% endif %}
-        {% if signup_closed and not participating %}
-          <hr>
-            <div class="alert alert-primary">
-              <p>Arrangementet er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
-            </div>
-        {% endif %}
-        {% if family %}
-          <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
-        {% endif %}
+      {% if participating %}
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">{{person.name}} er tilmeldt dette arrangement</h2>
+        </div>
+      </div>
       {% endif %}
-    </div>
+      {% if signup_closed and not participating %}
+      <hr>
+      <div class="alert alert-primary">
+        <p>Arrangementet er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
+      </div>
+      {% endif %}
+      {% if family %}
+      <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
+      {% endif %}
+      {% endif %}
+    {% else %}
+      <div class="info-box">
+        <p>Du skal oprette dig i systemet for at kunne tilmelde dig.</p>
+        <a class="button" href="{% url "entry_page" %}">
+          Gå til opskrivnings form
+        </a>
+      <div>
+  {%endif%}
 {% endblock %}
+<section>

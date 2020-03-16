@@ -46,6 +46,27 @@ class Activity(models.Model):
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
     )
 
+    @property
+    def address(self):
+        # TODO remove this one activity has address model
+        address = f"{self.streetname} {self.housenumber}"
+        address = (
+            f"{address} {self.floor}"
+            if self.floor != "" and self.floor is not None
+            else address
+        )
+        address = (
+            f"{address} {self.door}"
+            if self.door != "" and self.floor is not None
+            else address
+        )
+        address = (
+            f"{address}, {self.placename}"
+            if self.placename != "" and self.floor is not None
+            else address
+        )
+        return f"{address}, {self.zipcode} {self.city}"
+
     def is_historic(self):
         return self.end_date < timezone.now()
 

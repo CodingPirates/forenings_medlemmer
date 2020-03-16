@@ -5,6 +5,9 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, user_passes_test
 
+
+from members.models import Family
+
 from members.forms import ActivitySignupForm
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
@@ -15,45 +18,48 @@ from members.models.person import Person
 from members.utils.user import user_to_person, has_user
 
 
-@login_required
-@user_passes_test(has_user, "/admin_signup/")
 def ActivitySignup(request, activity_id, person_id=None):
-    # TODO: is should be possible to view an activity without loggin in
-    if person_id is None:
-        # View only mode
-        view_only_mode = True
-    else:
-        view_only_mode = False
-
     activity = get_object_or_404(Activity, pk=activity_id)
+    context = {
+        "is_logged_in": not request.user.is_anonymous,
+        "activity": activity,
+    }
+    if not context["is_logged_in"]:
+        return render(request, "members/activity_signup.html", context)
 
-    participating = False
+    # check if activity can be signed up
+    # TODO write function in activity that checks if can be signed up.
 
-    if request.resolver_match.url_name == "activity_view_person":
-        view_only_mode = True
+    if request.method == "GET":
+        context["form"] = ActivitySignupForm()
+        # "signup_closed": signup_closed,
+        # "view_only_mode": view_only_mode,
+        # "participating": participating,
+        # "union": union,
 
-    family = user_to_person(request.user).family
+        if context["is_logged_in"]:
+            family_members = (
+                user_to_person(request.user).family.get_family_members().filter()
+            )
+            context["applicale_persons"] = [
+                person
+                for person in family_members
+                if person.age_years() >= activity.min_age
+                and person.age_years() <= activity.max_age
+            ]
+            context["can_sign_up"] = True
+            # TODO fix already participating
+            # context["participating"] = ActivityParticipant.objects.get(
+            #     activity=activity, member__person_in=context["applicale_persons"]
+            # )
 
-    if person_id:
-        try:
-            person = family.person_set.get(pk=person_id)
+            print(family_members)
+            # context["applicale_persons"] =
+            context["signupform"] = 1
 
-            # Check not already signed up
-            try:
-                participant = ActivityParticipant.objects.get(
-                    activity=activity, member__person=person
-                )
-                # found - we can only allow one - switch to view mode
-                participating = True
-                view_only_mode = True
-            except ActivityParticipant.DoesNotExist:
-                participating = False  # this was expected - if not signed up yet
+        return render(request, "members/activity_signup.html", context)
 
-        except Person.DoesNotExist:
-            raise Http404("Person not found on family")
-    else:
-        person = None
-
+    # POST STUFF
     if not activity.open_invite:
         """ Make sure valid not expired invitation to event exists """
         try:
@@ -66,7 +72,7 @@ def ActivitySignup(request, activity_id, person_id=None):
     else:
         invitation = None
 
-    # signup_closed should default to False
+    #    signup_closed should default to False
     signup_closed = False
 
     # if activity is closed for signup, only invited persons can still join

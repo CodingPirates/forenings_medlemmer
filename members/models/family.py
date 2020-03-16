@@ -36,6 +36,9 @@ class Family(models.Model):
             self, {}
         )
 
+    def get_family_members(self):
+        return Person.objects.filter(family=self)
+
     def get_first_parent(self):
         try:
             parent = self.person_set.filter(

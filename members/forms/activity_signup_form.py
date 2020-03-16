@@ -8,65 +8,51 @@ from members.models.payment import Payment
 
 
 class ActivitySignupForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(ActivitySignupForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.form_action = ""
-        self.helper.html5_required = True
-        self.helper.layout = Layout(
-            Div(
-                Div(HTML("<h2>Tilmelding</h2>"), css_class="card-header"),
-                Div(
-                    Div(
-                        Div(
-                            HTML(
-                                """
-                    <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
-                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
-                    <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
-                    """
-                            ),
-                            css_class="col-md-12",
-                        ),
-                        css_class="row",
-                    ),
-                    Fieldset(
-                        "Tilmeldings oplysninger",
-                        Div(
-                            Div(
-                                Field("note", aria_describedby="noteHelp"),
-                                HTML(
-                                    '<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'
-                                ),
-                                css_class="col-md-6",
-                            ),
-                            Div(
-                                "photo_permission",
-                                "read_conditions",
-                                css_class="col-md-6",
-                            ),
-                            css_class="row",
-                        ),
-                    ),
-                    Fieldset(
-                        "Betaling",
-                        Field("payment_option", aria_describedby="paymentHelp"),
-                        HTML(
-                            '<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen.{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
-                        ),
-                        FormActions(
-                            Submit(
-                                "submit", "Tilmeld og betal", css_class="btn-success"
-                            ),
-                            HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
-                        ),
-                    ),
-                    css_class="card-body",
-                ),
-                css_class="card bg-success",
-            )
-        )
+    # def __init__(self, *args, **kwargs):
+    #     super(ActivitySignupForm, self).__init__(*args, **kwargs)
+    #     self.helper = FormHelper()
+    #     self.helper.form_method = "post"
+    #     self.helper.form_action = ""
+    #     self.helper.html5_required = True
+    #     self.helper.layout = Layout(
+    #         Div(
+    #             Div(
+    #                 Fieldset(
+    #                     "Tilmeldings oplysninger",
+    #                     Div(
+    #                         Div(
+    #                             Field("note", aria_describedby="noteHelp"),
+    #                             HTML(
+    #                                 '<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'
+    #                             ),
+    #                             css_class="col-md-6",
+    #                         ),
+    #                         Div(
+    #                             "photo_permission",
+    #                             "read_conditions",
+    #                             css_class="col-md-6",
+    #                         ),
+    #                         css_class="row",
+    #                     ),
+    #                 ),
+    #                 Fieldset(
+    #                     "Betaling",
+    #                     Field("payment_option", aria_describedby="paymentHelp"),
+    #                     HTML(
+    #                         '<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen.{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
+    #                     ),
+    #                     FormActions(
+    #                         Submit(
+    #                             "submit", "Tilmeld og betal", css_class="btn-success"
+    #                         ),
+    #                         HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
+    #                     ),
+    #                 ),
+    #                 css_class="card-body",
+    #             ),
+    #             css_class="card bg-success",
+    #         )
+    #     )
 
     note = forms.CharField(
         label="Besked til arrangør", widget=forms.Textarea, required=False

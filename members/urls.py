@@ -73,8 +73,9 @@ urlpatterns = [
     url(r"family/$", FamilyDetails, name="family_detail"),
     url(r"family/Person/(?P<id>[\d]+)/$", PersonUpdate, name="person_update"),
     url(r"family/Person/(?P<membertype>[A-Z]{2})$", PersonCreate, name="person_add"),
+    url(r"^activity/(?P<activity_id>[\d]+)/$", ActivitySignup, name="activity_view"),
     url(
-        r"family/activity/(?P<activity_id>[\d]+)/person/(?P<person_id>[\d]+)/$",
+        r"family/activity/(?P<activity_id>[\d]+)/$",
         ActivitySignup,
         name="activity_signup",
     ),
@@ -104,7 +105,6 @@ urlpatterns = [
         WaitingListSetSubscription,
         name="waiting_list_subscription",
     ),
-    url(r"^activity/(?P<activity_id>[\d]+)/$", ActivitySignup, name="activity_view"),
     url(r"quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     url(r"department_signup$", DepartmentSignView, name="department_signup"),
     url(r"departments$", departmentView, name="department_view"),

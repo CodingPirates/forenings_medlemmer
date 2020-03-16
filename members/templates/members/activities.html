@@ -88,7 +88,7 @@
           <tr>
             <td>{{invite.person.name}}</td>
             <td>
-              <a href="{%url 'activity_signup' invite.activity.id invite.person.id %}">
+              <a href="{%url 'activity_view' invite.activity.id %}">
                 {{invite.activity.name}}
               </a>
             </td>
@@ -96,7 +96,7 @@
               Coding Pirates: {{invite.activity.department.name}}
             </td>
             <td>
-              <a class="button-success" href="{%url 'activity_signup' invite.activity.id invite.person.id %}">
+              <a class="button-success" href="{%url 'activity_view' invite.activity.id %}">
                 Tilmeld aktivitet
               </a>
               <a class="button-danger" href="{%url 'invitation_decline' family.unique invite.id %}" >
@@ -124,7 +124,6 @@
         <tr>
           <th>Afdeling</th>
           <th>Aktivitet</th>
-          <th>Beskrivelse</th>
           <th>Handling</th>
         </tr>
       </thead>
@@ -136,22 +135,12 @@
             </td>
             <td>{{activity.name}}</td>
             <td>
-              {% for person in activity.persons %}
-                <a
-                  class="button-success"
-                  href="{%url 'activity_signup' activity.id person.id %}"
-                >
-                  Tilmeld {{ person.firstname }} aktivitet
-                </a>
-              {% endfor %}
-            </td>
-            <td>
               <a
                 class="button"
-                href="{%url 'activity_view_family' activity.id %}"
+                href="{%url 'activity_view' activity.id %}"
                 target="_blank"
               >
-                Læs mere
+                Tilmeld
               </a>
             </td>
           </tr>
