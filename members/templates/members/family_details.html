@@ -9,9 +9,31 @@
 <section>
   <h2>Personer</h2>
   <p>
-    Tryk på <kbd>Opret</kbd>-knapperne, for at tilføje flere personer. Opret
-    gerne begge forældre, så vi kan få fat i jer nemt.
+    Under menupunktet Afdelinger kan du finde afdelinger skrive dit barn op til
+    fremtidige klubaftener. Under Afdelinger kan du om der der allerede nu er
+    afdelinger i nærheden af dig, der har åbent for tilmeldinger, og det vil
+    også være her du kan tilmelde dit barn, hvis I har modtaget en invitation
+    på mail.
   </p>
+  <div class="action-list">
+    <ul>
+      <li>
+        <a href="{% url 'person_add' 'CH' %}">
+          Opret barn
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'person_add' 'PA' %}">
+          Opret forælder
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'person_add' 'GU' %}">
+          Opret værge
+        </a>
+      </li>
+    </ul>
+  </div>
   {% if family.person_set.count > 0 %}
     <table>
       <thead>
@@ -59,26 +81,6 @@
     </table>
     {% endif %}
 
-    <div class="action-list">
-      <p>Tilføj personer:</p>
-      <ul>
-        <li>
-          <a href="{% url 'person_add' 'CH' %}">
-            Opret barn
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'person_add' 'PA' %}">
-            Opret forælder
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'person_add' 'GU' %}">
-            Opret værge
-          </a>
-        </li>
-      </ul>
-    </div>
 
     {%if request_parents %}
         <div class="info-box">

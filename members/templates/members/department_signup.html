@@ -1,13 +1,13 @@
 {% extends 'members/base.html' %} {% block content %}
 <h2>Tilmeldinger i Coding Pirates</h2>
+
 <p>
-    Alle afdelinger i Coding Pirates har en venteliste, man kan skrive sig på.
-    Når du skriver dit barn op til en afdeling, får du automatisk sendt en
-    invitation, hvis der er en plads ledig, når tilmeldingen åbner.
-<p>
-    Hvis der er en afdeling eller andre events man kan tilmelde sig direkte skal
-    man se under arrangementer.
-    <a class="button" href="{% url "activities" %}">Gå til Arrangementer</a>
+  De fleste afdelinger starter nye hold to gange om året. Som regel i februar og
+  september. Du kan skrive dit barn op til en eller flere afdelinger her. Næste
+  gang afdelingen åbner op for nye tilmeldinger vil I modtage en mail med en
+  invitation. Under menupunktet Arrangementer kan I se afdelinger der har åbent
+  for tilmeldinger allerede nu og se invitationer sendt til jer.
+  <a class="button" href="{% url "activities" %}">Gå til Arrangementer</a>
 </p>
 
 <div class="tabs">
@@ -18,12 +18,13 @@
 
   <section>
     {% regroup departments by address.region as departments_region %}
-    <h2>Tilmeld Afdeling</h2>
+    <h2>Tilmeld Venteliste</h2>
     <p>
-      Opret jer kun på de lister der har interesse for jer. Det er en god ide at
-      kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye afdelinger
-      efterhånden som vi får bekræftet de åbner og børnene får kun tilbud om at
-      komme med på de afdelinger de har skrevet sig op til.
+      Tilmeld jer kun de afdelinger, der har interesse for jer. Det er en god
+      ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye
+      afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun
+      tilbud om at komme med på de afdelinger de har skrevet sig op til. Se
+      jeres nuværende ventelistestatus under "Se Pladser"
     </p>
 
     <div class="tabs">
@@ -93,16 +94,16 @@
   <section>
     <h2>Pladser på ventelister</h2>
     <p>
-      Din plads på ventelisten bliver beregnet ud fra, hvornår du oprettede dig i
-      systemet. Det er altså din anciennitet, der bestemmer din plads på
-      ventelisten til samtlige afdelinger, du er skrevet op på. Jo højere
-      anciennitet, des bedre plads på ventelisten(erne).
-
-      Bemærk at jeres position på ventelisten afgøres ud fra barnets
-      oprettelses tidspunkt i systemet -
-      <i> ikke tidspunktet i melder jeg på ventelisterne nedenfor! - </i> I kan
-      derfor frit tilmelde og framelde jer ventelisterne uden at frygte i mister
-      jeres position på listen.
+      Pladser på venteliste af vejledende. Den enkelte afdeling kan vælge at
+      prioritere børn længere nede på listen for at få den bedst mulige
+      fordeling af børn på holdet. Dit barns plads på ventelisten bliver
+      beregnet ud fra, hvornår barnet er oprettet i systemet. Det er altså
+      barnets anciennitet, der bestemmer pladsen på ventelisten til samtlige
+      afdelinger, barnet er skrevet op på. Jo højere anciennitet, des bedre
+      plads på ventelisten(erne). Bemærk at jeres position på ventelisten
+      afgøres ud fra barnets oprettelses tidspunkt i systemet - ikke tidspunktet
+      I melder jeg på ventelisterne nedenfor! I kan derfor frit tilmelde og
+      framelde jer ventelisterne uden at miste en position på listen.
     </p>
     {% for child in children %}
     <section>
