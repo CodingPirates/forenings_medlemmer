@@ -1,5 +1,5 @@
 {% extends 'members/base.html' %} {% block content %}
-<h2>Tilmeldinger i Coding Pirates</h2>
+<h2>Opskrivninger i Coding Pirates</h2>
 
 <p>
   De fleste afdelinger starter nye hold to gange om året. Som regel i februar og
@@ -12,15 +12,15 @@
 
 <div class="tabs">
   <ul>
-    <li>Tilmeld Afdelinger</li>
+    <li>Opskriv til Afdelinger</li>
     <li>Se Pladser</li>
   </ul>
 
   <section>
     {% regroup departments by address.region as departments_region %}
-    <h2>Tilmeld Venteliste</h2>
+    <h2>Opskrivninger til Venteliste</h2>
     <p>
-      Tilmeld jer kun de afdelinger, der har interesse for jer. Det er en god
+      Opskriv jer kun de afdelinger, der har interesse for jer. Det er en god
       ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye
       afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun
       tilbud om at komme med på de afdelinger de har skrevet sig op til. Se
@@ -42,7 +42,7 @@
                 <th>Kontaktperson</th>
                 <th>Adresse</th>
                 <th>Åbningstid</th>
-                <th>Tilmeld ventelister</th>
+                <th>Opskriv til ventelister</th>
               </tr>
             </thead>
             <tbody>
