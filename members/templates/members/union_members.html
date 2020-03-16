@@ -4,45 +4,47 @@
   <div id="union_info">
       <h1>Foreningen for {{union.name}}</h1>
       <strong>Adresse: </strong>{{union.address}}
-      <h4>Bestyrelse</h4>
       <div>
+        <h4>Bestyrelse</h4>
         <div>
-            <ul>
-              <li>
-                  <strong>Formand:</strong>
-                  <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a>
-              </li>
-              <li>
-                  <strong>Næstformand:</strong>
-                  <a href="mailto:{{union.second_chair_email}}">{{union.second_chair}}</a>
-              </li>
-              <li>
-                  <strong>Kasserer:</strong>
-                  <a href="mailto:{{union.cashier_email}}">{{union.cashier}}</a>
-              </li>
-              <li>
-                  <strong>Sekretær:</strong>
-                  <a href="mailto:{{union.secratary_email}}">{{union.secretary}}</a>
-              </li>
-              <li>
-                  <strong>Foreningsmail:</strong>
-                  <a href="mailto:{{union.union_email}}">{{union.union_email}}</a>
-              </li>
-            </ul>
-        </div>
-        <div>
-          <strong>Menige medlemmer</strong>
           <div>
-            {{union.boardMembers|linebreaks}}
-            <!--{% for boardMember in union.boardMembers %}
-              <a href="mailto:{{boardMember.email}}">{{boardMember.name}}</a><br>
-            {% endfor %}-->
+              <ul>
+                <li>
+                    <strong>Formand:</strong>
+                    <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a>
+                </li>
+                <li>
+                    <strong>Næstformand:</strong>
+                    <a href="mailto:{{union.second_chair_email}}">{{union.second_chair}}</a>
+                </li>
+                <li>
+                    <strong>Kasserer:</strong>
+                    <a href="mailto:{{union.cashier_email}}">{{union.cashier}}</a>
+                </li>
+                <li>
+                    <strong>Sekretær:</strong>
+                    <a href="mailto:{{union.secratary_email}}">{{union.secretary}}</a>
+                </li>
+                <li>
+                    <strong>Foreningsmail:</strong>
+                    <a href="mailto:{{union.union_email}}">{{union.union_email}}</a>
+                </li>
+              </ul>
+          </div>
+          <div>
+            <strong>Menige medlemmer</strong>
+            <div>
+              {{union.boardMembers|linebreaks}}
+              <!--{% for boardMember in union.boardMembers %}
+                <a href="mailto:{{boardMember.email}}">{{boardMember.name}}</a><br>
+              {% endfor %}-->
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="union-documents">
+    <div id="union_documents">
         {% if union.statues %}
             <a href="{{union.statues}}"><strong>Vedtægter</strong></a>
         {% endif %}
@@ -50,6 +52,7 @@
             <a href="{{union.statues}}"><strong>Referater</strong></a>
         {% endif %}
     </div>
+    {% if access == True%}
       <ul class="nav nav-pills nav-fill">
       {% for year in years %}
         <li  class="nav-item">
@@ -62,7 +65,7 @@
         </li>
       {% endfor %}
       </ul>
-      <div class="container">
+      <div class="container" id="member_table">
         <div class="tab-content">
           {% for year, memberList in members.items %}
             {% if year == current_year %}
@@ -94,4 +97,5 @@
           {% endfor %}
         </div>
     </div>
+    {% endif %}
 {% endblock %}

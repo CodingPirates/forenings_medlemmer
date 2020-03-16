@@ -113,7 +113,11 @@ urlpatterns = [
     url(r"waitinglist$", waitinglistView, name="waitinglist_view"),
     url(r"departments$", departmentView, name="department_view"),
     url(r"union_overview/$", unionOverview, name="unionOverview"),
-    url(r"union_overview/(?P<id>[\d]+)/$", unionMembersView, name="unionMembersView"),
+    url(
+        r"union_overview/(?P<union_id>[\d]+)/$",
+        unionMembersView,
+        name="unionMembersView",
+    ),
 ]
 
 # Redirect all old urls containing family unique values
