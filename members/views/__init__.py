@@ -1,4 +1,3 @@
-# flake8: noqa  # ignored since it is being used in the files
 from members.views.FamilyDetails import FamilyDetails
 from members.views.ConfirmFamily import ConfirmFamily
 from members.views.PersonCreate import PersonCreate
@@ -16,3 +15,26 @@ from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.departmentView import departmentView
 from members.views.Activities import Activities
 from members.views.AdminSignup import AdminSignup
+
+from .MembershipView import MembershipView
+
+__all__ = [
+    MembershipView,
+    FamilyDetails,
+    ConfirmFamily,
+    PersonCreate,
+    PersonUpdate,
+    WaitingListSetSubscription,
+    DeclineInvitation,
+    ActivitySignup,
+    UpdatePersonFromForm,
+    EntryPage,
+    userCreated,
+    volunteerSignup,
+    QuickpayCallback,
+    DepartmentSignView,
+    paymentGatewayErrorView,
+    departmentView,
+    Activities,
+    AdminSignup,
+]

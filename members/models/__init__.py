@@ -7,7 +7,6 @@ import members.models.activity
 import members.models.activityinvite
 import members.models.activityparticipant
 
-
 import members.models.department
 import members.models.emailitem
 import members.models.emailtemplate
@@ -41,6 +40,7 @@ from .equipment import Equipment
 from .equipmentloan import EquipmentLoan
 from .family import Family
 from .member import Member
+from .membership import Membership
 from .notification import Notification
 from .payment import Payment
 from .person import Person
@@ -69,6 +69,7 @@ __all__ = [
     Family,
     gatherDayliStatistics,
     Member,
+    Membership,
     Notification,
     Payment,
     Person,

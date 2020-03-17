@@ -1,4 +1,5 @@
 @use "_definitions";
+@use "buttons";
 
 body {
     display: grid;
@@ -33,6 +34,17 @@ section {
     margin: 10px auto;
     width: 66%;
     text-align: center;
+}
+
+.action-list {
+    text-align: center;
+    list-style-type: none;
+        li {
+            display: inline-block;
+            a {
+                @extend .button;
+            }
+        }
 }
 
 main {

@@ -1,0 +1,45 @@
+{% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
+{% block content %}
+<h2>Foreningsmedlemsskaber i Coding Pirates</h2>
+<p>
+  Coding Pirates består af {{ unions | length}} foreninger. Hver forening har
+  sin egen bestyrelse. For at blive medlem at en forening skal man betale
+  kontigent, hver forening sætter sin egen kontigent. Det er et krav at være
+  medlem for at være stemmeberetiget til en generalforsamling.
+  Nogle aktiviteter i Coding Pirates, f.eks klubaftner, har prisen på
+  medlemsskab indregnet.
+<p/>
+<p>
+  På denne side kan du se dine medlemsskaber og melde dig ind i foreninger.
+</p>
+
+<section>
+  <h3>Mine medlemsskaber</h3>
+  <table>
+    <thead>
+      <th>Navn</th>
+      <th>Forening</th>
+      <th>År</th>
+    </thead>
+    <tbody>
+      {% for membership in current_memberships %}
+        <tr>
+          <td>{{membership.person}}</td>
+          <td>{{membership.union}}</td>
+          <td>{{membership.sign_up_date.year}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h3>Bliv medlem</h3>
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+  </form>
+</section>
+
+{% endblock %}
