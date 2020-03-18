@@ -3,20 +3,19 @@ const base_url = window.location.href
   .slice(0, 3)
   .join("/");
 
-let unions = undefined;
-fetch("http://localhost:8000/graphql", {
+let unions = fetch(`${base_url}/graphql`, {
   method: "POST",
   headers: {
     "content-type": "application/json"
   },
-  body: '{"query":"{ unions {\\n    id\\n    membershipPrice\\n  }\\n}"}'
+  body: '{"query":"{ unions {id membershipPrice }}"}'
 })
   .then(res => res.json())
   .then(res => {
     unions = res.data["unions"];
   })
   .catch(err => {
-    console.log(err);
+    console.log(err); // TODO: error handling
   });
 
 // Sets price according to selected union
