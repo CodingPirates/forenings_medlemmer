@@ -2,47 +2,42 @@
 @use "buttons";
 
 #user-action-container {
-    padding: 5%;
-    margin: auto;
-    max-width: 1300px;
-    display: grid;
+    margin: 20px auto;
+    max-width: 700px;
+    display: flex;
     justify-content: stretch;
-
-    /* Actions is 2x2 grid on desktop */
+    flex-wrap:  wrap;
+    justify-content: space-around;
     @include _definitions.for-desktop {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        grid-gap: 5%;
+        > div {
+            width: 300px;
+        }
     }
     @include _definitions.for-phone {
-        grid-template-columns: auto;
-        grid-template-rows: repeat(auto);
-        grid-gap: 5px;
+        > div {
+            width: 100%;
+        }
     }
     > div {
         @extend %bg-primary;
         @extend %rounded-rect;
+        margin: 15px 0;
         display: flex;
-        padding: 10% 10px;
-        justify-content: flex-start;
-        color: white !important;
+        padding: 10px;
         align-items: center;
+        justify-content: space-evenly;
         > i {
-            margin: 0 10px;
+            padding: 0 10px;
         }
-
-        div {
-            width: 100%;
+        > div{
+            flex-grow: 2;
             text-align: center;
+            > a {
+                @extend .button;
+                font-weight: 800;
+            }
         }
 
-        a {
-            @extend .button-accent;
-            width: 80%;
-            display: block;
-            margin: auto;
-            font-weight: 800;
-        }
     }
 }
 

@@ -20,7 +20,6 @@
     <script src="{% static "members/js/date-input-polyfill.js" %}"></script>
     {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
         {% load crispy_forms_tags %}
-        <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
         <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
         <script src="{% static "members/js/dawa-form-fill.js" %}"></script>
     {% endif %}

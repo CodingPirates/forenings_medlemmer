@@ -31,7 +31,21 @@ def MembershipView(request):
             },
         )
     elif request.method == "POST":
-        print(request.POST)
-        form = MembershipForm(request.POST)
+        form = MembershipForm(family_members, request.POST)
         if form.is_valid():
+            Membership.objects.create(
+                person=form.cleaned_data["person"], union=form.cleaned_data["union"]
+            )
             return HttpResponseRedirect(reverse("membership_view"))
+        else:
+            return render(
+                request,
+                "members/membership_view.html",
+                {
+                    # TODO check for closed unions:
+                    "unions": unions,
+                    "family_members": family_members,
+                    "current_memberships": current_memberships,
+                    "form": form,
+                },
+            )

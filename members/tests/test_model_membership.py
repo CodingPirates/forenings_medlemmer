@@ -1,7 +1,4 @@
-from datetime import timedelta
-from random import randint
 from django.test import TestCase
-from django.utils import timezone
 from django.core.exceptions import ValidationError
 from members.models import Membership
 from .factories import UnionFactory, PersonFactory

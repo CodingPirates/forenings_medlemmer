@@ -1,6 +1,7 @@
-{% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
+{% extends 'members/base.html' %} {% load static %}
 {% block content %}
-<h2>Foreningsmedlemsskaber i Coding Pirates</h2>
+<script src="{% static "members/js/membership_create.js" %}"></script>
+<h2>Medlemsskaber</h2>
 <p>
   Coding Pirates består af {{ unions | length}} foreninger. Hver forening har
   sin egen bestyrelse. For at blive medlem at en forening skal man betale
@@ -12,6 +13,16 @@
 <p>
   På denne side kan du se dine medlemsskaber og melde dig ind i foreninger.
 </p>
+
+<section>
+  <h3>Bliv medlem</h3>
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <label>Kontigent i kroner: <span id="price">--</span></label>
+      <input type="submit" value="Gå til betaling">
+  </form>
+</section>
 
 <section>
   <h3>Mine medlemsskaber</h3>
@@ -31,15 +42,6 @@
       {% endfor %}
     </tbody>
   </table>
-</section>
-
-<section>
-  <h3>Bliv medlem</h3>
-  <form method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-  </form>
 </section>
 
 {% endblock %}
