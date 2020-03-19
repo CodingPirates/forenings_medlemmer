@@ -6,7 +6,7 @@
     max-width: 700px;
     display: flex;
     justify-content: stretch;
-    flex-wrap:  wrap;
+    flex-wrap: wrap;
     justify-content: space-around;
     @include _definitions.for-desktop {
         > div {
@@ -29,7 +29,7 @@
         > i {
             padding: 0 10px;
         }
-        > div{
+        > div {
             flex-grow: 2;
             text-align: center;
             > a {
@@ -37,7 +37,6 @@
                 font-weight: 800;
             }
         }
-
     }
 }
 
