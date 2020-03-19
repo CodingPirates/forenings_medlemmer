@@ -39,12 +39,12 @@ section {
 .action-list {
     text-align: center;
     list-style-type: none;
-        li {
-            display: inline-block;
-            a {
-                @extend .button;
-            }
+    li {
+        display: inline-block;
+        a {
+            @extend .button;
         }
+    }
 }
 
 main {

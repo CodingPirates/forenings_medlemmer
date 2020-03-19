@@ -1,11 +1,8 @@
 @use "_definitions";
 @use "buttons";
 
-
 form {
-    input {
-
-    }
+    input {}
 
     select {
         width: 90%;
@@ -19,12 +16,11 @@ form {
         font-weight: 800;
     }
 
-    input[type=submit] {
+    input[type="submit"] {
         display: block;
         @extend .button;
     }
 }
-
 
 .errorlist {
     li {
