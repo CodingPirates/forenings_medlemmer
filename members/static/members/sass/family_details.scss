@@ -1,0 +1,19 @@
+@use "_definitions";
+@use "buttons";
+section {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.action-list {
+    ul {
+        text-align: center;
+        list-style-type: none;
+        li {
+            display: inline-block;
+        }
+    }
+    a {
+        @extend .button;
+    }
+}
