@@ -40,10 +40,22 @@ You are more than welcome to contribute to the system. This guide documents how 
     store it as either plain `.css` files or `.scss` files.
     Compilation happens during each build, during local development run the
     following command in a separate terminal:
+
     ```bash
     docker-compose run web /bin/dart-sass/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
     ```
+
     It will compile SASS when you save a file.
+    If you create a new `.scss` file remember to add it to [main.scss][main.scss].
+
+-   [HTML documentation][html_docs] Shows the css classes that can used for
+    formatting.
+
+-   [Selenium][selenium]: runs the functional tests. To run a specific test run
+    ```bash
+        docker-compose run web ./manage.py test members.tests.test_functional.test_create_family
+    ```
+    where the name of your tests replaces the last part.
 
 ## Creating a pull request
 
@@ -53,7 +65,7 @@ You are more than welcome to contribute to the system. This guide documents how 
 3.  Open a draft pull request before writing any code. This ensures that the design
     discussion happens before the code and limits duplicate work.
 4.  Help us specify the requirements specification.
-5.  Code the features with tests
+5.  Code the features with tests, see the [testing guide][test_guide]
 6.  Run the entire test suite with: `docker-compose run web ./manage.py test`
 7.  Check that the following requirements are meet:
     -   The code has tests, code without tests is not accepted. (Except for
@@ -66,6 +78,8 @@ You are more than welcome to contribute to the system. This guide documents how 
 8.  Submit the pull request.
 9.  The backend is [Heroku][heroku], we can use their "review apps" to create
     a temporary server for each pull request.
+
+[test_guide]: https://github.com/CodingPirates/forenings_medlemmer/wiki/Writing-tests
 
 [heroku]: https://heroku.com
 
@@ -92,3 +106,9 @@ You are more than welcome to contribute to the system. This guide documents how 
 [poetry]: https://python-poetry.org
 
 [factories]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/tests/factories.py
+
+[selenium]: https://www.selenium.dev
+
+[main.scss]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/static/members/sass/main.scss
+
+[html_docs]: https://github.com/CodingPirates/forenings_medlemmer/wiki/HTML-formatting
