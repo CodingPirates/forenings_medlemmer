@@ -137,7 +137,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-DATE_INPUT_FORMATS = ("%d-%m-%Y", "%d-%m-%y")  # '25-10-06', '25-10-06'
+DATE_INPUT_FORMATS = ("%d/%m/%Y", "%Y-%m-%d")
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
@@ -195,4 +195,4 @@ SECURE_SSL_REDIRECT = env.bool("FORCE_HTTPS")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 LOGIN_URL = "/account/login/"
-LOGIN_REDIRECT_URL = "/family/"
+LOGIN_REDIRECT_URL = "/"

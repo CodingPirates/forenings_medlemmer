@@ -10,7 +10,7 @@ from members.views import (
     ConfirmFamily,
     QuickpayCallback,
     ActivitySignup,
-    waitinglistView,
+    DepartmentSignView,
     paymentGatewayErrorView,
     volunteerSignup,
     departmentView,
@@ -20,7 +20,6 @@ from members.views import (
     unionOverview,
 )
 from django.contrib.auth import views as auth_views
-from django.views.generic.base import RedirectView
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 
@@ -96,7 +95,6 @@ urlpatterns = [
         DeclineInvitation,
         name="invitation_decline",
     ),
-    url(r"family/waitinglist$", waitinglistView, name="family_waitinglist_view"),
     url(
         r"family/payment_gateway_error$",
         paymentGatewayErrorView,
@@ -110,49 +108,12 @@ urlpatterns = [
     ),
     url(r"^activity/(?P<activity_id>[\d]+)/$", ActivitySignup, name="activity_view"),
     url(r"quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
-    url(r"waitinglist$", waitinglistView, name="waitinglist_view"),
+    url(r"department_signup$", DepartmentSignView, name="department_signup"),
     url(r"departments$", departmentView, name="department_view"),
     url(r"union_overview/$", unionOverview, name="unionOverview"),
     url(
         r"union_overview/(?P<union_id>[\d]+)/$",
         unionMembersView,
         name="unionMembersView",
-    ),
-]
-
-# Redirect all old urls containing family unique values
-urlpatterns += [
-    url(r"family/[\w-]+/$", RedirectView.as_view(url="/family/", permanent=True)),
-    url(
-        r"family/[\w-]+/Person/[\d]+/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/Person/[A-Z]{2}$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/activity/[\d]+/person/[\d]+/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/activity/[\d]+/person/[\d]+/view/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/waitinglist$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/payment_gateway_error$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"confirm_details/[\w-]+/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"waiting_list/[\w-]+/[\d]+/[\d]+/(subscribe|unsubscribe)/$",
-        RedirectView.as_view(url="/family/", permanent=True),
     ),
 ]
