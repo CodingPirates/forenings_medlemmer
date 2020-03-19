@@ -28,7 +28,7 @@
     margin-bottom: 40px;
     justify-content: space-around;
     a {
-        @extend %button;
+        @extend %button !optional;
     }
 }
 
