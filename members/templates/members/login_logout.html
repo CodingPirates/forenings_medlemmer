@@ -1,5 +1,0 @@
-{% if user.is_authenticated %}
-  <a id="logout-button" class="nav-link" href="{% url 'person_logout' %}">Log ud</a>
-{% else %}
-  <a id="login-button"  class="nav-link" href="{% url 'person_login' %}">Log ind</a>
-{% endif %}

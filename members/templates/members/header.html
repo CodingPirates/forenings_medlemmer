@@ -6,8 +6,7 @@
     {% if user.is_authenticated %}
         <a href="{% url "entry_page" %}">Oversigt</a>
         <a href="{% url "family_detail" %}">Familie</a>
-        <a href="{% url "waitinglist_view" %}">Ventelister</a>
-        <a href="{% url "family_detail" %}">Afdelinger</a>
+        <a href="{% url "department_signup" %}">Afdelinger</a>
         <a href="{% url "activities" %}">Arrangementer</a>
         <span></span> {# Seperator for login out #}
         <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
