@@ -13,7 +13,6 @@ class signupForm(forms.Form):
         self.helper.form_method = "post"
         self.helper.form_action = "entry_page"
         self.helper.html5_required = True
-        self.fields["child_birthday"].widget.format = "%d-%m-%Y"
         self.helper.layout = Layout(
             Hidden("form_id", "signup", id="id_form_id"),
             Fieldset(
@@ -21,14 +20,7 @@ class signupForm(forms.Form):
                 Div(
                     Div(Field("child_gender"), css_class="col-md-2"),
                     Div(Field("child_name"), css_class="col-md-10"),
-                    Div(
-                        Field(
-                            "child_birthday",
-                            css_class="datepicker",
-                            input_formats=(settings.DATE_INPUT_FORMATS),
-                        ),
-                        css_class="col-md-4",
-                    ),
+                    Div(Field("child_birthday",), css_class="col-md-4",),
                     Div(Field("child_email"), css_class="col-md-4"),
                     Div(Field("child_phone"), css_class="col-md-4"),
                     css_class="row",
@@ -39,14 +31,7 @@ class signupForm(forms.Form):
                 Div(
                     Div(Field("parent_gender"), css_class="col-md-2"),
                     Div(Field("parent_name"), css_class="col-md-10"),
-                    Div(
-                        Field(
-                            "parent_birthday",
-                            css_class="datepicker",
-                            input_formats=(settings.DATE_INPUT_FORMATS),
-                        ),
-                        css_class="col-md-4",
-                    ),
+                    Div(Field("parent_birthday",), css_class="col-md-4",),
                     Div(Field("parent_email"), css_class="col-md-4"),
                     Div(Field("parent_phone"), css_class="col-md-4"),
                     css_class="row",
@@ -110,11 +95,11 @@ class signupForm(forms.Form):
     child_email = forms.EmailField(label="Barns email", required=False)
     child_phone = forms.CharField(label="Barns telefon", required=False, max_length=50)
     child_birthday = forms.DateField(
-        label="Barns fødselsdato (dd-mm-åååå)",
+        label="Barns fødselsdato",
         input_formats=(settings.DATE_INPUT_FORMATS),
-        error_messages={"invalid": "Indtast en gyldig dato. (dd-mm-åååå)"},
+        widget=forms.DateInput(attrs={"type": "date"}),
+        error_messages={"invalid": "Indtast en gyldig dato"},
     )
-
     parent_gender = forms.ChoiceField(
         label="Køn", required=True, choices=Person.MEMBER_ADULT_GENDER_CHOICES
     )
@@ -124,9 +109,10 @@ class signupForm(forms.Form):
         label="Forældres telefon", required=True, max_length=50
     )
     parent_birthday = forms.DateField(
-        label="Forældres fødselsdato (dd-mm-åååå)",
+        label="Forældres fødselsdato",
         input_formats=(settings.DATE_INPUT_FORMATS),
-        error_messages={"invalid": "Indtast en gyldig dato. (dd-mm-åååå)"},
+        error_messages={"invalid": "Indtast en gyldig dato."},
+        widget=forms.DateInput(attrs={"type": "date"}),
     )
 
     search_address = forms.CharField(

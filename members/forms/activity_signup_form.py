@@ -64,7 +64,7 @@ class ActivitySignupForm(forms.Form):
                     ),
                     css_class="card-body",
                 ),
-                css_class="card bg-success",
+                css_class="card",
             )
         )
 

@@ -11,7 +11,7 @@ from members.views.EntryPage import EntryPage
 from members.views.userCreated import userCreated
 from members.views.volunteerSignup import volunteerSignup
 from members.views.QuickpayCallback import QuickpayCallback
-from members.views.waitinglistView import waitinglistView
+from members.views.DepartmentSignView import DepartmentSignView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.departmentView import departmentView
 from members.views.Activities import Activities
