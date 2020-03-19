@@ -12,8 +12,6 @@ class ActivivtyInviteDeclineForm(forms.Form):
         self.helper.form_action = ""
         self.helper.html5_required = True
         self.helper.layout = Layout(
-            Submit("submit", "Afslå invitationen", css_class="btn-danger"),
-            HTML(
-                '<a class="btn btn-link" href="{% url "family_detail" %}">Tilbage</a>'
-            ),
+            Submit("submit", "Afslå invitationen", css_class="button-danger"),
+            HTML('<a class="button" href="{% url "activities" %}">Tilbage</a>'),
         )

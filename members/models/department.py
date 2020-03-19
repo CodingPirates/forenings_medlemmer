@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from datetime import timedelta
 from django.db import models
 import members.models.emailtemplate
+from members.models.activity import Activity
 from django.utils import timezone, html
 
 
@@ -84,3 +84,23 @@ class Department(models.Model):
         )
         context = {"department": self, "volunteer_name": volunteer_name}
         new_vol_email.makeEmail(self, context)
+
+    @staticmethod
+    def get_open_departments():
+        result = []
+        a_year_ago = (timezone.now() - timedelta(days=366)).date()
+        for department in Department.objects.filter(closed_dtm=None).order_by(
+            "address__region", "name"
+        ):
+            department_activties = Activity.objects.filter(
+                department=department
+            ).order_by("-end_date")
+            if a_year_ago < department.created:
+                result.append(department)
+            elif (
+                len(department_activties) > 0
+                and a_year_ago < department_activties[0].end_date
+            ):
+                result.append(department)
+
+        return result
