@@ -12,7 +12,7 @@ def unionMembersView(request, union_id):
     union = Union.objects.filter(pk=union_id)
 
     # Check if user is admin of union
-    access = True
+    access = Union.user_union_leader(union, request.user)
 
     # get members of union
     members = union[0].members()

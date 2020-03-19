@@ -48,8 +48,8 @@
         {% if union.statues %}
             <a href="{{union.statues}}"><strong>Vedtægter</strong></a>
         {% endif %}
-        {% if union.statues %}
-            <a href="{{union.statues}}"><strong>Referater</strong></a>
+        {% if union.meeting_notes %}
+            <a href="{{union.meeting_notes}}"><strong>Referater</strong></a>
         {% endif %}
     </div>
     {% if access == True%}
@@ -65,7 +65,7 @@
         </li>
       {% endfor %}
       </ul>
-      <div class="container" id="member_table">
+      <div id="member_table">
         <div class="tab-content">
           {% for year, memberList in members.items %}
             {% if year == current_year %}

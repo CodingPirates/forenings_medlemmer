@@ -23,6 +23,7 @@ class Union(models.Model):
     secratary_email = models.EmailField("Sekretærens email", blank=True)
     union_email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
+    meeting_notes = models.URLField("Link til seneste referater", blank=True)
     founded = models.DateField("Stiftet", blank=True, null=True)
     regions = (("S", "Sjælland"), ("J", "Jylland"), ("F", "Fyn"), ("Ø", "Øer"))
     region = models.CharField("region", max_length=1, choices=regions)
@@ -61,11 +62,12 @@ class Union(models.Model):
             members[year] = Person.objects.all()
         return members
 
-    def user_union_leader(user, self):
+    def user_union_leader(self, user):
         if user.is_superuser:
             return True
         elif (
-            True
+            # Remove False and #'s once "Foreningsledere fix" has been implemented.
+            False
             # user == self.chairman.user
             # or user == self.second_chair.user
             # or user == self.cashier.user
