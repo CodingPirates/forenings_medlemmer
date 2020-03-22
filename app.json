@@ -32,13 +32,11 @@
       "description": "Wheter or not https is enforced",
       "value": "True"
     },
-
-   "CORS_LIST" : {
+    "CORS_LIST" : {
       "required": true,
       "description": "The hosts that are allowed to acces cros origin",
       "value": "https://members.codingpirates.dk"
     },
-
     "SECRET_KEY": {
       "required": true,
       "generator": "secret",
@@ -54,9 +52,6 @@
       "description": "Which urls that can host the service",
       "value" : "*"
     },
-    "COVERALLS_REPO_TOKEN": {
-      "value": "x"
-    },
     "DEBUG" : {
       "required": true,
       "description": "Wheter the service will run in debug mode",
@@ -64,13 +59,13 @@
     },
     "QUICKPAY_API_KEY" : {
       "required": true,
-      "description": "The key for quickpay",
-      "value" : "xxxx"
+      "description": "The key for quickpay, test key",
+      "value" : "ec55645b143824405a140943680e680f99b6c6e02e309b057d238ed2288d90ad"
     },
     "QUICKPAY_PRIVATE_KEY" : {
       "required": true,
       "description": "The key for quickpay",
-      "value" : "xxxx"
+      "value" : "122295f79d2dc6fc49703ccb22acb01adc44924d8a0457f9ff122620368e20a0"
     },
     "SERVER_COMMAND" : {
       "required": true,
@@ -82,12 +77,7 @@
   "environments": {
     "test": {
         "env": {
-            "ALLOWED_HOSTS": "*",
-            "BASE_URL": "https://members.codingpirates.dk",
             "DEBUG": "True",
-            "QUICKPAY_API_KEY": "some_key",
-            "QUICKPAY_PRIVATE_KEY": "some_private_key",
-            "SECRET_KEY": "some_secret_key",
             "SERVER_COMMAND": "gunicorn forenings_medlemmer.wsgi:application --bind"
         },
         "addons":[

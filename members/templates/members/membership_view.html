@@ -24,24 +24,25 @@
   </form>
 </section>
 
-<section>
-  <h3>Mine medlemsskaber</h3>
-  <table>
-    <thead>
-      <th>Navn</th>
-      <th>Forening</th>
-      <th>År</th>
-    </thead>
-    <tbody>
-      {% for membership in current_memberships %}
-        <tr>
-          <td>{{membership.person}}</td>
-          <td>{{membership.union}}</td>
-          <td>{{membership.sign_up_date.year}}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
-
+{% if current_memberships %}
+  <section>
+    <h3>Mine medlemsskaber</h3>
+    <table>
+      <thead>
+        <th>Navn</th>
+        <th>Forening</th>
+        <th>År</th>
+      </thead>
+      <tbody>
+        {% for membership in current_memberships %}
+          <tr>
+            <td>{{membership.person}}</td>
+            <td>{{membership.union}}</td>
+            <td>{{membership.sign_up_date.year}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endif %}
 {% endblock %}

@@ -65,6 +65,12 @@ TEMPLATES = [
 
 SECRET_KEY = env.str("SECRET_KEY")
 
+
+PAYMENT_ID_PREFIX = env.str("PAYMENT_ID_PREFIX")
+if len(PAYMENT_ID_PREFIX) < 1 or len(PAYMENT_ID_PREFIX) > 3:
+    raise EnvironmentError("PAYMENT_ID_PREFIX must be between 1 and 3 chars")
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG")
 if DEBUG:
@@ -75,8 +81,8 @@ else:
 ALLOWED_HOSTS = [host.replace(" ", "") for host in env.list("ALLOWED_HOSTS")]
 BASE_URL = os.environ["BASE_URL"]
 
-# Application definition
 
+# Application definition
 INSTALLED_APPS = (
     "bootstrap4",
     "django.contrib.auth",

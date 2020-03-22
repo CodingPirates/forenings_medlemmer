@@ -16,11 +16,13 @@ from members.views.departmentView import departmentView
 from members.views.Activities import Activities
 from members.views.AdminSignup import AdminSignup
 
-from .MembershipView import MembershipView
+from .payments_view import PaymentsView
+from .memberships_view import MembershipView
 
 __all__ = [
     MembershipView,
     FamilyDetails,
+    PaymentsView,
     ConfirmFamily,
     PersonCreate,
     PersonUpdate,

@@ -48,7 +48,7 @@ from .union import Union
 from .volunteer import Volunteer
 from .waitinglist import WaitingList
 from .zipcoderegion import ZipcodeRegion
-
+from .payable_item import PayableItem
 
 from .statistics import gatherDayliStatistics
 
@@ -62,6 +62,7 @@ __all__ = [
     DailyStatisticsRegion,
     DailyStatisticsUnion,
     Department,
+    PayableItem,
     EmailItem,
     EmailTemplate,
     Equipment,

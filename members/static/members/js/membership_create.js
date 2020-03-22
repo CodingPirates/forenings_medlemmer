@@ -8,7 +8,7 @@ let unions = fetch(`${base_url}/graphql`, {
   headers: {
     "content-type": "application/json"
   },
-  body: '{"query":"{ unions {id membershipPrice }}"}'
+  body: '{"query":"{ unions {id membershipPriceOre }}"}'
 })
   .then(res => res.json())
   .then(res => {
@@ -23,6 +23,6 @@ document.addEventListener("DOMContentLoaded", event => {
   document.getElementById("id_union").addEventListener("change", event => {
     document.getElementById("price").innerText = unions.filter(
       union => union.id === event.target.value
-    )[0]["membershipPrice"];
+  )[0]["membershipPriceOre"] / 100;
   });
 });

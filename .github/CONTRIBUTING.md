@@ -52,10 +52,16 @@ You are more than welcome to contribute to the system. This guide documents how 
     formatting.
 
 -   [Selenium][selenium]: runs the functional tests. To run a specific test run
+
     ```bash
         docker-compose run web ./manage.py test members.tests.test_functional.test_create_family
     ```
+
     where the name of your tests replaces the last part.
+
+-   [Quickpay][quickpay]: We use QuickPay for payments, `.env.example`
+    contains a test api key. Quickpay has a series of cards that can be used
+    [for testing][quickpay_cards]
 
 ## Creating a pull request
 
@@ -112,3 +118,7 @@ You are more than welcome to contribute to the system. This guide documents how 
 [main.scss]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/static/members/sass/main.scss
 
 [html_docs]: https://github.com/CodingPirates/forenings_medlemmer/wiki/HTML-formatting
+
+[quickpay]: https://learn.quickpay.net/tech-talk/api/
+
+[quickpay_cards]: https://learn.quickpay.net/tech-talk/appendixes/test/

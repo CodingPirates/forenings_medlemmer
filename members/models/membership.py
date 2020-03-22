@@ -26,7 +26,7 @@ class Membership(models.Model):
         super(Membership, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"Medlemskab: {self.person} af {self.union}"
+        return f"Medlemskab: {self.person} : {self.union}"
 
     @staticmethod
     def can_be_member_validator(person, union, year=None):

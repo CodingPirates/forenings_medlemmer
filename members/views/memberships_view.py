@@ -4,15 +4,16 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 
 from members.utils.user import user_to_person, has_user
-from members.models import Person, Union, Membership
+from members.models import Person, Union, Membership, PayableItem
 from members.forms import MembershipForm
 
 
 @login_required
 @user_passes_test(has_user, "/admin_signup/")
 def MembershipView(request):
-    family = user_to_person(request.user).family
-    family_members = Person.objects.filter(family=family)
+
+    logged_in_person = user_to_person(request.user)
+    family_members = Person.objects.filter(family=logged_in_person.family)
     unions = Union.objects.all()
     current_memberships = Membership.objects.filter(person__in=family_members).order_by(
         "person", "sign_up_date", "union"
@@ -33,10 +34,18 @@ def MembershipView(request):
     elif request.method == "POST":
         form = MembershipForm(family_members, request.POST)
         if form.is_valid():
-            Membership.objects.create(
+            membership = Membership.objects.create(
                 person=form.cleaned_data["person"], union=form.cleaned_data["union"]
             )
-            return HttpResponseRedirect(reverse("membership_view"))
+            payment = PayableItem.objects.create(
+                person=logged_in_person,
+                amount_ore=membership.union.membership_price_ore,
+                membership=membership,
+            )
+            base_url = "/".join(request.build_absolute_uri().split("/")[:3])
+            return HttpResponseRedirect(
+                payment.get_link(continue_url=f"{base_url}{reverse('payments_view')}")
+            )
         else:
             return render(
                 request,
