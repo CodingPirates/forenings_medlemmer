@@ -52,6 +52,11 @@
       "description": "Which urls that can host the service",
       "value" : "*"
     },
+    "PAYMENT_ID_PREFIX": {
+      "required": true,
+      "description": "The prefix for quickpay id's 1-3 chars",
+      "value" : "rev"
+    },
     "DEBUG" : {
       "required": true,
       "description": "Wheter the service will run in debug mode",

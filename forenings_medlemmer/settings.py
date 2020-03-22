@@ -82,7 +82,6 @@ ALLOWED_HOSTS = [host.replace(" ", "") for host in env.list("ALLOWED_HOSTS")]
 BASE_URL = os.environ["BASE_URL"]
 
 
-# Application definition
 INSTALLED_APPS = (
     "bootstrap4",
     "django.contrib.auth",
