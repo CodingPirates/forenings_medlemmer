@@ -28,7 +28,19 @@ class UnionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Bestyrelsen",
+            "Bestyrelsen nye felter",
+            {
+                "fields": (
+                    "chairman",
+                    "second_chair",
+                    "cashier",
+                    "secretary",
+                    "board_members",
+                )
+            },
+        ),
+        (
+            "Bestyrelsen gamle felter",
             {
                 "fields": (
                     "chairman_old",
@@ -40,11 +52,6 @@ class UnionAdmin(admin.ModelAdmin):
                     "secretary_old",
                     "secretary_email_old",
                     "board_members_old",
-                    "chairman",
-                    "second_chair",
-                    "cashier",
-                    "secretary",
-                    "board_members",
                 )
             },
         ),
