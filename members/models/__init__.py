@@ -49,6 +49,7 @@ from .volunteer import Volunteer
 from .waitinglist import WaitingList
 from .zipcoderegion import ZipcodeRegion
 from .payable_item import PayableItem
+from .email import Email
 
 from .statistics import gatherDayliStatistics
 
@@ -56,6 +57,7 @@ __all__ = [
     Activity,
     ActivityInvite,
     ActivityParticipant,
+    Email,
     Address,
     AdminUserInformation,
     DailyStatisticsGeneral,

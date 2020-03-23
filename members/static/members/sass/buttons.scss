@@ -39,7 +39,7 @@
     color: white;
     display: block;
     &:hover {
-        background-color: _definitions.$danger-color-muted;
+        background-color: _definitions.$danger-color-muted !important;
         border-color: _definitions.$danger-color-muted;
     }
 }

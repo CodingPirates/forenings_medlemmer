@@ -18,8 +18,13 @@ let unions = fetch(`${base_url}/graphql`, {
     console.log(err); // TODO: error handling
   });
 
-// Sets price according to selected union
+
 document.addEventListener("DOMContentLoaded", event => {
+   // Set year
+  document.getElementById("year").innerText = new Date().getFullYear()
+
+
+  // Sets price according to selected union
   document.getElementById("id_union").addEventListener("change", event => {
     document.getElementById("price").innerText = unions.filter(
       union => union.id === event.target.value
