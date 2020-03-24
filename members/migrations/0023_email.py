@@ -7,17 +7,42 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0022_payableitem_processed'),
+        ("members", "0022_payableitem_processed"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Email',
+            name="Email",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('template', models.CharField(max_length=20, verbose_name='EmailTemplate')),
-                ('sent_dtm', models.DateTimeField(blank=True, null=True, verbose_name='Sendt tidstempel')),
-                ('person', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='recived_emails', to='members.Person')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "template",
+                    models.CharField(max_length=20, verbose_name="EmailTemplate"),
+                ),
+                (
+                    "sent_dtm",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Sendt tidstempel"
+                    ),
+                ),
+                (
+                    "person",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="recived_emails",
+                        to="members.Person",
+                    ),
+                ),
             ],
         ),
     ]

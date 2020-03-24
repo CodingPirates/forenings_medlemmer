@@ -1,7 +1,6 @@
 from django.test import TestCase
 from members.models import Email
 from members.tests.factories import PayableItemFactory
-from django.conf import settings
 
 
 class TestPaymentEmails(TestCase):
