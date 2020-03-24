@@ -24,7 +24,7 @@
         @extend %rounded-rect;
         display: flex;
         padding: 10% 10px;
-        justify-content:  space-around;
+        justify-content: space-around;
         color: white !important;
         align-items: center;
         > i {
@@ -37,7 +37,6 @@
             text-align: center;
             margin: auto;
             min-width: 200px;
-
         }
         a {
             @extend .button-accent;
