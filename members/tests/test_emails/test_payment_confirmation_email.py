@@ -6,8 +6,6 @@ from django.conf import settings
 
 class TestPaymentEmails(TestCase):
     def test_payment_confirmation_email(self):
-        # Tests that either membership, activty or season is passed
-        settings.EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+        # TODO How to test?
         payment = PayableItemFactory.create()
-        print(settings.BASE_DIR)
-        print(Email.send_payment_confirmation(payment))
+        Email.send_payment_confirmation(payment)
