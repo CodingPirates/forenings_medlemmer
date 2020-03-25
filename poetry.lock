@@ -239,17 +239,17 @@ description = "simplified environment variable parsing"
 name = "environs"
 optional = false
 python-versions = ">=3.5"
-version = "7.1.0"
+version = "7.3.1"
 
 [package.dependencies]
 marshmallow = ">=2.7.0"
 python-dotenv = "*"
 
 [package.extras]
-dev = ["pytest", "dj-database-url", "dj-email-url", "flake8 (3.7.9)", "flake8-bugbear (19.8.0)", "mypy (0.750)", "pre-commit (>=1.20,<2.0)", "tox"]
-django = ["dj-database-url", "dj-email-url"]
-lint = ["flake8 (3.7.9)", "flake8-bugbear (19.8.0)", "mypy (0.750)", "pre-commit (>=1.20,<2.0)"]
-tests = ["pytest", "dj-database-url", "dj-email-url"]
+dev = ["pytest", "dj-database-url", "dj-email-url", "django-cache-url", "flake8 (3.7.9)", "flake8-bugbear (20.1.4)", "mypy (0.770)", "pre-commit (>=1.20,<3.0)", "tox"]
+django = ["dj-database-url", "dj-email-url", "django-cache-url"]
+lint = ["flake8 (3.7.9)", "flake8-bugbear (20.1.4)", "mypy (0.770)", "pre-commit (>=1.20,<3.0)"]
+tests = ["pytest", "dj-database-url", "dj-email-url", "django-cache-url"]
 
 [[package]]
 category = "main"
@@ -697,7 +697,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "532d58ad4e61394de1031e418618532f5843d0df781d4c0293ad5f88d22fd5fe"
+content-hash = "c944f32d6460359c47ad7ea2036247207569fb633311e82f9c05879ba378e7ad"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -816,8 +816,8 @@ entrypoints = [
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
 ]
 environs = [
-    {file = "environs-7.1.0-py2.py3-none-any.whl", hash = "sha256:c1d72abc5115f1096475ef2bc47b08893ac1e6dd5fc649063eefa8849fda00b6"},
-    {file = "environs-7.1.0.tar.gz", hash = "sha256:6a85140c3a608e8a287db7215dd3777f4e8d12648bc2c24609ca0c662993ba59"},
+    {file = "environs-7.3.1-py2.py3-none-any.whl", hash = "sha256:9502d78a3b7ea23c211c3a88f4f946d188a7d936c59c3609f9303aeb26cdc58d"},
+    {file = "environs-7.3.1.tar.gz", hash = "sha256:68d53c4bb283d8008865815226afba83ab2ea09898e564f3399c9e73b3d4bcfd"},
 ]
 factory-boy = [
     {file = "factory_boy-2.12.0-py2.py3-none-any.whl", hash = "sha256:728df59b372c9588b83153facf26d3d28947fc750e8e3c95cefa9bed0e6394ee"},
