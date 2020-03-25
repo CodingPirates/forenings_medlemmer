@@ -33,11 +33,11 @@ class TestModelDepartment(TestCase):
         old_departments = DepartmentFactory.create_batch(
             10,
             closed_dtm=None,
-            created=timezone.now() - timedelta(days=randint(360, 999)),
+            created=timezone.now() - timedelta(days=randint(367, 999)),
         )
         [
             ActivityFactory.create(
-                end_date=timezone.now() - timedelta(days=randint(360, 999)),
+                end_date=timezone.now() - timedelta(days=randint(367, 999)),
                 department=department,
             )
             for department in old_departments[:5]

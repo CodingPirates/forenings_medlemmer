@@ -137,6 +137,15 @@
             </td>
             <td>{{activity.name}}</td>
             <td>
+              <a
+                class="button"
+                href="{%url 'activity_view_family' activity.id %}"
+                target="_blank"
+              >
+                Læs mere
+              </a>
+            </td>
+            <td>
               {% for person in activity.persons %}
                 <a
                   class="button-success"
@@ -145,15 +154,6 @@
                   Tilmeld {{ person.firstname }} aktivitet
                 </a>
               {% endfor %}
-            </td>
-            <td>
-              <a
-                class="button"
-                href="{%url 'activity_view_family' activity.id %}"
-                target="_blank"
-              >
-                Læs mere
-              </a>
             </td>
           </tr>
         {% endfor %}
