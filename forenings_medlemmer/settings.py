@@ -91,7 +91,6 @@ INSTALLED_APPS = (
     "flat_responsive",
     "django.contrib.admin",
     "graphene_django",
-    "fontawesome",
     "django_extensions",
 )
 
