@@ -220,14 +220,6 @@ six = ">=1.2"
 
 [[package]]
 category = "main"
-description = "An extension for Django admin that makes interface mobile friendly."
-name = "django-flat-responsive"
-optional = false
-python-versions = "*"
-version = "2.0"
-
-[[package]]
-category = "main"
 description = "Discover and load entry points from installed packages."
 name = "entrypoints"
 optional = false
@@ -690,7 +682,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "1a5d469bf2c82454a01c8156a01e492d386f96560f189236c314a8aaed725e1c"
+content-hash = "eb5626b30bd5e10e080a00b7804a16bbf88c87dc44bafa075e9e0bed4d94aaa8"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -801,9 +793,6 @@ django-cron = [
 django-extensions = [
     {file = "django-extensions-2.2.8.tar.gz", hash = "sha256:2699cc1d6fb4bd393c0b5832fea4bc685f2ace5800b3c9ff222b2080f161ac04"},
     {file = "django_extensions-2.2.8-py2.py3-none-any.whl", hash = "sha256:1a03c4e8bade575f8c2be6c76456f8a2be3f9b02ab9f47d3535afa9562dc0493"},
-]
-django-flat-responsive = [
-    {file = "django-flat-responsive-2.0.tar.gz", hash = "sha256:451caa2700c541b52fb7ce2d34d3d8dee9e980cf29f5463bc8a8c6256a1a6474"},
 ]
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
