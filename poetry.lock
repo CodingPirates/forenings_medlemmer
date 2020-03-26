@@ -526,7 +526,7 @@ description = "Python client for QuickPay API"
 name = "quickpay-api-client"
 optional = false
 python-versions = "*"
-version = "1.0.1"
+version = "2.0.1"
 
 [package.dependencies]
 requests = ">=2.5"
@@ -697,7 +697,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "532d58ad4e61394de1031e418618532f5843d0df781d4c0293ad5f88d22fd5fe"
+content-hash = "726b8c929f794aa14c642ab7892ba54f083dc1e8a87ffb8b95e48154e0b5caa8"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -930,8 +930,7 @@ pyyaml = [
     {file = "PyYAML-5.3.tar.gz", hash = "sha256:e9f45bd5b92c7974e59bcd2dcc8631a6b6cc380a904725fce7bc08872e691615"},
 ]
 quickpay-api-client = [
-    {file = "quickpay-api-client-1.0.1.tar.gz", hash = "sha256:ac5948ee895e4f4777ac687b390c1066dc40a95730891306ba335e13208c1b7c"},
-    {file = "quickpay_api_client-1.0.1-py2-none-any.whl", hash = "sha256:9180977460d1adc779d92c19a0323ef1a8a561c6fe876858e2c92ec397d799c2"},
+    {file = "quickpay-api-client-2.0.1.tar.gz", hash = "sha256:52a05d7b0654459b6f1b99aa912174b08cbdb45387f642fae1a354bffab9a469"},
 ]
 regex = [
     {file = "regex-2020.2.20-cp27-cp27m-win32.whl", hash = "sha256:99272d6b6a68c7ae4391908fc15f6b8c9a6c345a46b632d7fdb7ef6c883a2bbb"},
