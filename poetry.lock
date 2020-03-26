@@ -124,7 +124,7 @@ description = "Use an URL to configure email backend settings in your Django App
 name = "dj-email-url"
 optional = false
 python-versions = "*"
-version = "0.2.0"
+version = "1.0.0"
 
 [[package]]
 category = "main"
@@ -697,7 +697,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "532d58ad4e61394de1031e418618532f5843d0df781d4c0293ad5f88d22fd5fe"
+content-hash = "5435b8b4d9699c418b2a38353f0c826445ee51a9aeca654b8ceacac67836b602"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -776,8 +776,8 @@ dj-database-url = [
     {file = "dj_database_url-0.5.0-py2.py3-none-any.whl", hash = "sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9"},
 ]
 dj-email-url = [
-    {file = "dj-email-url-0.2.0.tar.gz", hash = "sha256:0362e390c17cc377f03bcbf6daf3f671797c929c1bf78a9f439d78f215ebe3fd"},
-    {file = "dj_email_url-0.2.0-py2.py3-none-any.whl", hash = "sha256:136ac43c7f29022130fc4769b4ca8b01cd1c39fedf1659c641c143808182a084"},
+    {file = "dj-email-url-1.0.0.tar.gz", hash = "sha256:0cb37ac18ffdfecf362a7ff59a8e4ddeb01ac0b0325092e69206656a50bd068a"},
+    {file = "dj_email_url-1.0.0-py2.py3-none-any.whl", hash = "sha256:19a0450378831e2707e00404866e632837efc67dcc2e7e7a98f72df94b89c1f6"},
 ]
 django = [
     {file = "Django-2.2.9-py3-none-any.whl", hash = "sha256:687c37153486cf26c3fdcbdd177ef16de38dc3463f094b5f9c9955d91f277b14"},
