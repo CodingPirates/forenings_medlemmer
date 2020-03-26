@@ -242,7 +242,7 @@ class UnionFactory(DjangoModelFactory):
 
     name = factory.LazyAttribute(lambda u: "Coding Pirates {}".format(u.address.city))
     chairman_old = Faker("name")
-    chairman_old = Faker("email")
+    chairman_email_old = Faker("email")
     second_chair_old = Faker("name")
     second_chair_email_old = Faker("email")
     cashier_old = Faker("name")

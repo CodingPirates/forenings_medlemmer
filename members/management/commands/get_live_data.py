@@ -1,9 +1,11 @@
 from zipfile import ZipFile
 import os
+import json
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import DatabaseError
 from members.models import Department, Union, Address
+from members.tests.factories import PersonFactory
 import requests
 import shutil
 
@@ -41,6 +43,24 @@ class Command(BaseCommand):
 
         with ZipFile(f"{temp_dir}/dump.zip", "r") as zipObj:
             zipObj.extractall(temp_dir)
+
+        union_file = open(f"{temp_dir}/union.json", "r")
+        union_json = json.load(union_file)
+        union_file.close()
+        for union in union_json:
+            PersonFactory(id=union["fields"]["chairman"])
+            PersonFactory(id=union["fields"]["second_chair"])
+            PersonFactory(id=union["fields"]["secretary"])
+            PersonFactory(id=union["fields"]["cashier"])
+            for board_member in union["fields"]["board_members"]:
+                PersonFactory(id=board_member)
+
+        department_file = open(f"{temp_dir}/department.json", "r")
+        department_json = json.load(department_file)
+        department_file.close()
+        for department in department_json:
+            for department_leader in department["fields"]["department_leaders"]:
+                PersonFactory(id=department_leader)
 
         print("Reading dumps files")
         for model in MODELS_TO_LOAD:
