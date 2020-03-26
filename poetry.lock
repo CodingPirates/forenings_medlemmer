@@ -582,7 +582,7 @@ description = "Python client for Sentry (https://getsentry.com)"
 name = "sentry-sdk"
 optional = false
 python-versions = "*"
-version = "0.14.0"
+version = "0.14.3"
 
 [package.dependencies]
 certifi = "*"
@@ -697,7 +697,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "532d58ad4e61394de1031e418618532f5843d0df781d4c0293ad5f88d22fd5fe"
+content-hash = "456e0885e5e9ba9dba5666c15418f41f82169f2c089b42112feba005d8386abd"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -969,8 +969,8 @@ selenium = [
     {file = "selenium-3.141.0.tar.gz", hash = "sha256:deaf32b60ad91a4611b98d8002757f29e6f2c2d5fcaf202e1c9ad06d6772300d"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-0.14.0.tar.gz", hash = "sha256:8e2d38dc58dc992280487e553ec3d97a424e4d179f4fad802ef3b08f64ccf4d8"},
-    {file = "sentry_sdk-0.14.0-py2.py3-none-any.whl", hash = "sha256:9b59e155229ea7d46a52b5c025d8c3c6d591e9dd9bb5f5f47310b2bb430038a8"},
+    {file = "sentry-sdk-0.14.3.tar.gz", hash = "sha256:bb90a4e19c7233a580715fc986cc44be2c48fc10b31e71580a2037e1c94b6950"},
+    {file = "sentry_sdk-0.14.3-py2.py3-none-any.whl", hash = "sha256:23808d571d2461a4ce3784ec12bbee5bdb8c026c143fe79d36cef8a6d653e71f"},
 ]
 singledispatch = [
     {file = "singledispatch-3.4.0.3-py2.py3-none-any.whl", hash = "sha256:833b46966687b3de7f438c761ac475213e53b306740f1abfaa86e1d1aae56aa8"},
