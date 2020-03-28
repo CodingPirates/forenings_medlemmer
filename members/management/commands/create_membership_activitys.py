@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
             self.stdout.write("foreningen %s " % (curUnion.name))
             department = mainDepartment
-            name = "Forenings medlemskab 2019: %s" % (curUnion.name)
+            name = "Foreningsmedlemsskab 2020: %s" % (curUnion.name)
             open_hours = "-"
             dawa_id = ""
 
@@ -48,9 +48,9 @@ class Command(BaseCommand):
                 localDepartments,
             )
             instructions = ""
-            start_date = datetime.date(year=2019, month=1, day=1)
-            end_date = datetime.date(year=2019, month=12, day=31)
-            signup_closing = datetime.date(year=2019, month=4, day=30)
+            start_date = datetime.date(year=2020, month=1, day=1)
+            end_date = datetime.date(year=2020, month=12, day=31)
+            signup_closing = datetime.date(year=2020, month=4, day=30)
             open_invite = True
             price_in_dkk = 75
             max_participants = 9999
@@ -64,13 +64,13 @@ class Command(BaseCommand):
                 open_hours=open_hours,
                 responsible_name=curUnion.chairman,
                 responsible_contact=curUnion.chairman_email,
-                placename=curUnion.placename,
-                zipcode=curUnion.zipcode,
-                city=curUnion.city,
-                streetname=curUnion.streetname,
-                housenumber=curUnion.housenumber,
-                floor=curUnion.floor,
-                door=curUnion.door,
+                placename=curUnion.address.placename,
+                zipcode=curUnion.address.zipcode,
+                city=curUnion.address.city,
+                streetname=curUnion.address.streetname,
+                housenumber=curUnion.address.housenumber,
+                floor=curUnion.address.floor,
+                door=curUnion.address.door,
                 dawa_id=dawa_id,
                 description=description,
                 instructions=instructions,
@@ -82,7 +82,7 @@ class Command(BaseCommand):
                 max_participants=max_participants,
                 max_age=max_age,
                 min_age=min_age,
-                membership_activity=True,
+                member_justified=True,
             )
 
             activity.save()

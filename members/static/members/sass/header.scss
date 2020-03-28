@@ -1,0 +1,60 @@
+@use '_definitions';
+
+nav {
+    @extend %container;
+    @extend %bg-primary;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    font-family: _definitions.$header_font;
+    img {
+        width: 50px;
+    }
+    // Desktop horizontal nav bar
+    @include _definitions.for-phone {
+        flex-direction: column;
+        justify-content: center;
+    }
+    @include _definitions.for-desktop {
+        flex-direction: row;
+    }
+    > span {
+        display: block;
+        flex-grow: 2;
+    }
+
+    > a {
+        @extend %rounded-rect;
+        color: white;
+        padding: 0 10px;
+        &:hover {
+            color: #cccccc;
+            text-decoration: none;
+        }
+        @include _definitions.for-phone {
+            // Bigger buttons on phone
+            font-size: 24px;
+            padding: 15px 0;
+            margin: 15px 0;
+            width: 100%;
+            border: 1px solid white;
+            text-align: center !important;
+        }
+    }
+}
+#login-logout {
+    text-align: right;
+}
+
+.inactive {
+    display: none;
+}
+
+#toggle {
+    @include _definitions.for-desktop {
+        display: none;
+    }
+    @include _definitions.for-phone {
+        display: inline;
+    }
+}

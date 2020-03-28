@@ -10,7 +10,7 @@ from members.views import (
     ConfirmFamily,
     QuickpayCallback,
     ActivitySignup,
-    waitinglistView,
+    DepartmentSignView,
     paymentGatewayErrorView,
     volunteerSignup,
     departmentView,
@@ -18,7 +18,6 @@ from members.views import (
     AdminSignup,
 )
 from django.contrib.auth import views as auth_views
-from django.views.generic.base import RedirectView
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 
@@ -63,11 +62,10 @@ urlpatterns = [
     ),
     url(
         r"^account/logout/$",
-        auth_views.LogoutView.as_view(),
+        auth_views.LogoutView.as_view(template_name="members/logout.html"),
         {"next_page": "/"},
         name="person_logout",
     ),
-
     url(r"activities/$", Activities, name="activities"),
     url(r"volunteer$", volunteerSignup, name="volunteer_signup"),
     url(r"user_created/$", userCreated, name="user_created"),
@@ -95,7 +93,6 @@ urlpatterns = [
         DeclineInvitation,
         name="invitation_decline",
     ),
-    url(r"family/waitinglist$", waitinglistView, name="family_waitinglist_view"),
     url(
         r"family/payment_gateway_error$",
         paymentGatewayErrorView,
@@ -109,43 +106,6 @@ urlpatterns = [
     ),
     url(r"^activity/(?P<activity_id>[\d]+)/$", ActivitySignup, name="activity_view"),
     url(r"quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
-    url(r"waitinglist$", waitinglistView, name="waitinglist_view"),
+    url(r"department_signup$", DepartmentSignView, name="department_signup"),
     url(r"departments$", departmentView, name="department_view"),
-]
-
-# Redirect all old urls containing family unique values
-urlpatterns += [
-    url(r"family/[\w-]+/$", RedirectView.as_view(url="/family/", permanent=True)),
-    url(
-        r"family/[\w-]+/Person/[\d]+/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/Person/[A-Z]{2}$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/activity/[\d]+/person/[\d]+/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/activity/[\d]+/person/[\d]+/view/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/waitinglist$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"family/[\w-]+/payment_gateway_error$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"confirm_details/[\w-]+/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
-    url(
-        r"waiting_list/[\w-]+/[\d]+/[\d]+/(subscribe|unsubscribe)/$",
-        RedirectView.as_view(url="/family/", permanent=True),
-    ),
 ]

@@ -1,41 +1,16 @@
 from django.test import TestCase
-from members.models.union import Union
-from members.models.department import Department
+
 from members.models.equipment import Equipment
 from django.core.exceptions import ValidationError
+
+from .factories import UnionFactory, DepartmentFactory
 
 
 class TestModelEquipment(TestCase):
     def setUp(self):
-        self.union1 = Union(
-            name="union1",
-            region="S",
-            streetname="",
-            housenumber="1",
-            zipcode="1234",
-            city="",
-        )
-        self.union1.save()
-
-        self.union2 = Union(
-            name="union2",
-            region="S",
-            streetname="",
-            housenumber="1",
-            zipcode="1234",
-            city="",
-        )
-        self.union2.save()
-
-        self.department = Department(
-            name="",
-            union=self.union1,
-            streetname="",
-            housenumber="1",
-            zipcode="1234",
-            city="",
-        )
-        self.department.save()
+        self.union1 = UnionFactory()
+        self.union2 = UnionFactory()
+        self.department = DepartmentFactory(union=self.union1)
 
     def test_clean_no_owner(self):
         # Validation should fail if their isn't a owner

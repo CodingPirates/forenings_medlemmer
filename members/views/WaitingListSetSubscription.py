@@ -10,7 +10,7 @@ from members.utils.user import user_to_person, has_user
 
 
 @login_required
-@user_passes_test(has_user, '/admin_signup/')
+@user_passes_test(has_user, "/admin_signup/")
 def WaitingListSetSubscription(request, id, departmentId, action):
 
     family = user_to_person(request.user).family
@@ -39,4 +39,4 @@ def WaitingListSetSubscription(request, id, departmentId, action):
                 "{} er ikke på {}s venteliste".format(person.name, department.name)
             )
 
-    return HttpResponseRedirect(reverse("family_detail"))
+    return HttpResponseRedirect(reverse("department_signup"))

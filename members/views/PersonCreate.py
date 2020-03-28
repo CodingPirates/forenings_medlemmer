@@ -11,7 +11,7 @@ from members.utils.user import user_to_person, has_user
 
 
 @login_required
-@user_passes_test(has_user, '/admin_signup/')
+@user_passes_test(has_user, "/admin_signup/")
 def PersonCreate(request, membertype):
     family = user_to_person(request.user).family
     if request.method == "POST":
@@ -21,7 +21,7 @@ def PersonCreate(request, membertype):
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
             UpdatePersonFromForm(person, form)
-            return HttpResponseRedirect(reverse("family_detail"))
+            return HttpResponseRedirect(reverse("entry_page"))
     else:
         person = Person()
         person.membertype = membertype

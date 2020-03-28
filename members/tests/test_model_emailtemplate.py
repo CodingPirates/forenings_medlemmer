@@ -2,10 +2,10 @@ from django.test import TestCase, override_settings
 from members.models.emailtemplate import EmailTemplate
 from members.models.family import Family
 from members.models.person import Person
-from members.models.union import Union
-from members.models.department import Department
 from django.core import mail
 from members.jobs import EmailSendCronJob
+
+from .factories import DepartmentFactory, UnionFactory
 
 
 class TestEmailTemplate(TestCase):
@@ -26,21 +26,10 @@ class TestEmailTemplate(TestCase):
         self.person = Person(family=self.family)
         self.person.save()
 
-        self.union = Union(
-            name="", region="S", streetname="", housenumber="1", zipcode="1234", city=""
+        self.union = UnionFactory()
+        self.department = DepartmentFactory(
+            union=self.union, department_email="department@example.com"
         )
-        self.union.save()
-
-        self.department = Department(
-            union=self.union,
-            name="",
-            streetname="",
-            housenumber="1",
-            zipcode="1234",
-            city="",
-            responsible_contact="department@example.com",
-        )
-        self.department.save()
 
     def util_check_email(self, receivers):
         self.assertEqual(len(mail.outbox), len(receivers))

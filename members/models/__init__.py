@@ -6,10 +6,8 @@
 import members.models.activity
 import members.models.activityinvite
 import members.models.activityparticipant
-import members.models.dailystatisticsdepartment
-import members.models.dailystatisticsgeneral
-import members.models.dailystatisticsregion
-import members.models.dailystatisticsunion
+
+
 import members.models.department
 import members.models.emailitem
 import members.models.emailtemplate
@@ -28,9 +26,54 @@ import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
 
 # Export models not files
-from .department import Department
-from .union import Union
-from .person import Person
+from .activity import Activity
+from .activityinvite import ActivityInvite
+from .activityparticipant import ActivityParticipant
+from .address import Address
+from .admin_user_information import AdminUserInformation
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
+from .department import Department
+from .emailitem import EmailItem
+from .emailtemplate import EmailTemplate
+from .equipment import Equipment
+from .equipmentloan import EquipmentLoan
+from .family import Family
+from .member import Member
+from .notification import Notification
+from .payment import Payment
+from .person import Person
+from .union import Union
+from .volunteer import Volunteer
+from .waitinglist import WaitingList
+from .zipcoderegion import ZipcodeRegion
+
+
+from .statistics import gatherDayliStatistics
+
+__all__ = [
+    Activity,
+    ActivityInvite,
+    ActivityParticipant,
+    Address,
+    AdminUserInformation,
+    DailyStatisticsGeneral,
+    DailyStatisticsRegion,
+    DailyStatisticsUnion,
+    Department,
+    EmailItem,
+    EmailTemplate,
+    Equipment,
+    EquipmentLoan,
+    Family,
+    gatherDayliStatistics,
+    Member,
+    Notification,
+    Payment,
+    Person,
+    Union,
+    Volunteer,
+    WaitingList,
+    ZipcodeRegion,
+]

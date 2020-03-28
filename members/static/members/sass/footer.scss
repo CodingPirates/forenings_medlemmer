@@ -1,0 +1,20 @@
+@use "_definitions";
+
+footer {
+    @extend %bg-primary;
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1.5em;
+    color: white !important;
+    text-align: center;
+    font-size: 20px;
+    > p > a {
+        color: white;
+    }
+    @include _definitions.for-desktop {
+        max-height: 75px;
+    }
+}

@@ -1,62 +1,46 @@
+from datetime import timedelta
+from random import randint
 from django.test import TestCase
-from members.models.union import Union
-from members.models.department import Department
-from members.models.emailtemplate import EmailTemplate
-import math
-from django.core import mail
-from members.jobs import EmailSendCronJob
+from django.utils import timezone
+from members.models import Department
+from .factories import DepartmentFactory, ActivityFactory
 
 
 class TestModelDepartment(TestCase):
-    def setUp(self):
-        self.union = Union()
-        self.union.save()
-
-        self.department = Department(
-            union=self.union,
-            streetname="Prins Jørgens Gård",
-            housenumber="1",
-            zipcode="1218",
-            city="København",
+    def test_get_open_departments(self):
+        open_departments = DepartmentFactory.create_batch(10, closed_dtm=None)
+        [
+            ActivityFactory.create(
+                start_date=timezone.now(),
+                end_date=timezone.now() - timedelta(days=randint(0, 350)),
+                department=department,
+            )
+            for department in open_departments
+        ]
+        # Department young than a year and no activities
+        new_departments = DepartmentFactory.create_batch(
+            10,
+            closed_dtm=None,
+            created=timezone.now() - timedelta(days=randint(0, 350)),
         )
-        self.department.save()
+        expected = set(open_departments + new_departments)
 
-        self.emailtemplate = EmailTemplate(
-            idname="VOL_NEW",
-            name="",
-            description="",
-            from_address="test@example.com",
-            subject="[TEST] new volunteer email",
+        # Closed departments
+        DepartmentFactory.create_batch(10, closed_dtm=timezone.now())
+
+        # depatments older than a year not closed but no activities in the
+        # last year or nor activites at all
+        old_departments = DepartmentFactory.create_batch(
+            10,
+            closed_dtm=None,
+            created=timezone.now() - timedelta(days=randint(367, 999)),
         )
-        self.emailtemplate.save()
+        [
+            ActivityFactory.create(
+                end_date=timezone.now() - timedelta(days=randint(367, 999)),
+                department=department,
+            )
+            for department in old_departments[:5]
+        ]
 
-    def util_calc_distance(self, coord1, coord2):
-        # Implements the Haversine formula
-        # Ref: https://stackoverflow.com/a/19412565/1689680
-        R = 6373.0
-        lat1 = math.radians(coord1[0])
-        lon1 = math.radians(coord1[1])
-        lat2 = math.radians(coord2[0])
-        lon2 = math.radians(coord2[1])
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = (
-            math.sin(dlat / 2) ** 2
-            + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-        )
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return R * c
-
-    def test_get_long_lat(self):
-        self.assertLess(
-            self.util_calc_distance(
-                self.department.getLatLon(), (55.67680271, 12.57994743)
-            ),
-            1.0,  # Calculated distance from the returned value and the expected value can be no more than 1 km
-        )
-
-    # TODO fix this test
-    # def test_new_volunteer_email(self):
-    #     self.department.new_volunteer_email("")
-    #     EmailSendCronJob().do()
-    #     self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(expected, set(Department.get_open_departments()))

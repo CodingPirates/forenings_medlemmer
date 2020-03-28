@@ -1,0 +1,48 @@
+@use "_definitions";
+
+body {
+    display: grid;
+    align-content: space-between;
+    @include _definitions.for-phone {
+        grid-template-rows: 1fr 12fr 1fr;
+    }
+    // Desktop horizontal nav bar
+    @include _definitions.for-desktop {
+        grid-template-rows: 50px 10fr 1fr;
+    }
+}
+
+body,
+html {
+    height: 100%;
+    font-family: _definitions.$main_font;
+    width: 100%;
+}
+
+section {
+    @extend %rounded-rect;
+    margin: 15px 0;
+
+    @extend %card;
+}
+
+.info-box {
+    @extend %rounded-rect;
+    background-color: _definitions.$light-grey;
+    padding: 10px;
+    margin: 10px auto;
+    width: 66%;
+    text-align: center;
+}
+
+main {
+    @extend %container;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: _definitions.$max_width;
+    @include _definitions.for-desktop {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

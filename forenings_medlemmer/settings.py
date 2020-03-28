@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 import logging
 from environs import Env
 import dj_database_url
@@ -20,14 +21,17 @@ from sentry_sdk.integrations.django import DjangoIntegration
 env = Env()
 env.read_env()
 
-if env.str("SENTRY_DSN") != 'not set':
+if env.str("SENTRY_DSN") != "not set":
     sentry_sdk.init(
         dsn=env.str("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
-        environment=env.str("MODE")
+        environment=env.str("MODE"),
     )
 
 logger = logging.getLogger(__name__)
+
+TESTING = os.path.basename(sys.argv[1]) == "test"
+USE_DAWA_ON_SAVE = not TESTING
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -88,6 +92,7 @@ INSTALLED_APPS = (
     "django.contrib.admin",
     "graphene_django",
     "fontawesome",
+    "django_extensions",
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -132,7 +137,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-DATE_INPUT_FORMATS = ("%d-%m-%Y", "%d-%m-%y")  # '25-10-06', '25-10-06'
+DATE_INPUT_FORMATS = ("%d/%m/%Y", "%Y-%m-%d")
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
@@ -177,8 +182,8 @@ CRON_CLASSES = [
     #   'members.jobs.RequestConfirmationCronJob',
     "members.jobs.SendActivitySignupConfirmationsCronJob",
     "members.jobs.PollQuickpayPaymentsCronJob",
-    "members.jobs.GenerateStatisticsCronJob",
     "members.jobs.UpdateDawaData",
+    "members.jobs.CaptureOutstandingPayments",
 ]
 
 # Dont keep job logs more than 7 days old
@@ -190,6 +195,4 @@ SECURE_SSL_REDIRECT = env.bool("FORCE_HTTPS")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 LOGIN_URL = "/account/login/"
-LOGIN_REDIRECT_URL = "/family/"
-TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
-TEST_OUTPUT_DIR = "test-results"
+LOGIN_REDIRECT_URL = "/"

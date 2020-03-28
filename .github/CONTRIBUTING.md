@@ -1,0 +1,114 @@
+## Contributing
+
+You are more than welcome to contribute to the system. This guide documents how to create a local development setup, the tools/frameworks used, and the steps required to get a pull request approved.
+
+## Getting a local setup.
+
+-   Installing Docker: Download and install [docker-compose][docker-guide]. If
+    you use Ubuntu 18.04 (LTS), you can use [this guide][docker-ubuntu-guide] to
+    set up Docker.
+
+-   Fork this repo to your own account.
+
+-   The setup adheres to the [twelve-factor-app][12f] principles. To get a
+    local development configuration, copy the file `.env.example` to `.env`
+
+-   Run `docker-compose up` to start your local system.
+
+-   Run `docker-compose run web ./manage.py get_live_data` to download public
+    data and insert it into your local database.
+
+-   To create a super user for the admin interface you can run
+    `docker-compose run web ./manage.py createsuperuser`
+
+## Primary Frameworks/Systems used
+
+-   [Django][django]: The base web framework used. The link is to their great
+    tutorial which takes an hour or two to complete.
+-   [Docker][docker-tutorial]: We use `docker-compose` to setup database,
+    environment and dependencies. The following commands is all that's required
+    to work on the system.
+
+    -   `docker-compose build` -- Builds the system.
+    -   `docker-compose up` -- Starts the systems.
+    -   `docker-compose down && docker volume rm backend_database`
+        \-- Deletes your local database
+    -   `docker-compose run web command` -- Replace `command` with what you want
+        to run in the system.
+
+-   [SASS][sass]: CSS files belong in `members/static/members/sass`,
+    store it as either plain `.css` files or `.scss` files.
+    Compilation happens during each build, during local development run the
+    following command in a separate terminal:
+
+    ```bash
+    docker-compose run web /bin/dart-sass/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
+    ```
+
+    It will compile SASS when you save a file.
+    If you create a new `.scss` file remember to add it to [main.scss][main.scss].
+
+-   [HTML documentation][html_docs] Shows the css classes that can used for
+    formatting.
+
+-   [Selenium][selenium]: runs the functional tests. To run a specific test run
+    ```bash
+        docker-compose run web ./manage.py test members.tests.test_functional.test_create_family
+    ```
+    where the name of your tests replaces the last part.
+
+## Creating a pull request
+
+1.  Join our [slack][slackinvite] and introduce yourself in the _medlemssystem_dev_ channel.
+2.  Pick a card from either the `backlog` or `to-do` column on the
+    [project page][project-link].
+3.  Open a draft pull request before writing any code. This ensures that the design
+    discussion happens before the code and limits duplicate work.
+4.  Help us specify the requirements specification.
+5.  Code the features with tests, see the [testing guide][test_guide]
+6.  Run the entire test suite with: `docker-compose run web ./manage.py test`
+7.  Check that the following requirements are meet:
+    -   The code has tests, code without tests is not accepted. (Except for
+        minimal CSS and text changes). Use the existing test as inspiration and
+        the [factories][factories] to create dummy data.
+    -   The code conforms to the [black][black] formatting rules. To format your
+        code run `docker-compose run web black .`. Consider looking for an
+        editor integration.
+    -   The code passes [flake8][flake8] checks.
+8.  Submit the pull request.
+9.  The backend is [Heroku][heroku], we can use their "review apps" to create
+    a temporary server for each pull request.
+
+[test_guide]: https://github.com/CodingPirates/forenings_medlemmer/wiki/Writing-tests
+
+[heroku]: https://heroku.com
+
+[docker-guide]: https://docs.docker.com/compose/install/
+
+[docker-tutorial]: https://docker-curriculum.com
+
+[docker-ubuntu-guide]: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
+
+[flake8]: https://flake8.pycqa.org/en/latest/
+
+[project-link]: https://github.com/CodingPirates/forenings_medlemmer/projects/2
+
+[sass]: https://sass-lang.com
+
+[slackinvite]: https://slackinvite.codingpirates.dk
+
+[12f]: https://12factor.net
+
+[django]: https://docs.djangoproject.com/en/3.0/intro/tutorial01/
+
+[black]: https://black.readthedocs.io/en/stable/
+
+[poetry]: https://python-poetry.org
+
+[factories]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/tests/factories.py
+
+[selenium]: https://www.selenium.dev
+
+[main.scss]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/static/members/sass/main.scss
+
+[html_docs]: https://github.com/CodingPirates/forenings_medlemmer/wiki/HTML-formatting

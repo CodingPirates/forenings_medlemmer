@@ -1,0 +1,41 @@
+name: Run tests & Analyse code
+
+on: [push, pull_request]
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Enviroment
+        run: cp .env.example .env
+      - name: Builds the stack
+        run: docker-compose build
+      - name: Test
+        run: docker-compose run web ./manage.py test
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: selenium-screens
+          path: ./test-screens
+
+      - name: Check formatting (Black)
+        run: docker-compose run web black --check .
+      - name: Static error check (Flake8)
+        run: docker-compose run web flake8
+      - name: Generating coverage
+        run: docker-compose run web coverage run --source='.' manage.py test
+      - name: Converting coverage
+        run: docker-compose run web coverage xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: a3618d89-999c-4144-a2c3-c45faa3ebb55
+          file: ./coverage.xml
+
+      - name: Create and upload UML diagram
+        run: mkdir -p UML && docker-compose run web ./manage.py graph_models members -o UML/UML_diagram.png
+      - uses: actions/upload-artifact@v1
+        with:
+          name: UML_diagram.png
+          path: UML

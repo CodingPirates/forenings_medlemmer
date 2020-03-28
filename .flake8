@@ -1,12 +1,10 @@
 [flake8]
 # See http://flake8.pycqa.org/en/latest/user/options.html for a list of options
-ignore = E501
+ignore = E501, W503
 exclude =
     .git,
     __pycache__,
-    virtualenv,
-    venv,
-    # ignore migrations as it is django generated code
+    # ignore django generated code
     members/migrations
 count = True
 statistics = True

@@ -8,7 +8,7 @@ class Activity(models.Model):
     class Meta:
         verbose_name = "Aktivitet"
         verbose_name_plural = "Aktiviteter"
-        ordering = ["department__zipcode", "start_date"]
+        ordering = ["department__address__zipcode", "start_date"]
 
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1)
@@ -16,13 +16,13 @@ class Activity(models.Model):
     open_hours = models.CharField("Tidspunkt", max_length=200)
     responsible_name = models.CharField("Ansvarlig", max_length=200)
     responsible_contact = models.EmailField("E-mail")
-    placename = models.CharField("Stednavn", max_length=200, blank=True)
+    placename = models.CharField("Stednavn", max_length=200, blank=True, null=True)
     zipcode = models.CharField("Postnummer", max_length=4)
     city = models.CharField("By", max_length=200)
     streetname = models.CharField("Vejnavn", max_length=200)
     housenumber = models.CharField("Husnummer", max_length=200)
-    floor = models.CharField("Etage", max_length=200, blank=True)
-    door = models.CharField("Dør", max_length=200, blank=True)
+    floor = models.CharField("Etage", max_length=200, blank=True, null=True)
+    door = models.CharField("Dør", max_length=200, blank=True, null=True)
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
     description = models.TextField("Beskrivelse", blank=False)
     instructions = models.TextField("Tilmeldings instruktioner", blank=True)
@@ -56,6 +56,9 @@ class Activity(models.Model):
 
     def is_season(self):
         return (self.end_date - self.start_date).days > 30
+
+    def will_reserve(self):
+        return self.start_date.year > timezone.now().year
 
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
