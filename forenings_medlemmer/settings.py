@@ -93,10 +93,8 @@ INSTALLED_APPS = (
     "members",
     "crispy_forms",
     "django_cron",
-    "flat_responsive",
     "django.contrib.admin",
     "graphene_django",
-    "fontawesome",
     "django_extensions",
 )
 
