@@ -1,13 +1,14 @@
 {% extends 'members/base.html' %} {% block content %}
 <h2>Aktiviteter i Coding Pirates</h2>
 <p>
-  På denne side kan du se de aktiviteter du er tilmeldt, de aktiviter du er
-  inviteret til og de aktiviter som ikke kræve at man er skrevet op ved en
-  afdeling.
+  Her kan du tilmelde dit barn en aktivitet. Det kan enten være en åben
+  aktivitet der ikke kræver opskrivning på venteliste eller hvis I har modtaget
+  en invitation vil den kunne ses her. De aktiviteter som I allerede er tilmeldt
+  vil også fremgå på denne side.
 <p>
   Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye
   events kan du gøre det på afdelingssiden.
-  <a class="button" href="{% url "activities" %}">
+  <a class="button" href="{% url "department_signup" %}">
     Gå til Afdelings opskrivninger
   </a>
 </p>
@@ -88,7 +89,7 @@
           <tr>
             <td>{{invite.person.name}}</td>
             <td>
-              <a href="{%url 'activity_view' invite.activity.id %}">
+              <a href="{%url 'activity_signup' invite.activity.id invite.person.id %}">
                 {{invite.activity.name}}
               </a>
             </td>
@@ -96,7 +97,7 @@
               Coding Pirates: {{invite.activity.department.name}}
             </td>
             <td>
-              <a class="button-success" href="{%url 'activity_view' invite.activity.id %}">
+              <a class="button-success" href="{%url 'activity_signup' invite.activity.id invite.person.id %}">
                 Tilmeld aktivitet
               </a>
               <a class="button-danger" href="{%url 'invitation_decline' family.unique invite.id %}" >
@@ -124,6 +125,7 @@
         <tr>
           <th>Afdeling</th>
           <th>Aktivitet</th>
+          <th>Beskrivelse</th>
           <th>Handling</th>
         </tr>
       </thead>
@@ -137,11 +139,21 @@
             <td>
               <a
                 class="button"
-                href="{%url 'activity_view' activity.id %}"
+                href="{%url 'activity_view_family' activity.id %}"
                 target="_blank"
               >
-                Tilmeld
+                Læs mere
               </a>
+            </td>
+            <td>
+              {% for person in activity.persons %}
+                <a
+                  class="button-success"
+                  href="{%url 'activity_signup' activity.id person.id %}"
+                >
+                  Tilmeld {{ person.firstname }} aktivitet
+                </a>
+              {% endfor %}
             </td>
           </tr>
         {% endfor %}
