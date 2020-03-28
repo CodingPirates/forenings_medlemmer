@@ -16,5 +16,6 @@ fi
 
 python manage.py migrate
 python manage.py dump_public_data
+python manage.py render_emails
 python manage.py collectstatic --no-input --clear
 exec "$@"

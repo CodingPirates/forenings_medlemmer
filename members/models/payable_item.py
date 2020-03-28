@@ -24,7 +24,7 @@ class PayableItem(models.Model):
     class Meta:
         verbose_name_plural = "Betalinger"
         verbose_name = "Betaling"
-        # ordering = ["address__zipcode"]
+        ordering = ["added"]
 
     person = models.ForeignKey(
         "Person", on_delete=models.PROTECT, related_name="payments"
@@ -130,7 +130,6 @@ class PayableItem(models.Model):
         return self._payment_link
 
     def get_status(self):
-        # Only call quickpay api if not done or refunded
         if self.refunded is not None:
             return "refunded"
         if self.processed:

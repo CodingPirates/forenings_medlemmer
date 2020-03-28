@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.mail import send_mail
+from django.template import Context
+from django.template.loader import get_template
 
 
 class Email(models.Model):
@@ -25,3 +27,9 @@ class Email(models.Model):
             ["to@example.com"],
             fail_silently=False,
         )
+
+    @staticmethod
+    def _render_payment_confirmation(payment):
+        template = get_template("members/email/payment_confirm.html")
+        html = template.render({"Payment": payment})
+        return html, "some email"
