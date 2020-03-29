@@ -3,7 +3,7 @@ import os
 from django.core.management.base import BaseCommand
 
 from members.tests.factories import PayableItemFactory
-from members.models.email import Email
+from members.models import PayableItem
 
 
 email_dir = "generated_emails"
@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
 def _write_payment_confirmation():
     payment = PayableItemFactory.build()
-    html, text = Email._render_payment_confirmation(payment)
+    html, text = PayableItem._render_payment_confirmation(payment)
     with open(f"{email_dir}/payment_confirmed_email.html", "w+") as htmlFile:
         htmlFile.write(html)
     with open(f"{email_dir}/payment_confirmed_email.txt", "w+") as txtFile:

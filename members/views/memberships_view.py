@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
 from members.forms import MembershipForm
 from members.models import Membership, PayableItem, Person, Union
 from members.utils.user import has_user, user_to_person
@@ -43,7 +42,7 @@ def MembershipView(request):
             )
             base_url = "/".join(request.build_absolute_uri().split("/")[:3])
             return HttpResponseRedirect(
-                payment.get_link(continue_url=f"{base_url}{reverse('payments_view')}")
+                payment.get_link(base_url=base_url, continue_page="payments_view")
             )
         else:
             return render(

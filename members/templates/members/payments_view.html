@@ -20,7 +20,7 @@
         <td>{{payment.get_item}}</td>
         <td>{{payment.show_amount}}kr</td>
         <td>
-          {% if payment.processed %}
+          {% if payment.get_status == "accepted" %}
             Betalt
           {% else %}
             <a href="{{payment.get_link}}" class="button-danger">
