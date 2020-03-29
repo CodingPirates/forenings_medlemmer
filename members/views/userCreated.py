@@ -1,6 +1,6 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.http import HttpResponse
 
 
 @xframe_options_exempt

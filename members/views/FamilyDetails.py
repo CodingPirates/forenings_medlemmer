@@ -1,11 +1,11 @@
 import datetime
+
 from django.conf import settings
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, user_passes_test
-
 from members.models.person import Person
-from members.utils.user import user_to_person, has_user
+from members.utils.user import has_user, user_to_person
 
 
 @login_required

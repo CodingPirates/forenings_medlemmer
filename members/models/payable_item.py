@@ -6,13 +6,20 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from members.models.quickpaytransaction import QuickpayTransaction
 
 
 def _set_quickpay_order_id():
-    return f"{settings.PAYMENT_ID_PREFIX}{timezone.now().timestamp()}"
+    if settings.PAYMENT_ID_PREFIX == "prod":
+        id = (
+            PayableItem.objects.all().count()
+            + QuickpayTransaction.objects.all().count()
+        )
+        return f"prod{'%06d' % id}"
+    else:
+        return f"{settings.PAYMENT_ID_PREFIX}{timezone.now().timestamp()}"
 
 
-url = "https://api.quickpay.net/payments"
 headers = {
     "accept-version": "v10",
     "content-type": "application/json",
@@ -32,7 +39,6 @@ class PayableItem(models.Model):
     added = models.DateTimeField("Tilføjet", default=timezone.now)
     refunded = models.DateTimeField("Refunderet", null=True, blank=True)
     amount_ore = models.IntegerField("Beløb i øre")
-
     # Payable items, at least one of them should not be null.
     membership = models.ForeignKey(
         "Membership",
@@ -47,6 +53,7 @@ class PayableItem(models.Model):
         unique=True,
         default=_set_quickpay_order_id,
     )
+    accepted = models.BooleanField("Accepteret", default=False)
     processed = models.BooleanField("Processed", default=False)
     quick_pay_id = models.IntegerField("Quick Pay ID")
     _payment_link = models.URLField("Betalingslink", null=True, blank=True)
@@ -77,7 +84,7 @@ class PayableItem(models.Model):
             raise ValidationError(f"{self} does not have any membership")
         if self.amount_ore < 100:
             raise ValidationError(
-                f"{self.amount} is below 1kr, rember to specify price in øre"
+                f"{self.amount_ore} is below 1kr, rember to specify price in øre"
             )
 
     def save(self, *args, **kwargs):
@@ -86,7 +93,7 @@ class PayableItem(models.Model):
 
     def __create_quickpay_transaction(self):
         response = requests.post(
-            url,
+            settings.QUICKPAY_URL,
             headers=headers,
             auth=auth,
             data=json.dumps(
@@ -104,15 +111,16 @@ class PayableItem(models.Model):
         return response.json()["id"]
 
     def __str__(self):
-        # TODO add season and activty
-        return f"Betaling: {self.person} på {self.amount_ore / 100.0}kr, for {self.membership}"
+        return (
+            f"Betaling: {self.person} på {self.show_amount()}kr, for {self.get_item()}"
+        )
 
     def get_link(self, continue_url=None):
         if self._payment_link is not None:
             return self._payment_link
 
         response = requests.put(
-            f"{url}/{self.quick_pay_id}/link",
+            f"{settings.QUICKPAY_URL}/{self.quick_pay_id}/link",
             auth=auth,
             headers=headers,
             data=json.dumps(
@@ -136,7 +144,7 @@ class PayableItem(models.Model):
             return self.state
 
         response = requests.get(
-            f"{url}/{self.quick_pay_id}", auth=auth, headers=headers,
+            f"{settings.QUICKPAY_URL}/{self.quick_pay_id}", auth=auth, headers=headers,
         )
         if response.status_code != 200:
             raise requests.HTTPError(
@@ -148,9 +156,13 @@ class PayableItem(models.Model):
             self.save()
         return state
 
-    def get_type_name(self):
+    def get_item(self):
         if self.membership is not None:
             return self.membership
+
+    def get_item_name(self):
+        if self.membership is not None:
+            return "Medlemsskab"
 
     def show_amount(self):
         return self.amount_ore / 100

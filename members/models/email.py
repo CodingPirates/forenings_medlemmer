@@ -31,5 +31,5 @@ class Email(models.Model):
     @staticmethod
     def _render_payment_confirmation(payment):
         template = get_template("members/email/payment_confirm.html")
-        html = template.render({"Payment": payment})
+        html = template.render({"payment": payment})
         return html, "some email"

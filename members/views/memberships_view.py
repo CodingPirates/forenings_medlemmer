@@ -1,11 +1,10 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
-
-from members.utils.user import user_to_person, has_user
-from members.models import Person, Union, Membership, PayableItem
 from members.forms import MembershipForm
+from members.models import Membership, PayableItem, Person, Union
+from members.utils.user import has_user, user_to_person
 
 
 @login_required

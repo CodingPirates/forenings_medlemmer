@@ -17,7 +17,7 @@
     {% for payment in payments %}
       <tr>
         <td>{{payment.added |date:'d-m-Y '}}</td>
-        <td>{{payment.get_type_name}}</td>
+        <td>{{payment.get_item}}</td>
         <td>{{payment.show_amount}}kr</td>
         <td>
           {% if payment.processed %}

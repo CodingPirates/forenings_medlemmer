@@ -50,6 +50,7 @@ from .waitinglist import WaitingList
 from .zipcoderegion import ZipcodeRegion
 from .payable_item import PayableItem
 from .email import Email
+from .quickpaytransaction import QuickpayTransaction
 
 from .statistics import gatherDayliStatistics
 
@@ -71,6 +72,7 @@ __all__ = [
     EquipmentLoan,
     Family,
     gatherDayliStatistics,
+    QuickpayTransaction,
     Member,
     Membership,
     Notification,

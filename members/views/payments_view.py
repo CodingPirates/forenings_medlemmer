@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
-
-from members.utils.user import user_to_person, has_user
-from members.models import Person, PayableItem
+from django.shortcuts import render
+from members.models import PayableItem, Person
+from members.utils.user import has_user, user_to_person
 
 
 @login_required

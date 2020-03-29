@@ -1,15 +1,14 @@
-from django.urls import reverse
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
-
 from members.forms import vol_signupForm
 from members.models.department import Department
 from members.models.family import Family
 from members.models.person import Person
 from members.models.volunteer import Volunteer
-from django.contrib.auth.models import User
 
 
 @xframe_options_exempt
