@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0025_payableitem_accepted'),
+        ("members", "0025_payableitem_accepted"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='payableitem',
-            name='confirmation_sent',
-            field=models.BooleanField(default=False, verbose_name='Bekræftelse sendt'),
+            model_name="payableitem",
+            name="confirmation_sent",
+            field=models.BooleanField(default=False, verbose_name="Bekræftelse sendt"),
         ),
     ]

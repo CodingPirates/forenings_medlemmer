@@ -6,11 +6,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0026_payableitem_confirmation_sent'),
+        ("members", "0026_payableitem_confirmation_sent"),
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='Email',
-        ),
+        migrations.DeleteModel(name="Email",),
     ]

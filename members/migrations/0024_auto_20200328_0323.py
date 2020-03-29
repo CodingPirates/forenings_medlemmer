@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0023_email'),
+        ("members", "0023_email"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='payableitem',
-            options={'ordering': ['added'], 'verbose_name': 'Betaling', 'verbose_name_plural': 'Betalinger'},
+            name="payableitem",
+            options={
+                "ordering": ["added"],
+                "verbose_name": "Betaling",
+                "verbose_name_plural": "Betalinger",
+            },
         ),
     ]

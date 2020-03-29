@@ -7,9 +7,6 @@ from members.tests.factories import PersonFactory, FamilyFactory, UnionFactory
 from members.models import Membership
 from datetime import date
 from .functional_helpers import log_in, get_text_contains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
 
 """
 This test starts with a family with a child that is a member and the parent
