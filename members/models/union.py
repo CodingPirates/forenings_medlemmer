@@ -3,7 +3,11 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from .person import Person
+from .person import Activity, ActivityParticipant, Payment
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import F
+import datetime
 
 
 class Union(models.Model):
@@ -56,10 +60,40 @@ class Union(models.Model):
             )
 
     def members(self):
-        years = range(self.founded.year, 2021)
+        years = range(self.founded.year, (timezone.now().date.year) + 1)
         members = {}
         for year in years:
-            members[year] = Person.objects.all()
+            temp_members = []
+            union_activities_1 = Activity.objects.filter(
+                member_justified=True,
+                union=self.id,
+                end_date__gt=F("start_date") + timedelta(days=2),
+                start_date__year=year,
+            )
+            search_string = f"forenings medlemsskab {year}"
+            union_activities_2 = Activity.objects.filter(
+                member_justified=True, name__icontains=search_string
+            ).union(union_activities_1)
+            for activity in union_activities_2:
+                for member in (
+                    ActivityParticipant.objects.select_related("person")
+                    .filter(activity=activity)
+                    .distinct()
+                ):
+                    if (
+                        len(
+                            Payment.objects.filter(
+                                person=members.person,
+                                amount_ore__gte=7500,
+                                activity=activity,
+                                confirmed_dtm__lte=datetime(year, 9, 30),
+                                refunded_dtm__isnull=True,
+                            )
+                        )
+                        > 0
+                    ):
+                        temp_members.append(member.person)
+            members[year] = temp_members
         return members
 
     def user_union_leader(self, user):

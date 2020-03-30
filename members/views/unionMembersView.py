@@ -8,14 +8,15 @@ from members.utils.user import has_user
 @login_required
 @user_passes_test(has_user, "/admin_signup/")
 def unionMembersView(request, union_id):
-    # get user union
+    # get chosen union
     union = Union.objects.filter(pk=union_id)
 
     # Check if user is admin of union
     access = Union.user_union_leader(union, request.user)
 
     # get members of union
-    members = union[0].members()
+    if access is True:
+        members = union[0].members()
 
     # get years union has been active
     today = timezone.now().date()
