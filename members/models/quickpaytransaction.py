@@ -27,10 +27,9 @@ class QuickpayTransaction(models.Model):
         """ On creation make quickpay order_id from payment id """
         if self.pk is None:
             if settings.DEBUG:
-                prefix = "test"
+                self.order_id = f"dev{timezone.now().timestamp()}"
             else:
-                prefix = "prod"
-            self.order_id = prefix + "%06d" % self.payment.pk
+                self.order_id = "prod" + "%06d" % self.payment.pk
         return super(QuickpayTransaction, self).save(*args, **kwargs)
 
     # method requests payment URL from Quickpay.
