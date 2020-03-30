@@ -16,7 +16,7 @@ def unionMembersView(request, union_id):
 
     # get members of union
     if access is True:
-        members = union[0].members()
+        members = list(set(union[0].members()))
 
     # get years union has been active
     today = timezone.now().date()
