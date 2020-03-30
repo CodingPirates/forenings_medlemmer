@@ -3,7 +3,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from .person import Activity, ActivityParticipant, Payment
+from members.models import Activity, ActivityParticipant, Payment
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F
