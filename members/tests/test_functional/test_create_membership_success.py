@@ -70,7 +70,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
 
         # Enter card number
-        self.browser.find_element_by_id("cardnumber").send_keys("1000 0000 0000 0008")
+        self.browser.find_element_by_id("cardnumber").send_keys("1000000000000008")
 
         # Enter experation month
         self.browser.find_element_by_id("expiration-month").send_keys("11")
