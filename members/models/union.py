@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from django.db import models
+import members.models.payment as Payment
+import members.models.activity as Activity
+import members.models.activityparticipant as ActivityParticipant
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from members.models import Activity, ActivityParticipant, Payment
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F
