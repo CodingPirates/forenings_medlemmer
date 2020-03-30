@@ -109,8 +109,6 @@ You are more than welcome to contribute to the system. This guide documents how 
 
 [black]: https://black.readthedocs.io/en/stable/
 
-[poetry]: https://python-poetry.org
-
 [factories]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/tests/factories.py
 
 [selenium]: https://www.selenium.dev
