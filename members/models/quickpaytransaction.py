@@ -92,9 +92,7 @@ class QuickpayTransaction(models.Model):
 
                 self.link_url = link["url"]
                 self.save()
-            except Exception as e:
-                print(self.order_id)
-                print(e)
+            except Exception:
                 # Something went wrong talking to quickpay - ask people to come back later
                 return reverse("payment_gateway_error_view")
 
