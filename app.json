@@ -3,36 +3,39 @@
   "description": "The member system for coding pirates",
   "website": "https://codingpirates.dk",
   "stack": "container",
-  "buildpacks": [
-    { "url": "heroku/python" }
-  ],
-  "env" : {
-      "MODE" : {
+  "buildpacks": [{ "url": "heroku/python" }],
+  "env": {
+    "MODE": {
       "required": true,
       "description": "The mode the system is running in",
       "value": "staging"
-     },
-     "SENTRY_DSN" : {
-     "required": true,
-     "description": "SENTRY DSN",
-     "value": "not set"
     },
-    "EMAIL_URL" : {
-     "required": true,
-     "description": "EMAIL URL",
-     "value": "console:"
+    "SENTRY_DSN": {
+      "required": true,
+      "description": "SENTRY DSN",
+      "value": "not set"
     },
-    "ADMINS" : {
-     "required": true,
-     "description": "Admins that get email on crashes",
-     "value": "[('dit navn', 'din@email.dk')]"
+    "EMAIL_URL": {
+      "required": true,
+      "description": "EMAIL URL",
+      "value": "console:"
     },
-     "FORCE_HTTPS" : {
+    "PAYMENT_ID_PREFIX": {
+      "required": true,
+      "description": "The prefix for quickpay id's 1-3 chars",
+      "value": "rev"
+    },
+    "ADMINS": {
+      "required": true,
+      "description": "Admins that get email on crashes",
+      "value": "[('dit navn', 'din@email.dk')]"
+    },
+    "FORCE_HTTPS": {
       "required": true,
       "description": "Wheter or not https is enforced",
       "value": "True"
     },
-   "CORS_LIST" : {
+    "CORS_LIST": {
       "required": true,
       "description": "The hosts that are allowed to acces cros origin",
       "value": "https://members.codingpirates.dk"
@@ -50,42 +53,40 @@
     "ALLOWED_HOSTS": {
       "required": true,
       "description": "Which urls that can host the service",
-      "value" : "*"
+      "value": "*"
     },
-    "DEBUG" : {
+    "DEBUG": {
       "required": true,
       "description": "Wheter the service will run in debug mode",
-      "value" : "False"
+      "value": "False"
     },
-    "QUICKPAY_API_KEY" : {
+    "QUICKPAY_API_KEY": {
       "required": true,
       "description": "The key for quickpay - test ",
-      "value" : "ec55645b143824405a140943680e680f99b6c6e02e309b057d238ed2288d90ad"
+      "value": "ec55645b143824405a140943680e680f99b6c6e02e309b057d238ed2288d90ad"
     },
-    "QUICKPAY_PRIVATE_KEY" : {
+    "QUICKPAY_PRIVATE_KEY": {
       "required": true,
       "description": "The key for quickpay - test",
-      "value" : "122295f79d2dc6fc49703ccb22acb01adc44924d8a0457f9ff122620368e20a0"
+      "value": "122295f79d2dc6fc49703ccb22acb01adc44924d8a0457f9ff122620368e20a0"
     },
-    "SERVER_COMMAND" : {
+    "SERVER_COMMAND": {
       "required": true,
       "description": "The Service that starts the app",
-      "value" : "gunicorn forenings_medlemmer.wsgi:application --bind"
+      "value": "gunicorn forenings_medlemmer.wsgi:application --bind"
     }
   },
   "addons": ["heroku-postgresql:hobby-dev"],
   "environments": {
     "test": {
-        "env": {
-            "DEBUG": "True",
-            "SERVER_COMMAND": "gunicorn forenings_medlemmer.wsgi:application --bind"
-        },
-        "addons":[
-          "heroku-postgresql:in-dyno"
-        ],
-        "scripts": {
-            "test": "./manage.py test"
-        }
+      "env": {
+        "DEBUG": "True",
+        "SERVER_COMMAND": "gunicorn forenings_medlemmer.wsgi:application --bind"
+      },
+      "addons": ["heroku-postgresql:in-dyno"],
+      "scripts": {
+        "test": "./manage.py test"
+      }
     }
   }
 }
