@@ -62,13 +62,7 @@ TEMPLATES = [
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
 SECRET_KEY = env.str("SECRET_KEY")
-
-
-PAYMENT_ID_PREFIX = env.str("PAYMENT_ID_PREFIX")
-if len(PAYMENT_ID_PREFIX) < 1 or len(PAYMENT_ID_PREFIX) > 3:
-    raise EnvironmentError("PAYMENT_ID_PREFIX must be between 1 and 3 chars")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -165,7 +159,7 @@ EMAIL_BACKEND = email["EMAIL_BACKEND"]
 EMAIL_HOST = email["EMAIL_HOST"]
 EMAIL_HOST_USER = email["EMAIL_HOST_USER"]
 EMAIL_HOST_PASSWORD = email["EMAIL_HOST_PASSWORD"]
-EMAIL_FILE_PATH = "app/members/sent_mail"
+EMAIL_FILE_PATH = BASE_DIR
 SERVER_EMAIL = "hostmaster@members.codingpirates.dk"
 EMAIL_PORT = email["EMAIL_PORT"]
 EMAIL_USE_SSL = email["EMAIL_USE_SSL"]

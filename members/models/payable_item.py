@@ -134,6 +134,7 @@ class PayableItem(models.Model):
             data["continue_url"] += (
                 "" if continue_page is None else reverse(continue_page)
             )
+        print(data)
         response = requests.put(
             f"{settings.QUICKPAY_URL}/{self.quick_pay_id}/link",
             auth=auth,
