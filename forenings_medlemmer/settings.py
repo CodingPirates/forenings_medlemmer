@@ -75,7 +75,6 @@ else:
 ALLOWED_HOSTS = [host.replace(" ", "") for host in env.list("ALLOWED_HOSTS")]
 BASE_URL = os.environ["BASE_URL"]
 
-# Application definition
 
 INSTALLED_APPS = (
     "bootstrap4",
@@ -88,10 +87,8 @@ INSTALLED_APPS = (
     "members",
     "crispy_forms",
     "django_cron",
-    "flat_responsive",
     "django.contrib.admin",
     "graphene_django",
-    "fontawesome",
     "django_extensions",
 )
 
@@ -191,6 +188,15 @@ DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 7
 
 QUICKPAY_API_KEY = os.environ["QUICKPAY_API_KEY"]
 QUICKPAY_PRIVATE_KEY = os.environ["QUICKPAY_PRIVATE_KEY"]
+PAYMENT_ID_PREFIX = env.str("PAYMENT_ID_PREFIX")
+if (
+    PAYMENT_ID_PREFIX != "prod"
+    and len(PAYMENT_ID_PREFIX) < 1
+    or len(PAYMENT_ID_PREFIX) > 3
+):
+    raise EnvironmentError("PAYMENT_ID_PREFIX must be between 1 and 3 chars")
+
+
 SECURE_SSL_REDIRECT = env.bool("FORCE_HTTPS")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 

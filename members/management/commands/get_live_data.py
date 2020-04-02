@@ -9,7 +9,7 @@ from members.tests.factories import PersonFactory
 import requests
 import shutil
 
-MODELS_TO_LOAD = ["address", "union", "department"]
+from dump_public_data import MODELS_TO_DUMP as MODELS_TO_LOAD
 
 
 class Command(BaseCommand):
