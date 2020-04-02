@@ -27,10 +27,9 @@ class QuickpayTransaction(models.Model):
         """ On creation make quickpay order_id from payment id """
         if self.pk is None:
             if settings.DEBUG:
-                prefix = "test"
+                self.order_id = f"dev{timezone.now().timestamp()}"
             else:
-                prefix = "prod"
-            self.order_id = prefix + "%06d" % self.payment.pk
+                self.order_id = "prod" + "%06d" % self.payment.pk
         return super(QuickpayTransaction, self).save(*args, **kwargs)
 
     # method requests payment URL from Quickpay.
@@ -63,11 +62,13 @@ class QuickpayTransaction(models.Model):
                 if self.transaction_id is None:
                     activity = client.post(
                         "/payments",
-                        currency="DKK",
-                        order_id=self.order_id,
-                        variables=variables,
-                        invoice_address=address,
-                        shipping_address=address,
+                        body={
+                            "currency": "DKK",
+                            "order_id": self.order_id,
+                            "variables": variables,
+                            "invoice_address": address,
+                            "shipping_address": address,
+                        },
                     )
                     self.transaction_id = activity["id"]
                     self.save()
@@ -78,13 +79,15 @@ class QuickpayTransaction(models.Model):
                 # Enable auto-capture if the activity starts this year
                 link = client.put(
                     f"/payments/{self.transaction_id}/link",
-                    amount=self.payment.amount_ore,
-                    id=self.transaction_id,
-                    continueurl=return_url,
-                    cancelurl=return_url,
-                    customer_email=self.payment.family.email,
-                    autocapture=self.payment.activity.start_date.year
-                    <= timezone.now().year,
+                    body={
+                        "amount": self.payment.amount_ore,
+                        "id": self.transaction_id,
+                        "continueurl": return_url,
+                        "cancelurl": return_url,
+                        "customer_email": self.payment.family.email,
+                        "autocapture": self.payment.activity.start_date.year
+                        <= timezone.now().year,
+                    },
                 )
 
                 self.link_url = link["url"]

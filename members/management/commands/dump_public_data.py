@@ -5,7 +5,7 @@ from io import StringIO
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 
-MODELS_TO_DUMP = ["department", "union", "address"]
+MODELS_TO_DUMP = ["department", "union", "address", "emailtemplate", "activity"]
 
 
 class Command(BaseCommand):
