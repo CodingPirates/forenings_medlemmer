@@ -7,7 +7,11 @@ from members.models.address import Address
 
 @xframe_options_exempt
 def departmentView(request, unique=None):
-    depQuery = Department.objects.filter(closed_dtm__isnull=True).filter(isVisible=True)
+    depQuery = (
+        Department.objects.filter(closed_dtm__isnull=True)
+        .filter(isVisible=True)
+        .exclude(address__region="")
+    )
     deps = {}
     for region in Address.REGION_CHOICES:
         deps[region[1]] = []
