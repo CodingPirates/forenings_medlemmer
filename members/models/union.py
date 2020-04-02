@@ -77,26 +77,24 @@ class Union(models.Model):
                 member_justified=True, name__icontains=search_string
             ).union(union_activities_1)
             for activity in union_activities_2:
-                for member in (
-                    ActivityParticipant.ActivityParticipant.objects.select_related(
-                        "person"
-                    )
-                    .filter(activity=activity)
-                    .distinct()
-                ):
+                for (
+                    participant
+                ) in ActivityParticipant.ActivityParticipant.objects.filter(
+                    activity=activity
+                ).distinct():
                     if (
                         len(
                             Payment.Payment.objects.filter(
-                                person=members.person,
+                                person=participant.member.person,
                                 amount_ore__gte=7500,
                                 activity=activity,
-                                confirmed_dtm__lte=datetime(year, 9, 30),
+                                confirmed_dtm__lte=datetime.datetime(year, 9, 30),
                                 refunded_dtm__isnull=True,
                             )
                         )
                         > 0
                     ):
-                        temp_members.append(member.person)
+                        temp_members.append(participant.member.person)
             members[year] = temp_members
         return members
 

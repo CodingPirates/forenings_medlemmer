@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 
 import factory
 from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute, SelfAttribute
-from factory.fuzzy import FuzzyChoice, FuzzyInteger
+from factory.fuzzy import FuzzyChoice, FuzzyInteger, FuzzyAttribute
 from faker.providers import BaseProvider
 
 
@@ -186,8 +186,8 @@ class FamilyFactory(DjangoModelFactory):
 
     unique = Faker("uuid4")
     # email = Faker("email")
-    email = factory.Sequence(
-        lambda n: "family{0}@example.com".format(Family.objects.all().count() + n)
+    email = factory.FuzzyAttribute(
+        lambda: f"family{Family.objects.all().count() + 1}@example.com"
     )
     # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
@@ -219,9 +219,9 @@ class PersonFactory(DjangoModelFactory):
     longitude = Faker("longitude")
     latitude = Faker("latitude")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    email = factory.Sequence(
-        lambda n: "person{0}@example.com".format(Person.objects.all().count() + n)
-    )  # Faker("email")
+    email = factory.FuzzyAttribute(
+        lambda: f"person{Person.objects.all().count() + 1}@example.com"
+    )
     phone = Faker("phone_number")
     gender = FuzzyChoice([code for (code, name) in Person.MEMBER_GENDER_CHOICES])
     birthday = Faker("date")
