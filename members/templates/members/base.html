@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {% load staticfiles %}
+    {% load static %}
     <title>Coding Pirates Medlemssystem</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    {% load fontawesome %}
-    {% fontawesome_stylesheet %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha256-KzZiKy0DWYsnwMF+X1DvQngQ2/FxF7MF3Ff72XcpuPs=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous" />
     {% load bootstrap4 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
@@ -20,7 +20,6 @@
     <script src="{% static "members/js/date-input-polyfill.js" %}"></script>
     {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
         {% load crispy_forms_tags %}
-        <script src="{% static "members/js/bootstrap-datepicker.js" %}"></script>
         <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
         <script src="{% static "members/js/dawa-form-fill.js" %}"></script>
     {% endif %}
