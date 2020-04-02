@@ -186,7 +186,7 @@ class FamilyFactory(DjangoModelFactory):
 
     unique = Faker("uuid4")
     # email = Faker("email")
-    email = factory.FuzzyAttribute(
+    email = FuzzyAttribute(
         lambda: f"family{Family.objects.all().count() + 1}@example.com"
     )
     # dont_send_mails = Faker("boolean")
@@ -219,7 +219,7 @@ class PersonFactory(DjangoModelFactory):
     longitude = Faker("longitude")
     latitude = Faker("latitude")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    email = factory.FuzzyAttribute(
+    email = FuzzyAttribute(
         lambda: f"person{Person.objects.all().count() + 1}@example.com"
     )
     phone = Faker("phone_number")
