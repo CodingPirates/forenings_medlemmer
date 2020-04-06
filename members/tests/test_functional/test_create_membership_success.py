@@ -2,12 +2,11 @@ import os
 import socket
 from datetime import date
 import time
-
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-
+from selenium.webdriver.common.keys import Keys
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from members.models import Membership, PayableItem
@@ -82,7 +81,28 @@ class SignUpTest(StaticLiveServerTestCase):
             self.fail("Was not sent to quickpay")
 
         # Enter card number
-        self.browser.find_element_by_id("cardnumber").send_keys("1000 0600 0000 0002")
+        card_field = self.browser.find_element_by_id("cardnumber")
+        card_field.send_keys(Keys.NUMPAD1)
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD6)
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD0)
+        card_field.send_keys(Keys.NUMPAD2)
+        # self.browser.find_element_by_id("cardnumber").send_keys("1000 0600 0000 0002")
+        time.sleep(1)
 
         # Enter experation month
         self.browser.find_element_by_id("expiration-month").send_keys("11")
@@ -92,8 +112,7 @@ class SignUpTest(StaticLiveServerTestCase):
 
         # Enter CVS
         self.browser.find_element_by_id("cvd").send_keys("208")
-
-        time.sleep(5)
+        self.browser.find_element_by_id("cvd").send_keys(Keys.TAB)
 
         self.browser.save_screenshot("test-screens/membership_test_card_details.png")
 
@@ -101,7 +120,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.find_element_by_xpath("//*[@type='submit']").click()
 
         try:  # Wait to be redirected back from quickpay, worst case i 5 mins
-            WebDriverWait(self.browser, 60 * 5).until(
+            WebDriverWait(self.browser, 60).until(
                 EC.title_is("Coding Pirates Medlemssystem")
             )
         except Exception:
