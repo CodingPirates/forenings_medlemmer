@@ -1,12 +1,18 @@
-import socket
 import os
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+import socket
+from datetime import date
+
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from members.tests.factories import PersonFactory, FamilyFactory, UnionFactory
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from members.models import Membership
-from datetime import date
-from .functional_helpers import log_in, get_text_contains
+from members.tests.factories import FamilyFactory, PersonFactory, UnionFactory
+
+from .functional_helpers import get_text_contains, log_in
+
 
 """
 This test starts with a family with a child that is a member and the parent
@@ -63,6 +69,13 @@ class SignUpTest(StaticLiveServerTestCase):
 
         # Leave quickpay and go back to entry page
         self.browser.get(f"{self.live_server_url}")
+
+        try:  # Wait to be redirected back from quickpay, worst case i 5 mins
+            WebDriverWait(self.browser, 60 * 5).until(
+                EC.title_is("Coding Pirates Medlemssystem")
+            )
+        except Exception:
+            self.fail("Was not sent back to own page")
 
         # Go to paymetns views
         get_text_contains(self.browser, "Se dine betalinger")[0].click()

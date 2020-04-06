@@ -1,15 +1,19 @@
-import socket
 import os
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+import socket
+from datetime import date
+
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from members.tests.factories import PersonFactory, FamilyFactory, UnionFactory
-from members.models import Membership, PayableItem
-from datetime import date
-from .functional_helpers import log_in, get_text_contains
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
+from members.models import Membership, PayableItem
+from members.tests.factories import FamilyFactory, PersonFactory, UnionFactory
+
+from .functional_helpers import get_text_contains, log_in
+
 
 """
 This test starts with a family with a child that is a member and the parent
@@ -87,6 +91,8 @@ class SignUpTest(StaticLiveServerTestCase):
 
         # Enter CVS
         self.browser.find_element_by_id("cvd").send_keys("123")
+
+        self.browser.save_screenshot("test-screens/membership_test_card_details.png")
 
         # Finish payment
         self.browser.find_element_by_xpath("//*[@type='submit']").click()

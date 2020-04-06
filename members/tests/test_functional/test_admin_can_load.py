@@ -1,12 +1,15 @@
-import socket
 import os
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+import socket
+
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from members.tests.factories import PersonFactory
+
 
 """
 This test creates a super user and checks that the admin interface can be loaded
