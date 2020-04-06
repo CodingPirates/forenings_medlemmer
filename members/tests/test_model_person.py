@@ -4,7 +4,8 @@ from members.models.person import Person
 from datetime import datetime
 from freezegun import freeze_time
 
-from members.tests.factories import PersonFactory, TIMEZONE
+from members.tests.factories import PersonFactory
+from members.tests.factories.factory_helpers import TIMEZONE
 
 
 class TestModelPerson(TestCase):
