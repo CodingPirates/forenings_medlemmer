@@ -128,12 +128,11 @@ class PayableItem(models.Model):
             "language": "da",
             "auto_capture": True,
         }
-        if base_url is not None:
-            data["callback_url"] = f"{base_url}{reverse('quickpay_callback_new')}"
-            data["continue_url"] = base_url
-            data["continue_url"] += (
-                "" if continue_page is None else reverse(continue_page)
-            )
+        # if base_url is not None:
+        #    data["callback_url"] = f"{base_url}{reverse('quickpay_callback_new')}"
+        #    data["continue_url"] += (
+        #        "" if continue_page is None else reverse(continue_page)
+        #    )
         print(data)
         response = requests.put(
             f"{settings.QUICKPAY_URL}/{self.quick_pay_id}/link",
