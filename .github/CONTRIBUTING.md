@@ -21,6 +21,11 @@ You are more than welcome to contribute to the system. This guide documents how 
 -   To create a super user for the admin interface you can run
     `docker-compose run web ./manage.py createsuperuser`
 
+-   The see the emails we send (Payment confirmation etc.) run
+    `docker-compose run web ./manage.py render_emails`
+    This will create a `generated_emails` folder with the html and text version
+    of the emails. 
+
 ## Primary Frameworks/Systems used
 
 -   [Django][django]: The base web framework used. The link is to their great

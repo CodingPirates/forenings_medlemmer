@@ -12,13 +12,13 @@ from django.template.loader import get_template
 
 
 def _set_quickpay_order_id():
-    if settings.PAYMENT_ID_PREFIX == "prod":
+    if settings.PAYMENT_ID_PREFIX == "pro":
         id = (
             PayableItem.objects.all().count()
             + quickpaytransaction.QuickpayTransaction.objects.all().count()
             + 1
         )
-        return f"prod{'%06d' % id}"
+        return f"prod-{id}"
     else:
         return f"{settings.PAYMENT_ID_PREFIX}{timezone.now().timestamp()}"
 

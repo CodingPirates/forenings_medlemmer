@@ -41,6 +41,13 @@ class UnionAdmin(admin.ModelAdmin):
             },
         ),
         (
+            "Kontigent",
+            {
+                "fields": ("membership_price_ore",),
+                "description": "Sæt kontigentet for at blive medlem af jeres forening",
+            },
+        ),
+        (
             "Info",
             {
                 "fields": ("bank_main_org", "bank_account", "statues", "founded"),

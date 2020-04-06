@@ -1,5 +1,4 @@
 from django.contrib import admin
-from members.models import PayableItem
 
 
 class PayableItemAdmin(admin.ModelAdmin):
