@@ -82,7 +82,7 @@ class SignUpTest(StaticLiveServerTestCase):
             self.fail("Was not sent to quickpay")
 
         # Enter card number
-        self.browser.find_element_by_id("cardnumber").send_keys("1000000000000008")
+        self.browser.find_element_by_id("cardnumber").send_keys("1000 0600 0000 0002")
 
         # Enter experation month
         self.browser.find_element_by_id("expiration-month").send_keys("11")
@@ -91,7 +91,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.find_element_by_id("expiration-year").send_keys("30")
 
         # Enter CVS
-        self.browser.find_element_by_id("cvd").send_keys("123")
+        self.browser.find_element_by_id("cvd").send_keys("208")
 
         time.sleep(5)
 
