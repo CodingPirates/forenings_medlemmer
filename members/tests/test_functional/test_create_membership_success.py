@@ -69,6 +69,13 @@ class SignUpTest(StaticLiveServerTestCase):
         # Gå til betaling
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
 
+        try:  # Wait to be redirected to quickpay, worst case i 5 mins
+            WebDriverWait(self.browser, 60).until(
+                EC.title_is("Coding Pirates Test Account")
+            )
+        except Exception:
+            self.fail("Was not sent to quickpay")
+
         # Enter card number
         self.browser.find_element_by_id("cardnumber").send_keys("1000000000000008")
 
