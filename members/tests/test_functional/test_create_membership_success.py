@@ -1,6 +1,7 @@
 import os
 import socket
 from datetime import date
+import time
 
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -91,6 +92,8 @@ class SignUpTest(StaticLiveServerTestCase):
 
         # Enter CVS
         self.browser.find_element_by_id("cvd").send_keys("123")
+
+        time.sleep(5)
 
         self.browser.save_screenshot("test-screens/membership_test_card_details.png")
 
