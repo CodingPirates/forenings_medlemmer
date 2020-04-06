@@ -26,6 +26,7 @@ from members.models import (
     Family,
     EmailItem,
     Payment,
+    PayableItem,
     Equipment,
     EquipmentLoan,
     EmailTemplate,
@@ -40,6 +41,7 @@ from .member_admin import MemberAdmin
 from .payment_admin import PaymentAdmin
 from .activity_admin import ActivityAdmin
 from .membership_admin import MembershipAdmin
+from .payable_item_admin import PayableItemAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
@@ -49,6 +51,7 @@ admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Union, UnionAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+admin.site.register(PayableItem, PayableItemAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Member, MemberAdmin)
 admin.site.register(Membership, MembershipAdmin)
