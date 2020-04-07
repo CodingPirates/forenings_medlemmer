@@ -20,56 +20,34 @@
             maxZoom: 18,
             accessToken: 'pk.eyJ1IjoiY29kaW5ncGlyYXRlcyIsImEiOiJjamRhOXM1ZGIwdm04MnlvMnQ5dDBsdWpkIn0.NMaydnMG6m8OBpJhUbNgzg'
         }).addTo(kort);
-        {% for region, depList in departments.items %}
-            {% for dep in depList %}
-                {% if dep.isVisible == True %}
-            var marker{{forloop.counter}} = L.marker([{{dep.latitude}},{{dep.longtitude}}]).addTo(kort);
-            marker{{forloop.counter}}.bindPopup('{{dep.html | safe}}');
-                {% endif %}
-             {% endfor %}
+        {% for department in departments %}
+          {% if department.isVisible == True %}
+            var marker{{forloop.counter}} = L.marker([{{department.address.latitude}},{{department.address.longtitude}}]).addTo(kort);
+            marker{{forloop.counter}}.bindPopup(department.toHTML());
+          {% endif %}
         {% endfor %}
     });
     </script>
   </head>
 
   <body>
-      <div style="height:500px;" id="kort"></div>
-    <ul class="nav nav-pills nav-fill">
-    {% for region, depList in departments.items %}
-    <li  class="nav-item">
-        {% if region == 'Hovedstaden' %}
-           <a class="nav-link active" data-toggle="pill" href="#{{region}}">{{region}}
-         </a>
-        {% else %}
-          <a  class="nav-link" data-toggle="pill" href="#{{region}}">{{region}}</a>
-        {% endif %}
-    </li>
-    {% endfor %}
-    </ul>
-    <br>
-    <div class="container">
-      <div class="tab-content">
-        {% for region, depList in departments.items %}
-          {% if region == 'Hovedstaden'%}
-            <div id="{{region}}" class="tab-pane fade in active show">
-          {% else %}
-            <div id="{{region}}" class="tab-pane fade in">
-          {% endif %}
-          <div class="row">
-            {% for dep in depList %}
-              <div class="col-sm-4 col-centered">
-                  {{dep.html | safe}}
-              </div>
-              {% if forloop.counter|divisibleby:"3" %}
-                </div>
-                <br>
-                <div class="row">
-              {% endif %}
-            {% endfor %}
-            </div>
-          </div>
+    <div style="height:500px;" id="kort"></div>
+    {% regroup departments by address.region as departments_region %}
+    <div class="tabs">
+      <ul>
+        {% for region in departments_region%}
+          <li>{{region.grouper}}</li>
         {% endfor %}
-      </div>
+      </ul>
+      {% for region in departments_region%}
+        <section id="department_list">
+          {% for department in region.list %}
+            <div>
+              department.toHTML()
+            </div>
+          {% endfor %}
+        </section>
+      {% endfor %}
     </div>
   </body>
 </html>
