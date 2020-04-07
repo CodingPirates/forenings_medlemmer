@@ -1,4 +1,4 @@
-// Sets data-label attribute on tables
+// Sets listner on every tab section
 document.addEventListener("DOMContentLoaded", function(event) {
   for (var tabs of Array.from(document.getElementsByClassName("tabs"))) {
     const tabButtons = Array.from(
@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const sections = Array.from(
       Array.from(tabs.children).filter(element => element.tagName === "SECTION")
     );
-    console.log(sections);
+
     // Default to first as active
     toggleActive(sections, tabButtons, 0);
 
@@ -21,20 +21,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 function toggleActive(sections, buttons, activeIndex) {
-  // remove active from every button.
   for (var button of buttons) {
-    button.className = button.className
-      .split(" ")
-      .filter(className => className !== "tab-active")
-      .join(" ");
+    // remove active from every button.
+    button.classList.remove("tab-active");
   }
   for (var section of sections) {
-    section.className = section.className
-      .split(" ")
-      .filter(className => className !== "tab-section-active")
-      .join(" ");
+    // hide every section
+    section.hidden = true;
   }
-
-  buttons[activeIndex].className += " tab-active";
-  sections[activeIndex].className += " tab-section-active";
+  buttons[activeIndex].classList.add("tab-active");
+  sections[activeIndex].hidden = false;
 }

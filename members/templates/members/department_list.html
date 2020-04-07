@@ -1,75 +1,64 @@
-<!DOCTYPE html>
-<html lang="da">
-  <head>
-    {% load static %}
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-    {% load bootstrap4 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
+{% extends 'members/base.html' %}
+{% load static %}
+{% block content %}
 
-    <script type="text/javascript">
-    $(document).ready(function() {
-        var southEast = L.latLng(54.91711327768886, 8.76734733581543);
-        var northEast = L.latLng(58.038693522227945, 14.979954628418003);
-        var kort = L.map('kort').fitBounds([southEast, northEast]);
-        L.tileLayer('https://api.mapbox.com/styles/v1/codingpirates/cjdaaa7yt3qts2rrwzpsx5ysw/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY29kaW5ncGlyYXRlcyIsImEiOiJjamRhN3JtZHgxamphMzNvMHpraTJra2J1In0.lVqzzzCf9gHneicqDONuaw', {
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-            maxZoom: 18,
-            accessToken: 'pk.eyJ1IjoiY29kaW5ncGlyYXRlcyIsImEiOiJjamRhOXM1ZGIwdm04MnlvMnQ5dDBsdWpkIn0.NMaydnMG6m8OBpJhUbNgzg'
-        }).addTo(kort);
-        {% for region, depList in departments.items %}
-            {% for dep in depList %}
-                {% if dep.isVisible == True %}
-            var marker{{forloop.counter}} = L.marker([{{dep.latitude}},{{dep.longtitude}}]).addTo(kort);
-            marker{{forloop.counter}}.bindPopup('{{dep.html | safe}}');
-                {% endif %}
-             {% endfor %}
-        {% endfor %}
-    });
-    </script>
-  </head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
-  <body>
-      <div style="height:500px;" id="kort"></div>
-    <ul class="nav nav-pills nav-fill">
-    {% for region, depList in departments.items %}
-    <li  class="nav-item">
-        {% if region == 'Hovedstaden' %}
-           <a class="nav-link active" data-toggle="pill" href="#{{region}}">{{region}}
-         </a>
-        {% else %}
-          <a  class="nav-link" data-toggle="pill" href="#{{region}}">{{region}}</a>
-        {% endif %}
-    </li>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+
+<script src="{% static "members/js/department_map.js" %}"></script>
+
+
+<div style="height:500px;" id="map"></div>
+{% regroup departments by address.region as departments_region %}
+<div class="tabs">
+  <ul>
+    {% for region in departments_region%}
+      <li>{{region.grouper}}</li>
     {% endfor %}
-    </ul>
-    <br>
-    <div class="container">
-      <div class="tab-content">
-        {% for region, depList in departments.items %}
-          {% if region == 'Hovedstaden'%}
-            <div id="{{region}}" class="tab-pane fade in active show">
-          {% else %}
-            <div id="{{region}}" class="tab-pane fade in">
-          {% endif %}
-          <div class="row">
-            {% for dep in depList %}
-              <div class="col-sm-4 col-centered">
-                  {{dep.html | safe}}
-              </div>
-              {% if forloop.counter|divisibleby:"3" %}
-                </div>
-                <br>
-                <div class="row">
+  </ul>
+  {% for region in departments_region%}
+    <section id="department-container">
+      {% for department in region.list%}
+        <div id="department-{{department.pk}}">
+          <ul>
+            <li>
+              <strong>Coding Pirates: </strong>
+              {% if department.website != '' %}
+                <a href="{department.website}">{{department}}</a>
+              {% else %}
+                {{department}}
               {% endif %}
-            {% endfor %}
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-  </body>
-</html>
+            </li>
+
+            <li><strong>Adresse:</strong> {{department.address}}</li>
+
+            <li>
+              <strong>Afdelingsleder: </strong>
+              {% if department.department_leaders.all %}
+                {{department.department_leaders.all.0}}
+                {# TODO move to only department leaders once responsible_name is removed #}
+              {% else %}
+                {{department.responsible_name}}
+              {% endif %}
+            </li>
+
+            <li>
+              <strong>Email:</strong>
+              <a href="mailto:{department.department_email}">
+                 {{department.department_email}}
+              </a>
+            </li>
+
+            <li>
+              <strong>Tidspunkt: </strong>
+              {{department.open_hours}}
+            </li>
+          </ul>
+        </div>
+      {% endfor %}
+    </section>
+  {% endfor %}
+</div>
+{% endblock %}
