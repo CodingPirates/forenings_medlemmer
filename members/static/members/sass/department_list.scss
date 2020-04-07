@@ -1,6 +1,6 @@
 @use "_definitions";
 
-#department-container{
+#department-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
@@ -14,11 +14,10 @@
         }
         ul {
             list-style-type: none;
-            padding: 0px;
+            padding: 0;
         }
     }
 }
-
 
 .department-map-box {
     font-size: 1.3em;
