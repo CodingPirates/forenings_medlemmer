@@ -22,11 +22,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 function toggleActive(sections, buttons, activeIndex) {
   for (var button of buttons) {
-    // remove active from every button.
     button.classList.remove("tab-active");
   }
   for (var section of sections) {
-    // hide every section
     section.hidden = true;
   }
   buttons[activeIndex].classList.add("tab-active");
