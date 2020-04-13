@@ -41,10 +41,10 @@ class UnionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Kontigent",
+            "Kontingent",
             {
                 "fields": ("membership_price_ore",),
-                "description": "Sæt kontigentet for at blive medlem af jeres forening",
+                "description": "Sæt kontingent for at blive medlem af jeres forening",
             },
         ),
         (
