@@ -19,11 +19,13 @@ from members.views.WaitingListSetSubscription import WaitingListSetSubscription
 from .memberships_view import MembershipView
 from .payments_view import PaymentsView
 from .quickpay_callback_new import QuickPayCallbackNew
+from .seasons_view import Seasons
 
 __all__ = [
     Activities,
     ActivitySignup,
     AdminSignup,
+    Seasons,
     ConfirmFamily,
     DeclineInvitation,
     DepartmentSignView,

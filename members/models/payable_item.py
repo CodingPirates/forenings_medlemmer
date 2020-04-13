@@ -50,6 +50,13 @@ class PayableItem(models.Model):
         null=True,
         blank=True,
     )
+    season = models.ForeignKey(
+        "SeasonParticipant",
+        on_delete=models.PROTECT,
+        related_name="payment",
+        null=True,
+        blank=True,
+    )
     quick_pay_order_id = models.CharField(
         "Quick Pay order ID",
         max_length=20,
@@ -167,10 +174,16 @@ class PayableItem(models.Model):
             return resp["state"]
 
     def get_item(self):
+        if self.season is not None:
+            return self.season
+
         if self.membership is not None:
             return self.membership
 
     def get_item_name(self):
+        if self.season is not None:
+            return "Sæson"
+
         if self.membership is not None:
             return "Medlemsskab"
 

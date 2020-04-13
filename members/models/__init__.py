@@ -50,10 +50,14 @@ from .waitinglist import WaitingList
 from .zipcoderegion import ZipcodeRegion
 from .payable_item import PayableItem
 from .quickpaytransaction import QuickpayTransaction
-
+from .season import Season
+from .season_invite import SeasonInvite
+from .season_participant import SeasonParticipant
 from .statistics import gatherDayliStatistics
 
 __all__ = [
+    SeasonParticipant,
+    SeasonInvite,
     Activity,
     ActivityInvite,
     ActivityParticipant,
@@ -75,6 +79,7 @@ __all__ = [
     Membership,
     Notification,
     Payment,
+    Season,
     Person,
     Union,
     Volunteer,

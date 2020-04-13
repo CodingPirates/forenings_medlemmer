@@ -19,6 +19,7 @@ from members.views import (
     AdminSignup,
     PaymentsView,
     QuickPayCallbackNew,
+    Seasons,
 )
 from django.contrib.auth import views as auth_views
 from graphene_django.views import GraphQLView
@@ -69,6 +70,7 @@ urlpatterns = [
         {"next_page": "/"},
         name="person_logout",
     ),
+    url(r"seasons/$", Seasons, name="seasons"),
     url(r"activities/$", Activities, name="activities"),
     url(r"volunteer$", volunteerSignup, name="volunteer_signup"),
     url(r"user_created/$", userCreated, name="user_created"),

@@ -71,7 +71,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.get(f"{self.live_server_url}")
 
         try:  # Wait to be redirected back from quickpay, worst case i 5 mins
-            WebDriverWait(self.browser, 60 * 5).until(
+            WebDriverWait(self.browser, 60).until(
                 EC.title_is("Coding Pirates Medlemssystem")
             )
         except Exception:

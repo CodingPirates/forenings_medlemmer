@@ -11,6 +11,7 @@ from .payment_factory import PaymentFactory
 from .volunteer_factory import VolunteerFactory
 from .membership_factory import MembershipFactory
 from .payable_item_factory import PayableItemFactory
+from .season_factory import SeasonFactory
 
 __all__ = [
     PayableItemFactory,
@@ -26,4 +27,5 @@ __all__ = [
     MemberFactory,
     VolunteerFactory,
     MembershipFactory,
+    SeasonFactory,
 ]
