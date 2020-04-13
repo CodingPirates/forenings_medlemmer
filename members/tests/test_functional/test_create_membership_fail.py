@@ -25,6 +25,7 @@ Once they go back to our page it is marked at not payed.
 
 class SignUpTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
+    # TODO save screenshost along the way
 
     def setUp(self):
         self.email = "parent@example.com"

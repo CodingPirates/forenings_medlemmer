@@ -26,6 +26,7 @@ screen. And recvies an email confirmation.
 
 class SignUpTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
+    # TODO save screenshost along the way
 
     def setUp(self):
         self.email = "parent@example.com"
