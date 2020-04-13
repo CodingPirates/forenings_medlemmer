@@ -20,7 +20,7 @@ def MembershipView(request):
         form = MembershipForm(family_members)
         return render(
             request,
-            "members/membership_view.html",
+            "members/memberships.html",
             {
                 # TODO check for closed unions:
                 "unions": unions,
@@ -42,12 +42,12 @@ def MembershipView(request):
             )
             base_url = "/".join(request.build_absolute_uri().split("/")[:3])
             return HttpResponseRedirect(
-                payment.get_link(base_url=base_url, continue_page="payments_view")
+                payment.get_link(base_url=base_url, continue_page="payments")
             )
         else:
             return render(
                 request,
-                "members/membership_view.html",
+                "members/memberships.html",
                 {
                     # TODO check for closed unions:
                     "unions": unions,

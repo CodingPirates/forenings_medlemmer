@@ -59,7 +59,7 @@ class TestPayableItem(TestCase):
     def test_show_amount(self):
         # Tests that we can retrive both the paid item and the name.
         payment = PayableItemFactory.create(amount_ore=10000)
-        self.assertEqual(payment.show_amount(), 100.00)
+        self.assertEqual(payment.show_amount(), "100,00")
 
     def test_amount_less_than_1kr(self):
         # Tests that we can retrive both the paid item and the name.

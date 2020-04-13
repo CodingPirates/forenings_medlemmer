@@ -73,8 +73,8 @@ urlpatterns = [
     url(r"volunteer$", volunteerSignup, name="volunteer_signup"),
     url(r"user_created/$", userCreated, name="user_created"),
     url(r"admin_signup/$", AdminSignup, name="admin_signup"),
-    url(r"memberships/$", MembershipView, name="membership_view"),
-    url(r"payments/$", PaymentsView, name="payments_view"),
+    url(r"memberships/$", MembershipView, name="memberships"),
+    url(r"payments/$", PaymentsView, name="payments"),
     url(
         r"payments/quickpaycallback$", QuickPayCallbackNew, name="quickpay_callback_new"
     ),

@@ -175,7 +175,7 @@ class PayableItem(models.Model):
             return "Medlemsskab"
 
     def show_amount(self):
-        return self.amount_ore / 100
+        return f"{(self.amount_ore / 100):,.2f}".replace(".", ",")
 
     def send_payment_confirmation(self):
         if self.get_status() == "accepted" and not self.confirmation_sent:

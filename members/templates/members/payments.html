@@ -4,7 +4,7 @@
 <h2>Betalinger</h2>
 <p>
   På denne side kan du se et oversigt over dine betalinger, hvis en betaling
-  manlger er den markeret med rød.
+  mangler er den markeret med rød.
 </p>
 <table>
   <thead>
@@ -18,7 +18,7 @@
       <tr>
         <td>{{payment.added |date:'d-m-Y '}}</td>
         <td>{{payment.get_item}}</td>
-        <td>{{payment.show_amount}}kr</td>
+        <td>{{payment.show_amount}} kr</td>
         <td>
           {% if payment.get_status == "accepted" %}
             Betalt
