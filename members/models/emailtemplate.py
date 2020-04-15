@@ -140,6 +140,7 @@ class EmailTemplate(models.Model):
                     reciever=destination_address,
                     activity=activity,
                     template=self,
+                    department=department,
                 ).count()
                 < 1
             ):
