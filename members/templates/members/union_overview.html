@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 {% extends 'members/base.html' %}
+{% load static %}
 {% block content %}
     <div class="container">
       <h1>Foreninger</h1>
-      <div class="row">
-        {% for union in unions %}
-          <div class="col-sm-4 col-centered">
-
-            <a href="members.codingpirates.dk/union_overview/{{union.id}}" ><strong>{{union.name}}</strong></a><br>
-            {{union.address}}
-            <br>Foreningsleder: <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a><br>
-            <br>
-          </div>
+      {% regroup unions by address.region as unions_region %}
+      <div class="tabs">
+        <ul>
+          {% for region in unions_region %}
+            <li>{{region.grouper}}</li>
+          {% endfor %}
+        </ul>
+        {% for region in unions_region %}
+          <section id="department_container">
+            {% for union in region.list%}
+              <ul>
+                <li><a href="members.codingpirates.dk/union_overview/{{union.id}}" ><strong>{{union.name}}</strong></a></li>
+                <li>{{union.address}}</li>
+                <li>Foreningsleder: <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a></li>
+              </ul>
+            {% endfor %}
+          </section>
         {% endfor %}
       </div>
     </div>

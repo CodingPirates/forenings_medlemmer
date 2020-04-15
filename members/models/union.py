@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from django.db import models
-import members.models.payment as Payment
-import members.models.activity as Activity
-import members.models.activityparticipant as ActivityParticipant
+from .payment import Payment
+from .activity import Activity
+from .activityparticipant import ActivityParticipant
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
@@ -66,25 +66,23 @@ class Union(models.Model):
         members = {}
         for year in years:
             temp_members = []
-            union_activities_1 = Activity.Activity.objects.filter(
+            union_activities_1 = Activity.objects.filter(
                 member_justified=True,
                 union=self.id,
                 end_date__gt=F("start_date") + timedelta(days=2),
                 start_date__year=year,
             )
             search_string = f"forenings medlemsskab {year}"
-            union_activities_2 = Activity.Activity.objects.filter(
+            union_activities_2 = Activity.objects.filter(
                 member_justified=True, name__icontains=search_string
             ).union(union_activities_1)
             for activity in union_activities_2:
-                for (
-                    participant
-                ) in ActivityParticipant.ActivityParticipant.objects.filter(
+                for participant in ActivityParticipant.objects.filter(
                     activity=activity
                 ).distinct():
                     if (
                         len(
-                            Payment.Payment.objects.filter(
+                            Payment.objects.filter(
                                 person=participant.member.person,
                                 amount_ore__gte=7500,
                                 activity=activity,

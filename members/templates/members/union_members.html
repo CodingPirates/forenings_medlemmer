@@ -52,50 +52,39 @@
             <a href="{{union.meeting_notes}}"><strong>Referater</strong></a>
         {% endif %}
     </div>
-    {% if access == True%}
-      <ul class="nav nav-pills nav-fill">
-      {% for year in years %}
-        <li  class="nav-item">
-            {% if year == current_year %}
-               <a class="nav-link active" data-toggle="pill" href="#{{year}}">{{year}}
-             </a>
-            {% else %}
-              <a  class="nav-link" data-toggle="pill" href="#{{year}}">{{year}}</a>
-            {% endif %}
-        </li>
-      {% endfor %}
-      </ul>
-      <div id="member_table">
-        <div class="tab-content">
+    {% if access %}
+      <div class="tabs">
+        <ul>
+          {% for year in years %}
+            <li>{{year}}</li>
+          {% endfor %}
+        </ul>
+        <div id="member_table">
           {% for year, memberList in members.items %}
-            {% if year == current_year %}
-              <div id="{{year}}" class="tab-pane fade in active show">
-            {% else %}
-              <div id="{{year}}" class="tab-pane fade in">
-            {% endif %}
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Navn</th>
-                  <th>Email</th>
-                  <th>Adresse</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for member in memberList%}
+            <section>
+              <table class="table table-striped">
+                <thead>
                   <tr>
-                    <td>{{member.membertype}}</td>
-                    <td>{{member.name}}</td>
-                    <td><a href="mailto:{{member.email}}">{{member.email}}</a></td>
-                    <td>{{member.address}}</td>
+                    <th>Type</th>
+                    <th>Navn</th>
+                    <th>Email</th>
+                    <th>Adresse</th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-            </div>
+                </thead>
+                <tbody>
+                  {% for member in memberList%}
+                    <tr>
+                      <td>{{member.membertype}}</td>
+                      <td>{{member.name}}</td>
+                      <td><a href="mailto:{{member.email}}">{{member.email}}</a></td>
+                      <td>{{member.address}}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </section>
           {% endfor %}
         </div>
-    </div>
+      </div>
     {% endif %}
 {% endblock %}
