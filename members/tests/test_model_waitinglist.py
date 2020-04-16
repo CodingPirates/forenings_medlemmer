@@ -4,8 +4,8 @@ from members.tests.factories import (
     WaitingListFactory,
     DepartmentFactory,
     PersonFactory,
-    TIMEZONE,
 )
+from members.tests.factories.factory_helpers import TIMEZONE
 from freezegun import freeze_time
 from datetime import datetime, timedelta
 import faker
