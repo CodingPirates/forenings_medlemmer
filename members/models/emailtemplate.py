@@ -134,18 +134,27 @@ class EmailTemplate(models.Model):
             html_content = html_template.render(context)
             text_content = text_template.render(context)
             subject_content = subject_template.render(context)
-
-            email = members.models.emailitem.EmailItem.objects.create(
-                template=self,
-                reciever=destination_address,
-                person=person,
-                family=family,
-                activity=activity,
-                department=department,
-                subject=subject_content,
-                body_html=html_content,
-                body_text=text_content,
-            )
-            email.save()
-            emails.append(email)
+            if (
+                members.models.emailitem.EmailItem.objects.filter(
+                    person=person,
+                    reciever=destination_address,
+                    activity=activity,
+                    template=self,
+                    department=department,
+                ).count()
+                < 1
+            ):
+                email = members.models.emailitem.EmailItem.objects.create(
+                    template=self,
+                    reciever=destination_address,
+                    person=person,
+                    family=family,
+                    activity=activity,
+                    department=department,
+                    subject=subject_content,
+                    body_html=html_content,
+                    body_text=text_content,
+                )
+                email.save()
+                emails.append(email)
         return emails
