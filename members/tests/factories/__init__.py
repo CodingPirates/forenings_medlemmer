@@ -25,5 +25,6 @@ __all__ = [
     ActivityFactory,
     MemberFactory,
     VolunteerFactory,
+    membership,
     MembershipFactory,
 ]
