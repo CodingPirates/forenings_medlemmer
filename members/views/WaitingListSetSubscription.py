@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
+
 from members.models.department import Department
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
-from members.utils.user import has_user, user_to_person
+from members.utils.user import user_to_person, has_user
 
 
 @login_required

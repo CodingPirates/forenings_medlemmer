@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
+
 from members.models.department import Department
 from members.models.union import Union
 

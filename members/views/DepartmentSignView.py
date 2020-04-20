@@ -1,7 +1,11 @@
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
-from members.models import Department, WaitingList
-from members.utils.user import has_user, user_to_person
+from members.models import (
+    WaitingList,
+    Department,
+)
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from members.utils.user import user_to_person, has_user
 
 
 @login_required
