@@ -62,7 +62,6 @@ TEMPLATES = [
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
 SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -135,8 +134,6 @@ USE_L10N = True
 USE_TZ = True
 
 DATE_INPUT_FORMATS = ("%d/%m/%Y", "%Y-%m-%d")
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 # How many days is Family data considered valid.
 # After this period an E-mail asking for information
@@ -199,6 +196,7 @@ if (
 
 SECURE_SSL_REDIRECT = env.bool("FORCE_HTTPS")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 
 LOGIN_URL = "/account/login/"
 LOGIN_REDIRECT_URL = "/"
