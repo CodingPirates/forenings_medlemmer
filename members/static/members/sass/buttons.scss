@@ -16,11 +16,10 @@
     padding: 0.375rem 0.75rem;
     font-size: 1.1rem;
     line-height: 1.5;
-    color: white;
+    color: white !important;
     margin: 10px;
     &:hover {
-        color: white;
-        background-color: _definitions.$accent-color-muted;
+        background-color: _definitions.$accent-color-muted !important;
     }
 }
 
@@ -33,6 +32,22 @@
     }
 }
 
+.block-button {
+    // TODO rework this once login form has changed
+    display: block !important;
+    width: 100% !important;
+    margin: 15px auto !important;
+}
+
+.button-primary-color {
+    @extend .button;
+    background-color: _definitions.$primary-color;
+    &:hover {
+        background-color: _definitions.$primary-color-muted !important;
+        color: black;
+    }
+}
+
 .button-danger {
     @extend .button;
     background-color: _definitions.$danger-color;
@@ -40,7 +55,7 @@
     color: white;
     display: block;
     &:hover {
-        background-color: _definitions.$danger-color-muted;
+        background-color: _definitions.$danger-color-muted !important;
         border-color: _definitions.$danger-color-muted;
     }
 }
