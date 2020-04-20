@@ -6,15 +6,9 @@ function toggleNav() {
   for (var child of parent.children) {
     if (child !== toggle) {
       if (isDesktop()) {
-        child.classList.add("active");
+        child.classList.remove("inactive");
       } else {
-        if (child.classList.contains("inactive")) {
-          child.classList.remove("inactive");
-          child.classList.add("active");
-        } else {
-          child.classList.remove("active");
-          child.classList.add("inactive");
-        }
+        child.classList.toggle("inactive");
       }
     }
   }
@@ -24,7 +18,7 @@ toggleNav(); // If desktop show
 function resizeNav() {
   for (var child of parent.children) {
     if (isDesktop()) {
-      child.classList.add("active");
+      child.classList.remove("inactive");
     } else {
       child.classList.add("inactive");
     }
