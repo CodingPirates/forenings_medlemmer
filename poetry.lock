@@ -232,7 +232,7 @@ description = "simplified environment variable parsing"
 name = "environs"
 optional = false
 python-versions = ">=3.5"
-version = "7.3.1"
+version = "7.4.0"
 
 [package.dependencies]
 marshmallow = ">=2.7.0"
@@ -682,7 +682,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "383cab5e9e4b97e13d2aee7e32af2a9476597982feee70e0e22b581369a2035a"
+content-hash = "9597ec56f1101c0ecc91822ca54ef0c87f01b617d75e4abca608ee7ba59adf62"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -799,8 +799,8 @@ entrypoints = [
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
 ]
 environs = [
-    {file = "environs-7.3.1-py2.py3-none-any.whl", hash = "sha256:9502d78a3b7ea23c211c3a88f4f946d188a7d936c59c3609f9303aeb26cdc58d"},
-    {file = "environs-7.3.1.tar.gz", hash = "sha256:68d53c4bb283d8008865815226afba83ab2ea09898e564f3399c9e73b3d4bcfd"},
+    {file = "environs-7.4.0-py2.py3-none-any.whl", hash = "sha256:5a130876f555cffafeecd775c2e81a447b46c9a1a27f7241e0a822c4c7d30f2a"},
+    {file = "environs-7.4.0.tar.gz", hash = "sha256:ae38e5263a1da25c3057d3b77eabc7840143f8fb893fb3795532e1aeba5e0806"},
 ]
 factory-boy = [
     {file = "factory_boy-2.12.0-py2.py3-none-any.whl", hash = "sha256:728df59b372c9588b83153facf26d3d28947fc750e8e3c95cefa9bed0e6394ee"},
