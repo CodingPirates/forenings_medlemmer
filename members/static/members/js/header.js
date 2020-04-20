@@ -7,7 +7,6 @@ function toggleNav() {
   for (var child of parent.children) {
     if (child !== toggle) {
       if (isDesktop()) {
-          // TODO switch to class list
         child.className = "active";
       } else {
         child.className = child.className.includes("inactive")

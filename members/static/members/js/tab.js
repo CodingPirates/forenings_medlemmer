@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 function toggleActive(sections, buttons, activeIndex) {
   // remove active from every button.
   for (var button of buttons) {
-      // TODO use classlist 
     button.className = button.className
       .split(" ")
       .filter(className => className !== "tab-active")
