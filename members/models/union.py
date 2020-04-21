@@ -30,7 +30,7 @@ class Union(models.Model):
     union_email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
     meeting_notes = models.URLField("Link til seneste referater", blank=True)
-    founded = models.DateField("Stiftet", blank=True, null=True)
+    founded = models.DateField("Stiftet")
     regions = (("S", "Sjælland"), ("J", "Jylland"), ("F", "Fyn"), ("Ø", "Øer"))
     region = models.CharField("region", max_length=1, choices=regions)
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
