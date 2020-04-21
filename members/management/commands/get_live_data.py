@@ -7,7 +7,7 @@ from members.models import Department, Union, Address
 import requests
 import shutil
 
-from dump_public_data import MODELS_TO_DUMP as MODELS_TO_LOAD
+from .dump_public_data import MODELS_TO_DUMP as MODELS_TO_LOAD
 
 
 class Command(BaseCommand):
