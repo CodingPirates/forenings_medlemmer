@@ -34,6 +34,7 @@
 
 .block-button {
     // TODO rework this once login form has changed
+    @extend .button;
     display: block !important;
     width: 100% !important;
     margin: 15px auto !important;
