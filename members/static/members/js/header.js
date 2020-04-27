@@ -2,16 +2,13 @@ const toogle = document.getElementById("toggle");
 const parent = toogle.parentElement;
 let isDesktop = () => window.getComputedStyle(toggle).display == "none";
 
-
 function toggleNav() {
   for (var child of parent.children) {
     if (child !== toggle) {
       if (isDesktop()) {
-        child.className = "active";
+        child.classList.remove("inactive");
       } else {
-        child.className = child.className.includes("inactive")
-          ? "active"
-          : "inactive";
+        child.classList.toggle("inactive");
       }
     }
   }
@@ -21,9 +18,9 @@ toggleNav(); // If desktop show
 function resizeNav() {
   for (var child of parent.children) {
     if (isDesktop()) {
-      child.className = "active";
+      child.classList.remove("inactive");
     } else {
-      child.className = "inactive";
+      child.classList.add("inactive");
     }
   }
 }
