@@ -21,18 +21,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 function toggleActive(sections, buttons, activeIndex) {
-  // remove active from every button.
   for (var button of buttons) {
-    button.className = button.className
-      .split(" ")
-      .filter(className => className !== "tab-active")
-      .join(" ");
+    button.className = button.classList.remove("tab-active");
   }
   for (var section of sections) {
-    section.className = section.className
-      .split(" ")
-      .filter(className => className !== "tab-section-active")
-      .join(" ");
+    section.className = section.classList.remove("tab-section-active");
   }
 
   buttons[activeIndex].className += " tab-active";
