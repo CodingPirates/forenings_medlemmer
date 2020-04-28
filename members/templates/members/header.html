@@ -8,12 +8,10 @@
         <a href="{% url "family_detail" %}">Familie</a>
         <a href="{% url "department_signup" %}">Afdelinger</a>
         <a href="{% url "activities" %}">Arrangementer</a>
-        <span></span> {# Seperator for login out #}
         <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
     {% else %}
         <a href="{% url "entry_page" %}">Tilmeld barn</a>
         <a href="{% url "volunteer_signup" %}">Bliv frivillig</a>
-        <span></span> {# Seperator for login out #}
         <a id="login-logout" href="{% url 'person_login' %}">Log ind</a>
     {% endif %}
     <a href="https://codingpirates.dk" target="_blank">

@@ -2,7 +2,7 @@
 @use "buttons";
 
 #user-action-container {
-    padding: 5%;
+    padding: 5% 5% 10%;
     margin: auto;
     max-width: 1300px;
     display: grid;
@@ -24,24 +24,26 @@
         @extend %rounded-rect;
         display: flex;
         padding: 10% 10px;
-        justify-content: flex-start;
+        justify-content: space-around;
         color: white !important;
         align-items: center;
-        > i {
-            margin-right: 10px;
-        }
-
-        div {
-            width: 100%;
+        > span {
             text-align: center;
+            width: 30%;
+            @include _definitions.for-phone {
+                font-size: 0.8em; // Smaller icons on phone
+            }
         }
-
-        a {
-            @extend .button-accent;
-            width: 80%;
-            display: block;
+        > div {
+            text-align: center;
             margin: auto;
-            font-weight: 800;
+            min-width: 200px;
+            > a {
+                @extend .button-accent;
+                display: block;
+                margin: auto;
+                font-weight: 800;
+            }
         }
     }
 }

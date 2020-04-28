@@ -1,4 +1,5 @@
 @use "_definitions";
+@use "buttons";
 
 body {
     display: grid;
@@ -22,8 +23,6 @@ html {
 section {
     @extend %rounded-rect;
     margin: 15px 0;
-
-    @extend %card;
 }
 
 .info-box {
@@ -33,6 +32,17 @@ section {
     margin: 10px auto;
     width: 66%;
     text-align: center;
+}
+
+.action-list {
+    text-align: center;
+    list-style-type: none;
+    li {
+        display: inline-block;
+        a {
+            @extend .button;
+        }
+    }
 }
 
 main {
