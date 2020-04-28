@@ -18,11 +18,6 @@ nav {
     @include _definitions.for-desktop {
         flex-direction: row;
     }
-    > span {
-        display: block;
-        flex-grow: 2;
-    }
-
     > a {
         @extend %rounded-rect;
         color: white;
@@ -44,6 +39,7 @@ nav {
 }
 #login-logout {
     text-align: right;
+    flex-grow: 2;
 }
 
 .inactive {
