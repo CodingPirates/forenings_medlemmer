@@ -15,25 +15,24 @@
     også være her du kan tilmelde dit barn, hvis I har modtaget en invitation
     på mail.
   </p>
-  <div class="action-list">
-    <ul>
-      <li>
-        <a href="{% url 'person_add' 'CH' %}">
-          Opret barn
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'person_add' 'PA' %}">
-          Opret forælder
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'person_add' 'GU' %}">
-          Opret værge
-        </a>
-      </li>
-    </ul>
-  </div>
+  <ul class="action-list">
+    <li>
+      <a href="{% url 'person_add' 'CH' %}">
+        Opret barn
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'person_add' 'PA' %}">
+        Opret forælder
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'person_add' 'GU' %}">
+        Opret værge
+      </a>
+    </li>
+  </ul>
+  
   {% if family.person_set.count > 0 %}
     <table>
       <thead>
