@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from members.tests.factories import DepartmentFactory
 from django.utils import timezone
+from datetime import timedelta
 
 """
 This test goes to the root signup page and creates a child and parent.
@@ -19,10 +20,18 @@ class DepartmentListTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
 
     def setUp(self):
-        self.department_1 = DepartmentFactory.create(created=timezone.now())
+        self.department_1 = DepartmentFactory.create(
+            created=(timezone.now() - timedelta(days=5)).date(),
+            isVisible=True,
+            closed_dtm=None,
+        )
         self.department_1.address.region = "Region Hovedstaden"
         self.department_1.address.save()
-        self.department_2 = DepartmentFactory.create(created=timezone.now())
+        self.department_2 = DepartmentFactory.create(
+            created=(timezone.now() - timedelta(days=5)).date(),
+            isVisible=True,
+            closed_dtm=None,
+        )
         self.department_2.address.region = "Region Syddanmark"
         self.department_2.address.save()
         self.browser = webdriver.Remote(
@@ -43,24 +52,24 @@ class DepartmentListTest(StaticLiveServerTestCase):
 
         # check that there's the "Hovedstaden" region tab
         self.browser.find_element_by_xpath(
-            "//ul[@class='tabs']/li[text()[contains(.,'Hovedstaden')]]"
+            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]"
         ).click()
         self.browser.save_screenshot("test-screens/department_list_first_region.png")
 
         # check that the department we made in the "Hovedstaden" region is present
-        department_name = self.browser.find_elements_by_xpath(
-            "//section[@id='department-container']/div/ul/li[text()[contains(.,'Coding Pirates:')]]"
-        )[0].text.split(" ")[-1]
+        department_name = self.browser.find_element_by_xpath(
+            "//section[@id='department-container']/div/ul/li/strong[text()[contains(.,'Coding Pirates:')]]/"
+        ).text
         self.assertEqual(department_name, self.department_1.name)
 
         # check that there's the "Syddanmark" region tab
         self.browser.find_element_by_xpath(
-            "//ul[@class='tabs']/li[text()[contains(.,'Syddanmark')]]"
+            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Syddanmark')]]"
         ).click()
         self.browser.save_screenshot("test-screens/department_list_second_region.png")
 
         # check that the department we made in the "Syddanmark" region is present
-        department_name = self.browser.find_elements_by_xpath(
-            "//section[@id='department-container']/div/ul/li[text()[contains(.,'Coding Pirates:')]]"
-        )[0].text.split(" ")[-1]
+        department_name = self.browser.find_element_by_xpath(
+            "//section[@id='department-container']/div/ul/li/strong[text()[contains(.,'Coding Pirates:')]]/"
+        ).text
         self.assertEqual(department_name, self.department_2.name)
