@@ -4,6 +4,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from members.tests.factories import DepartmentFactory
+from django.utils import timezone
 
 """
 This test goes to the root signup page and creates a child and parent.
@@ -18,10 +19,12 @@ class DepartmentListTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
 
     def setUp(self):
-        self.department_1 = DepartmentFactory.create()
-        self.department_1.address.region = "Hovedstaden"
-        self.department_2 = DepartmentFactory.create()
-        self.department_2.address.region = "Syddanmark"
+        self.department_1 = DepartmentFactory.create(created=timezone.now())
+        self.department_1.address.region = "Region Hovedstaden"
+        self.department_1.address.save()
+        self.department_2 = DepartmentFactory.create(created=timezone.now())
+        self.department_2.address.region = "Region Syddanmark"
+        self.department_2.address.save()
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
