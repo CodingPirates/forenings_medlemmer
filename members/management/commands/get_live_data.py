@@ -44,9 +44,9 @@ class Command(BaseCommand):
         with ZipFile(f"{temp_dir}/dump.zip", "r") as zipObj:
             zipObj.extractall(temp_dir)
 
-        union_file = open(f"{temp_dir}/union.json", "r")
-        union_json = json.load(union_file)
-        union_file.close()
+        with open(f"{temp_dir}/union.json", "r") as union_file:
+            union_json = union_file.read()
+
         for union in union_json:
             _create_person_with_id(union["fields"]["chairman"])
             _create_person_with_id(id=union["fields"]["second_chair"])
@@ -55,9 +55,8 @@ class Command(BaseCommand):
             for board_member in union["fields"]["board_members"]:
                 _create_person_with_id(board_member)
 
-        department_file = open(f"{temp_dir}/department.json", "r")
-        department_json = json.load(department_file)
-        department_file.close()
+        with open(f"{temp_dir}/department.json", "r") as department_file:
+            department_json = department_file.read()
         for department in department_json:
             for department_leader in department["fields"]["department_leaders"]:
                 _create_person_with_id(department_leader)
