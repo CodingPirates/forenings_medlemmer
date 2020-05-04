@@ -48,9 +48,9 @@ class Command(BaseCommand):
 
         for union in union_json:
             _create_person_with_id(union["fields"]["chairman"])
-            _create_person_with_id(id=union["fields"]["second_chair"])
-            _create_person_with_id(id=union["fields"]["secretary"])
-            _create_person_with_id(id=union["fields"]["cashier"])
+            _create_person_with_id(union["fields"]["second_chair"])
+            _create_person_with_id(union["fields"]["secretary"])
+            _create_person_with_id(union["fields"]["cashier"])
             for board_member in union["fields"]["board_members"]:
                 _create_person_with_id(board_member)
 
