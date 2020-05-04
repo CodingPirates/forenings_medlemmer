@@ -42,6 +42,13 @@ class Command(BaseCommand):
         with ZipFile(f"{temp_dir}/dump.zip", "r") as zipObj:
             zipObj.extractall(temp_dir)
 
+        with open(f"{temp_dir}/union.json", "r") as union_file:
+            union_json = union_file.read()
+
+        for union in union_json:
+            if union["fields"]["founded"] == "":
+                union["fields"]["founded"] = "1999"
+
         print("Reading dumps files")
         for model in MODELS_TO_LOAD:
             call_command("loaddata", f"{temp_dir}/{model}.json")
