@@ -23,9 +23,9 @@
             <li>
               <strong>Coding Pirates: </strong>
               {% if department.website != '' %}
-                <a href="{department.website}">{{department}}</a>
+                <a href={{department.website}} target="_blank">{{department.name}}</a>
               {% else %}
-                {{department}}
+                {{department.name}}
               {% endif %}
             </li>
 
