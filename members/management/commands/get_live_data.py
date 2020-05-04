@@ -48,8 +48,8 @@ class Command(BaseCommand):
             union_json = json.load(union_file)
 
         for union in union_json:
-            if union["fields"]["founded"] == "null":
-                union["fields"]["founded"] = datetime.datetime(1970, 1, 1)
+            if union["fields"]["founded"] is None:
+                union["fields"]["founded"] = str(datetime.date(1970, 1, 1))
 
         with open(f"{temp_dir}/union.json", "w") as union_file:
             json.dump(union_json, union_file)
