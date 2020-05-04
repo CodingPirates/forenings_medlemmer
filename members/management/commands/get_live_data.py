@@ -1,5 +1,6 @@
 from zipfile import ZipFile
 import os
+import json
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import DatabaseError
@@ -44,7 +45,7 @@ class Command(BaseCommand):
             zipObj.extractall(temp_dir)
 
         with open(f"{temp_dir}/union.json", "r") as union_file:
-            union_json = union_file.read()
+            union_json = json.load(union_file)
 
         for union in union_json:
             _create_person_with_id(union["fields"]["chairman"])
@@ -55,7 +56,8 @@ class Command(BaseCommand):
                 _create_person_with_id(board_member)
 
         with open(f"{temp_dir}/department.json", "r") as department_file:
-            department_json = department_file.read()
+            department_json = json.load(department_file)
+
         for department in department_json:
             for department_leader in department["fields"]["department_leaders"]:
                 _create_person_with_id(department_leader)
