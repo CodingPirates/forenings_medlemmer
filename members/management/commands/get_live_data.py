@@ -50,6 +50,9 @@ class Command(BaseCommand):
             if union["fields"]["founded"] == "":
                 union["fields"]["founded"] = "1999"
 
+        with open(f"{temp_dir}/union.json", "w") as union_file:
+            json.dump(union_json, union_file)
+
         print("Reading dumps files")
         for model in MODELS_TO_LOAD:
             call_command("loaddata", f"{temp_dir}/{model}.json")
