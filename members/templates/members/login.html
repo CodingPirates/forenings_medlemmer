@@ -1,3 +1,4 @@
+
 {% extends 'members/base.html' %}
 
 {% block content %}
@@ -22,8 +23,8 @@
                     {{ form.password }}
                 </div>
                 <div class="field" style="margin-top: 1.2em;">
-                    <input type="submit" class="form-control btn-success" value="Log ind" />
-                    <a href="{% url 'password_reset' %}" title="Glemt kode?" class="btn btn-info float-right">
+                    <input type="submit" value="Log ind" class="block-button"/>
+                    <a href="{% url 'password_reset' %}" title="Glemt kode?" class="button-primary-color block-button">
                         Glemt adgangskode?
                     </a>
                 </div>
