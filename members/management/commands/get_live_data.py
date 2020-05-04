@@ -7,6 +7,7 @@ from django.db import DatabaseError
 from members.models import Department, Union, Address
 import requests
 import shutil
+import datetime
 
 from .dump_public_data import MODELS_TO_DUMP as MODELS_TO_LOAD
 
@@ -47,8 +48,8 @@ class Command(BaseCommand):
             union_json = json.load(union_file)
 
         for union in union_json:
-            if union["fields"]["founded"] == "":
-                union["fields"]["founded"] = "1999"
+            if union["fields"]["founded"] == "null":
+                union["fields"]["founded"] = datetime.datetime(1970, 1, 1)
 
         with open(f"{temp_dir}/union.json", "w") as union_file:
             json.dump(union_json, union_file)
