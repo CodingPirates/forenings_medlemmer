@@ -8,6 +8,7 @@ from members.utils.user import has_user
 @login_required
 @user_passes_test(has_user, "/admin_signup/")
 def unionMembersView(request, union_id):
+    members = []
     union = get_object_or_404(Union, pk=union_id)
 
     user_has_access = Union.user_union_leader(union, request.user)
