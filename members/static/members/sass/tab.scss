@@ -31,7 +31,16 @@
     > section {
         display: none;
         &.tab-section-active {
-            display: block;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        > ul {
+            flex: 0 0 30%;
+            margin: 5px;
+            border: 1px solid #dee2e6 !important;
+            list-style-type: none;
+            padding: 0 10px;
         }
     }
 }
