@@ -83,9 +83,17 @@ class signupForm(forms.Form):
                     css_class="row",
                 ),
             ),
+            Div(Field("password1")),
+            Div(Field("password2")),
             Submit("submit", "Opret", css_class="btn-success"),
         )
 
+    password1 = forms.CharField(
+        label="Kodeord", required=True, widget=forms.PasswordInput
+    )
+    password2 = forms.CharField(
+        label="Gentag kodeord", required=True, widget=forms.PasswordInput
+    )
     child_gender = forms.ChoiceField(
         label="Køn", required=True, choices=Person.MEMBER_GENDER_CHOICES
     )

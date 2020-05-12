@@ -47,9 +47,19 @@ def EntryPage(request):
                     username=signup.cleaned_data["parent_email"],
                     email=signup.cleaned_data["parent_email"],
                 )
-                password = User.objects.make_random_password()
-                user.set_password(password)
-                user.save()
+                password1 = signup.cleaned_data["password1"]
+                password2 = signup.cleaned_data["password2"]
+
+                if password1 and password2 and password1 != password2:
+                    user.set_password(password2)
+                    user.save()
+                else:
+                    signup.add_error(
+                        "Udfyld venligst begge kodeords felter, og sørg for at de matcher"
+                    )
+                    return render(
+                        request, "members/entry_page.html", {"signupform": signup}
+                    )
 
                 # create parent
                 parent = Person.objects.create(
@@ -93,7 +103,6 @@ def EntryPage(request):
                 child.save()
 
                 # redirect to success
-                request.session["password"] = password
                 return HttpResponseRedirect(reverse("user_created"))
             else:
                 return render(
