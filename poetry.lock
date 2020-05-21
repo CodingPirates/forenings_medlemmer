@@ -104,7 +104,7 @@ description = "Hosted coverage reports for GitHub, Bitbucket and Gitlab"
 name = "codecov"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "2.1.0"
+version = "2.1.1"
 
 [package.dependencies]
 coverage = "*"
@@ -673,7 +673,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "c30eff70c035709677f0b719b91a60ff9298e889669d4a6f9a83c6441270c0e9"
+content-hash = "b93a996bc63542fa0bd11b841cc7ab52cbff0c7271344571d142d8235d48f7da"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -715,7 +715,7 @@ click = [
     {file = "click-7.1.1.tar.gz", hash = "sha256:8a18b4ea89d8820c5d0c7da8a64b2c324b4dabb695804dbfea19b9be9d88c0cc"},
 ]
 codecov = [
-    {file = "codecov-2.1.0.tar.gz", hash = "sha256:43ad6cb3e7de073d911aa3ab6a754db88d270fcb0e0d8e2062b964098a51d69b"},
+    {file = "codecov-2.1.1.tar.gz", hash = "sha256:520ab0ef447d695a9f71e83f9fa65eedbd2d6d1022ff88836e27b9eb82fbdc7b"},
 ]
 coverage = [
     {file = "coverage-5.0.4-cp27-cp27m-macosx_10_12_x86_64.whl", hash = "sha256:8a620767b8209f3446197c0e29ba895d75a1e272a36af0786ec70fe7834e4307"},
