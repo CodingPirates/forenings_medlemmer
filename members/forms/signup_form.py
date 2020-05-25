@@ -1,93 +1,10 @@
 from django import forms
 from django.conf import settings
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 
 from members.models.person import Person
 
 
 class signupForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(signupForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.form_action = "entry_page"
-        self.helper.html5_required = True
-        self.helper.layout = Layout(
-            Hidden("form_id", "signup", id="id_form_id"),
-            Fieldset(
-                "Barnets oplysninger",
-                Div(
-                    Div(Field("child_gender"), css_class="col-md-2"),
-                    Div(Field("child_name"), css_class="col-md-10"),
-                    Div(Field("child_birthday",), css_class="col-md-4",),
-                    Div(Field("child_email"), css_class="col-md-4"),
-                    Div(Field("child_phone"), css_class="col-md-4"),
-                    css_class="row",
-                ),
-            ),
-            Fieldset(
-                "Forældres oplysninger",
-                Div(
-                    Div(Field("parent_gender"), css_class="col-md-2"),
-                    Div(Field("parent_name"), css_class="col-md-10"),
-                    Div(Field("parent_birthday",), css_class="col-md-4",),
-                    Div(Field("parent_email"), css_class="col-md-4"),
-                    Div(Field("parent_phone"), css_class="col-md-4"),
-                    css_class="row",
-                ),
-            ),
-            Fieldset(
-                "Adresse oplysninger",
-                Div(
-                    Div(
-                        Field("search_address", id="search-address"),
-                        css_class="col-md-10",
-                    ),
-                    Div(Field("manual_entry", id="manual-entry"), css_class="col-md-2"),
-                    Div(
-                        Field(
-                            "streetname", readonly=True, css_class="autofilled-address"
-                        ),
-                        css_class="col-md-9",
-                    ),
-                    Div(
-                        Field(
-                            "housenumber", readonly=True, css_class="autofilled-address"
-                        ),
-                        css_class="col-md-1",
-                    ),
-                    Div(
-                        Field("floor", readonly=True, css_class="autofilled-address"),
-                        css_class="col-md-1",
-                    ),
-                    Div(
-                        Field("door", readonly=True, css_class="autofilled-address"),
-                        css_class="col-md-1",
-                    ),
-                    Div(
-                        Field("zipcode", readonly=True, css_class="autofilled-address"),
-                        css_class="col-md-2",
-                    ),
-                    Div(
-                        Field("city", readonly=True, css_class="autofilled-address"),
-                        css_class="col-md-5",
-                    ),
-                    Div(
-                        Field(
-                            "placename", readonly=True, css_class="autofilled-address"
-                        ),
-                        css_class="col-md-5",
-                    ),
-                    Hidden("dawa_id", "", id="id_dawa_id"),
-                    css_class="row",
-                ),
-            ),
-            Div(Field("password1")),
-            Div(Field("password2")),
-            Submit("submit", "Opret", css_class="btn-success"),
-        )
-
     password1 = forms.CharField(
         label="Kodeord", required=True, widget=forms.PasswordInput
     )
