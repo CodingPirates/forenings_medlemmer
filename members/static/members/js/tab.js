@@ -28,6 +28,6 @@ function toggleActive(sections, buttons, activeIndex) {
     section.className = section.classList.remove("tab-section-active");
   }
 
-  buttons[activeIndex].className += " tab-active";
-  sections[activeIndex].className += " tab-section-active";
+  buttons[activeIndex].classList.add("tab-active");
+  sections[activeIndex].classList.add("tab-section-active");
 }

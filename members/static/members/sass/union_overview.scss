@@ -1,0 +1,16 @@
+@use "_definitions";
+
+.union_list {
+  display: grid;
+  grid-template-rows: auto;
+  justify-content: stretch;
+  @include _definitions.for-desktop{
+      grid-template-columns: repeat(3, 1fr);
+  }
+  @include _definitions.for-phone{
+      grid-template-columns: repeat(1, 1fr);
+  }
+  > ul{
+    list-style: none;
+  }
+}
