@@ -3,7 +3,8 @@ from factory import Faker, DjangoModelFactory, SubFactory
 from factory.fuzzy import FuzzyChoice
 
 from members.models import Union
-from members.tests.factories import AddressFactory, PersonFactory
+from members.tests.factories import AddressFactory
+from members.tests.factories.person_factory import PersonFactory
 from members.tests.factories.factory_helpers import TIMEZONE
 
 
@@ -29,7 +30,15 @@ class UnionFactory(DjangoModelFactory):
     founded = Faker("date_time", tzinfo=TIMEZONE)
     region = FuzzyChoice([r[0] for r in Union.regions])
     address = SubFactory(AddressFactory)
-    board_members = SubFactory(PersonFactory)
     board_members_old = Faker("text")
     bank_main_org = Faker("boolean")
     bank_account = Faker("numerify", text="####-##########")
+
+    @factory.post_generation
+    def board_members(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for person in extracted:
+                self.board_members.add(person)
