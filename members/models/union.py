@@ -89,7 +89,7 @@ class Union(models.Model):
             raise ValidationError(
                 "Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal bankkonto udfyldes."
             )
-            
+
     def members(self):
         years = range(self.founded.year, (timezone.now().date()).year + 1)
         members = {}
@@ -129,13 +129,11 @@ class Union(models.Model):
         if user.is_superuser:
             return True
         elif (
-            # Remove False and #'s once "Foreningsledere fix" has been implemented.
-            False
-            # user == self.chairman.user
-            # or user == self.second_chair.user
-            # or user == self.cashier.user
-            # or user == self.secretary.user
-            # or self.board_members.objects.filter(Person__user=user) == user
+            user == self.chairman.user
+            or user == self.second_chair.user
+            or user == self.cashier.user
+            or user == self.secretary.user
+            or self.board_members.objects.filter(Person__user=user) == user
         ):
             return True
         else:

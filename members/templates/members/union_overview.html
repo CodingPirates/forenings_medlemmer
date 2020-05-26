@@ -17,7 +17,7 @@
               <ul>
                 <li><a href="members.codingpirates.dk/union_overview/{{union.id}}" ><strong>{{union.name}}</strong></a></li>
                 <li>{{union.address}}</li>
-                <li>Foreningsleder: <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a></li>
+                <li>Foreningsleder: <a href="mailto:{{union.chairman.email}}">{{union.chairman.name}}</a></li>
               </ul>
             {% endfor %}
           </div>

@@ -11,19 +11,19 @@
               <ul>
                 <li>
                     <strong>Formand:</strong>
-                    <a href="mailto:{{union.chairman_email}}">{{union.chairman}}</a>
+                    <a href="mailto:{{union.chairman.email}}">{{union.chairman.name}}</a>
                 </li>
                 <li>
                     <strong>Næstformand:</strong>
-                    <a href="mailto:{{union.second_chair_email}}">{{union.second_chair}}</a>
+                    <a href="mailto:{{union.second_chair.email}}">{{union.second_chair.name}}</a>
                 </li>
                 <li>
                     <strong>Kasserer:</strong>
-                    <a href="mailto:{{union.cashier_email}}">{{union.cashier}}</a>
+                    <a href="mailto:{{union.cashier.email}}">{{union.cashier.name}}</a>
                 </li>
                 <li>
                     <strong>Sekretær:</strong>
-                    <a href="mailto:{{union.secratary_email}}">{{union.secretary}}</a>
+                    <a href="mailto:{{union.secratary.email}}">{{union.secretary.name}}</a>
                 </li>
                 <li>
                     <strong>Foreningsmail:</strong>
@@ -34,10 +34,9 @@
           <div>
             <strong>Menige medlemmer</strong>
             <div>
-              {{union.boardMembers|linebreaks}}
-              <!--{% for boardMember in union.boardMembers %}
+              {% for boardMember in union.boardMembers %}
                 <a href="mailto:{{boardMember.email}}">{{boardMember.name}}</a><br>
-              {% endfor %}-->
+              {% endfor %}
             </div>
           </div>
         </div>
