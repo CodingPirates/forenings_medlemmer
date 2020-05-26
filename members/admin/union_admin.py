@@ -4,6 +4,9 @@ from members.models import Address
 
 
 class UnionAdmin(admin.ModelAdmin):
+    filter_horizontal = ["board_members"]
+    raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
+
     def get_form(self, request, obj=None, **kwargs):
         form = super(UnionAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields["address"].queryset = Address.get_user_addresses(request.user)
@@ -25,18 +28,30 @@ class UnionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Bestyrelsen",
+            "Bestyrelsen nye felter",
             {
                 "fields": (
                     "chairman",
-                    "chairman_email",
                     "second_chair",
-                    "second_chair_email",
                     "cashier",
-                    "cashier_email",
                     "secretary",
-                    "secratary_email",
-                    "boardMembers",
+                    "board_members",
+                )
+            },
+        ),
+        (
+            "Bestyrelsen gamle felter",
+            {
+                "fields": (
+                    "chairman_old",
+                    "chairman_email_old",
+                    "second_chair_old",
+                    "second_chair_email_old",
+                    "cashier_old",
+                    "cashier_email_old",
+                    "secretary_old",
+                    "secretary_email_old",
+                    "board_members_old",
                 )
             },
         ),
