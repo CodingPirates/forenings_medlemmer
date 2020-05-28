@@ -223,17 +223,17 @@ category = "main"
 description = "simplified environment variable parsing"
 name = "environs"
 optional = false
-python-versions = ">=3.5"
-version = "7.4.0"
+python-versions = ">=3.5.3"
+version = "8.0.0"
 
 [package.dependencies]
 marshmallow = ">=2.7.0"
 python-dotenv = "*"
 
 [package.extras]
-dev = ["pytest", "dj-database-url", "dj-email-url", "django-cache-url", "flake8 (3.7.9)", "flake8-bugbear (20.1.4)", "mypy (0.770)", "pre-commit (>=1.20,<3.0)", "tox"]
+dev = ["pytest", "dj-database-url", "dj-email-url", "django-cache-url", "flake8 (3.8.2)", "flake8-bugbear (20.1.4)", "mypy (0.770)", "pre-commit (>=2.4,<3.0)", "tox"]
 django = ["dj-database-url", "dj-email-url", "django-cache-url"]
-lint = ["flake8 (3.7.9)", "flake8-bugbear (20.1.4)", "mypy (0.770)", "pre-commit (>=1.20,<3.0)"]
+lint = ["flake8 (3.8.2)", "flake8-bugbear (20.1.4)", "mypy (0.770)", "pre-commit (>=2.4,<3.0)"]
 tests = ["pytest", "dj-database-url", "dj-email-url", "django-cache-url"]
 
 [[package]]
@@ -673,7 +673,7 @@ version = "5.0.1"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "c30eff70c035709677f0b719b91a60ff9298e889669d4a6f9a83c6441270c0e9"
+content-hash = "4a678ac3d5b4452763a862823d46427e1492a64a75ead2c930a401ae8838e588"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -785,8 +785,8 @@ django-extensions = [
     {file = "django_extensions-2.2.8-py2.py3-none-any.whl", hash = "sha256:1a03c4e8bade575f8c2be6c76456f8a2be3f9b02ab9f47d3535afa9562dc0493"},
 ]
 environs = [
-    {file = "environs-7.4.0-py2.py3-none-any.whl", hash = "sha256:5a130876f555cffafeecd775c2e81a447b46c9a1a27f7241e0a822c4c7d30f2a"},
-    {file = "environs-7.4.0.tar.gz", hash = "sha256:ae38e5263a1da25c3057d3b77eabc7840143f8fb893fb3795532e1aeba5e0806"},
+    {file = "environs-8.0.0-py2.py3-none-any.whl", hash = "sha256:a98005aab7613b6fe7a1af7192a5163f72a52d3348d3918e6c7a2a32e4012779"},
+    {file = "environs-8.0.0.tar.gz", hash = "sha256:bf3fd6bc54fcfd7f512ddcb80a7781f0ced2b0c83dd123d619e9468ecdaaf537"},
 ]
 factory-boy = [
     {file = "factory_boy-2.12.0-py2.py3-none-any.whl", hash = "sha256:728df59b372c9588b83153facf26d3d28947fc750e8e3c95cefa9bed0e6394ee"},
