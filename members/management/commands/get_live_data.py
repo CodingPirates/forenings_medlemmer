@@ -48,8 +48,8 @@ class Command(BaseCommand):
             union_json = json.load(union_file)
 
         for union in union_json:
-            union.pop("region", None)
-            union.pop("REGION_CHOICES", None)
+            union["fields"].pop("region", None)
+            union["fields"].pop("REGION_CHOICES", None)
             _create_person_with_id(union["fields"]["chairman"])
             _create_person_with_id(union["fields"]["second_chair"])
             _create_person_with_id(union["fields"]["secretary"])
