@@ -1,0 +1,16 @@
+@use "_definitions";
+
+.form {
+
+}
+
+#personform {
+  border: 1px solid red;
+  > li {
+    border: 1px solid red;
+    display: grid;
+    grid-template-rows: auto;
+    justify-content: stretch;
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

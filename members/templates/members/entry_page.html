@@ -1,4 +1,4 @@
-{% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
+{% extends 'members/base.html' %}{% load static %}
 {% block content %}
 
 {% if user.is_authenticated %}
@@ -45,9 +45,24 @@
     Indtast barnets og forældrenes informationer, for at tilmelde en Coding
     Pirates-workshop, eller for at komme med på ventelisten.
   </p>
-  <form method="post">
+  <form method="post" class="form">
       {% csrf_token %}
-      {{ signupform }}
+      <h2>Barnets Oplysninger</h2>
+      <section id="personform">
+      {{childform.as_ul}}
+      </section>
+      <h2>Forældres Oplysninger</h2>
+      <section id="personform">
+      {{adultform.as_p}}
+      </section>
+      <h2>Adresse Oplysninger</h2>
+      <section id="addressform">
+      {{addressform.as_p}}
+      </section>
+      <h2>Kodeord</h2>
+      <section id="signupform">
+      {{signupform.as_p}}
+      </signup>
       <input type="submit" value="Opret">
   </form>
 {% endif %}

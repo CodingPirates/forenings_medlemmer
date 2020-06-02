@@ -1,6 +1,6 @@
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
-from members.forms import signupForm
+from members.forms import signupForm, childForm, adultForm, addressForm
 from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponseRedirect
@@ -15,6 +15,9 @@ def EntryPage(request):
         # figure out which form was filled out.
         if request.POST["form_id"] == "signup":
             # signup has been filled
+            childform = childForm(request.POST)
+            adultform = adultForm(request.POST)
+            addressform = addressForm(request.POST)
             signup = signupForm(request.POST)
             if signup.is_valid():
                 # check if family already exists
@@ -29,7 +32,14 @@ def EntryPage(request):
                         "Denne email adresse er allerede oprettet. Du kan tilføje flere børn på samme forælder, når du er kommet videre! - Log ind ovenfor, for at få adgang.",
                     )
                     return render(
-                        request, "members/entry_page.html", {"signupform": signup}
+                        request,
+                        "members/entry_page.html",
+                        {
+                            "signupform": signup,
+                            "childform": childform,
+                            "adultform": adultform,
+                            "addressform": addressform,
+                        },
                     )
                 except Exception:
                     # all is fine - we did not expect any
@@ -58,7 +68,14 @@ def EntryPage(request):
                         "Udfyld venligst begge kodeords felter, og sørg for at de matcher"
                     )
                     return render(
-                        request, "members/entry_page.html", {"signupform": signup}
+                        request,
+                        "members/entry_page.html",
+                        {
+                            "signupform": signup,
+                            "childform": childform,
+                            "adultform": adultform,
+                            "addressform": addressform,
+                        },
                     )
 
                 # create parent
@@ -106,9 +123,28 @@ def EntryPage(request):
                 return HttpResponseRedirect(reverse("user_created"))
             else:
                 return render(
-                    request, "members/entry_page.html", {"signupform": signup}
+                    request,
+                    "members/entry_page.html",
+                    {
+                        "signupform": signup,
+                        "childform": childform,
+                        "adultform": adultform,
+                        "addressform": addressform,
+                    },
                 )
 
     # initial load (if we did not return above)
     signup = signupForm()
-    return render(request, "members/entry_page.html", {"signupform": signup})
+    childform = childForm()
+    adultform = adultForm()
+    addressform = addressForm()
+    return render(
+        request,
+        "members/entry_page.html",
+        {
+            "signupform": signup,
+            "childform": childform,
+            "adultform": adultform,
+            "addressform": addressform,
+        },
+    )
