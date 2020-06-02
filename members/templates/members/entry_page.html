@@ -49,20 +49,28 @@
       {% csrf_token %}
       <h2>Barnets Oplysninger</h2>
       <section id="personform">
+      <ul>
       {{childform.as_ul}}
+      </ul>
       </section>
       <h2>Forældres Oplysninger</h2>
       <section id="personform">
-      {{adultform.as_p}}
+      <ul>
+      {{adultform.as_ul}}
+      </ul>
       </section>
       <h2>Adresse Oplysninger</h2>
       <section id="addressform">
-      {{addressform.as_p}}
+      <ul>
+      {{addressform.as_ul}}
+      </ul>
       </section>
       <h2>Kodeord</h2>
       <section id="signupform">
-      {{signupform.as_p}}
-      </signup>
+      <ul>
+      {{signupform.as_ul}}
+      </ul>
+      </section>
       <input type="submit" value="Opret">
   </form>
 {% endif %}

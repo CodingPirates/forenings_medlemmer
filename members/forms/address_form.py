@@ -5,6 +5,13 @@ class addressForm(forms.Form):
     search_address = forms.CharField(
         label="Indtast adresse", required=False, max_length=200
     )
+
+    manual_entry = forms.ChoiceField(
+        label="Indtast felter manuelt",
+        widget=forms.CheckboxInput,
+        required=False,
+        choices=((True, "True"), (False, "False")),
+    )
     streetname = forms.CharField(
         label="Vejnavn",
         required=True,
@@ -52,10 +59,4 @@ class addressForm(forms.Form):
     )
     form_id = forms.CharField(
         label="Form ID", max_length=10, widget=forms.HiddenInput(), initial="signup"
-    )
-    manual_entry = forms.ChoiceField(
-        label="Indtast felter manuelt",
-        widget=forms.CheckboxInput,
-        required=False,
-        choices=((True, "True"), (False, "False")),
     )
