@@ -51,8 +51,6 @@ class Union(models.Model):
     union_email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
     founded = models.DateField("Stiftet", blank=True, null=True)
-    regions = (("S", "Sjælland"), ("J", "Jylland"), ("F", "Fyn"), ("Ø", "Øer"))
-    region = models.CharField("region", max_length=1, choices=regions)
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
     board_members = models.ManyToManyField("Person", blank=True)
     board_members_old = models.TextField("Menige medlemmer", blank=True)

@@ -21,11 +21,11 @@ class Address(models.Model):
     city = models.CharField("By", max_length=200)
     zipcode = models.CharField("Postnummer", max_length=4)
     REGION_CHOICES = (
-        ("Region Syddanmark", "Region Syddanmark"),
-        ("Region Hovedstaden", "Region Hovedstaden"),
-        ("Region Nordjylland", "Region Nordjylland"),
-        ("Region Midtjylland", "Region Midtjylland"),
-        ("Region Sjælland", "Region Sjælland"),
+        ("Region Syddanmark", "Syddanmark"),
+        ("Region Hovedstaden", "Hovedstaden"),
+        ("Region Nordjylland", "Nordjylland"),
+        ("Region Midtjylland", "Midtjylland"),
+        ("Region Sjælland", "Sjælland"),
     )
     region = models.CharField("Region", choices=REGION_CHOICES, max_length=20)
     municipality = models.CharField("Kommune", max_length=100, blank=True)

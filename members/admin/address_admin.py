@@ -18,6 +18,7 @@ class AddressAdmin(admin.ModelAdmin):
                     "zipcode",
                     "city",
                     "municipality",
+                    "region",
                 )
             },
         ),

@@ -4,6 +4,7 @@ from graphene_django.types import DjangoObjectType
 
 from members.models import (
     Department,
+    Address,
     Union,
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
@@ -35,13 +36,18 @@ class StatisticsUnion(DjangoObjectType):
 class UnionType(DjangoObjectType):
     class Meta:
         model = Union
-        exclude_fields = ("region", "bank_main_org", "bank_account")
+        exclude_fields = ("bank_main_org", "bank_account")
 
 
 class DepartmentType(DjangoObjectType):
     class Meta:
         model = Department
-        # only_fields = ("name", "description")
+
+
+class AddressType(DjangoObjectType):
+    class Meta:
+        model = Address
+        exclude_fields = ("region",)
 
 
 class Query(graphene.ObjectType):
@@ -68,7 +74,9 @@ class Query(graphene.ObjectType):
         return Union.objects.all()
 
     def resolve_departments(self, info, **kwargs):
-        return Department.objects.all()
+        return filter(
+            lambda dep: dep.address.region != "", Department.get_open_departments()
+        )
 
 
 schema = graphene.Schema(query=Query)
