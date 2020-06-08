@@ -4,6 +4,7 @@ from members.models import Address
 
 
 class UnionAdmin(admin.ModelAdmin):
+    list_filter = ("address__region",)
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 

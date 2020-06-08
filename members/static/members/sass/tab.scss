@@ -5,6 +5,7 @@
         display: flex;
         list-style-type: none;
         padding: 0 10px;
+        align-items: stretch;
         @extend %bg-primary;
 
         @include _definitions.for-phone {
@@ -15,8 +16,10 @@
             border-radius: 0.5em;
             cursor: pointer;
             background-color: _definitions.$primary-color-muted;
-            display: inline-block;
+            display: flex;
+            justify-content: center;
             text-align: center;
+            align-items: center;
             padding: 20px 0;
             font-size: 1.5em;
             box-shadow: 0 0 2px black inset;
@@ -35,3 +38,4 @@
         }
     }
   }
+}

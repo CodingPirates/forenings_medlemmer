@@ -1,6 +1,5 @@
 import factory
 from factory import Faker, DjangoModelFactory, SubFactory
-from factory.fuzzy import FuzzyChoice
 
 from members.models import Union
 from members.tests.factories import AddressFactory
@@ -28,7 +27,6 @@ class UnionFactory(DjangoModelFactory):
     union_email = Faker("email")
     statues = Faker("url")
     founded = Faker("date_time", tzinfo=TIMEZONE)
-    region = FuzzyChoice([r[0] for r in Union.regions])
     address = SubFactory(AddressFactory)
     board_members_old = Faker("text")
     bank_main_org = Faker("boolean")
