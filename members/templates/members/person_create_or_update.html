@@ -1,6 +1,21 @@
 {% extends 'members/base.html' %}
-{% load crispy_forms_tags %}
 
 {% block content %}
-  {% crispy form %}
+<form method="post" class="form" id="signup-page">
+    {% csrf_token %}
+    <h3>Barnets Oplysninger</h3>
+    <section id="personform">
+    <ul>
+    {{form.as_ul}}
+    </ul>
+    </section>
+    <h3>Adresse Oplysninger</h3>
+    <section id="addressform_2">
+    <ul>
+    {{addressform.as_ul}}
+    </ul>
+    </section>
+    <input type="submit"  class="button" value="Opret">
+    <a class="btn btn-link" href="{% url 'family_detail' %}"><b>Fortryd</b></a>
+</form>
 {% endblock %}

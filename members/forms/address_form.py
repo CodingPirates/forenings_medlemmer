@@ -2,10 +2,21 @@ from django import forms
 
 
 class addressForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(addressForm, self).__init__(*args, **kwargs)
+        if not self.initial:
+            del self.fields["update_family"]
+
     search_address = forms.CharField(
         label="Indtast adresse", required=False, max_length=200
     )
-
+    update_family = forms.ChoiceField(
+        label="Opdater hele familien med denne adresse",
+        widget=forms.CheckboxInput,
+        initial=True,
+        required=False,
+        choices=((True, "True"), (False, "False")),
+    )
     manual_entry = forms.ChoiceField(
         label="Indtast felter manuelt",
         widget=forms.CheckboxInput,
@@ -56,7 +67,4 @@ class addressForm(forms.Form):
     )
     dawa_id = forms.CharField(
         label="Dawa ID", max_length=200, widget=forms.HiddenInput(), required=False
-    )
-    form_id = forms.CharField(
-        label="Form ID", max_length=10, widget=forms.HiddenInput(), initial="signup"
     )

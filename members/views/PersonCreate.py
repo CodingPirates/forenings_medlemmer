@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-from members.forms import PersonForm
+from members.forms import childForm, adultForm, addressForm
 from members.models.person import Person
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
@@ -23,6 +23,7 @@ def PersonCreate(request, membertype):
             UpdatePersonFromForm(person, form)
             return HttpResponseRedirect(reverse("entry_page"))
     else:
+        data = {}
         person = Person()
         person.membertype = membertype
         if family.person_set.count() > 0:
@@ -36,9 +37,29 @@ def PersonCreate(request, membertype):
             person.door = first_person.door
             person.placename = first_person.placename
             person.dawa_id = first_person.dawa_id
-        form = PersonForm(instance=person)
+            data = {
+                "zipcode": first_person.zipcode,
+                "city": first_person.city,
+                "streetname": first_person.streetname,
+                "housenumber": first_person.housenumber,
+                "floor": first_person.floor,
+                "door": first_person.door,
+                "placename": first_person.placename,
+                "dawa_id": first_person.dawa_id,
+            }
+        if membertype == "CH":
+            form = childForm
+        elif membertype == "PA" or "GU":
+            form = adultForm
+        addressform = addressForm(initial=data)
     return render(
         request,
         "members/person_create_or_update.html",
-        {"form": form, "person": person, "family": family, "membertype": membertype},
+        {
+            "form": form,
+            "addressform": addressform,
+            "person": person,
+            "family": family,
+            "membertype": membertype,
+        },
     )
