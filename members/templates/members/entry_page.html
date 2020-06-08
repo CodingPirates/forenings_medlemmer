@@ -45,33 +45,33 @@
     Indtast barnets og forældrenes informationer, for at tilmelde en Coding
     Pirates-workshop, eller for at komme med på ventelisten.
   </p>
-  <form method="post" class="form">
+  <form method="post" class="form" id="signup-page">
       {% csrf_token %}
-      <h2>Barnets Oplysninger</h2>
+      <h3>Barnets Oplysninger</h3>
       <section id="personform">
       <ul>
       {{childform.as_ul}}
       </ul>
       </section>
-      <h2>Forældres Oplysninger</h2>
+      <h3>Forældres Oplysninger</h3>
       <section id="personform">
       <ul>
       {{adultform.as_ul}}
       </ul>
       </section>
-      <h2>Adresse Oplysninger</h2>
+      <h3>Adresse Oplysninger</h3>
       <section id="addressform">
       <ul>
       {{addressform.as_ul}}
       </ul>
       </section>
-      <h2>Kodeord</h2>
+      <h3>Kodeord</h3>
       <section id="signupform">
       <ul>
       {{signupform.as_ul}}
       </ul>
       </section>
-      <input type="submit" value="Opret">
+      <input type="submit"  class="button" value="Opret">
   </form>
 {% endif %}
 {% endblock %}
