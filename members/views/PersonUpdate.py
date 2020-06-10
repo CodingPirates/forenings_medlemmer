@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-from members.forms import PersonForm
+from members.forms import adultForm, childForm, addressForm
 
 from members.views.UpdatePersonFromForm import UpdatePersonFromForm
 
@@ -21,16 +21,48 @@ def PersonUpdate(request, id):
     )
     if person in persons_in_family:
         if request.method == "POST":
-            form = PersonForm(request.POST, instance=person)
-            if form.is_valid():
-                UpdatePersonFromForm(person, form)
+            if person.membertype == "CH":
+                personform = childForm(request.POST)
+            else:
+                personform = adultForm(request.POST)
+            addressform = addressForm(request.POST, initial={"update_family": True})
+            if personform.is_valid() and addressform.is_valid():
+                UpdatePersonFromForm(person, personform, addressform)
                 return HttpResponseRedirect(reverse("family_detail"))
         else:
-            form = PersonForm(instance=person)
+            if person.membertype == "CH":
+                form = childForm(
+                    initial={
+                        "child_name": person.name,
+                        "child_email": person.email,
+                        "child_phone": person.phone,
+                        "child_birthday": person.birthday,
+                    }
+                )
+            else:
+                form = adultForm(
+                    initial={
+                        "parent_name": person.name,
+                        "parent_email": person.email,
+                        "parent_phone": person.phone,
+                        "parent_birthday": person.birthday,
+                    }
+                )
+            data = {
+                "zipcode": person.zipcode,
+                "city": person.city,
+                "streetname": person.streetname,
+                "housenumber": person.housenumber,
+                "floor": person.floor,
+                "door": person.door,
+                "placename": person.placename,
+                "dawa_id": person.dawa_id,
+            }
+            addressform = addressForm(initial=data)
         return render(
             request,
             "members/person_create_or_update.html",
-            {"form": form, "person": person},
+            {"form": form, "addressform": addressform, "person": person},
         )
     else:
         return HttpResponse("Du kan kun redigere en person i din egen familie")

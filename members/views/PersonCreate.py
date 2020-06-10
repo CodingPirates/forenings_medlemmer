@@ -18,10 +18,14 @@ def PersonCreate(request, membertype):
         person = Person()
         person.membertype = membertype
         person.family = family
-        form = PersonForm(request.POST, instance=person)
-        if form.is_valid():
-            UpdatePersonFromForm(person, form)
-            return HttpResponseRedirect(reverse("entry_page"))
+        if membertype == "CH":
+            personform = childForm(request.POST)
+        elif membertype == "PA" or "GU":
+            personform = adultForm(request.POST)
+        addressform = addressForm(request.POST, initial={"update_family": True})
+        if personform.is_valid() and addressform.is_valid():
+            UpdatePersonFromForm(person, personform, addressform)
+            return HttpResponseRedirect(reverse("family_detail"))
     else:
         data = {}
         person = Person()

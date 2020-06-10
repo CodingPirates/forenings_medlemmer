@@ -3,7 +3,13 @@
 {% block content %}
 <form method="post" class="form" id="signup-page">
     {% csrf_token %}
-    <h3>Barnets Oplysninger</h3>
+    {% if person.membertype == "CH" %}
+      <h3>Barnets Oplysninger</h3>
+    {% elif person.membertype == "PA" %}
+      <h3>Forældres Oplysninger</h3>
+    {% elif person.membertype == "GU" %}
+      <h3>Værgens Oplysninger</h3>
+    {% endif %}
     <section id="personform">
     <ul>
     {{form.as_ul}}

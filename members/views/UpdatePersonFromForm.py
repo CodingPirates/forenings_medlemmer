@@ -1,31 +1,37 @@
-def UpdatePersonFromForm(person, form):
+def UpdatePersonFromForm(person, personform, addressform):
     # Update person and if selected - relatives
+    if person.membertype == "CH":
+        person.name = personform.cleaned_data["child_name"]
+        person.email = personform.cleaned_data["child_email"]
+        person.phone = personform.cleaned_data["child_phone"]
+        person.birthday = personform.cleaned_data["child_birthday"]
+    else:
+        person.name = personform.cleaned_data["parent_name"]
+        person.email = personform.cleaned_data["parent_email"]
+        person.phone = personform.cleaned_data["parent_phone"]
+        person.birthday = personform.cleaned_data["parent_birthday"]
 
-    person.name = form.cleaned_data["name"]
-    person.email = form.cleaned_data["email"]
-    person.phone = form.cleaned_data["phone"]
-    person.birthday = form.cleaned_data["birthday"]
-    person.city = form.cleaned_data["city"]
-    person.zipcode = form.cleaned_data["zipcode"]
-    person.streetname = form.cleaned_data["streetname"]
-    person.housenumber = form.cleaned_data["housenumber"]
-    person.floor = form.cleaned_data["floor"]
-    person.door = form.cleaned_data["door"]
-    person.placename = form.cleaned_data["placename"]
-    person.dawa_id = form.cleaned_data["dawa_id"]
+    person.city = addressform.cleaned_data["city"]
+    person.zipcode = addressform.cleaned_data["zipcode"]
+    person.streetname = addressform.cleaned_data["streetname"]
+    person.housenumber = addressform.cleaned_data["housenumber"]
+    person.floor = addressform.cleaned_data["floor"]
+    person.door = addressform.cleaned_data["door"]
+    person.placename = addressform.cleaned_data["placename"]
+    person.dawa_id = addressform.cleaned_data["dawa_id"]
     person.save()
 
-    if form.cleaned_data["address_global"] in "True":
+    if addressform.cleaned_data["update_family"] == "True":
         relatives = person.family.person_set.all()
 
         for relative in relatives:
-            relative.city = form.cleaned_data["city"]
-            relative.zipcode = form.cleaned_data["zipcode"]
-            relative.streetname = form.cleaned_data["streetname"]
-            relative.housenumber = form.cleaned_data["housenumber"]
-            relative.floor = form.cleaned_data["floor"]
-            relative.door = form.cleaned_data["door"]
-            relative.placename = form.cleaned_data["placename"]
-            relative.dawa_id = form.cleaned_data["dawa_id"]
+            relative.city = addressform.cleaned_data["city"]
+            relative.zipcode = addressform.cleaned_data["zipcode"]
+            relative.streetname = addressform.cleaned_data["streetname"]
+            relative.housenumber = addressform.cleaned_data["housenumber"]
+            relative.floor = addressform.cleaned_data["floor"]
+            relative.door = addressform.cleaned_data["door"]
+            relative.placename = addressform.cleaned_data["placename"]
+            relative.dawa_id = addressform.cleaned_data["dawa_id"]
 
             relative.save()
