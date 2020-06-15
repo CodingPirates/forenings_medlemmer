@@ -1,6 +1,5 @@
 from .signup_form import signupForm
-from .volunteer_signup_form import volunteerForm
-from .admin_signup_form import adminSignupForm
+from .volunteer_form import volunteerForm
 from .activity_signup_form import ActivitySignupForm
 from .activity_invite_decline_form import ActivivtyInviteDeclineForm
 from .child_form import childForm
@@ -12,7 +11,6 @@ __all__ = [
     ActivitySignupForm,
     signupForm,
     volunteerForm,
-    adminSignupForm,
     childForm,
     adultForm,
     addressForm,
