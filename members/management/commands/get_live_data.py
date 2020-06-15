@@ -48,12 +48,17 @@ class Command(BaseCommand):
             union_json = json.load(union_file)
 
         for union in union_json:
+            union["fields"].pop("region", None)
+            union["fields"].pop("REGION_CHOICES", None)
             _create_person_with_id(union["fields"]["chairman"])
             _create_person_with_id(union["fields"]["second_chair"])
             _create_person_with_id(union["fields"]["secretary"])
             _create_person_with_id(union["fields"]["cashier"])
             for board_member in union["fields"]["board_members"]:
                 _create_person_with_id(board_member)
+
+        with open(f"{temp_dir}/union.json", "w") as union_file:
+            json.dump(union_json, union_file)
 
         with open(f"{temp_dir}/department.json", "r") as department_file:
             department_json = json.load(department_file)
