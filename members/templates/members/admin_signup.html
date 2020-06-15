@@ -6,13 +6,22 @@
       <h1>Til afdelingskaptajnen</h1>
       <p>Vi lagde mærke til at du ikke har en profil i systemet som frivillig.</p>
       <p>Derfor beder vi dig udfylde dette skema, så kan vi lave en profil til dig.</p>
-      </div>
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            {% crispy adminSignupForm %}
-          </div>
-        </div>
     </div>
+    <form method="post" class="form" id="signup-page">
+        {% csrf_token %}
+        <h3>Kaptajnens oplysninger</h3>
+        <section id="volunteerform">
+        <ul>
+        {{volunteerform.as_ul}}
+        </ul>
+        </section>
+        <h3>Adresse oplysninger</h3>
+        <section id="addressform">
+        <ul>
+        {{addressform.as_ul}}
+        </ul>
+        </section>
+        <input type="submit"  class="button" value="Opret">
+    </form>
 </div>
 {% endblock %}

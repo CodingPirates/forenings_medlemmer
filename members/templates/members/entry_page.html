@@ -47,19 +47,19 @@
   </p>
   <form method="post" class="form" id="signup-page">
       {% csrf_token %}
-      <h3>Barnets Oplysninger</h3>
+      <h3>Barnets oplysninger</h3>
       <section id="personform">
       <ul>
       {{childform.as_ul}}
       </ul>
       </section>
-      <h3>Forældres Oplysninger</h3>
+      <h3>Forældres oplysninger</h3>
       <section id="personform">
       <ul>
       {{adultform.as_ul}}
       </ul>
       </section>
-      <h3>Adresse Oplysninger</h3>
+      <h3>Adresse oplysninger</h3>
       <section id="addressform">
       <ul>
       {{addressform.as_ul}}

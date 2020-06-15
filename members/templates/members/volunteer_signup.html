@@ -1,5 +1,4 @@
 {% extends 'members/base.html' %}
-{% load crispy_forms_tags %}
 {% block content %}
     <div class="jumbotron">
         <h1>Til frivillige der ikke tidligere er oprettet som forælder</h1>
@@ -14,9 +13,26 @@
             På sigt kommer der flere funktioner, der er relevante for de frivillige.
         </p>
       </div>
-        <div class="card">
-          <div class="card-body">
-            {% crispy vol_signupform %}
-          </div>
-        </div>
+      <form method="post" class="form" id="signup-page">
+          {% csrf_token %}
+          <h3>Frivilliges oplysninger</h3>
+          <section id="volunteerform">
+          <ul>
+          {{volunteerform.as_ul}}
+          </ul>
+          </section>
+          <h3>Adresse oplysninger</h3>
+          <section id="addressform">
+          <ul>
+          {{addressform.as_ul}}
+          </ul>
+          </section>
+          <h3>Kodeord</h3>
+          <section id="signupform">
+          <ul>
+          {{signupform.as_ul}}
+          </ul>
+          </section>
+          <input type="submit"  class="button" value="Opret">
+      </form>
 {% endblock %}
