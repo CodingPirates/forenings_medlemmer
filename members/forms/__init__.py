@@ -1,4 +1,3 @@
-from .person_form import PersonForm
 from .signup_form import signupForm
 from .volunteer_signup_form import vol_signupForm
 from .admin_signup_form import adminSignupForm
@@ -11,7 +10,6 @@ from .address_form import addressForm
 __all__ = [
     ActivivtyInviteDeclineForm,
     ActivitySignupForm,
-    PersonForm,
     signupForm,
     vol_signupForm,
     adminSignupForm,
