@@ -13,7 +13,7 @@ This test creates a super user and checks that the admin interface can be loaded
 """
 
 
-class SignUpTest(StaticLiveServerTestCase):
+class AdminPageTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
 
     def setUp(self):
@@ -33,7 +33,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/admin_load_test.png")
         self.browser.quit()
 
-    def test_entry_page(self):
+    def test_admin_can_load(self):
         # Loads the admin login page
         self.browser.get(f"{self.live_server_url}/admin")
         self.assertIn("admin", self.browser.title)

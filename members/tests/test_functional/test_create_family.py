@@ -21,6 +21,7 @@ class SignUpTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.email = "parent@example.com"
+        self.password = "test123"
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
@@ -72,14 +73,15 @@ class SignUpTest(StaticLiveServerTestCase):
         self.assertEqual("Sverigesgade 20, 5000 Odense C", field.get_attribute("value"))
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
-        # Submit form
+        field = self.browser.find_element_by_name("password1")
+        field.send_keys(self.password)
+        field = self.browser.find_element_by_name("password2")
+        field.send_keys(self.password)
+
         self.browser.find_element_by_name("submit").click()
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
         # Check that redirect and get password
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
-        password = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'Adgangskoden er')]]"
-        )[0].text.split(" ")[-1]
 
         # Go to login page,
         self.browser.find_elements_by_xpath(
@@ -91,7 +93,7 @@ class SignUpTest(StaticLiveServerTestCase):
         field.send_keys(self.email)
 
         field = self.browser.find_element_by_name("password")
-        field.send_keys(password)
+        field.send_keys(self.password)
 
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
 
