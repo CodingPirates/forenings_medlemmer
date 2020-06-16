@@ -16,7 +16,8 @@
     {% endfor %}
   </ul>
   {% for region in departments_region%}
-    <section id="department-container">
+    <section>
+      <div  id="department-container">
       {% for department in region.list%}
         <div id="department-{{department.pk}}">
           <ul>
@@ -55,6 +56,7 @@
           </ul>
         </div>
       {% endfor %}
+      </div>
     </section>
   {% endfor %}
 </div>

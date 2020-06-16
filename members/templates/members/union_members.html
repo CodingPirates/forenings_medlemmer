@@ -34,7 +34,7 @@
           <div>
             <strong>Menige medlemmer</strong>
             <div>
-              {% for boardMember in union.boardMembers %}
+              {% for boardMember in BoardMembers %}
                 <a href="mailto:{{boardMember.email}}">{{boardMember.name}}</a><br>
               {% endfor %}
             </div>

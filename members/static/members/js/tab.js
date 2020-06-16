@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const sections = Array.from(
       Array.from(tabs.children).filter(element => element.tagName === "SECTION")
     );
-
+    console.log(sections);
     // Default to first as active
     toggleActive(sections, tabButtons, 0);
 
@@ -25,7 +25,7 @@ function toggleActive(sections, buttons, activeIndex) {
     button.classList.remove("tab-active");
   }
   for (var section of sections) {
-    section.hidden = true;
+    section.className = section.classList.remove("tab-section-active");
   }
   buttons[activeIndex].classList.add("tab-active");
   sections[activeIndex].classList.add("tab-section-active");

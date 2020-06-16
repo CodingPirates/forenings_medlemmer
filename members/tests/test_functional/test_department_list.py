@@ -7,14 +7,6 @@ from members.tests.factories import DepartmentFactory
 from django.utils import timezone
 from datetime import timedelta
 
-"""
-This test goes to the root signup page and creates a child and parent.
-It uses the address Autocomplete widget to fill the address.
-
-Once the form is filled it uses the generated password and checks that it can be
-used to log in.
-"""
-
 
 class DepartmentListTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
@@ -58,7 +50,7 @@ class DepartmentListTest(StaticLiveServerTestCase):
 
         # check that the department we made in the "Hovedstaden" region is present
         department_name = self.browser.find_element_by_xpath(
-            "//section[@id='department-container']/div/ul/li/a"
+            "//section/div/div/ul/li/a"
         ).get_attribute("text")
         self.assertEqual(department_name, self.department_1.name)
 

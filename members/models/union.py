@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F
 import datetime
+from members.utils.user import user_to_person
 
 
 class Union(models.Model):
@@ -125,14 +126,17 @@ class Union(models.Model):
         return members
 
     def user_union_leader(self, user):
+        board_members = self.board_members.all()
+        for persons in board_members:
+            if persons.user == user:
+                return True
         if user.is_superuser:
             return True
         elif (
-            user == self.chairman.user
-            or user == self.second_chair.user
-            or user == self.cashier.user
-            or user == self.secretary.user
-            or self.board_members.objects.filter(Person__user=user) == user
+            (self.chairman and user == self.chairman.user)
+            or (self.second_chair and user == self.second_chair.user)
+            or (self.cashier and user == self.cashier.user)
+            or (self.secretary and user == self.secretary.user)
         ):
             return True
         else:
