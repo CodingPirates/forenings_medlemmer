@@ -10,7 +10,6 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F
 import datetime
-from members.utils.user import user_to_person
 
 
 class Union(models.Model):
