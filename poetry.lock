@@ -104,7 +104,7 @@ description = "Hosted coverage reports for GitHub, Bitbucket and Gitlab"
 name = "codecov"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "2.1.4"
+version = "2.1.7"
 
 [package.dependencies]
 coverage = "*"
@@ -674,7 +674,7 @@ version = "5.1.0"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "199336670089046d97178471280834e029a963771dc9b4fc5d20e42995c7b4a4"
+content-hash = "c3b19f5355ca8bf4d9b23071fd0c4fdfa3573cd509f0c12d25a227e328dc7089"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -716,9 +716,9 @@ click = [
     {file = "click-7.1.1.tar.gz", hash = "sha256:8a18b4ea89d8820c5d0c7da8a64b2c324b4dabb695804dbfea19b9be9d88c0cc"},
 ]
 codecov = [
-    {file = "codecov-2.1.4-py2.py3-none-any.whl", hash = "sha256:7378c4bec1809dde64031bf7d76c95266b0e6d60cfcd1d6a16ce96bfb6360ac3"},
-    {file = "codecov-2.1.4-py3.8.egg", hash = "sha256:24c24a7c8d1231b83729c7a2a33655ce472a3ba05e0111d52701e3e3075657c9"},
-    {file = "codecov-2.1.4.tar.gz", hash = "sha256:bf30a41f65e747b159e2a749d1f9c92042d358bba0905fd94d3def3a368e592c"},
+    {file = "codecov-2.1.7-py2.py3-none-any.whl", hash = "sha256:b67bb8029e8340a7bf22c71cbece5bd18c96261fdebc2f105ee4d5a005bc8728"},
+    {file = "codecov-2.1.7-py3.8.egg", hash = "sha256:d8b8109f44edad03b24f5f189dac8de9b1e3dc3c791fa37eeaf8c7381503ec34"},
+    {file = "codecov-2.1.7.tar.gz", hash = "sha256:491938ad774ea94a963d5d16354c7299e90422a33a353ba0d38d0943ed1d5091"},
 ]
 coverage = [
     {file = "coverage-5.0.4-cp27-cp27m-macosx_10_12_x86_64.whl", hash = "sha256:8a620767b8209f3446197c0e29ba895d75a1e272a36af0786ec70fe7834e4307"},
@@ -915,6 +915,7 @@ regex = [
     {file = "regex-2020.2.20.tar.gz", hash = "sha256:9e9624440d754733eddbcd4614378c18713d2d9d0dc647cf9c72f64e39671be5"},
 ]
 requests = [
+    {file = "requests-2.23.0-py2.7.egg", hash = "sha256:5d2d0ffbb515f39417009a46c14256291061ac01ba8f875b90cad137de83beb4"},
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
     {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},
 ]
