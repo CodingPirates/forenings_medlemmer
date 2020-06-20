@@ -1,5 +1,6 @@
 from django.contrib import admin
 from members.models import Activity, AdminUserInformation
+from django.utils import timezone
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
@@ -77,8 +78,34 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
             return queryset.filter(waitinglist__department__pk=self.value())
 
 
+class PersonMemberFilter(admin.SimpleListFilter):
+    title = "Medlemskab"
+    parameter_name = "member"
+
+    def lookups(self, request, model_admin):
+        departments = [("any", "Nuværende medlem"), ("none", "Ikke-nuværende medlem")]
+
+        return departments
+
+    def queryset(self, request, queryset):
+        if self.value() == "any":
+            return queryset.filter(member__member_since__lte=timezone.now()).exclude(
+                member__member_until__lte=timezone.now()
+            )  # , member__member_until__gte=timezone.now())
+        elif self.value() == "none":
+            return queryset.exclude(
+                member__member_since__lte=timezone.now(),
+                member__member_until__gte=timezone.now(),
+            ).exclude(
+                member__member_since__lte=timezone.now(),
+                member__member_until__isnull=True,
+            )
+        elif self.value() is None:
+            return queryset
+
+
 class VolunteerListFilter(admin.SimpleListFilter):
-    title = "frivillig i"
+    title = "Frivillig i"
     parameter_name = "volunteer"
 
     def lookups(self, request, model_admin):

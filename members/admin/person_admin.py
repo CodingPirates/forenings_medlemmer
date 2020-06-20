@@ -23,6 +23,7 @@ from .person_admin_filters import (
     PersonWaitinglistListFilter,
     PersonInvitedListFilter,
     PersonParticipantListFilter,
+    PersonMemberFilter,
 )
 
 from .inlines import (
@@ -51,6 +52,7 @@ class PersonAdmin(admin.ModelAdmin):
         VolunteerListFilter,
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
+        PersonMemberFilter,
         PersonParticipantListFilter,
     )
     search_fields = ("name", "family__email", "notes")
