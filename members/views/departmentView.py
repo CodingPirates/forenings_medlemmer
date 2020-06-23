@@ -11,7 +11,11 @@ def departmentView(request, unique=None):
         "members/department_list.html",
         {
             "departments": filter(
-                lambda dep: dep.address.region != "", Department.get_open_departments()
+                lambda dep: dep.isVisible,
+                filter(
+                    lambda dep: dep.address.region != "",
+                    Department.get_open_departments(),
+                ),
             )
         },
     )
