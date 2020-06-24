@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from members.models import User
+from django.contrib.auth.base_user import BaseUserManager
 
 """
 This test goes to the root signup page and creates a child and parent.
@@ -22,7 +22,7 @@ class SignUpTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.email = "parent@example.com"
-        self.password = User.objects.make_random_password()
+        self.password = BaseUserManager().make_random_password()
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
