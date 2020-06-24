@@ -54,5 +54,7 @@ class UnionMembersTest(StaticLiveServerTestCase):
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
         self.browser.save_screenshot("test-screens/union_members_3.png")
 
-        union_founded = self.browser.find_element_by_xpath("(//li[@class=''])[1]").text
+        union_founded = self.browser.find_element_by_xpath(
+            "(//div[@class='tabs reverse']/ul/li)[1]"
+        ).text
         self.assertEqual(int(union_founded), self.union_1.founded.year)
