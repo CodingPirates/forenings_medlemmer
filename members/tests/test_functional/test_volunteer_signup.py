@@ -83,7 +83,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/volunteer_sign_up_screen_3.png")
 
         self.browser.find_element_by_name("submit").click()
-        self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         self.browser.save_screenshot("test-screens/volunteer_sign_up_screen_4.png")
         # Check that redirect and get password
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")

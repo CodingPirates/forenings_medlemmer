@@ -98,7 +98,7 @@ class SignUpTest(StaticLiveServerTestCase):
         field.send_keys(self.password)
 
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
-        self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         # Check that we were redirectet to overview page
         elements = self.browser.find_elements_by_xpath(
