@@ -74,6 +74,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.assertEqual("Sverigesgade 20, 5000 Odense C", field.get_attribute("value"))
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
+        self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         field = self.browser.find_element_by_name("password1")
         field.send_keys(self.password)
         field = self.browser.find_element_by_name("password2")
@@ -97,6 +98,7 @@ class SignUpTest(StaticLiveServerTestCase):
         field.send_keys(self.password)
 
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
+        self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         # Check that we were redirectet to overview page
         elements = self.browser.find_elements_by_xpath(
