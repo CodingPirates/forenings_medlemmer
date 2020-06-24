@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from members.tests.factories import DepartmentFactory
+from members.models import User
 
 """
 This test goes to the volunteer signup page and creates volunteer.
@@ -23,7 +24,7 @@ class SignUpTest(StaticLiveServerTestCase):
     def setUp(self):
         self.department_1 = DepartmentFactory.create()
         self.email = "volunteer@example.com"
-        self.password = "test123"
+        self.password = User.objects.make_random_password()
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
