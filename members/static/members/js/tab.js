@@ -9,8 +9,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
       Array.from(tabs.children).filter(element => element.tagName === "SECTION")
     );
     console.log(sections);
-    // Default to first as active
-    toggleActive(sections, tabButtons, 0);
+
+    // Default to first as active, unless "reverse" class then set last as active
+    if($("div").hasClass("reverse")){
+      toggleActive(sections, tabButtons, tabButtons.length-1);
+    }else{
+      toggleActive(sections, tabButtons, 0);
+    }
 
     for (var button of tabButtons) {
       button.addEventListener("click", event =>

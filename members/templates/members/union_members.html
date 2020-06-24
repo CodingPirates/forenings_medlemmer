@@ -52,7 +52,7 @@
         {% endif %}
     </div>
     {% if access %}
-      <div class="tabs">
+      <div class="tabs reverse">
         <ul>
           {% for year in years %}
             <li>{{year}}</li>
@@ -84,8 +84,10 @@
             </section>
           {% endfor %}
           {% else %}
-            <section>
-            </section>
+            {% for year in years %}
+              <section>
+              </section>
+            {%endfor%}
           {%endif%}
       </div>
     {% endif %}
