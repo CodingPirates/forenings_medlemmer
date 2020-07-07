@@ -4,6 +4,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from django.contrib.auth.base_user import BaseUserManager
@@ -74,14 +75,15 @@ class SignUpTest(StaticLiveServerTestCase):
         self.assertEqual("Sverigesgade 20, 5000 Odense C", field.get_attribute("value"))
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
-        self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         field = self.browser.find_element_by_name("password1")
         field.send_keys(self.password)
+        field.send_keys(Keys.PAGE_DOWN)
         field = self.browser.find_element_by_name("password2")
         field.send_keys(self.password)
+        self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
 
         self.browser.find_element_by_name("submit").click()
-        self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
+        self.browser.save_screenshot("test-screens/sign_up_screen_4.png")
         # Check that redirect and get password
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
 
@@ -98,7 +100,6 @@ class SignUpTest(StaticLiveServerTestCase):
         field.send_keys(self.password)
 
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
-        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         # Check that we were redirectet to overview page
         elements = self.browser.find_elements_by_xpath(
