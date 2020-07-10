@@ -313,7 +313,7 @@ description = "Graphene Django integration"
 name = "graphene-django"
 optional = false
 python-versions = "*"
-version = "2.11.0"
+version = "2.11.1"
 
 [package.dependencies]
 Django = ">=1.11"
@@ -686,7 +686,7 @@ version = "5.1.0"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "c172b749edea5f903fa3cc492a3afc69a19cdd35c7520e7111c29ec2a0ce9290"
+content-hash = "83e2d4d7bf1940c33e12c907b5bf6c50236bc71dbe86a8426e3fe6c3b57e246c"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -824,8 +824,8 @@ graphene = [
     {file = "graphene-2.1.8.tar.gz", hash = "sha256:2cbe6d4ef15cfc7b7805e0760a0e5b80747161ce1b0f990dfdc0d2cf497c12f9"},
 ]
 graphene-django = [
-    {file = "graphene-django-2.11.0.tar.gz", hash = "sha256:6354016ceab1ca25b45bb3689ca8d53c8b004904e10aed0a5cc4db29c92cb690"},
-    {file = "graphene_django-2.11.0-py2.py3-none-any.whl", hash = "sha256:b93b80eb34b72410cd16829f9776483640110d323a2a3169590a6d20d8b258b9"},
+    {file = "graphene-django-2.11.1.tar.gz", hash = "sha256:4ebf61a8b13ff6d7433c95b2efdaf723b1ee6bf8e74a34d89a378f1151c104ff"},
+    {file = "graphene_django-2.11.1-py2.py3-none-any.whl", hash = "sha256:84d0b83349741336dc45d7af65886fbe6d3f6cbc34588e039f73f5ada8b48940"},
 ]
 graphql-core = [
     {file = "graphql-core-2.3.2.tar.gz", hash = "sha256:aac46a9ac524c9855910c14c48fc5d60474def7f99fd10245e76608eba7af746"},
