@@ -9,58 +9,133 @@ import members.models.payable_item
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0022_merge_20200526_1130'),
+        ("members", "0022_merge_20200526_1130"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Membership',
+            name="Membership",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sign_up_date', models.DateField(verbose_name='Opskrivningsdato')),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='members.Person')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sign_up_date", models.DateField(verbose_name="Opskrivningsdato")),
+                (
+                    "person",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="members.Person"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Foreningsmedlemskab',
-                'verbose_name_plural': 'Foreningsmedlemskaber',
-                'ordering': ['union'],
+                "verbose_name": "Foreningsmedlemskab",
+                "verbose_name_plural": "Foreningsmedlemskaber",
+                "ordering": ["union"],
             },
         ),
         migrations.AddField(
-            model_name='union',
-            name='closed',
-            field=models.DateField(blank=True, null=True, verbose_name='Lukket'),
+            model_name="union",
+            name="closed",
+            field=models.DateField(blank=True, null=True, verbose_name="Lukket"),
         ),
         migrations.AddField(
-            model_name='union',
-            name='membership_price_ore',
-            field=models.IntegerField(default=7500, verbose_name='Medlemskontingent i ører'),
+            model_name="union",
+            name="membership_price_ore",
+            field=models.IntegerField(
+                default=7500, verbose_name="Medlemskontingent i ører"
+            ),
         ),
         migrations.CreateModel(
-            name='PayableItem',
+            name="PayableItem",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('added', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Tilføjet')),
-                ('refunded', models.DateTimeField(blank=True, null=True, verbose_name='Refunderet')),
-                ('amount_ore', models.IntegerField(verbose_name='Beløb i øre')),
-                ('quick_pay_order_id', models.CharField(default=members.models.payable_item._set_quickpay_order_id, max_length=20, unique=True, verbose_name='Quick Pay order ID')),
-                ('accepted', models.BooleanField(default=False, verbose_name='Accepteret')),
-                ('processed', models.BooleanField(default=False, verbose_name='Processed')),
-                ('confirmation_sent', models.BooleanField(default=False, verbose_name='Bekræftelse sendt')),
-                ('quick_pay_id', models.IntegerField(verbose_name='Quick Pay ID')),
-                ('_payment_link', models.URLField(blank=True, null=True, verbose_name='Betalingslink')),
-                ('membership', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='payment', to='members.Membership')),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='payments', to='members.Person')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "added",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="Tilføjet"
+                    ),
+                ),
+                (
+                    "refunded",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Refunderet"
+                    ),
+                ),
+                ("amount_ore", models.IntegerField(verbose_name="Beløb i øre")),
+                (
+                    "quick_pay_order_id",
+                    models.CharField(
+                        default=members.models.payable_item._set_quickpay_order_id,
+                        max_length=20,
+                        unique=True,
+                        verbose_name="Quick Pay order ID",
+                    ),
+                ),
+                (
+                    "accepted",
+                    models.BooleanField(default=False, verbose_name="Accepteret"),
+                ),
+                (
+                    "processed",
+                    models.BooleanField(default=False, verbose_name="Processed"),
+                ),
+                (
+                    "confirmation_sent",
+                    models.BooleanField(
+                        default=False, verbose_name="Bekræftelse sendt"
+                    ),
+                ),
+                ("quick_pay_id", models.IntegerField(verbose_name="Quick Pay ID")),
+                (
+                    "_payment_link",
+                    models.URLField(
+                        blank=True, null=True, verbose_name="Betalingslink"
+                    ),
+                ),
+                (
+                    "membership",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="payment",
+                        to="members.Membership",
+                    ),
+                ),
+                (
+                    "person",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="payments",
+                        to="members.Person",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Betaling',
-                'verbose_name_plural': 'Betalinger',
-                'ordering': ['added'],
+                "verbose_name": "Betaling",
+                "verbose_name_plural": "Betalinger",
+                "ordering": ["added"],
             },
         ),
         migrations.AddField(
-            model_name='membership',
-            name='union',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='members.Union'),
+            model_name="membership",
+            name="union",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="members.Union"
+            ),
         ),
     ]
