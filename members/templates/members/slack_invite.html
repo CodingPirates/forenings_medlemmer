@@ -1,0 +1,26 @@
+{% load static %}
+<div class="container">
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut nec nunc nisl. Suspendisse eu neque tempus, fringilla justo quis, ultrices quam. Nam eleifend feugiat ipsum, sed sodales eros luctus sed.</p>
+  <form
+    action="http://slackinvite.codingpirates.dk/invite"
+    method="post"
+    target="_blank"
+  >
+    <div class="form-group">
+      <label for="name">Navn:</label>
+      <input name="name" type="text" class="form-control" id="name" placeholder="Miss 1337" required>
+      <label for="email">Email:</label>
+      <input name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Kaptajn@Hack.dk" required>
+    </div>
+    <div class="form-group">
+      <label for="type"><strong>Frivillig eller barn?</strong></label>
+      <label class="radio-inline"><input type="radio" name="type" value="frivillig" required>Frivillig</label>
+      <label class="radio-inline"><input type="radio" name="type" value="barn" required>barn</label>
+    </div>
+    <div class="form-group">
+      <label for="info">Info:</label>
+      <textarea name="info" class="form-control" rows="5" id="info" placeholder="Fortæl lidt om dig selv. Hvilken forening/afdeling? Sidder du i en bestyrelse? Er der andet vi skal vide?" required></textarea>
+    </div>
+    <button id="slack_indsend" type="submit" class="btn block-button">Indsend</button>
+  </form>
+</div>
