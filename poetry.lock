@@ -217,10 +217,7 @@ description = "Extensions for Django"
 name = "django-extensions"
 optional = false
 python-versions = ">=3.5"
-version = "3.0.3"
-
-[package.dependencies]
-six = ">=1.2"
+version = "3.0.5"
 
 [[package]]
 category = "main"
@@ -687,7 +684,7 @@ version = "5.2.0"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "e75a0f4e6c2cddb2c33c80a3952fc3e42e86caa468097c430587ed0893e9fff6"
+content-hash = "952813cd24b2bd0cf373465f676e96c64da1968d9fb0f9cfedf1736f7599a060"
 python-versions = "^3.8.0"
 
 [metadata.files]
@@ -800,8 +797,8 @@ django-cron = [
     {file = "django-cron-0.5.1.tar.gz", hash = "sha256:08d22708c8b2ecab8cda989019a66c7e1e2424c59d822796fd45abf7731d261d"},
 ]
 django-extensions = [
-    {file = "django-extensions-3.0.3.tar.gz", hash = "sha256:6230898b1e1d5deb3ddab8335b2d270edb7afa4ef916a95e479a19fdfb0464cb"},
-    {file = "django_extensions-3.0.3-py2.py3-none-any.whl", hash = "sha256:d5fcf8f3bab019487e07473c24453bccd5acfb4440f3ef36788294c307b09d4c"},
+    {file = "django-extensions-3.0.5.tar.gz", hash = "sha256:6306175ae8c78c18ea7aff794f5fa3a47de7d128666e6668bd40596895da7f84"},
+    {file = "django_extensions-3.0.5-py2.py3-none-any.whl", hash = "sha256:40d4b7aec7bbe66dda8704fbfaf2e1b7e04ec4aea6b10dcbd78d8af7c37bfddb"},
 ]
 environs = [
     {file = "environs-8.0.0-py2.py3-none-any.whl", hash = "sha256:a98005aab7613b6fe7a1af7192a5163f72a52d3348d3918e6c7a2a32e4012779"},
