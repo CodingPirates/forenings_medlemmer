@@ -1,11 +1,8 @@
 {% load static %}
+<script src="{% static "members/js/slackform.js" %}"></script>
 <div class="container">
   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut nec nunc nisl. Suspendisse eu neque tempus, fringilla justo quis, ultrices quam. Nam eleifend feugiat ipsum, sed sodales eros luctus sed.</p>
-  <form
-    action="http://slackinvite.codingpirates.dk/invite"
-    method="post"
-    target="_blank"
-  >
+  <form id="slackform" action="" onsubmit="sendSlackDetails()">
     <div class="form-group">
       <label for="name">Navn:</label>
       <input name="name" type="text" class="form-control" id="name" placeholder="Miss 1337" required>
@@ -21,6 +18,7 @@
       <label for="info">Info:</label>
       <textarea name="info" class="form-control" rows="5" id="info" placeholder="Fortæl lidt om dig selv. Hvilken forening/afdeling? Sidder du i en bestyrelse? Er der andet vi skal vide?" required></textarea>
     </div>
-    <button id="slack_indsend" type="submit" class="btn block-button">Indsend</button>
+    <p id="slack_succes" hidden>Success</p>
+    <button type="submit" class="btn block-button">Indsend</button>
   </form>
 </div>
