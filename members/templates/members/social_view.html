@@ -1,0 +1,26 @@
+{% extends 'members/base.html' %}
+{% load static %}
+
+{% block content %}
+      <h1>&nbsp;</h1>
+      <div class="jumbotron">
+        <p>Herunder kan du finde og tilmelde dig vores forskellige commuinities og kommunikations kanaler, så du kan holde dig godt opdateret:</p>
+        <div class="tabs">
+          <ul>
+            <li>Piratnyt - Nyhedsbrev</li>
+            <li>Coding Pirates Slack</li>
+            <li>Coding Pirates Facebook</li>
+          </ul>
+          <section>
+            {% include "members/mailchimp_signup_form.html"%}
+          </section>
+          <section>
+            {% include "members/slack_invite.html" %}
+          </section>
+          <section>
+            <div class="container">
+              <a href="https://www.facebook.com/groups/codingpiratescommunity"><img src="{% static "facebook_header_image.png" %}"></a>
+            </div>
+          </section>
+      </div>
+{% endblock %}
