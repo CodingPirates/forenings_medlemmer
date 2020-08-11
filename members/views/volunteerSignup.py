@@ -86,6 +86,7 @@ def volunteerSignup(request):
                 # department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
 
                 # redirect to success
+                request.session["volunteer"] = True
                 request.session["password"] = password
                 return HttpResponseRedirect(reverse("user_created"))
             else:

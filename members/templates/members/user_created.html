@@ -6,19 +6,24 @@
       <div class="jumbotron">
         <h1>Brugeren er oprettet!</h1>
         <p>Vi har oprettet en bruger til dig. Du logger ind ved hjælp af din e-mail-adresse samt adgangskode.</p>
+        <p><i>Adgangskoden er {{ password }}</i></p>
         <p>Herunder kan du finde og tilmelde dig vores forskellige communities og kommunikations kanaler, så du kan holde dig godt opdateret:</p>
         <div class="tabs">
           <ul>
-            <li>Piratnyt - Nyhedsbrev</li>
-            <li>Coding Pirates Slack</li>
-            <li>Coding Pirates Facebook</li>
+            {% if volunteer %}
+              <li>Piratnyt - Nyhedsbrev</li>
+              <li>Coding Pirates Slack</li>
+            {% endif %}
+              <li>Coding Pirates Facebook</li>
           </ul>
-          <section>
-            {% include "members/mailchimp_signup_form.html"%}
-          </section>
-          <section>
-            {% include "members/slack_invite.html" %}
-          </section>
+          {% if volunteer %}
+            <section>
+              {% include "members/mailchimp_signup_form.html"%}
+            </section>
+            <section>
+              {% include "members/slack_invite.html" %}
+            </section>
+          {% endif %}
           <section>
             <div class="container">
               <a href="https://www.facebook.com/groups/codingpiratescommunity"><img src="{% static "facebook_header_image.png" %}"></a>

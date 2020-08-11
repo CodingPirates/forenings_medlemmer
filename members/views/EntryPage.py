@@ -94,6 +94,7 @@ def EntryPage(request):
 
                 # redirect to success
                 request.session["password"] = password
+                request.session["volunteer"] = False
                 return HttpResponseRedirect(reverse("user_created"))
             else:
                 return render(

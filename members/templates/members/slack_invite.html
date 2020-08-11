@@ -1,7 +1,7 @@
 {% load static %}
 <div class="container">
   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut nec nunc nisl. Suspendisse eu neque tempus, fringilla justo quis, ultrices quam. Nam eleifend feugiat ipsum, sed sodales eros luctus sed.</p>
-  <form id="slackform" action="" onsubmit="sendSlackDetails()">
+  <form id="slackform" action="" onsubmit="return sendSlackDetails(event)">
     <div class="form-group">
       <label for="name">Navn:</label>
       <input name="name" type="text" class="form-control" id="name" placeholder="Miss 1337" required>
@@ -22,10 +22,16 @@
   </form>
 </div>
 <script type="text/javascript">
-function sendSlackDetails() {
-  var form = new FormData(document.getElementById('slackform'));
+function sendSlackDetails(event) {
+  event.preventDefault()
+  var form = new FormData();
+  form.append("name", "torben test");
+  form.append("email", "test@test.dk");
+  form.append("type", "frivillig");
+  form.append("info", "beskrivelse");
   fetch("https://slackinvite.codingpirates.dk/invite", {
     "method": "POST",
+    "mode": "no-cors",
     "headers": {
       "content-type": "multipart/form-data;"
     },
@@ -38,5 +44,4 @@ function sendSlackDetails() {
     console.error(err);
   });
 }
-alert("The form was submitted");
 </script>

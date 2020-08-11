@@ -6,9 +6,17 @@ from django.http import HttpResponse
 @xframe_options_exempt
 def userCreated(request):
     if "password" in request.session:
+        password = request.session.get("password")
         del request.session["password"]
+        volunteer = False
+        if request.session.get("volunteer"):
+            volunteer = True
     else:
         return HttpResponse(
             "Du kan ikke tilgå adressen direkte. Du skal oprette en bruger for at komme hertil."
         )
-    return render(request, "members/user_created.html")
+    return render(
+        request,
+        "members/user_created.html",
+        {"password": password, "volunteer": volunteer},
+    )
