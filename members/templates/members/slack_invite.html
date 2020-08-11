@@ -1,5 +1,4 @@
 {% load static %}
-<script src="{% static "members/js/slackform.js" %}"></script>
 <div class="container">
   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut nec nunc nisl. Suspendisse eu neque tempus, fringilla justo quis, ultrices quam. Nam eleifend feugiat ipsum, sed sodales eros luctus sed.</p>
   <form id="slackform" action="" onsubmit="sendSlackDetails()">
@@ -22,3 +21,22 @@
     <button type="submit" class="btn block-button">Indsend</button>
   </form>
 </div>
+<script type="text/javascript">
+function sendSlackDetails() {
+  var form = new FormData(document.getElementById('slackform'));
+  fetch("https://slackinvite.codingpirates.dk/invite", {
+    "method": "POST",
+    "headers": {
+      "content-type": "multipart/form-data;"
+    },
+    "body": form
+  })
+  .then(response => {
+    console.log(response);
+  })
+  .catch(err => {
+    console.error(err);
+  });
+}
+alert("The form was submitted");
+</script>

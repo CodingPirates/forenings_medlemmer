@@ -1,4 +1,5 @@
 function sendSlackDetails() {
+  alert("The form was submitted");
   var form = new FormData(document.getElementById('slackform'));
   fetch("https://slackinvite.codingpirates.dk/invite", {
     "method": "POST",
