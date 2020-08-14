@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from members.tests.factories import UnionFactory
+from members.tests.factories import UnionFactory, PersonFactory
 from members.models import Union
 
 
@@ -31,3 +31,28 @@ class TestModelUnion(TestCase):
     def test_string_representation(self):
         union = UnionFactory()
         self.assertEqual("Foreningen for " + union.name, str(union))
+
+    def test_user_union_leader(self):
+        union = UnionFactory()
+
+        super_user = PersonFactory.create()
+        super_user.user.is_superuser = True
+        super_user.user.save()
+
+        user_board_position = PersonFactory.create()
+        union.chairman = user_board_position
+        union.save()
+
+        user_board_member = PersonFactory.create()
+        union.board_members.add(user_board_member)
+        union.save()
+
+        normal_user = PersonFactory()
+        user_is_none = PersonFactory()
+        user_is_none.user = None
+
+        self.assertTrue(union.user_union_leader(super_user.user))
+        self.assertTrue(union.user_union_leader(user_board_position.user))
+        self.assertTrue(union.user_union_leader(user_board_member.user))
+        self.assertFalse(union.user_union_leader(normal_user.user))
+        self.assertFalse(union.user_union_leader(user_is_none.user))

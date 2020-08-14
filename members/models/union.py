@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from django.db import models
 from .payment import Payment
 from .activity import Activity
@@ -125,18 +123,16 @@ class Union(models.Model):
         return members
 
     def user_union_leader(self, user):
-        board_members = self.board_members.all()
-        for persons in board_members:
-            if persons.user == user:
-                return True
-        if user.is_superuser:
-            return True
-        elif (
-            (self.chairman and user == self.chairman.user)
-            or (self.second_chair and user == self.second_chair.user)
-            or (self.cashier and user == self.cashier.user)
-            or (self.secretary and user == self.secretary.user)
-        ):
-            return True
-        else:
-            return False
+        people_on_board = [person.user for person in self.board_members.all()]
+        board_posistions = [
+            self.chairman,
+            self.second_chair,
+            self.cashier,
+            self.secretary,
+        ]
+        board_posistions = [
+            position.user for position in board_posistions if position is not None
+        ]
+        return user is not None and (
+            user.is_superuser or user in people_on_board + board_posistions
+        )
