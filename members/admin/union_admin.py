@@ -50,8 +50,10 @@ class UnionAdmin(admin.ModelAdmin):
                     "meeting_notes",
                     "founded",
                 ),
-                "description": "Indsæt et link til jeres vedtægter, jeres seneste referater, hvornår I er stiftet (har holdt stiftende \
-                generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
+                "description": """
+                    Indsæt et link til jeres vedtægter, jeres seneste referater, \
+                    hvornår I er stiftet (har holdt stiftende generalforsamling) \
+                    og jeres bankkonto hvis I har sådan en til foreningen.""",
             },
         ),
     ]
