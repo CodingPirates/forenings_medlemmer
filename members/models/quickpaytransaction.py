@@ -103,17 +103,14 @@ class QuickpayTransaction(models.Model):
         client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
         # get payment id from order id
-        transactions = client.get("/payments", order_id=self.order_id)
+        transaction = client.get(f"/payments/{self.transaction_id}")
 
-        if len(transactions) > 0:
-            transaction = transactions[0]
-
-            if transaction["state"] == "processed" and transaction["accepted"]:
-                self.payment.set_confirmed()
-            if transaction["state"] == "new" and transaction["accepted"]:
-                self.payment.set_accepted()
-            if transaction["state"] == "rejected" and not transaction["accepted"]:
-                self.payment.set_rejected(repr(transaction))
+        if transaction["state"] == "processed" and transaction["accepted"]:
+            self.payment.set_confirmed()
+        if transaction["state"] == "new" and transaction["accepted"]:
+            self.payment.set_accepted()
+        if transaction["state"] == "rejected" and not transaction["accepted"]:
+            self.payment.set_rejected(repr(transaction))
 
     def __str__(self):
         return (

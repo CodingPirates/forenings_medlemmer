@@ -1,27 +1,19 @@
 import os
 import socket
-from datetime import date
 import time
+from datetime import date
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test.utils import override_settings
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.common.keys import Keys
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.core import mail
-from django.test.utils import override_settings
+from selenium.webdriver.support.ui import Select
 
-from members.models import Payment, ActivityParticipant, quickpaytransaction
-
-from members.tests.factories import (
-    FamilyFactory,
-    PersonFactory,
-    UnionFactory,
-    ActivityFactory,
-)
+from members.models import Payment
+from members.tests.factories import ActivityFactory, FamilyFactory, PersonFactory
 
 from .functional_helpers import get_text_contains, log_in
-
 
 """
 Creates two children and pays for thir activities, the first fails the second
