@@ -1,6 +1,6 @@
 import factory
-from factory import Faker, DjangoModelFactory, SubFactory
-
+from factory import Faker, SubFactory
+from factory.django import DjangoModelFactory
 from members.models import Union
 from members.tests.factories import AddressFactory
 from members.tests.factories.factory_helpers import TIMEZONE
