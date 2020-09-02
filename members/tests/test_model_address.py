@@ -37,7 +37,8 @@ class TestModelAddress(TestCase):
         home = Address.objects.create(
             dawa_id="02ba51b3-3482-4c59-be8f-f42bf2b243b6",
             dawa_overwrite=True,
-            latitude=12.591215)
+            latitude=12.591215,
+        )
         home.save()
         self.assertEqual(home.latitude, 12.591215)
 
