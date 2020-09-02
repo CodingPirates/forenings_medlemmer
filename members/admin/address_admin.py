@@ -24,6 +24,6 @@ class AddressAdmin(admin.ModelAdmin):
         ),
         (
             "Dawa info",
-            {"fields": ("dawa_id", "longitude", "latitude"), "classes": ("collapse",)},
+            {"fields": ("dawa_id", "dawa_overwrite", "longitude", "latitude"), "classes": ("collapse",)},
         ),
     ]
