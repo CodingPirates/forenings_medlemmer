@@ -7,7 +7,8 @@ from members.tests.factories.activity_participant_factory import (
 from members.tests.factories.person_factory import PersonFactory
 from members.tests.factories.family_factory import FamilyFactory
 from factory.fuzzy import FuzzyInteger
-from factory import Faker, DjangoModelFactory, SubFactory
+from factory import Faker, SubFactory
+from factory.django import DjangoModelFactory
 
 
 class PaymentFactory(DjangoModelFactory):
