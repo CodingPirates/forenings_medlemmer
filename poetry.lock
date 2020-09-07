@@ -281,12 +281,11 @@ category = "main"
 description = "Let your Python tests travel through time"
 name = "freezegun"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "0.3.15"
+python-versions = ">=3.5"
+version = "1.0.0"
 
 [package.dependencies]
-python-dateutil = ">=1.0,<2.0 || >2.0"
-six = "*"
+python-dateutil = ">=2.7"
 
 [[package]]
 category = "main"
@@ -687,7 +686,7 @@ version = "5.2.0"
 brotli = ["brotli"]
 
 [metadata]
-content-hash = "d3218a4163bd0f980d55ae892e4de348fea0b1476e23918603bd8a00a7989054"
+content-hash = "119d841a6089ec8621fd8eef6012ecdd3c3e1919d7ad774cc43c2f022f04b173"
 lock-version = "1.0"
 python-versions = "^3.8.0"
 
@@ -820,8 +819,8 @@ flake8 = [
     {file = "flake8-3.8.3.tar.gz", hash = "sha256:f04b9fcbac03b0a3e58c0ab3a0ecc462e023a9faf046d57794184028123aa208"},
 ]
 freezegun = [
-    {file = "freezegun-0.3.15-py2.py3-none-any.whl", hash = "sha256:82c757a05b7c7ca3e176bfebd7d6779fd9139c7cb4ef969c38a28d74deef89b2"},
-    {file = "freezegun-0.3.15.tar.gz", hash = "sha256:e2062f2c7f95cc276a834c22f1a17179467176b624cc6f936e8bc3be5535ad1b"},
+    {file = "freezegun-1.0.0-py2.py3-none-any.whl", hash = "sha256:02b35de52f4699a78f6ac4518e4cd3390dddc43b0aeb978335a8f270a2d9668b"},
+    {file = "freezegun-1.0.0.tar.gz", hash = "sha256:1cf08e441f913ff5e59b19cc065a8faa9dd1ddc442eaf0375294f344581a0643"},
 ]
 graphene = [
     {file = "graphene-2.1.8-py2.py3-none-any.whl", hash = "sha256:09165f03e1591b76bf57b133482db9be6dac72c74b0a628d3c93182af9c5a896"},
