@@ -15,7 +15,7 @@
           <div class="union_list">
             {% for union in region.list%}
               <ul>
-                <li><a href="{% url 'unionMembersView' '{{union.id}}' %}"><strong>{{union.name}}</strong></a></li>
+                <li><a href="{% url 'unionMembersView' union.id %}"><strong>{{union.name}}</strong></a></li>
                 <li>{{union.address}}</li>
                 <li>Foreningsleder: <a href="mailto:{{union.chairman.email}}">{{union.chairman.name}}</a></li>
               </ul>
