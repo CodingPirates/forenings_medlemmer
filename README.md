@@ -16,7 +16,7 @@ volunteers.
 
 ### Development
 
-For more info, see our [contributing guide](./github/CONTRIBUTING.md) or ask on
+For more info, see our [contributing guide](./.github/CONTRIBUTING.md) or ask on
 [Slack][slack]
 
 <!-- Links -->

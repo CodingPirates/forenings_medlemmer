@@ -1,5 +1,5 @@
-from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute
-
+from factory import Faker, SubFactory, LazyAttribute
+from factory.django import DjangoModelFactory
 from members.models import Department
 from members.tests.factories.union_factory import UnionFactory
 from members.tests.factories.address_factory import AddressFactory

@@ -33,6 +33,15 @@ class TestModelAddress(TestCase):
             str(placename_address), "Himmelev Bygade 3, Himmelev, 4000 Roskilde"
         )
 
+    def test_dawa_overwrite(self):
+        home = Address.objects.create(
+            dawa_id="02ba51b3-3482-4c59-be8f-f42bf2b243b6",
+            dawa_overwrite=True,
+            latitude=12.591215,
+        )
+        home.save()
+        self.assertEqual(home.latitude, 12.591215)
+
     def test_fetch_data_by_dawa_id(self):
         home = Address.objects.create(dawa_id="7dd8edbb-370f-4cdf-836c-6b4969a0da9c")
         home.get_dawa_data()
