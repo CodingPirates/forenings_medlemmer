@@ -106,13 +106,17 @@ class Union(models.Model):
                 for participant in ActivityParticipant.objects.filter(
                     activity=activity
                 ).distinct():
+                    date = timezone.now().date()
+                    date.year = year
+                    date.month = 9
+                    date.day = 30
                     if (
                         len(
                             Payment.objects.filter(
                                 person=participant.member.person,
                                 amount_ore__gte=7500,
                                 activity=activity,
-                                confirmed_dtm__lte=datetime.datetime(year, 9, 30),
+                                confirmed_dtm__lte=date,
                                 refunded_dtm__isnull=True,
                             )
                         )
