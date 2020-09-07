@@ -1,5 +1,6 @@
 import factory
-from factory import Faker, DjangoModelFactory
+from factory import Faker
+from factory.django import DjangoModelFactory
 from members.models import Family
 from members.tests.factories.factory_helpers import TIMEZONE
 
