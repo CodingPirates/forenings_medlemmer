@@ -2,8 +2,8 @@ from members.tests.factories.factory_helpers import TIMEZONE
 from members.models import Volunteer
 from members.tests.factories.person_factory import PersonFactory
 from members.tests.factories.department_factory import DepartmentFactory
-from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute
-
+from factory import Faker, SubFactory, LazyAttribute
+from factory.django import DjangoModelFactory
 from members.tests.factories.factory_helpers import datetime_after
 
 

@@ -5,8 +5,8 @@ from members.models import Activity
 from members.tests.factories.union_factory import UnionFactory
 from members.tests.factories.department_factory import DepartmentFactory
 from django.utils import timezone
-from factory import Faker, DjangoModelFactory, SubFactory, LazyAttribute
-
+from factory import Faker, SubFactory, LazyAttribute
+from factory.django import DjangoModelFactory
 from members.tests.factories.factory_helpers import (
     datetime_after,
     datetime_before,

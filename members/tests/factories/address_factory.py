@@ -1,4 +1,5 @@
-from factory import Faker, DjangoModelFactory
+from factory import Faker
+from factory.django import DjangoModelFactory
 
 from members.models import Address
 from factory.fuzzy import FuzzyChoice
