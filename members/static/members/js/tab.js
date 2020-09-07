@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const sections = Array.from(
       Array.from(tabs.children).filter(element => element.tagName === "SECTION")
     );
-    console.log(sections);
 
     // Default to first as active, unless "reverse" class then set last as active
     if($("div").hasClass("reverse")){

@@ -11,8 +11,6 @@ def unionMembersView(request, union_id):
     members = []
     union = get_object_or_404(Union, pk=union_id)
 
-    BoardMembers = union.board_members.all()
-
     user_has_access = Union.user_union_leader(union, request.user)
 
     if user_has_access:
@@ -26,7 +24,7 @@ def unionMembersView(request, union_id):
         "current_year": today.year,
         "members": members,
         "union": union,
-        "BoardMembers": BoardMembers,
+        "boardmembers": union.board_members.all(),
         "access": user_has_access,
     }
 
