@@ -93,18 +93,18 @@ class Union(models.Model):
         for year in years:
             temp_members = []
             union_activities_1 = Activity.objects.filter(
-                member_justified=True,
-                union=self.id,
-                end_date__gt=F("start_date") + timedelta(days=2),
-                start_date__year=year,
+                member_justified=True, union=self.id, start_date__year=year,
             )
             search_string = f"forenings medlemsskab {year}"
             union_activities_2 = Activity.objects.filter(
                 member_justified=True, name__icontains=search_string
             ).union(union_activities_1)
+            print("År" + year)
+            print("union_activities_1")
             print(union_activities_1)
-            print("/n")
+            print("union_activities_2")
             print(union_activities_2)
+            print("")
             for activity in union_activities_2:
                 for participant in ActivityParticipant.objects.filter(
                     activity=activity
