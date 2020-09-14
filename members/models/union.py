@@ -1,6 +1,7 @@
 from django.db import models
 from .payment import Payment
 from .activity import Activity
+from .person import Person
 from .activityparticipant import ActivityParticipant
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -118,6 +119,7 @@ class Union(models.Model):
                         > 0
                     ):
                         temp_members.append(participant.member.person)
+            members[year] = Person.objects.filter().first().get()
             members[year] = temp_members
         return members
 
