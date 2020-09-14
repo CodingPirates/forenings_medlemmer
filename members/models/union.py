@@ -102,10 +102,9 @@ class Union(models.Model):
                 end_date__gt=F("start_date") + timedelta(days=2),
                 start_date__year=year,
             )
-            search_string = f"forenings medlemsskab {year}"
             union_activities_2 = Activity.objects.filter(
-                member_justified=True, name__icontains=search_string
-            )
+                member_justified=True, union_id=self.id, start_date__year=year,
+            ).union(union_activities_1)
             print("År")
             print(year)
             print("union_activities_1")
