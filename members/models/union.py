@@ -6,8 +6,10 @@ from .activityparticipant import ActivityParticipant
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
+from django.utils.timezone import make_aware
 from datetime import timedelta
 from django.db.models import F
+import datetime
 
 
 class Union(models.Model):
@@ -116,7 +118,9 @@ class Union(models.Model):
                                 person=participant.member.person,
                                 amount_ore__gte=7500,
                                 activity=activity,
-                                confirmed_dtm__lte=timezone.datetime(year, 9, 30),
+                                confirmed_dtm__lte=make_aware(
+                                    datetime.datetime(year, 9, 30)
+                                ),
                                 refunded_dtm__isnull=True,
                             )
                         )
