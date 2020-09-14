@@ -99,7 +99,8 @@ class Union(models.Model):
             union_activities_2 = Activity.objects.filter(
                 member_justified=True, name__icontains=search_string
             ).union(union_activities_1)
-            print("År" + year)
+            print("År")
+            print(year)
             print("union_activities_1")
             print(union_activities_1)
             print("union_activities_2")
