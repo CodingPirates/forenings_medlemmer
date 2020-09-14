@@ -2,6 +2,7 @@ from django.db import models
 from .payment import Payment
 from .activity import Activity
 from .person import Person
+from .department import Department
 from .activityparticipant import ActivityParticipant
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -92,10 +93,14 @@ class Union(models.Model):
     def members(self):
         years = range(self.founded.year, (timezone.now().date()).year + 1)
         members = {}
+        departments = Department.objects.filter(union=self.id)
         for year in years:
             temp_members = []
             union_activities_1 = Activity.objects.filter(
-                member_justified=True, union=self.id, start_date__year=year,
+                member_justified=True,
+                department__in=departments,
+                end_date__gt=F("start_date") + timedelta(days=2),
+                start_date__year=year,
             )
             search_string = f"forenings medlemsskab {year}"
             union_activities_2 = Activity.objects.filter(
