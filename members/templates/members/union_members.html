@@ -58,11 +58,37 @@
             <li>{{year}}</li>
           {% endfor %}
         </ul>
-
+        {% if members.items %}
+          {% for year, memberList in members.items %}
+            <section>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Navn</th>
+                    <th>Email</th>
+                    <th>Adresse</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for member in memberList%}
+                    <tr>
+                      <td>{{member.membertype}}</td>
+                      <td>{{member.name}}</td>
+                      <td><a href="mailto:{{member.email}}">{{member.email}}</a></td>
+                      <td>{{member.address}}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </section>
+          {% endfor %}
+          {% else %}
             {% for year in years %}
               <section>
               </section>
             {%endfor%}
+          {%endif%}
       </div>
     {% endif %}
 {% endblock %}
