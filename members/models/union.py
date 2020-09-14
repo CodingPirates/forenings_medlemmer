@@ -105,7 +105,7 @@ class Union(models.Model):
             search_string = f"forenings medlemsskab {year}"
             union_activities_2 = Activity.objects.filter(
                 member_justified=True, name__icontains=search_string
-            ).union(union_activities_1)
+            )
             print("År")
             print(year)
             print("union_activities_1")
