@@ -133,6 +133,8 @@ class Union(models.Model):
                         temp_members.append(participant.member.person)
             members[year] = Person.objects.filter().first()
             members[year] = temp_members
+            print("Members:")
+            print(members)
         return members
 
     def user_union_leader(self, user):
