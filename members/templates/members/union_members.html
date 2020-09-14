@@ -58,7 +58,7 @@
             <li>{{year}}</li>
           {% endfor %}
         </ul>
-        {% if members.items %}
+        {% if members %}
           {% for year, memberList in members.items %}
             <section>
               <table class="table table-striped">
@@ -83,12 +83,12 @@
               </table>
             </section>
           {% endfor %}
-          {% else %}
-            {% for year in years %}
-              <section>
-              </section>
-            {%endfor%}
-          {%endif%}
+        {% else %}
+          {% for year in years %}
+            <section>
+            </section>
+          {%endfor%}
+        {%endif%}
       </div>
     {% endif %}
 {% endblock %}
