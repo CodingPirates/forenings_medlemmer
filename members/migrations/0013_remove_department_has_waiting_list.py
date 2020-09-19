@@ -10,5 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="department", name="has_waiting_list",),
+        migrations.RemoveField(
+            model_name="department",
+            name="has_waiting_list",
+        ),
     ]

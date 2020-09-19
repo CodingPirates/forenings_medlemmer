@@ -20,7 +20,12 @@ class signupForm(forms.Form):
                 Div(
                     Div(Field("child_gender"), css_class="col-md-2"),
                     Div(Field("child_name"), css_class="col-md-10"),
-                    Div(Field("child_birthday",), css_class="col-md-4",),
+                    Div(
+                        Field(
+                            "child_birthday",
+                        ),
+                        css_class="col-md-4",
+                    ),
                     Div(Field("child_email"), css_class="col-md-4"),
                     Div(Field("child_phone"), css_class="col-md-4"),
                     css_class="row",
@@ -31,7 +36,12 @@ class signupForm(forms.Form):
                 Div(
                     Div(Field("parent_gender"), css_class="col-md-2"),
                     Div(Field("parent_name"), css_class="col-md-10"),
-                    Div(Field("parent_birthday",), css_class="col-md-4",),
+                    Div(
+                        Field(
+                            "parent_birthday",
+                        ),
+                        css_class="col-md-4",
+                    ),
                     Div(Field("parent_email"), css_class="col-md-4"),
                     Div(Field("parent_phone"), css_class="col-md-4"),
                     css_class="row",
