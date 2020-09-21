@@ -27,23 +27,74 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Afdelinger",
             },
         ),
-        migrations.RemoveField(model_name="department", name="city",),
-        migrations.RemoveField(model_name="department", name="dawa_id",),
-        migrations.RemoveField(model_name="department", name="door",),
-        migrations.RemoveField(model_name="department", name="floor",),
-        migrations.RemoveField(model_name="department", name="housenumber",),
-        migrations.RemoveField(model_name="department", name="latitude",),
-        migrations.RemoveField(model_name="department", name="longitude",),
-        migrations.RemoveField(model_name="department", name="placename",),
-        migrations.RemoveField(model_name="department", name="streetname",),
-        migrations.RemoveField(model_name="department", name="zipcode",),
-        migrations.RemoveField(model_name="union", name="city",),
-        migrations.RemoveField(model_name="union", name="door",),
-        migrations.RemoveField(model_name="union", name="floor",),
-        migrations.RemoveField(model_name="union", name="housenumber",),
-        migrations.RemoveField(model_name="union", name="placename",),
-        migrations.RemoveField(model_name="union", name="streetname",),
-        migrations.RemoveField(model_name="union", name="zipcode",),
+        migrations.RemoveField(
+            model_name="department",
+            name="city",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="dawa_id",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="door",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="floor",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="housenumber",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="latitude",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="longitude",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="placename",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="streetname",
+        ),
+        migrations.RemoveField(
+            model_name="department",
+            name="zipcode",
+        ),
+        migrations.RemoveField(
+            model_name="union",
+            name="city",
+        ),
+        migrations.RemoveField(
+            model_name="union",
+            name="door",
+        ),
+        migrations.RemoveField(
+            model_name="union",
+            name="floor",
+        ),
+        migrations.RemoveField(
+            model_name="union",
+            name="housenumber",
+        ),
+        migrations.RemoveField(
+            model_name="union",
+            name="placename",
+        ),
+        migrations.RemoveField(
+            model_name="union",
+            name="streetname",
+        ),
+        migrations.RemoveField(
+            model_name="union",
+            name="zipcode",
+        ),
         migrations.AddField(
             model_name="address",
             name="region",

@@ -15,7 +15,10 @@ class Migration(migrations.Migration):
             old_name="responsible_contact",
             new_name="department_email",
         ),
-        migrations.RemoveField(model_name="department", name="onMap",),
+        migrations.RemoveField(
+            model_name="department",
+            name="onMap",
+        ),
         migrations.AddField(
             model_name="department",
             name="department_leaders",

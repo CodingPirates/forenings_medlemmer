@@ -29,7 +29,9 @@ class Department(models.Model):
     isOpening = models.BooleanField("Er afdelingen under opstart", default=False)
     website = models.URLField("Hjemmeside", blank=True)
     union = models.ForeignKey(
-        "Union", verbose_name="Lokalforening", on_delete=models.PROTECT,
+        "Union",
+        verbose_name="Lokalforening",
+        on_delete=models.PROTECT,
     )
 
     def no_members(self):

@@ -42,7 +42,10 @@ class DepartmentAdmin(admin.ModelAdmin):
             "Ansvarlig",
             {"fields": ("responsible_name", "department_email", "department_leaders")},
         ),
-        ("Adresse", {"fields": ("address",)},),
+        (
+            "Adresse",
+            {"fields": ("address",)},
+        ),
         (
             "Afdelingssiden",
             {

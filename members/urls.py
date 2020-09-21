@@ -50,7 +50,7 @@ urlpatterns = [
         name="password_reset_done",
     ),
     url(
-        r"^account/forgot/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
+        r"^account/forgot/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$",
         auth_views.PasswordResetConfirmView.as_view(
             template_name="members/forgot_confirm.html"
         ),
