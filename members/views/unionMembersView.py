@@ -14,7 +14,7 @@ def unionMembersView(request, union_id):
     user_has_access = Union.user_union_leader(union, request.user)
 
     if user_has_access:
-        members = list(set(union.members()))
+        members = union.members()
     print("Members:")
     print(members)
 
