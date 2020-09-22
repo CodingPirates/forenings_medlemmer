@@ -1,4 +1,5 @@
-from factory import Faker, DjangoModelFactory
+from factory import Faker
+from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyAttribute
 from members.models import Family
 from members.tests.factories.factory_helpers import TIMEZONE

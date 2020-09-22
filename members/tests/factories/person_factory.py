@@ -1,4 +1,5 @@
-from factory import Faker, DjangoModelFactory, SubFactory, SelfAttribute
+from factory import Faker, SubFactory, SelfAttribute
+from factory.django import DjangoModelFactory
 from members.tests.factories.factory_helpers import TIMEZONE, LOCALE
 from members.tests.factories.providers import DanishProvider
 from factory.fuzzy import FuzzyChoice, FuzzyAttribute
