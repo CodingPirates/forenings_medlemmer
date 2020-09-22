@@ -15,8 +15,6 @@ def unionMembersView(request, union_id):
 
     if user_has_access:
         members = union.members()
-    print("Members:")
-    print(members)
 
     today = timezone.now().date()
     years_active = range(union.founded.year, today.year + 1)

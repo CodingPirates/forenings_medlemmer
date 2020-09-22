@@ -61,11 +61,11 @@ class DepartmentListTest(StaticLiveServerTestCase):
         ).get_attribute("text")
         self.assertEqual(department_name, self.department_1.name)
 
-        # check there is only one department preset
+        # check there is only one department present
         self.assertEqual(
             len(
                 self.browser.find_elements_by_xpath(
-                    "(//section[@id='department-container'])[1]/div"
+                    "//section[1]/div[@id='department-container']/div"
                 )
             ),
             1,
