@@ -1,7 +1,6 @@
 from django.db import models
 from .payment import Payment
 from .activity import Activity
-from .person import Person
 from .department import Department
 from .activityparticipant import ActivityParticipant
 from django.core.exceptions import ValidationError
