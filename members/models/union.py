@@ -105,13 +105,6 @@ class Union(models.Model):
             union_activities_2 = Activity.objects.filter(
                 member_justified=True, union_id=self.id, start_date__year=year,
             ).union(union_activities_1)
-            print("År")
-            print(year)
-            print("union_activities_1")
-            print(union_activities_1)
-            print("union_activities_2")
-            print(union_activities_2)
-            print("")
             for activity in union_activities_2:
                 for participant in ActivityParticipant.objects.filter(
                     activity=activity
@@ -131,10 +124,7 @@ class Union(models.Model):
                         > 0
                     ):
                         temp_members.append(participant.member.person)
-            members[year] = Person.objects.filter().first()
             members[year] = temp_members
-            print("Members:")
-            print(members)
         return members
 
     def user_union_leader(self, user):
