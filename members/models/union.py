@@ -103,7 +103,9 @@ class Union(models.Model):
                 start_date__year=year,
             )
             union_activities_2 = Activity.objects.filter(
-                member_justified=True, union_id=self.id, start_date__year=year,
+                member_justified=True,
+                union_id=self.id,
+                start_date__year=year,
             ).union(union_activities_1)
             for activity in union_activities_2:
                 for participant in ActivityParticipant.objects.filter(
