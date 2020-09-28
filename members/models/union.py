@@ -96,11 +96,11 @@ class Union(models.Model):
         union_activities_filter = Activity.objects.filter(
             member_justified=True,
         )
-        union_activities_1_filter = union_activities_filter.objects.filter(
+        union_activities_1_filter = union_activities_filter.filter(
             department__in=departments,
             end_date__gt=F("start_date") + timedelta(days=2),
         )
-        union_activities_2_filter = union_activities_filter.objects.filter(
+        union_activities_2_filter = union_activities_filter.filter(
             union_id=self.id,
         )
         payment_filter = Payment.objects.filter(
@@ -110,24 +110,24 @@ class Union(models.Model):
         participant_filter = ActivityParticipant.objects.all()
         for year in years:
             temp_members = []
-            union_activities_1 = union_activities_1_filter.objects.filter(
+            union_activities_1 = union_activities_1_filter.filter(
                 start_date__year=year,
             )
-            union_activities_2 = union_activities_2_filter.objects.filter(
+            union_activities_2 = union_activities_2_filter.filter(
                 start_date__year=year,
             ).union(union_activities_1)
-            payment_filter_1 = payment_filter.objects.filter(
+            payment_filter_1 = payment_filter.filter(
                 confirmed_dtm__lte=make_aware(datetime.datetime(year, 9, 30)),
             )
             for activity in union_activities_2:
-                payment_filter_2 = payment_filter_1.objects.filter(
+                payment_filter_2 = payment_filter_1.filter(
                     activity=activity,
                 )
-                for participant in participant_filter.objects.filter(
+                for participant in participant_filter.filter(
                     activity=activity
                 ).distinct():
                     if (
-                        payment_filter_2.objects.filter(
+                        payment_filter_2.filter(
                             person=participant.member.person,
                         ).count()
                         > 0
