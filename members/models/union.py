@@ -93,35 +93,43 @@ class Union(models.Model):
         years = range(self.founded.year, (timezone.now().date()).year + 1)
         members = {}
         departments = Department.objects.filter(union=self.id)
+        union_activities_filter = Activity.objects.filter(
+            member_justified=True,
+        )
+        union_activities_1_filter = union_activities_filter.objects.filter(
+            department__in=departments,
+            end_date__gt=F("start_date") + timedelta(days=2),
+        )
+        union_activities_2_filter = union_activities_filter.objects.filter(
+            union_id=self.id,
+        )
+        payment_filter = Payment.objects.filter(
+            amount_ore__gte=7500,
+            refunded_dtm__isnull=True,
+        )
+        participant_filter = ActivityParticipant.objects.all()
         for year in years:
             temp_members = []
-            union_activities_1 = Activity.objects.filter(
-                member_justified=True,
-                department__in=departments,
-                end_date__gt=F("start_date") + timedelta(days=2),
+            union_activities_1 = union_activities_1_filter.objects.filter(
                 start_date__year=year,
             )
-            union_activities_2 = Activity.objects.filter(
-                member_justified=True,
-                union_id=self.id,
+            union_activities_2 = union_activities_2_filter.objects.filter(
                 start_date__year=year,
             ).union(union_activities_1)
+            payment_filter_1 = payment_filter.objects.filter(
+                confirmed_dtm__lte=make_aware(datetime.datetime(year, 9, 30)),
+            )
             for activity in union_activities_2:
-                for participant in ActivityParticipant.objects.filter(
+                payment_filter_2 = payment_filter_1.objects.filter(
+                    activity=activity,
+                )
+                for participant in participant_filter.objects.filter(
                     activity=activity
                 ).distinct():
                     if (
-                        len(
-                            Payment.objects.filter(
-                                person=participant.member.person,
-                                amount_ore__gte=7500,
-                                activity=activity,
-                                confirmed_dtm__lte=make_aware(
-                                    datetime.datetime(year, 9, 30)
-                                ),
-                                refunded_dtm__isnull=True,
-                            )
-                        )
+                        payment_filter_2.objects.filter(
+                            person=participant.member.person,
+                        ).count()
                         > 0
                     ):
                         temp_members.append(participant.member.person)

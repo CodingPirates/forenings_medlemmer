@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     );
 
     // Default to first as active, unless "reverse" class then set last as active
-    if($("div").hasClass("reverse")){
+    if(document.getElementsByClassName("tabs reverse").length != 0){
       toggleActive(sections, tabButtons, tabButtons.length-1);
     }else{
       toggleActive(sections, tabButtons, 0);
