@@ -73,7 +73,19 @@
                 <tbody>
                   {% for member in memberList%}
                     <tr>
-                      <td>{{member.membertype}}</td>
+                      <td>
+                        {%if member.membertype == 'PA' %}
+                            Forælder
+                        {%endif%}
+                        {%if member.membertype == 'GU' %}
+                            Værge
+                        {%endif%}
+                        {%if member.membertype == 'CH' %}
+                            Barn
+                        {%endif%}
+                        {%if member.membertype == 'NA' %}
+                            Frivillig
+                        {%endif%}</td>
                       <td>{{member.name}}</td>
                       <td><a href="mailto:{{member.email}}">{{member.email}}</a></td>
                       <td>{{member.address}}</td>
