@@ -13,13 +13,11 @@ class CodingPiratesProvider(BaseProvider):
     ]
 
     def activity_type(self):
-        """ Formatter for generating random activity types
-        """
+        """Formatter for generating random activity types"""
         return random.choice(self.activity_types)
 
     def activity(self):
-        """ Formatter for generating random Coding Pirates activities
-        """
+        """Formatter for generating random Coding Pirates activities"""
         pattern = "{{activity_type}} {{year}}"
         return self.generator.parse(pattern)
 
@@ -56,18 +54,15 @@ class DanishProvider(BaseProvider):
     street_suffixes = ["Vej", "Gade", "Vangen", "Stræde", "Plads"]
 
     def floor(self):
-        """ Formatter for generating floor names in danish
-        """
+        """Formatter for generating floor names in danish"""
         return random.choice(self.floor_formats)
 
     def door(self):
-        """ Formatter for generating door names in danish
-        """
+        """Formatter for generating door names in danish"""
         return random.choice(self.door_formats)
 
     def zipcode(self):
-        """ Formatter for generating door names in danish
-        """
+        """Formatter for generating door names in danish"""
         return str(random.randint(1000, 9999))
 
     def city_suffix(self):
@@ -90,11 +85,9 @@ class DanishProvider(BaseProvider):
         return self.generator.parse(pattern)
 
     def municipality(self):
-        """ Formatter for generating danish municipality names
-        """
+        """Formatter for generating danish municipality names"""
         return self.generator.parse("{{city}} kommune")
 
     def street_name(self):
-        """ Formatter for generating danish street names
-        """
+        """Formatter for generating danish street names"""
         return self.generator.parse("{{name}}s {{street_suffix}}")
