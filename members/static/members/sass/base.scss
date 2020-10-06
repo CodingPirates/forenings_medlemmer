@@ -1,0 +1,90 @@
+@import url("https://fonts.googleapis.com/css?family=Bungee|Lato|Pirata+One&display=swap");
+
+$primary-color: #25a2ce;
+$primary-color-muted: #2c8098;
+$primary-color-tint75: #33c8ff;
+$primary-color-tint50: #77daff;
+$primary-color-tint25: #bbecff;
+$accent-color: #efb422;
+$accent-color-muted: #ed9224;
+$max_width: 1300px;
+$main_font: "Lato", sans-serif;
+$header_font: "Bungee", cursive;
+
+@mixin for-phone {
+    @media only screen and (max-width: 667px) {
+        @content;
+    }
+}
+@mixin for-desktop {
+    @media (min-width: 668px) {
+        @content;
+    }
+}
+
+.bg-primary {
+    background-color: $primary-color;
+    color: white;
+}
+.bg-accent {
+    background-color: $accent-color !important;
+    color: white;
+}
+
+.container {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@mixin rounded-rect {
+    border-radius: 0.25rem;
+}
+%rounded-rect {
+    @include rounded-rect;
+}
+
+.button {
+    @include rounded-rect();
+    text-align: center;
+    display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+    background-color: $primary-color;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: white;
+    &:hover {
+        color: white;
+        background-color: $primary-color-muted;
+    }
+}
+
+.button-accent {
+    @extend .button;
+    @extend .bg-accent;
+    &:hover {
+        background-color: $accent-color-muted;
+        color: black;
+    }
+}
+
+table {
+    word-wrap: break-word;
+    border: 1px solid #dee2e6 !important;
+}
+
+.background-muted, .alert-info {
+    background-color: $primary-color-tint25 !important;
+    border-color: $primary-color-tint50 !important;
+    color: $primary-color-muted !important;
+}

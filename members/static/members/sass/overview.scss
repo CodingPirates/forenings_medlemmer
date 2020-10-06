@@ -1,0 +1,56 @@
+@use "_definitions";
+@use "buttons";
+
+#user-action-container {
+    padding: 5% 5% 10%;
+    margin: auto;
+    max-width: 1300px;
+    display: grid;
+    justify-content: stretch;
+
+    /* Actions is 2x2 grid on desktop */
+    @include _definitions.for-desktop {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-gap: 5%;
+    }
+    @include _definitions.for-phone {
+        grid-template-columns: auto;
+        grid-template-rows: repeat(auto);
+        grid-gap: 5px;
+    }
+    > div {
+        @extend %bg-primary;
+        @extend %rounded-rect;
+        display: flex;
+        padding: 10% 10px;
+        justify-content: space-around;
+        color: white !important;
+        align-items: center;
+        > span {
+            text-align: center;
+            width: 30%;
+            @include _definitions.for-phone {
+                font-size: 0.8em; // Smaller icons on phone
+            }
+        }
+        > div {
+            text-align: center;
+            margin: auto;
+            min-width: 200px;
+            > a {
+                @extend .button-accent;
+                display: block;
+                margin: auto;
+                font-weight: 800;
+            }
+        }
+    }
+}
+
+#signup-form {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 1.25rem;
+    background-clip: border-box;
+    border-radius: 0.25rem;
+}

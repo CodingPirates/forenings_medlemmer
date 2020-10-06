@@ -7,10 +7,14 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from members.models.family import Family
 from members.models.person import Person
+from members.views import Overview
 
 
 @xframe_options_exempt
 def EntryPage(request):
+    if request.user.is_authenticated:
+        return Overview.Overview(request)
+
     if request.method == "POST":
         # figure out which form was filled out.
         if request.POST["form_id"] == "signup":
