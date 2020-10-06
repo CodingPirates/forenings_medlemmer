@@ -39,4 +39,4 @@ def WaitingListSetSubscription(request, id, departmentId, action):
                 "{} er ikke på {}s venteliste".format(person.name, department.name)
             )
 
-    return HttpResponseRedirect(reverse("family_detail"))
+    return HttpResponseRedirect(reverse("department_signup"))

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.conf import settings
 from quickpay_api_client import QPClient
@@ -27,10 +25,9 @@ class QuickpayTransaction(models.Model):
         """ On creation make quickpay order_id from payment id """
         if self.pk is None:
             if settings.DEBUG:
-                prefix = "test"
+                self.order_id = f"dev{timezone.now().timestamp()}"
             else:
-                prefix = "prod"
-            self.order_id = prefix + "%06d" % self.payment.pk
+                self.order_id = "prod" + "%06d" % self.payment.pk
         return super(QuickpayTransaction, self).save(*args, **kwargs)
 
     # method requests payment URL from Quickpay.
@@ -63,11 +60,13 @@ class QuickpayTransaction(models.Model):
                 if self.transaction_id is None:
                     activity = client.post(
                         "/payments",
-                        currency="DKK",
-                        order_id=self.order_id,
-                        variables=variables,
-                        invoice_address=address,
-                        shipping_address=address,
+                        body={
+                            "currency": "DKK",
+                            "order_id": self.order_id,
+                            "variables": variables,
+                            "invoice_address": address,
+                            "shipping_address": address,
+                        },
                     )
                     self.transaction_id = activity["id"]
                     self.save()
@@ -78,13 +77,15 @@ class QuickpayTransaction(models.Model):
                 # Enable auto-capture if the activity starts this year
                 link = client.put(
                     f"/payments/{self.transaction_id}/link",
-                    amount=self.payment.amount_ore,
-                    id=self.transaction_id,
-                    continueurl=return_url,
-                    cancelurl=return_url,
-                    customer_email=self.payment.family.email,
-                    autocapture=self.payment.activity.start_date.year
-                    <= timezone.now().year,
+                    body={
+                        "amount": self.payment.amount_ore,
+                        "id": self.transaction_id,
+                        "continueurl": return_url,
+                        "cancelurl": return_url,
+                        "customer_email": self.payment.family.email,
+                        "autocapture": self.payment.activity.start_date.year
+                        <= timezone.now().year,
+                    },
                 )
 
                 self.link_url = link["url"]
@@ -100,17 +101,14 @@ class QuickpayTransaction(models.Model):
         client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
         # get payment id from order id
-        transactions = client.get("/payments", order_id=self.order_id)
+        transaction = client.get(f"/payments/{self.transaction_id}")
 
-        if len(transactions) > 0:
-            transaction = transactions[0]
-
-            if transaction["state"] == "processed" and transaction["accepted"]:
-                self.payment.set_confirmed()
-            if transaction["state"] == "new" and transaction["accepted"]:
-                self.payment.set_accepted()
-            if transaction["state"] == "rejected" and not transaction["accepted"]:
-                self.payment.set_rejected(repr(transaction))
+        if transaction["state"] == "processed" and transaction["accepted"]:
+            self.payment.set_confirmed()
+        if transaction["state"] == "new" and transaction["accepted"]:
+            self.payment.set_accepted()
+        if transaction["state"] == "rejected" and not transaction["accepted"]:
+            self.payment.set_rejected(repr(transaction))
 
     def __str__(self):
         return (

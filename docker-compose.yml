@@ -10,6 +10,7 @@ services:
       - "${PORT}:${PORT}"
     depends_on:
       - database
+      - selenium
     networks:
       - webnet
     environment:
@@ -20,7 +21,7 @@ services:
       - QUICKPAY_PRIVATE_KEY=$QUICKPAY_PRIVATE_KEY
       - DATABASE_URL=$DATABASE_URL
       - ALLOWED_HOSTS=$ALLOWED_HOSTS
-      - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN
+      - PAYMENT_ID_PREFIX=$PAYMENT_ID_PREFIX
       - CORS_LIST=$CORS_LIST
       - FORCE_HTTPS=$FORCE_HTTPS
       - EMAIL_URL=$EMAIL_URL
@@ -40,6 +41,13 @@ services:
       - POSTGRES_DB=$POSTGRES_DB
     ports:
       - "5432${DB_PORT}"
+
+  selenium:
+    image: selenium/standalone-chrome
+    networks:
+      - webnet
+    ports:
+      - 4444
 
 volumes:
   database:

@@ -35,19 +35,14 @@ class EmailItem(models.Model):
     # send this email. Notice no checking of race condition, so this should be called by
     # cronscript and made sure the same mail is not sent multiple times in parallel
     def send(self):
-        if settings.DEBUG:
-            # never use actual destination in debug
-            destination_email = settings.DEBUG_EMAIL_DESTINATION
-        else:
-            destination_email = self.reciever
-
         self.sent_dtm = timezone.now()
+        self.save()
         try:
             send_mail(
                 self.subject,
                 self.body_text,
                 settings.SITE_CONTACT,
-                (destination_email,),
+                (self.reciever,),
                 html_message=self.body_html,
             )
         except Exception as e:

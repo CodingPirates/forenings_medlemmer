@@ -1,8 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from datetime import timedelta
 from django.db import models
 import members.models.emailtemplate
-from django.utils import timezone, html
+from members.models.activity import Activity
+from django.utils import timezone
 
 
 class Department(models.Model):
@@ -29,7 +29,9 @@ class Department(models.Model):
     isOpening = models.BooleanField("Er afdelingen under opstart", default=False)
     website = models.URLField("Hjemmeside", blank=True)
     union = models.ForeignKey(
-        "Union", verbose_name="Lokalforening", on_delete=models.PROTECT,
+        "Union",
+        verbose_name="Lokalforening",
+        on_delete=models.PROTECT,
     )
 
     def no_members(self):
@@ -40,43 +42,6 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
-    def toHTML(self):
-        myHTML = ""
-        if self.website == "":
-            myHTML += (
-                "<strong>Coding Pirates " + html.escape(self.name) + "</strong><br>"
-            )
-        else:
-            myHTML += (
-                '<a href="'
-                + html.escape(self.website)
-                + '"" target="_blank">'
-                + "<strong>Coding Pirates "
-                + html.escape(self.name)
-                + "</strong></a><br>"
-            )
-        if self.isOpening:
-            myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
-        myHTML += html.escape(str(self.address))
-        myHTML += (
-            "<br>Afdelingsleder: "
-            + html.escape(
-                self.department_leaders.all()[0]
-                if len(self.department_leaders.all())
-                else self.responsible_name
-            )
-            + "<br>"
-        )
-        myHTML += (
-            'E-mail: <a href="mailto:'
-            + html.escape(self.department_email)
-            + '">'
-            + html.escape(self.department_email)
-            + "</a><br>"
-        )
-        myHTML += "Tidspunkt: " + html.escape(self.open_hours)
-        return myHTML
-
     def new_volunteer_email(self, volunteer_name):
         # First fetch department leaders email
         new_vol_email = members.models.emailtemplate.EmailTemplate.objects.get(
@@ -84,3 +49,23 @@ class Department(models.Model):
         )
         context = {"department": self, "volunteer_name": volunteer_name}
         new_vol_email.makeEmail(self, context)
+
+    @staticmethod
+    def get_open_departments():
+        result = []
+        a_year_ago = (timezone.now() - timedelta(days=366)).date()
+        for department in Department.objects.filter(closed_dtm=None).order_by(
+            "address__region", "name"
+        ):
+            department_activties = Activity.objects.filter(
+                department=department
+            ).order_by("-end_date")
+            if a_year_ago < department.created:
+                result.append(department)
+            elif (
+                len(department_activties) > 0
+                and a_year_ago < department_activties[0].end_date
+            ):
+                result.append(department)
+
+        return result

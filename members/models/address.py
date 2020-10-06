@@ -21,11 +21,11 @@ class Address(models.Model):
     city = models.CharField("By", max_length=200)
     zipcode = models.CharField("Postnummer", max_length=4)
     REGION_CHOICES = (
-        ("Region Syddanmark", "Region Syddanmark"),
-        ("Region Hovedstaden", "Region Hovedstaden"),
-        ("Region Nordjylland", "Region Nordjylland"),
-        ("Region Midtjylland", "Region Midtjylland"),
-        ("Region Sjælland", "Region Sjælland"),
+        ("Region Syddanmark", "Syddanmark"),
+        ("Region Hovedstaden", "Hovedstaden"),
+        ("Region Nordjylland", "Nordjylland"),
+        ("Region Midtjylland", "Midtjylland"),
+        ("Region Sjælland", "Sjælland"),
     )
     region = models.CharField("Region", choices=REGION_CHOICES, max_length=20)
     municipality = models.CharField("Kommune", max_length=100, blank=True)
@@ -34,6 +34,14 @@ class Address(models.Model):
     )
     latitude = models.DecimalField(
         "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
+    )
+    help_temp = """
+    Lader dig gemme en anden Længdegrad og breddegrad end den gemt i DAWA \
+    (hvor vi henter adressedata). \
+    Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.
+    """
+    dawa_overwrite = models.BooleanField(
+        "Overskriv DAWA", default=False, help_text=help_temp
     )
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
 
@@ -45,7 +53,7 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        if settings.USE_DAWA_ON_SAVE:
+        if settings.USE_DAWA_ON_SAVE and not self.dawa_overwrite:
             self.get_dawa_data()
         super().save(*args, **kwargs)
 

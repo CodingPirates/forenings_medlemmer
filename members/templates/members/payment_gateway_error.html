@@ -1,19 +1,25 @@
 {% extends "members/base.html" %}
 
 {% block content %}
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1>Der er lige nu problemer med vores udbyder af betalingskortbetalinger!</h1>
-          <p>Der er desværre i øjeblikket et problem med vores vores betalingsudbyder (Quickpay.dk) - Vi kan derfor ikke modtage din betaling lige nu.</p>
-          <p>Der er ikke blevet trukket penge på dit betalingskort og der mangler fortsat betaling for din tilmelding.</p>
-          <p><em>Selve tilmeldingen <b>er gennemført</b> - så du er sikker på at beholde pladsen!</em></p>
-          <p>Men vi beder dig komme tilbage til medlemssiden igen om en uges tid og afslutte betalingen ved at betale for deltagelsen. (tryk blot på den røde <kbd>betal</kbd>-knap)</p>
-          {% if unique %}
-            <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
-          {% endif%}
-          <p></p>
-        </div>
-      </div>
-    </div>
+<h2>Der er lige nu problemer med vores udbyder af betalingskortbetalinger!</h2>
+<p>
+  Der er desværre i øjeblikket et problem med vores vores betalingsudbyder
+  (Quickpay.dk) - Vi kan derfor ikke modtage din betaling lige nu.
+</p>
+<p>
+  Der er ikke blevet trukket penge på dit betalingskort og der mangler fortsat
+  betaling for din tilmelding.
+</p>
+<p>
+  <em>
+    Selve tilmeldingen <b>er gennemført</b> - så du er sikker på at beholde
+    pladsen!
+  </em>
+</p>
+<p>
+  Men vi beder dig komme tilbage til medlemssiden igen om en uges tid og
+  afslutte betalingen ved at betale for deltagelsen.
+  (tryk blot på den røde <kbd>betal</kbd>-knap)
+</p>
+<a class="button" href="{% url 'activities' %}">Tilbage</a>
 {% endblock %}

@@ -25,8 +25,6 @@ class vol_signupForm(forms.Form):
                     Div(
                         Field(
                             "volunteer_birthday",
-                            css_class="datepicker",
-                            input_formats=(settings.DATE_INPUT_FORMATS),
                         ),
                         css_class="col-md-3",
                     ),
@@ -95,7 +93,8 @@ class vol_signupForm(forms.Form):
         label="Fødselsdato (dd-mm-åååå)",
         required=True,
         input_formats=(settings.DATE_INPUT_FORMATS),
-        error_messages={"invalid": "Indtast en gyldig dato. (dd-mm-åååå)"},
+        error_messages={"invalid": "Indtast en gyldig dato."},
+        widget=forms.DateInput(attrs={"type": "date"}),
     )
     volunteer_department = forms.ModelChoiceField(
         queryset=Department.objects.all(),

@@ -1,13 +1,14 @@
-@use "base";
+@use "_definitions";
+@use "buttons";
 
 body {
     display: grid;
     align-content: space-between;
-    @include base.for-phone {
+    @include _definitions.for-phone {
         grid-template-rows: 1fr 12fr 1fr;
     }
     // Desktop horizontal nav bar
-    @include base.for-desktop {
+    @include _definitions.for-desktop {
         grid-template-rows: 50px 10fr 1fr;
     }
 }
@@ -15,16 +16,41 @@ body {
 body,
 html {
     height: 100%;
-    font-family: base.$main_font;
+    font-family: _definitions.$main_font;
+    width: 100%;
 }
 
 section {
-    @extend .container;
+    @extend %rounded-rect;
+    margin: 15px 0;
+}
+
+.info-box {
+    @extend %rounded-rect;
+    background-color: _definitions.$light-grey;
+    padding: 10px;
+    margin: 10px auto;
+    width: 66%;
+    text-align: center;
+}
+
+.action-list {
+    text-align: center;
+    list-style-type: none;
+    li {
+        display: inline-block;
+        a {
+            @extend .button;
+        }
+    }
+}
+
+main {
+    @extend %container;
     margin-top: 20px;
     margin-bottom: 20px;
-    max-width: base.$max_width;
-
-    @include base.for-desktop {
+    max-width: _definitions.$max_width;
+    @include _definitions.for-desktop {
         width: 90%;
         margin-left: auto;
         margin-right: auto;

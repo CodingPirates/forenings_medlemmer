@@ -1,13 +1,52 @@
 {% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
 {% block content %}
 
-    <h1>Tilmelding til Coding Pirates</h1>
-    <p>
-        Indtast barnets og forældrenes informationer, for at tilmelde en Coding
-        Pirates-workshop, eller for at komme med på ventelisten.
-    </p>
-    <div id="signup-form">
-        {% crispy signupform %}
+{% if user.is_authenticated %}
+  <div id="user-action-container">
+    <div>
+      <span><i class="fa-users fa fa-4x"></i></span>
+      <div>
+        <h4>Jeres familie</h4>
+        <a href="{% url 'family_detail' %}">
+          Se familie <i class="fa fa-long-arrow-alt-right"></i>
+        </a>
+      </div>
     </div>
+    <div>
+      <span><i class="fa-list-ol fa fa-4x"></i></span>
+      <div>
+        <h4>Tilmeld Afdelinger</h4>
+        <a href="{% url "department_signup" %}">
+          Afdelinger <i class="fa fa-long-arrow-alt-right"></i>
+        </a>
+      </div>
+    </div>
+    <div>
+      <span><i class="fa-calendar fa fa-4x"></i></span>
+      <div>
+        <h4>Tilmeld arrangementer</h4>
+        <a href="{% url "activities" %}">
+          Arrangementer <i class="fa fa-long-arrow-alt-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
 
+  <p class="text-center">
+    For yderligere hjælp med at bruge denne side - se på
+    <a href="http://codingpirates.dk/crmhjaelp/">"Sådan bruger du vores
+    medlemssystem"</a> eller skriv til os på
+    <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.
+  </p>
+
+{% else %}
+  <h1>Tilmelding til Coding Pirates</h1>
+  <p>
+    Indtast barnets og forældrenes informationer, for at tilmelde en Coding
+    Pirates-workshop, eller for at komme med på ventelisten.
+  </p>
+  <div id="signup-form">
+      {% crispy signupform %}
+  </div>
+{% endif %}
 {% endblock %}

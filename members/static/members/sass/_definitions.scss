@@ -1,0 +1,51 @@
+$primary-color: #00aeef;
+$primary-color-muted: #00a0e0;
+$accent-color: #ff9900;
+$accent-color-muted: #ed9224;
+$danger-color: #dc3545;
+$danger-color-muted: #a01525;
+$success-color: #28a745;
+$success-color-muted: #288745;
+$max_width: 1300px;
+$main_font: "Lato", sans-serif;
+$header_font: "Bungee", cursive;
+$light-grey: #dedfe0;
+$dark-grey: #6d6e71;
+$yellow: #ffff00;
+
+@mixin for-phone {
+    @media only screen and (max-width: 667px) {
+        @content;
+    }
+}
+@mixin for-desktop {
+    @media (min-width: 668px) {
+        @content;
+    }
+}
+
+%card {
+    border: 1px solid $light-grey;
+    padding: 5px;
+}
+
+%bg-primary {
+    background-color: $primary-color;
+    color: white;
+}
+
+%bg-accent {
+    background-color: $accent-color !important;
+}
+
+%container {
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+%rounded-rect {
+    border-radius: 0.25rem;
+}

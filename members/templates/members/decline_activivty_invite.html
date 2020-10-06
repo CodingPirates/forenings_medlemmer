@@ -1,22 +1,24 @@
 {% extends 'members/base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="container-fluid">
-      <h1>Nej tak til {{activity_invite.activity.name}} <small>{{activity_invite.activity.department.name}}</small></h1>
-      <div class="row">
-        <div class="col-12">
-          <section class="card">
-            <h3>Hej {{activity_invite.person.name}}</h3>
-            <p>Hvis du trykker <kbd>Afslå invitation</kbd> nedenfor, giver du din plads på <strong>{{activity_invite.activity.name}}, {{activity_invite.activity.department.name}}</strong> videre til den næste på ventelisten.</p>
-            <p>Du bliver også automatisk afmeldt ventelisten på {{activity_invite.activity.department.name}}, men du kan altid tilmelde dig den igen <em>uden at du har mistet din position</em>. Så vil du modtage invitationer når vi inviterer flere med.</p>
-          </section>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12">
-        {% crispy form %}
-        </div>
-      </div>
-      <p></p>
-    </div>
+<h1>
+  Afslå invitation
+</h1>
+<section>
+  <h3>Hej {{activity_invite.person.name}}</h3>
+  <p>
+    Hvis du trykker <kbd>Afslå invitation</kbd> nedenfor, giver du din plads på
+    <strong>
+      {{activity_invite.activity.name}}, {{activity_invite.activity.department.name}}
+    </strong>
+    videre til den næste på ventelisten.
+  </p>
+  <p>
+    Du bliver også automatisk afmeldt ventelisten på
+    {{activity_invite.activity.department.name}}, men du kan altid tilmelde dig
+    den igen <em>uden at du har mistet din position</em>.
+    Så vil du modtage invitationer når vi inviterer flere med.
+  </p>
+</section>
+{% crispy form %}
 {% endblock %}

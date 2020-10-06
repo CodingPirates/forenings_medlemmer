@@ -21,7 +21,6 @@ class PersonForm(forms.ModelForm):
                     Div(
                         Field(
                             "birthday",
-                            css_class="datepicker",
                             input_formats=(settings.DATE_INPUT_FORMATS),
                         ),
                         css_class="col-md-4",
@@ -42,7 +41,6 @@ class PersonForm(forms.ModelForm):
                     Div(
                         Field(
                             "birthday",
-                            css_class="datepicker",
                             input_formats=(settings.DATE_INPUT_FORMATS),
                         ),
                         css_class="col-md-4",
@@ -56,12 +54,11 @@ class PersonForm(forms.ModelForm):
             self.fields["phone"].required = True
             self.fields["gender"].choices = Person.MEMBER_ADULT_GENDER_CHOICES
 
-        self.fields["birthday"].widget.format = "%d-%m-%Y"
+        self.fields["birthday"].widget = forms.DateInput(attrs={"type": "date"})
         self.fields["streetname"].required = True
         self.fields["housenumber"].required = True
         self.fields["zipcode"].required = True
         self.fields["city"].required = True
-
         self.helper.layout = Layout(
             nameFieldSet,
             Fieldset(
