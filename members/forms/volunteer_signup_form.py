@@ -22,7 +22,12 @@ class vol_signupForm(forms.Form):
                 Div(
                     Div(Field("volunteer_gender"), css_class="col-md-2"),
                     Div(Field("volunteer_name"), css_class="col-md-10"),
-                    Div(Field("volunteer_birthday",), css_class="col-md-3",),
+                    Div(
+                        Field(
+                            "volunteer_birthday",
+                        ),
+                        css_class="col-md-3",
+                    ),
                     Div(Field("volunteer_email"), css_class="col-md-3"),
                     Div(Field("volunteer_phone"), css_class="col-md-3"),
                     Div(Field("volunteer_department"), css_class="col-md-3"),

@@ -85,7 +85,8 @@ def old_stat_code(timestamp):
     )
     dailyStatisticsGeneral.activity_participants_female = (
         Person.objects.filter(
-            member__activityparticipant__activity__isnull=False, gender=Person.FEMALE,
+            member__activityparticipant__activity__isnull=False,
+            gender=Person.FEMALE,
         )
         .distinct()
         .count()
@@ -113,7 +114,9 @@ def old_stat_code(timestamp):
             union=union
         ).count()
         dailyStatisticsUnion.active_activities = Activity.objects.filter(
-            department__union=union, start_date__lte=timestamp, end_date__gte=timestamp,
+            department__union=union,
+            start_date__lte=timestamp,
+            end_date__gte=timestamp,
         ).count()
         dailyStatisticsUnion.activities = Activity.objects.filter(
             department__union=union
@@ -196,9 +199,11 @@ def old_stat_code(timestamp):
             .distinct()
             .count()
         )
-        dailyStatisticsRegion.activity_participants = ActivityParticipant.objects.filter(
-            activity__department__address__zipcode__in=zipsInRegion
-        ).count()
+        dailyStatisticsRegion.activity_participants = (
+            ActivityParticipant.objects.filter(
+                activity__department__address__zipcode__in=zipsInRegion
+            ).count()
+        )
         dailyStatisticsRegion.members = 0  # TODO: to loosely defined now
         dailyStatisticsRegion.waitinglist = (
             Person.objects.filter(
