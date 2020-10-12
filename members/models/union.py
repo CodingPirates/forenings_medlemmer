@@ -107,7 +107,9 @@ class Union(models.Model):
             amount_ore__gte=7500,
             refunded_dtm__isnull=True,
         )
-        participant_filter = ActivityParticipant.objects.all()
+        participant_filter = ActivityParticipant.objects.all().select_related(
+            "activity", "member__person"
+        )
         for year in years:
             temp_members = []
             union_activities_1 = union_activities_1_filter.filter(
@@ -118,7 +120,7 @@ class Union(models.Model):
             ).union(union_activities_1)
             payment_filter_1 = payment_filter.filter(
                 confirmed_dtm__lte=make_aware(datetime.datetime(year, 9, 30)),
-            )
+            ).select_related("activity", "activityparticipant")
             for activity in union_activities_2:
                 payment_filter_2 = payment_filter_1.filter(
                     activity=activity,
