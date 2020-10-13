@@ -17,7 +17,11 @@ class TestModelAddress(TestCase):
             door="th",
         )
         row_house_address = Address(
-            streetname="Kabys", housenumber=314, city="Århus", zipcode="7000", door="C",
+            streetname="Kabys",
+            housenumber=314,
+            city="Århus",
+            zipcode="7000",
+            door="C",
         )
         placename_address = Address(
             streetname="Himmelev Bygade",

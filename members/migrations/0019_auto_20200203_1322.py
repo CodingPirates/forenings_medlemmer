@@ -12,7 +12,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="union", old_name="cashier_email", new_name="cashier_email_old",
+            model_name="union",
+            old_name="cashier_email",
+            new_name="cashier_email_old",
         ),
         migrations.RenameField(
             model_name="union",
@@ -30,19 +32,29 @@ class Migration(migrations.Migration):
             new_name="secretary_email_old",
         ),
         migrations.RenameField(
-            model_name="union", old_name="cashier", new_name="cashier_old",
+            model_name="union",
+            old_name="cashier",
+            new_name="cashier_old",
         ),
         migrations.RenameField(
-            model_name="union", old_name="chairman", new_name="chairman_old",
+            model_name="union",
+            old_name="chairman",
+            new_name="chairman_old",
         ),
         migrations.RenameField(
-            model_name="union", old_name="second_chair", new_name="second_chair_old",
+            model_name="union",
+            old_name="second_chair",
+            new_name="second_chair_old",
         ),
         migrations.RenameField(
-            model_name="union", old_name="secretary", new_name="secretary_old",
+            model_name="union",
+            old_name="secretary",
+            new_name="secretary_old",
         ),
         migrations.RenameField(
-            model_name="union", old_name="boardMembers", new_name="boardMembers_old",
+            model_name="union",
+            old_name="boardMembers",
+            new_name="boardMembers_old",
         ),
         migrations.AddField(
             model_name="union",

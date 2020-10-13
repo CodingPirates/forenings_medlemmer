@@ -39,7 +39,10 @@ class Family(models.Model):
     def get_first_parent(self):
         try:
             parent = self.person_set.filter(
-                membertype__in=(Person.PARENT, Person.GUARDIAN,)
+                membertype__in=(
+                    Person.PARENT,
+                    Person.GUARDIAN,
+                )
             )[0]
         except IndexError:
             return None
