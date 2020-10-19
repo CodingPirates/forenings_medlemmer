@@ -107,10 +107,10 @@ class TestModelWaitinglist(TestCase):
 
         # Checks for Ordering
         self.assertEqual(
-            WaitingList.get_by_child(persons[0]),
-            [(departments[0], 1), (departments[1], 1)],
+            set(WaitingList.get_by_child(persons[0])),
+            set([(departments[0], 1), (departments[1], 1)]),
         )
         self.assertEqual(
-            WaitingList.get_by_child(persons[1]),
-            [(departments[0], 2), (departments[1], 2)],
+            set(WaitingList.get_by_child(persons[1])),
+            set([(departments[0], 2), (departments[1], 2)]),
         )

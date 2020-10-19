@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
 
@@ -8,7 +6,8 @@ class WaitingList(models.Model):
     class Meta:
         verbose_name = "På venteliste"
         verbose_name_plural = "På ventelister"
-        ordering = ["on_waiting_list_since"]
+        ordering = ["on_waiting_list_since", "department"]
+        unique_together = ("person", "department")
 
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)

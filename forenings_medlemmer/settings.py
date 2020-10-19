@@ -64,6 +64,7 @@ TEMPLATES = [
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str("SECRET_KEY")
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG")
 if DEBUG:
@@ -183,6 +184,7 @@ CRON_CLASSES = [
 # Dont keep job logs more than 7 days old
 DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 7
 
+QUICKPAY_URL = "https://api.quickpay.net/payments"
 QUICKPAY_API_KEY = os.environ["QUICKPAY_API_KEY"]
 QUICKPAY_PRIVATE_KEY = os.environ["QUICKPAY_PRIVATE_KEY"]
 PAYMENT_ID_PREFIX = env.str("PAYMENT_ID_PREFIX")

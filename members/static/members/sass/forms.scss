@@ -1,0 +1,31 @@
+@use "_definitions";
+@use "buttons";
+
+form {
+    select {
+        width: 90%;
+        display: block;
+        margin: 0 auto;
+    }
+    label {
+        margin-top: 10px;
+        margin-right: 5px;
+        margin-left: 15px;
+        font-weight: 800;
+    }
+
+    input[type="submit"] {
+        display: block;
+        @extend .button;
+    }
+}
+
+.errorlist {
+    li {
+        @extend %rounded-rect;
+        background-color: _definitions.$danger-color;
+        font-weight: 600;
+        padding: 5px;
+        width: 90%;
+    }
+}

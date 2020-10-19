@@ -54,6 +54,8 @@ class Union(models.Model):
     address = models.ForeignKey("Address", on_delete=models.PROTECT)
     board_members = models.ManyToManyField("Person", blank=True)
     board_members_old = models.TextField("Menige medlemmer", blank=True)
+    closed = models.DateField("Lukket", blank=True, null=True)
+    membership_price_ore = models.IntegerField("Medlemskontingent i ører", default=7500)
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",
         default=True,

@@ -1,0 +1,15 @@
+Betalingbekræftelse
+
+Hi {{payment.person}}
+Du har den {{payment.added}} betalt for følgende ved Coding Pirates
+
+Person: {{payment.get_item.person}}
+Købt: {{payment.get_item_name}}
+Pris: {{payment.show_amount}}kr
+
+Se mere (members.codingpirates.dk/payments)
+
+Med venlig hilsen Coding Pirates
+
+Skriv til os hvis du har nogle spørgsmål til overstående.
+kontakt@codingpirates.dk (mailto:kontakt@codingpirates.dk)

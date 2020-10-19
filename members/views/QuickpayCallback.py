@@ -1,14 +1,12 @@
+import hashlib
+import hmac
 import json
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-
 from members.models.quickpaytransaction import QuickpayTransaction
-
-import hashlib
-import hmac
 
 
 def signQuickpay(base, private_key):

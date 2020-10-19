@@ -7,7 +7,6 @@ import members.models.activity
 import members.models.activityinvite
 import members.models.activityparticipant
 
-
 import members.models.department
 import members.models.emailitem
 import members.models.emailtemplate
@@ -41,6 +40,7 @@ from .equipment import Equipment
 from .equipmentloan import EquipmentLoan
 from .family import Family
 from .member import Member
+from .membership import Membership
 from .notification import Notification
 from .payment import Payment
 from .person import Person
@@ -48,11 +48,16 @@ from .union import Union
 from .volunteer import Volunteer
 from .waitinglist import WaitingList
 from .zipcoderegion import ZipcodeRegion
-
-
+from .payable_item import PayableItem
+from .quickpaytransaction import QuickpayTransaction
+from .season import Season
+from .season_invite import SeasonInvite
+from .season_participant import SeasonParticipant
 from .statistics import gatherDayliStatistics
 
 __all__ = [
+    SeasonParticipant,
+    SeasonInvite,
     Activity,
     ActivityInvite,
     ActivityParticipant,
@@ -62,15 +67,19 @@ __all__ = [
     DailyStatisticsRegion,
     DailyStatisticsUnion,
     Department,
+    PayableItem,
     EmailItem,
     EmailTemplate,
     Equipment,
     EquipmentLoan,
     Family,
     gatherDayliStatistics,
+    QuickpayTransaction,
     Member,
+    Membership,
     Notification,
     Payment,
+    Season,
     Person,
     Union,
     Volunteer,

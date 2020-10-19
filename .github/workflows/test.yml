@@ -40,3 +40,10 @@ jobs:
         with:
           name: UML_diagram.png
           path: UML
+
+      - name: Create and render emails
+        run: docker-compose run web ./manage.py render_emails
+      - uses: actions/upload-artifact@v1
+        with:
+          name: rendered_emails
+          path: ./generated_emails

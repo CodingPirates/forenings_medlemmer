@@ -9,8 +9,12 @@ from .waitinglist_factory import WaitingListFactory
 from .activity_participant_factory import ActivityParticipantFactory
 from .payment_factory import PaymentFactory
 from .volunteer_factory import VolunteerFactory
+from .membership_factory import MembershipFactory
+from .payable_item_factory import PayableItemFactory
+from .season_factory import SeasonFactory
 
 __all__ = [
+    PayableItemFactory,
     ActivityParticipantFactory,
     PaymentFactory,
     AddressFactory,
@@ -22,4 +26,6 @@ __all__ = [
     ActivityFactory,
     MemberFactory,
     VolunteerFactory,
+    MembershipFactory,
+    SeasonFactory,
 ]

@@ -6,6 +6,8 @@ from quickpay_api_client import QPClient
 from django.urls import reverse
 from django.utils import timezone
 
+from .payable_item import _set_quickpay_order_id
+
 
 class QuickpayTransaction(models.Model):
     payment = models.ForeignKey("Payment", on_delete=models.PROTECT)
@@ -26,10 +28,7 @@ class QuickpayTransaction(models.Model):
     def save(self, *args, **kwargs):
         """ On creation make quickpay order_id from payment id """
         if self.pk is None:
-            if settings.DEBUG:
-                self.order_id = f"dev{timezone.now().timestamp()}"
-            else:
-                self.order_id = "prod" + "%06d" % self.payment.pk
+            self.order_id = _set_quickpay_order_id()
         return super(QuickpayTransaction, self).save(*args, **kwargs)
 
     # method requests payment URL from Quickpay.

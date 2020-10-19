@@ -1,0 +1,38 @@
+{% extends 'members/base.html' %} {% load static %}
+{% block content %}
+<script src="{% static "members/js/membership_create.js" %}"></script>
+<h2>Betalinger</h2>
+<p>
+  På denne side kan du se et oversigt over dine betalinger, hvis en betaling
+  mangler er den markeret med rød.
+</p>
+<table>
+  <thead>
+    <th>Dato</th>
+    <th>Købt</th>
+    <th>Beløb</th>
+    <th>Status</th>
+  </thead>
+  <tbody>
+    {% for payment in payments %}
+      <tr>
+        <td>{{payment.added |date:'d-m-Y '}}</td>
+        <td>{{payment.get_item}}</td>
+        <td>{{payment.show_amount}} kr</td>
+        <td>
+          {% if payment.get_status == "accepted" %}
+            Betalt
+          {% else %}
+            <a href="{{payment.get_link}}" class="button-danger">
+              Ikke betalt
+            </div>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+{% endblock %}

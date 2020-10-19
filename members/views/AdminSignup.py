@@ -1,14 +1,13 @@
-from django.shortcuts import render
-from django.utils import timezone
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
-
+from django.utils import timezone
 from members.forms import adminSignupForm
+from members.models.department import Department
 from members.models.family import Family
 from members.models.person import Person
 from members.models.volunteer import Volunteer
-from members.models.department import Department
 
 
 @login_required

@@ -1,11 +1,14 @@
-import socket
 import os
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+import socket
+
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+
 
 """
 This test goes to the root signup page and creates a child and parent.
