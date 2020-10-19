@@ -1,6 +1,7 @@
 from django import forms
 from members.models import Person, Union
 from members.models import Membership
+from datetime import date
 
 
 class MembershipForm(forms.Form):
@@ -11,7 +12,15 @@ class MembershipForm(forms.Form):
         self.fields["person"].initial = 1
 
         # TODO exclude closed unions and union where is member
-        self.fields["union"].queryset = Union.objects.all()
+        member_of = [
+            membership.union
+            for membership in Membership.objects.filter(
+                person__in=family_members, sign_up_date__year=date.today().year
+            )
+        ]
+        self.fields["union"].queryset = Union.objects.filter(
+            closed__isnull=True
+        ).exclude(pk__in=member_of)
 
     person = forms.ModelChoiceField(Person.objects.none())
     union = forms.ModelChoiceField(Union.objects.none(), label="Forening")
