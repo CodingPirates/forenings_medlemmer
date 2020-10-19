@@ -35,6 +35,14 @@ class Address(models.Model):
     latitude = models.DecimalField(
         "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
+    help_temp = """
+    Lader dig gemme en anden Længdegrad og breddegrad end den gemt i DAWA \
+    (hvor vi henter adressedata). \
+    Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.
+    """
+    dawa_overwrite = models.BooleanField(
+        "Overskriv DAWA", default=False, help_text=help_temp
+    )
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
 
     def __str__(self):
@@ -45,7 +53,7 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        if settings.USE_DAWA_ON_SAVE:
+        if settings.USE_DAWA_ON_SAVE and not self.dawa_overwrite:
             self.get_dawa_data()
         super().save(*args, **kwargs)
 

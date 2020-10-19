@@ -1,0 +1,2 @@
+ignore:
+  - "members/tests" # wildcards accepted
