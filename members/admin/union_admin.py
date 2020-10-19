@@ -66,7 +66,13 @@ class UnionAdmin(admin.ModelAdmin):
         (
             "Info",
             {
-                "fields": ("bank_main_org", "bank_account", "statues", "founded"),
+                "fields": (
+                    "bank_main_org",
+                    "bank_account",
+                    "statues",
+                    "founded",
+                    "closed",
+                ),
                 "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
                 generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
             },

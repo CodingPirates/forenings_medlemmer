@@ -1,5 +1,6 @@
 import graphene
 from graphene_django.types import DjangoObjectType
+from datetime import date
 
 
 from members.models import (
@@ -9,6 +10,7 @@ from members.models import (
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
     DailyStatisticsUnion,
+    Membership,
 )
 from members.models.statistics import DepartmentStatistics as DepStatModel
 
@@ -50,6 +52,10 @@ class AddressType(DjangoObjectType):
         exclude_fields = ("region",)
 
 
+class PersonTypeInput(graphene.InputObjectType):
+    person_id = graphene.Integer(required=True)
+
+
 class Query(graphene.ObjectType):
     unions = graphene.List(UnionType)
     departments = graphene.List(DepartmentType)
@@ -76,6 +82,20 @@ class Query(graphene.ObjectType):
     def resolve_departments(self, info, **kwargs):
         return filter(
             lambda dep: dep.address.region != "", Department.get_open_departments()
+        )
+
+    def resolve_memberships(self, info, imput):
+        class Arguments:
+            input = PersonTypeInput(required=True)
+
+        member_of = [
+            membership.union
+            for membership in Membership.objects.filter(
+                person__id=input["person_id"], sign_up_date__year=date.today().year
+            )
+        ]
+        return Union.objects.filter(closed__isnull=True).exclude(
+            pk__in=[union.id for union in member_of]
         )
 
 
