@@ -27,6 +27,13 @@ class DepartmentListTest(StaticLiveServerTestCase):
         )
         self.department_1.address.region = "Region Hovedstaden"
         self.department_1.address.save()
+        self.department_3 = DepartmentFactory.create(
+            created=(timezone.now() - timedelta(days=5)).date(),
+            isVisible=False,
+            closed_dtm=None,
+        )
+        self.department_3.address.region = "Region Hovedstaden"
+        self.department_3.address.save()
         self.department_2 = DepartmentFactory.create(
             created=(timezone.now() - timedelta(days=5)).date(),
             isVisible=True,
@@ -62,15 +69,18 @@ class DepartmentListTest(StaticLiveServerTestCase):
         ).get_attribute("text")
         self.assertEqual(department_name, self.department_1.name)
 
+        # check there is only one department preset
+        self.assertEqual(
+            len(
+                self.browser.find_elements_by_xpath(
+                    "(//section[@id='department-container'])[1]/div"
+                )
+            ),
+            1,
+        )
+
         # check that there's the "Syddanmark" region tab
         self.browser.find_element_by_xpath(
             "//div[@class='tabs']/ul/li[text()[contains(.,'Region Syddanmark')]]"
         ).click()
         self.browser.save_screenshot("test-screens/department_list_second_region.png")
-
-        # check that the department we made in the "Syddanmark" region is present
-        # DOESN'T WORK: Selenium always goes and takes the first tab, for some reason
-        # department_name = self.browser.find_element_by_xpath(
-        #     "//section[@id='department-container']/div/ul/li/a"
-        # ).get_attribute("text")
-        # self.assertEqual(department_name, self.department_2.name)

@@ -70,8 +70,10 @@ class Payment(models.Model):
 
         """ On creation make quickpay transaction if paymenttype CREDITCARD """
         if is_new and self.payment_type == Payment.CREDITCARD:
-            quickpay_transaction = members.models.quickpaytransaction.QuickpayTransaction(
-                payment=self, amount_ore=self.amount_ore
+            quickpay_transaction = (
+                members.models.quickpaytransaction.QuickpayTransaction(
+                    payment=self, amount_ore=self.amount_ore
+                )
             )
             quickpay_transaction.save()
         return super_return

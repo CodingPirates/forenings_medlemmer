@@ -10,7 +10,7 @@ let department_request = fetch(`${base_url}/graphql`, {
   headers: {
     "content-type": "application/json"
   },
-  body: '{"query":"{ departments {id address { longitude latitude }}}"}'
+  body: '{"query":"{ departments {id isVisible address { longitude latitude }}}"}'
 })
   .then(res => res.json())
   .then(res => {
@@ -43,7 +43,8 @@ document.addEventListener("DOMContentLoaded", event => {
 function addToMap(department) {
   if (
     department.address.latitude === null ||
-    department.address.latitude === null
+    department.address.latitude === null ||
+    department.isVisible == false
   ) {
     return;
   }

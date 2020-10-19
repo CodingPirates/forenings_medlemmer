@@ -66,5 +66,7 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
-        migrations.DeleteModel(name="DailyStatisticsDepartment",),
+        migrations.DeleteModel(
+            name="DailyStatisticsDepartment",
+        ),
     ]
