@@ -4,7 +4,10 @@ import django.contrib.auth.password_validation as validators
 
 class signupForm(forms.Form):
     password1 = forms.CharField(
-        label="Kodeord", required=True, widget=forms.PasswordInput
+        label="Kodeord",
+        required=True,
+        widget=forms.PasswordInput,
+        help_text="Kodeord skal være på mindst 8 tegn og må meget gerne indeholde både tal og bogstaver. Kodeord der er alt for lette at gætte vil blive afvist.",
     )
     password2 = forms.CharField(
         label="Gentag kodeord", required=True, widget=forms.PasswordInput
