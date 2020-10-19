@@ -2,7 +2,7 @@ from datetime import timedelta
 from django.db import models
 import members.models.emailtemplate
 from members.models.activity import Activity
-from django.utils import timezone, html
+from django.utils import timezone
 
 
 class Department(models.Model):
@@ -39,43 +39,6 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
-
-    def toHTML(self):
-        myHTML = ""
-        if self.website == "":
-            myHTML += (
-                "<strong>Coding Pirates " + html.escape(self.name) + "</strong><br>"
-            )
-        else:
-            myHTML += (
-                '<a href="'
-                + html.escape(self.website)
-                + '"" target="_blank">'
-                + "<strong>Coding Pirates "
-                + html.escape(self.name)
-                + "</strong></a><br>"
-            )
-        if self.isOpening:
-            myHTML += "<strong>Afdelingen slår snart dørene op!</strong><br>"
-        myHTML += html.escape(str(self.address))
-        myHTML += (
-            "<br>Afdelingsleder: "
-            + html.escape(
-                self.department_leaders.all()[0]
-                if len(self.department_leaders.all())
-                else self.responsible_name
-            )
-            + "<br>"
-        )
-        myHTML += (
-            'E-mail: <a href="mailto:'
-            + html.escape(self.department_email)
-            + '">'
-            + html.escape(self.department_email)
-            + "</a><br>"
-        )
-        myHTML += "Tidspunkt: " + html.escape(self.open_hours)
-        return myHTML
 
     def new_volunteer_email(self, volunteer_name):
         # First fetch department leaders email

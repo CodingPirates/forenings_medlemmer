@@ -1,6 +1,7 @@
 from factory import Faker, DjangoModelFactory
 
 from members.models import Address
+from factory.fuzzy import FuzzyChoice
 
 
 class AddressFactory(DjangoModelFactory):
@@ -16,3 +17,4 @@ class AddressFactory(DjangoModelFactory):
     municipality = Faker("municipality")
     longitude = Faker("longitude")
     latitude = Faker("latitude")
+    region = FuzzyChoice([r[0] for r in Address.REGION_CHOICES])
