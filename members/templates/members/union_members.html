@@ -86,7 +86,7 @@
                         {%if member.membertype == 'NA' %}
                             Frivillig
                         {%endif%}</td>
-                      <td>{{member.family.get_first_parent().name}}{% name = member.family.get_first_parent().name %}{{name}}</td>
+                      <td>{{member.name}}</td>
                       <td><a href="mailto:{{member.email}}">{{member.email}}</a></td>
                       <td>{{member.address}}</td>
                     </tr>
