@@ -82,9 +82,7 @@ class SignUpTest(StaticLiveServerTestCase):
         )[0].text.split(" ")[-1]
 
         # Go to login page,
-        self.browser.find_elements_by_xpath("//*[text()[contains(.,'Log Ind')]]")[
-            0
-        ].click()
+        self.browser.find_element_by_id("login-logout").click()
 
         # enter email and password
         field = self.browser.find_element_by_name("username")
