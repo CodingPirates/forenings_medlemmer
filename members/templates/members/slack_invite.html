@@ -29,9 +29,9 @@ function sendSlackDetails(event) {
   form.append("email", "test@test.dk");
   form.append("type", "frivillig");
   form.append("info", "beskrivelse");
-  fetch("https://slackinvite.codingpirates.dk/invite", {
+  fetch("https://cors-anywhere.herokuapp.com/https://slackinvite.codingpirates.dk/invite", {
     "method": "POST",
-    "mode": "no-cors",
+    "mode": "cors",
     "headers": {
       "content-type": "multipart/form-data;"
     },
