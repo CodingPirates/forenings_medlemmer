@@ -12,7 +12,7 @@ def MembershipView(request):
 
     logged_in_person = user_to_person(request.user)
     family_members = Person.objects.filter(family=logged_in_person.family)
-    unions = Union.objects.all()
+    unions = Union.objects.filter(closed__isNull=True)
     current_memberships = Membership.objects.filter(person__in=family_members).order_by(
         "person", "sign_up_date", "union"
     )
@@ -22,7 +22,6 @@ def MembershipView(request):
             request,
             "members/memberships.html",
             {
-                # TODO check for closed unions:
                 "unions": unions,
                 "family_members": family_members,
                 "current_memberships": current_memberships,
@@ -49,7 +48,6 @@ def MembershipView(request):
                 request,
                 "members/memberships.html",
                 {
-                    # TODO check for closed unions:
                     "unions": unions,
                     "family_members": family_members,
                     "current_memberships": current_memberships,

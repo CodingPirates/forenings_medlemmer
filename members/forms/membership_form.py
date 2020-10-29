@@ -10,7 +10,7 @@ class MembershipForm(forms.Form):
         self.fields["person"].queryset = Person.objects.filter(pk__in=family_members)
         self.fields["person"].initial = 1
 
-        # TODO exclude closed unions and union where is member
+        # TODO union where is member
         self.fields["union"].queryset = Union.objects.filter(closed__isnull=True)
 
     person = forms.ModelChoiceField(Person.objects.none())

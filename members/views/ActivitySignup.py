@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -11,18 +10,18 @@ from members.models.activityparticipant import ActivityParticipant
 from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
-from members.utils.user import has_user, user_to_person
+from members.utils.user import user_to_person
 
 
-@login_required
-@user_passes_test(has_user, "/admin_signup/")
 def ActivitySignup(request, activity_id, person_id=None):
     # TODO: is should be possible to view an activity without loggin in
+    family = 0
     if person_id is None:
         # View only mode
         view_only_mode = True
     else:
         view_only_mode = False
+        family = user_to_person(request.user).family
 
     activity = get_object_or_404(Activity, pk=activity_id)
 
@@ -30,8 +29,6 @@ def ActivitySignup(request, activity_id, person_id=None):
 
     if request.resolver_match.url_name == "activity_view_person":
         view_only_mode = True
-
-    family = user_to_person(request.user).family
 
     if person_id:
         try:
