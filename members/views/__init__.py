@@ -16,3 +16,4 @@ from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.departmentView import departmentView
 from members.views.Activities import Activities
 from members.views.AdminSignup import AdminSignup
+from members.views.confirmAge import confirmAge
