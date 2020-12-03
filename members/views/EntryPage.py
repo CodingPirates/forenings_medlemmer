@@ -36,16 +36,19 @@ def EntryPage(request):
                     pass
                 # TODO: rewrite this! <<<<
 
-
-                #Get child birthday.
+                # Get child birthday.
                 today = timezone.now().date()
                 date = signup.cleaned_data["child_birthday"]
-                years = today.year - date.year - ((today.month, today.day) < (date.month, date.day))
+                years = (
+                    today.year
+                    - date.year
+                    - ((today.month, today.day) < (date.month, date.day))
+                )
 
-                #Check if child is over 17 or under 5
+                # Check if child is over 17 or under 5
                 if years > 17 or years < 5:
-                    #Send to confirm age is over 17 or under 5
-                    return HttpResponseRedirect(reverse("confirmAge"))
+                    # Send to confirm age is over 17 or under 5
+                    return HttpResponseRedirect(reverse("confirmAge", args=(signup)))
 
                 # create new family.
                 family = Family.objects.create(
