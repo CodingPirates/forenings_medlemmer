@@ -14,7 +14,7 @@ jobs:
         run: docker-compose build
       - name: Test
         run: docker-compose run web ./manage.py test
-      - uses: actions/upload-artifact@v2.1.4
+      - uses: actions/upload-artifact@v2.2.2
         if: always()
         with:
           name: selenium-screens
@@ -36,7 +36,7 @@ jobs:
 
       - name: Create and upload UML diagram
         run: mkdir -p UML && docker-compose run web ./manage.py graph_models members -o UML/UML_diagram.png
-      - uses: actions/upload-artifact@v2.1.4
+      - uses: actions/upload-artifact@v2.2.2
         with:
           name: UML_diagram.png
           path: UML
