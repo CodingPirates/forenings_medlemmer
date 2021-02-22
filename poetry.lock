@@ -130,14 +130,14 @@ python-versions = "*"
 
 [[package]]
 name = "django"
-version = "3.1.1"
+version = "3.1.7"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-asgiref = ">=3.2.10,<3.3.0"
+asgiref = ">=3.2.10,<4"
 pytz = "*"
 sqlparse = ">=0.2.2"
 
@@ -694,7 +694,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8.0"
-content-hash = "19473cd66efb2672fb22baa53f1e703edb4fe7788a8d53e7149ef544cb9a2760"
+content-hash = "906ca04999d4bd28bea72b0f2452e351c7d4df05a7b52fa02195e2d93c26a0a9"
 
 [metadata.files]
 aniso8601 = [
@@ -779,8 +779,8 @@ dj-email-url = [
     {file = "dj_email_url-1.0.1-py2.py3-none-any.whl", hash = "sha256:557c07b3039befdc1c561c4038b155d659c09f996d5e33c91189c2e23969da90"},
 ]
 django = [
-    {file = "Django-3.1.1-py3-none-any.whl", hash = "sha256:b5fbb818e751f660fa2d576d9f40c34a4c615c8b48dd383f5216e609f383371f"},
-    {file = "Django-3.1.1.tar.gz", hash = "sha256:59c8125ca873ed3bdae9c12b146fbbd6ed8d0f743e4cf5f5817af50c51f1fc2f"},
+    {file = "Django-3.1.7-py3-none-any.whl", hash = "sha256:baf099db36ad31f970775d0be5587cc58a6256a6771a44eb795b554d45f211b8"},
+    {file = "Django-3.1.7.tar.gz", hash = "sha256:32ce792ee9b6a0cbbec340123e229ac9f765dff8c2a4ae9247a14b2ba3a365a7"},
 ]
 django-bootstrap4 = [
     {file = "django-bootstrap4-2.2.0.tar.gz", hash = "sha256:1c0a931b4245a0dcd5051ea1b244ac130a328374ce8e85254c75eb072a737201"},
