@@ -6,6 +6,7 @@ class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "department",
+        "activitytype",
         "start_date",
         "open_invite",
         "price_in_dkk",
@@ -15,7 +16,7 @@ class ActivityAdmin(admin.ModelAdmin):
     search_fields = ("name", "department__name")
     list_per_page = 20
     raw_id_fields = ("department",)
-    list_filter = ("department", "open_invite")
+    list_filter = ("department", "open_invite", "activitytype")
     save_as = True
 
     # Only view activities on own department
@@ -44,6 +45,7 @@ class ActivityAdmin(admin.ModelAdmin):
                 "description": "<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårssæson 2018</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>",
                 "fields": (
                     "name",
+                    "activitytype",
                     "open_hours",
                     "description",
                     "start_date",
