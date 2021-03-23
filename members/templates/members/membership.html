@@ -11,8 +11,13 @@
   <a class="button" href="{% url "department_signup" %}">
     Gå til Afdelings opskrivninger
   </a>
+  <p>
+    Se også listen over åben arrangementer her.
+    <a class="button" href="{% url "activities" %}">
+      Gå til arrangementer
+    </a>
+    </p>
 </p>
-
 
 <section>
   <h2>Nuværende og tidligere medlemsskaber</h2>
@@ -58,13 +63,13 @@
 
   {% else %}
     <div class="info-box">
-      Der er endnu ingen tilmeldt aktiviteter.
+      Ingen medlemsskaber.
     </div>
   {% endif %}
 </section>
 
 <section>
-  <h2>Medlemsskaber</h2>
+  <h2>Tilmeld som medlem her</h2>
   {% if membership_activities %}
     <p>Liste over lokalforeninger du kan tilmelde dig:</p>
     <table>
@@ -108,7 +113,7 @@
     </table>
   {% else %}
     <div class="info-box">
-      Der er ikke nogen aktiviteter.
+      Der er ikke åbent for indmeldelse i nogen foreninger. Kom tilbage senere.
     </div>
   {% endif %}
 </section>
