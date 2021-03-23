@@ -15,4 +15,5 @@ from members.views.DepartmentSignView import DepartmentSignView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.departmentView import departmentView
 from members.views.Activities import Activities
+from members.views.Membership import Membership
 from members.views.AdminSignup import AdminSignup

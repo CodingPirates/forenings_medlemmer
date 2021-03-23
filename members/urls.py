@@ -15,6 +15,7 @@ from members.views import (
     volunteerSignup,
     departmentView,
     Activities,
+    Membership,
     AdminSignup,
 )
 from django.contrib.auth import views as auth_views
@@ -67,6 +68,7 @@ urlpatterns = [
         name="person_logout",
     ),
     url(r"activities/$", Activities, name="activities"),
+    url(r"membership/$", Membership, name="membership"),
     url(r"volunteer$", volunteerSignup, name="volunteer_signup"),
     url(r"user_created/$", userCreated, name="user_created"),
     url(r"admin_signup/$", AdminSignup, name="admin_signup"),
