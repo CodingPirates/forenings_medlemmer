@@ -126,7 +126,7 @@ class QuickpayTransaction(models.Model):
 
         status, body, headers = client.post(
             f"/payments/{self.transaction_id}/capture",
-            amount=self.payment.amount_ore,
+            body={"amount": self.payment.amount_ore},
             raw=True,
         )
 
