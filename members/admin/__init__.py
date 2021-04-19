@@ -20,7 +20,6 @@ from members.models import (
     Volunteer,
     Member,
     Activity,
-    ActivityType,
     ActivityInvite,
     ActivityParticipant,
     Family,
@@ -52,7 +51,6 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Member, MemberAdmin)
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Activity, ActivityAdmin)
-admin.site.register(ActivityType)
 admin.site.register(EmailTemplate)
 
 
