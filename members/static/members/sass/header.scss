@@ -1,4 +1,4 @@
-@use '_definitions';
+@use 'definitions';
 
 nav {
     @extend %container;
@@ -6,16 +6,16 @@ nav {
     padding: 0 5%;
     display: flex;
     align-items: center;
-    font-family: _definitions.$header_font;
+    font-family: definitions.$header_font;
     img {
         width: 50px;
     }
     // Desktop horizontal nav bar
-    @include _definitions.for-phone {
+    @include definitions.for-phone {
         flex-direction: column;
         justify-content: center;
     }
-    @include _definitions.for-desktop {
+    @include definitions.for-desktop {
         flex-direction: row;
     }
     > a {
@@ -26,7 +26,7 @@ nav {
             color: #cccccc;
             text-decoration: none;
         }
-        @include _definitions.for-phone {
+        @include definitions.for-phone {
             // Bigger buttons on phone
             font-size: 24px;
             padding: 15px 0;
@@ -47,10 +47,10 @@ nav {
 }
 
 #toggle {
-    @include _definitions.for-desktop {
+    @include definitions.for-desktop {
         display: none;
     }
-    @include _definitions.for-phone {
+    @include definitions.for-phone {
         display: inline;
     }
 }
