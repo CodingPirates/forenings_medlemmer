@@ -73,6 +73,23 @@ You are more than welcome to contribute to the system. This guide documents how 
     contains a test api key. Quickpay has a series of cards that can be used
     [for testing][quickpay_cards]
 
+### Local development
+
+Pragmatic development is to use docker for database and run server and/or tests locally
+* Install Poetry
+* Run `poetry install`
+* Install npm
+* Run `npm install`
+* start the virtual env shell and work from there further on with `poetry shell`
+* boot the database with `docker-compose start database`
+* boot the selenium docker with `docker-compose start selenium`
+* Copy the sample envirionment file: `cp .env.example .env`
+* Run sass: `./node_modules/sass/sass.js members/static/members/sass/main.scss`
+* Run the tests: `./manage.py test`
+
+From here on you can boot a development server and optionally populate it with some arbitrary data:
+* Boot development server
+
 ## Creating a pull request
 
 1.  Join our [slack][slackinvite] and introduce yourself in the _medlemssystem_dev_ channel.

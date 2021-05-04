@@ -11,5 +11,8 @@
     "url": "gh:CodingPirates/forenings_medlemmer.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "sass": "^1.32.12"
+  }
 }
