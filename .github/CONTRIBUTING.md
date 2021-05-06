@@ -77,18 +77,34 @@ You are more than welcome to contribute to the system. This guide documents how 
 
 Pragmatic development is to use docker for database and run server and/or tests locally
 * Install Poetry
-* Run `poetry install`
+* Install python dependencies: `poetry install`
 * Install npm
-* Run `npm install`
-* start the virtual env shell and work from there further on with `poetry shell`
+* Install npm dependencies: `npm install`
+* Copy the sample environment file: `cp .env.example .env`
+
 * boot the database with `docker-compose start database`
-* boot the selenium docker with `docker-compose start selenium`
-* Copy the sample envirionment file: `cp .env.example .env`
+* boot a selenium docker with `docker run -it -p 4444:4444 -p 7900:7900 --network="host" -v /dev/shm:/dev/shm selenium/standalone-chrome`
+* start the virtual env shell and work from there further on with `poetry shell`
 * Run sass: `./node_modules/sass/sass.js members/static/members/sass/main.scss`
+* Run collectstatic: `./manage.py collectstatic --no-input --clear`
 * Run the tests: `./manage.py test`
 
 From here on you can boot a development server and optionally populate it with some arbitrary data:
-* Boot development server
+* Boot development server : ``
+
+You can load some sample data into the local development environment by starting the django console with `./manage.py shell` and then 
+```python
+from members.tests.factories.member_factory import MemberFactory
+MemberFactory.create_batch(20)
+```
+In the same console you can create a password for the first person, so you can login:
+```python
+from members.models import Person
+p = Person.objects.first()
+p.user.set_password('test')
+p.user.save() # store in DB
+p.user.username # show login email
+```
 
 ## Creating a pull request
 
