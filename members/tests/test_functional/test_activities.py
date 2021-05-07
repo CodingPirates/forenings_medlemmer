@@ -21,11 +21,21 @@ class ActivitiesTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
 
     def setUp(self):
+        self.activity_arrangement = ActivityFactory.create(
+            open_invite=True,
+            signup_closing=Faker("future_datetime", end_date="+100d"),
+            min_age=5,
+            max_age=90,
+            name="Arrangement",
+            activitytype_id="ARRANGEMENT",
+        )
+        self.activity_arrangement.save()
         self.activity_forløb = ActivityFactory.create(
             open_invite=True,
             signup_closing=Faker("future_datetime", end_date="+100d"),
             min_age=5,
             max_age=90,
+            name="Forløb",
             activitytype_id="FORLØB",
         )
         self.activity_forløb.save()
@@ -34,9 +44,19 @@ class ActivitiesTest(StaticLiveServerTestCase):
             signup_closing=Faker("future_datetime", end_date="+100d"),
             min_age=5,
             max_age=90,
+            name="Foreningsmedlemskab",
             activitytype_id="FORENINGSMEDLEMSKAB",
         )
         self.activity_foreningsmedlemskab.save()
+        self.activity_støttemedlemskab = ActivityFactory.create(
+            open_invite=True,
+            signup_closing=Faker("future_datetime", end_date="+100d"),
+            min_age=5,
+            max_age=90,
+            name="Støttemedlemskab",
+            activitytype_id="STØTTEMEDLEMSKAB",
+        )
+        self.activity_støttemedlemskab.save()
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
@@ -96,5 +116,7 @@ class ActivitiesTest(StaticLiveServerTestCase):
                 "//table/tbody/tr/td[@data-label='Aktivitet']"
             )
         ]
+        self.assertIn(self.activity_arrangement.name, activity_names)
         self.assertIn(self.activity_forløb.name, activity_names)
         self.assertNotIn(self.activity_foreningsmedlemskab.name, activity_names)
+        self.assertNotIn(self.activity_støttemedlemskab.name, activity_names)
