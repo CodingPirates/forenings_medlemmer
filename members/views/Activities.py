@@ -18,7 +18,9 @@ def Activities(request):
         person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None
     )
     open_activities = Activity.objects.filter(
-        open_invite=True, signup_closing__gte=timezone.now()
+        open_invite=True,
+        signup_closing__gte=timezone.now(),
+        activitytype__in=["FORLØB", "ARRANGEMENT"],
     ).order_by("zipcode")
     participating = ActivityParticipant.objects.filter(
         member__person__family=family
