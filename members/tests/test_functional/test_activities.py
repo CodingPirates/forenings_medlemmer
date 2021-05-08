@@ -121,3 +121,57 @@ class ActivitiesTest(StaticLiveServerTestCase):
         self.assertIn(self.activity_forløb.name, activity_names)
         self.assertNotIn(self.activity_foreningsmedlemskab.name, activity_names)
         self.assertNotIn(self.activity_støttemedlemskab.name, activity_names)
+
+    def test_members(self):
+        email = "some_email@bob.gl"
+        password = "MySecret"
+        volunteer = VolunteerFactory.create(
+            person=PersonFactory.create(
+                birthday=Faker("date_between", start_date="-50y", end_date="-10y"),
+                user=UserFactory.create(username=email, email=email, password=password),
+            )
+        )
+        volunteer.person.user.set_password(password)
+        volunteer.person.user.save()
+        volunteer.person.birthday = datetime.date(1980, 1, 10)
+
+        # Login
+        self.browser.get(f"{self.live_server_url}/account/login")
+        self.browser.save_screenshot("test-screens/login.png")
+        field = self.browser.find_element_by_name("username")
+        field.send_keys(email)
+        field = self.browser.find_element_by_name("password")
+        field.send_keys(password)
+
+        self.browser.save_screenshot("test-screens/login_filled.png")
+
+        self.browser.find_element_by_xpath("//input[@value='Log ind']").click()
+        self.browser.save_screenshot("test-screens/logged_in.png")
+        self.assertIn(
+            "Jeres familie",
+            [
+                e.text
+                for e in self.browser.find_elements_by_xpath(
+                    "//body/descendant-or-self::*"
+                )
+            ],
+        )
+
+        # Loads the activities
+        self.browser.get(f"{self.live_server_url}/members")
+        WebDriverWait(self.browser, 10).until(
+            lambda d: d.execute_script("return 'initialised'")
+        )
+        self.browser.save_screenshot("test-screens/activities_1.png")
+
+        # Check that the page contains all activities
+        activity_names = [
+            e.text
+            for e in self.browser.find_elements_by_xpath(
+                "//table/tbody/tr/td[@data-label='Aktivitet']"
+            )
+        ]
+        self.assertNotIn(self.activity_arrangement.name, activity_names)
+        self.assertNotIn(self.activity_forløb.name, activity_names)
+        self.assertIn(self.activity_foreningsmedlemskab.name, activity_names)
+        self.assertNotIn(self.activity_støttemedlemskab.name, activity_names)
