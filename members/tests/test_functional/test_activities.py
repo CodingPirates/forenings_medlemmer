@@ -19,6 +19,7 @@ This test goes to the activities list.
 
 class ActivitiesTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
+    serialized_rollback = True
 
     def setUp(self):
         self.activity_arrangement = ActivityFactory.create(

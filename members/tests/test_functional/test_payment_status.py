@@ -23,6 +23,7 @@ passes. It tests that the status of the payments are correct.
 
 class SignUpTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
+    serialized_rollback = True
 
     def setUp(self):
         self.email = "parent@example.com"
