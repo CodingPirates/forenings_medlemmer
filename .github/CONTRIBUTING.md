@@ -85,7 +85,7 @@ Pragmatic development is to use docker for database and run server and/or tests 
 * boot the database with `docker-compose start database`
 * boot a selenium docker with `docker run -it -p 4444:4444 -p 7900:7900 --network="host" -v /dev/shm:/dev/shm selenium/standalone-chrome`
 * start the virtual env shell and work from there further on with `poetry shell`
-* Run sass: `./node_modules/sass/sass.js members/static/members/sass/main.scss`
+* Run sass: `./node_modules/.bin/sass members/static/members/sass/main.scss`
 * Run collectstatic: `./manage.py collectstatic --no-input --clear`
 * Run the tests: `./manage.py test`
 
