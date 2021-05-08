@@ -1,0 +1,50 @@
+import datetime
+from django.shortcuts import render
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from members.models.activity import Activity
+from members.models.activityparticipant import ActivityParticipant
+from members.models import Person
+from members.utils.user import user_to_person, has_user
+
+
+@login_required
+@user_passes_test(has_user, "/admin_signup/")
+def SupportMembership(request):
+    family = user_to_person(request.user).family
+    activities = Activity.objects.filter(
+        activitytype__in=["STØTTEMEDLEMSKAB"],
+    ).order_by("zipcode")
+    participating = ActivityParticipant.objects.filter(
+        member__person__family=family
+    ).order_by("-activity__start_date")
+
+    activities_with_persons = []
+    # augment open invites with the persons who could join it in the family
+    for curActivity in activities:
+        applicablePersons = Person.objects.filter(
+            family=family,  # only members of this family
+            birthday__lte=timezone.now()
+            - datetime.timedelta(days=curActivity.min_age * 365),  # old enough
+            birthday__gt=timezone.now()
+            - datetime.timedelta(days=curActivity.max_age * 365),  # not too old
+        ).exclude(
+            member__activityparticipant__activity=curActivity
+        )  # not already participating
+
+        if applicablePersons.exists():
+            activities_with_persons.append(
+                {
+                    "id": curActivity.id,
+                    "name": curActivity.name,
+                    "department": curActivity.department,
+                    "persons": applicablePersons,
+                }
+            )
+
+    context = {
+        "participating": participating,
+        "activities": activities_with_persons,
+    }
+    return render(request, "members/support_membership.html", context)
