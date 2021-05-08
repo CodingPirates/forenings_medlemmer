@@ -89,10 +89,10 @@ class ActivitiesTest(StaticLiveServerTestCase):
         field = self.browser.find_element_by_name("password")
         field.send_keys(password)
 
-        self.browser.save_screenshot("test-screens/login_filled.png")
+        self.browser.save_screenshot("test-screens/activities_login_filled.png")
 
         self.browser.find_element_by_xpath("//input[@value='Log ind']").click()
-        self.browser.save_screenshot("test-screens/logged_in.png")
+        self.browser.save_screenshot("test-screens/activities_logged_in.png")
         self.assertIn(
             "Jeres familie",
             [
@@ -104,11 +104,11 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
 
         # Loads the activities
-        self.browser.get(f"{self.live_server_url}/activities")
+        self.browser.find_element_by_link_text("Arrangementer").click()
         WebDriverWait(self.browser, 10).until(
             lambda d: d.execute_script("return 'initialised'")
         )
-        self.browser.save_screenshot("test-screens/activities_1.png")
+        self.browser.save_screenshot("test-screens/activities_list.png")
 
         # Check that the page contains all activities
         activity_names = [
@@ -122,7 +122,7 @@ class ActivitiesTest(StaticLiveServerTestCase):
         self.assertNotIn(self.activity_foreningsmedlemskab.name, activity_names)
         self.assertNotIn(self.activity_støttemedlemskab.name, activity_names)
 
-    def test_members(self):
+    def test_membership(self):
         email = "some_email@bob.gl"
         password = "MySecret"
         volunteer = VolunteerFactory.create(
@@ -143,10 +143,10 @@ class ActivitiesTest(StaticLiveServerTestCase):
         field = self.browser.find_element_by_name("password")
         field.send_keys(password)
 
-        self.browser.save_screenshot("test-screens/login_filled.png")
+        self.browser.save_screenshot("test-screens/membership_login_filled.png")
 
         self.browser.find_element_by_xpath("//input[@value='Log ind']").click()
-        self.browser.save_screenshot("test-screens/logged_in.png")
+        self.browser.save_screenshot("test-screens/membership_logged_in.png")
         self.assertIn(
             "Jeres familie",
             [
@@ -157,12 +157,12 @@ class ActivitiesTest(StaticLiveServerTestCase):
             ],
         )
 
-        # Loads the activities
-        self.browser.get(f"{self.live_server_url}/members")
+        # Loads the members
+        self.browser.find_element_by_link_text("Medlemskaber").click()
         WebDriverWait(self.browser, 10).until(
             lambda d: d.execute_script("return 'initialised'")
         )
-        self.browser.save_screenshot("test-screens/activities_1.png")
+        self.browser.save_screenshot("test-screens/membership_list.png")
 
         # Check that the page contains all activities
         activity_names = [
