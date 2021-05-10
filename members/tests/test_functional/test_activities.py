@@ -146,6 +146,17 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
         self.browser.save_screenshot("test-screens/activities_list.png")
 
+        # Check that the page contains all participating activities
+        activity_names = [
+            e.text
+            for e in self.browser.find_elements_by_xpath(
+                "//section[@id='participation']/table/tbody/tr/td[@data-label='Aktivitet']"
+            )
+        ]
+        self.assertEqual(2, len(activity_names))
+        self.assertIn(self.activity_arrangement_participate.name, activity_names)
+        self.assertIn(self.activity_forløb_participate.name, activity_names)
+
         # Check that the page contains all activities
         activity_names = [
             e.text
@@ -165,6 +176,18 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
         self.browser.save_screenshot("test-screens/membership_list.png")
 
+        # Check that the page contains all participating activities
+        activity_names = [
+            e.text
+            for e in self.browser.find_elements_by_xpath(
+                "//section[@id='participation']/table/tbody/tr/td[@data-label='Aktivitet']"
+            )
+        ]
+        self.assertEqual(1, len(activity_names))
+        self.assertIn(
+            self.activity_foreningsmedlemskab_participate.name, activity_names
+        )
+
         # Check that the page contains all activities
         activity_names = [
             e.text
@@ -182,6 +205,16 @@ class ActivitiesTest(StaticLiveServerTestCase):
             lambda d: d.execute_script("return 'initialised'")
         )
         self.browser.save_screenshot("test-screens/supportmembership_list.png")
+
+        # Check that the page contains all participating activities
+        activity_names = [
+            e.text
+            for e in self.browser.find_elements_by_xpath(
+                "//section[@id='participation']/table/tbody/tr/td[@data-label='Aktivitet']"
+            )
+        ]
+        self.assertEqual(1, len(activity_names))
+        self.assertIn(self.activity_støttemedlemskab_participate.name, activity_names)
 
         # Check that the page contains all activities
         activity_names = [
