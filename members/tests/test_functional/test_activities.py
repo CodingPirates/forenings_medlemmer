@@ -121,6 +121,14 @@ class ActivitiesTest(StaticLiveServerTestCase):
 
         self.browser.find_element_by_xpath("//input[@value='Log ind']").click()
         self.browser.save_screenshot("test-screens/activities_logged_in.png")
+
+    def tearDown(self):
+        if not os.path.exists("test-screens"):
+            os.mkdir("test-screens")
+        self.browser.save_screenshot("test-screens/activities_list_final.png")
+        self.browser.quit()
+
+    def test_entry_page(self):
         self.assertIn(
             "Jeres familie",
             [
@@ -130,12 +138,9 @@ class ActivitiesTest(StaticLiveServerTestCase):
                 )
             ],
         )
-
-    def tearDown(self):
-        if not os.path.exists("test-screens"):
-            os.mkdir("test-screens")
-        self.browser.save_screenshot("test-screens/activities_list_final.png")
-        self.browser.quit()
+        self.browser.find_element_by_link_text("Se familie")
+        self.browser.find_element_by_link_text("Afdelinger")
+        self.browser.find_element_by_link_text("Arrangementer")
 
     def test_activities(self):
 
