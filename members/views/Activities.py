@@ -23,7 +23,8 @@ def Activities(request):
         activitytype__in=["FORLØB", "ARRANGEMENT"],
     ).order_by("zipcode")
     participating = ActivityParticipant.objects.filter(
-        member__person__family=family
+        member__person__family=family,
+        activity__activitytype__in=["FORLØB", "ARRANGEMENT"],
     ).order_by("-activity__start_date")
 
     open_activities_with_persons = []
