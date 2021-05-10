@@ -140,7 +140,27 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
         self.browser.find_element_by_link_text("Se familie")
         self.browser.find_element_by_link_text("Afdelinger")
-        self.browser.find_element_by_link_text("Arrangementer")
+        links = list(
+            map(
+                lambda e: e.get_attribute("href"),
+                self.browser.find_elements_by_link_text("Arrangementer"),
+            )
+        )
+        self.assertEqual(links[0], links[1])
+        links = list(
+            map(
+                lambda e: e.get_attribute("href"),
+                self.browser.find_elements_by_link_text("Medlemskaber"),
+            )
+        )
+        self.assertEqual(links[0], links[1])
+        links = list(
+            map(
+                lambda e: e.get_attribute("href"),
+                self.browser.find_elements_by_link_text("Støttemedlemskaber"),
+            )
+        )
+        self.assertEqual(links[0], links[1])
 
     def test_activities(self):
 
