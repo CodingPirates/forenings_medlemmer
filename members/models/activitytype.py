@@ -29,4 +29,4 @@ class ActivityType(models.Model):
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
 
     def __str__(self):
-        return self.id
+        return self.display_name
