@@ -21,13 +21,22 @@ class ActivitiesTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
 
     def setUp(self):
-        self.activity = ActivityFactory.create(
+        self.activity_forløb = ActivityFactory.create(
             open_invite=True,
             signup_closing=Faker("future_datetime", end_date="+100d"),
             min_age=5,
             max_age=90,
+            activitytype_id="FORLØB",
         )
-        self.activity.save()
+        self.activity_forløb.save()
+        self.activity_foreningsmedlemskab = ActivityFactory.create(
+            open_invite=True,
+            signup_closing=Faker("future_datetime", end_date="+100d"),
+            min_age=5,
+            max_age=90,
+            activitytype_id="FORENINGSMEDLEMSKAB",
+        )
+        self.activity_foreningsmedlemskab.save()
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
@@ -87,4 +96,5 @@ class ActivitiesTest(StaticLiveServerTestCase):
                 "//table/tbody/tr/td[@data-label='Aktivitet']"
             )
         ]
-        self.assertIn(self.activity.name, activity_names)
+        self.assertIn(self.activity_forløb.name, activity_names)
+        self.assertNotIn(self.activity_foreningsmedlemskab.name, activity_names)
