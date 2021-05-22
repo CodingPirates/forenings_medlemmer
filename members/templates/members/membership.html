@@ -1,23 +1,26 @@
 {% extends 'members/base.html' %} {% block content %}
 <h2>Bliv medlem af en Coding Pirates lokalforening</h2>
-<p>
-  Her kan du melde dig ind i en forening.
-<p>
-  Bemærk at et medlemsskab ikke betyder at dit barn kan gå til aktiviteter.
-  Til gengæld støtter du din lokalforening og du har mulighed for at stemme
-  til den årlige generalforsamling.
-  Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye
-  events kan du gøre det på afdelingssiden.
-  <a class="button" href="{% url "department_signup" %}">
-    Gå til Afdelings opskrivninger
-  </a>
-  <p>
-    Se også listen over åben arrangementer her.
-    <a class="button" href="{% url "activities" %}">
-      Gå til arrangementer
-    </a>
+    <p>
+        Her kan du melde dig eller dit barn ind i en forening.
     </p>
-</p>
+    <p>
+        Bemærk at medlemskab ikke betyder at dit barn kan gå til aktiviteter. Deltagelse i sæsonaktiviteter vil
+        automatisk være medlemmer af lokalforeningen. Som medlem støtter du din lokalforening og har mulighed for at
+        stemme til generalforsamlinger i både lokalforeningen og i hos Coding Pirates Denmark.
+    </p>
+    <p>
+        Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye events kan du gøre det på
+        afdelingssiden.
+    </p>
+    <a class="button" href="{% url "department_signup" %}">
+        Gå til Afdelings opskrivninger
+    </a>
+    <p>
+        Se også listen over åben arrangementer her.
+    </p>
+    <a class="button" href="{% url "activities" %}">
+        Gå til arrangementer
+    </a>
 
 <section id="participation">
   <h2>Nuværende og tidligere medlemsskaber</h2>
