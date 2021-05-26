@@ -4,6 +4,7 @@
 
 # ensure all models are included - otherwise makemigrations fails to detect models
 import members.models.activity
+import members.models.activitytype
 import members.models.activityinvite
 import members.models.activityparticipant
 
@@ -27,6 +28,7 @@ import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
 # Export models not files
 from .activity import Activity
+from .activitytype import ActivityType
 from .activityinvite import ActivityInvite
 from .activityparticipant import ActivityParticipant
 from .address import Address
@@ -55,6 +57,7 @@ from .statistics import gatherDayliStatistics
 __all__ = [
     Activity,
     ActivityInvite,
+    ActivityType,
     ActivityParticipant,
     Address,
     AdminUserInformation,
