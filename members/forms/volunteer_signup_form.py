@@ -97,7 +97,7 @@ class vol_signupForm(forms.Form):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     volunteer_department = forms.ModelChoiceField(
-        queryset=Department.objects.all(),
+        queryset=Department.objects.filter(closed_dtm__isnull=True),
         required=True,
         label="Afdeling",
         empty_label="-",
