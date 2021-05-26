@@ -43,7 +43,9 @@ class ActivityFactory(DjangoModelFactory):
     dawa_id = Faker("uuid4")
     description = Faker("text")
     instructions = Faker("text")
-    signup_closing = Faker("date_time", tzinfo=TIMEZONE)
+    signup_closing = Faker(
+        "date_time_between", tzinfo=TIMEZONE, start_date="-100d", end_date="+100d"
+    )
     start_date = LazyAttribute(
         lambda d: datetime_before(d.now)
         if d.active
@@ -56,6 +58,8 @@ class ActivityFactory(DjangoModelFactory):
     open_invite = Faker("boolean")
     price_in_dkk = Faker("random_number", digits=4)
     max_participants = Faker("random_number")
-    min_age = Faker("random_number")
-    max_age = LazyAttribute(lambda a: a.min_age + Faker("random_number").generate({}))
+    min_age = Faker("random_int", min=5, max=18)
+    max_age = LazyAttribute(
+        lambda a: a.min_age + Faker("random_int", min=10, max=80).generate({})
+    )
     member_justified = Faker("boolean")

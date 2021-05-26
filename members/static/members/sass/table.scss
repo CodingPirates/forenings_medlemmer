@@ -1,4 +1,4 @@
-@use "_definitions";
+@use "definitions";
 
 table {
     width: 100%;
@@ -6,7 +6,7 @@ table {
     @extend %card;
     /* Zebra striping */
     tr:nth-of-type(odd) {
-        background: _definitions.$light-grey;
+        background: definitions.$light-grey;
     }
     thead > tr > th {
         @extend %bg-primary;
@@ -22,7 +22,7 @@ table {
         padding: 10px;
         word-break: break-all;
     }
-    @include _definitions.for-phone {
+    @include definitions.for-phone {
         td,
         tr {
             display: block;

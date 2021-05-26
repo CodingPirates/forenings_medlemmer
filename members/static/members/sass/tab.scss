@@ -1,4 +1,4 @@
-@use "_definitions";
+@use "definitions";
 
 .tabs {
     > ul {
@@ -8,14 +8,14 @@
         align-items: stretch;
         @extend %bg-primary;
 
-        @include _definitions.for-phone {
+        @include definitions.for-phone {
             flex-wrap: wrap;
         }
         li {
             width: 100%;
             border-radius: 0.5em;
             cursor: pointer;
-            background-color: _definitions.$primary-color-muted;
+            background-color: definitions.$primary-color-muted;
             display: flex;
             justify-content: center;
             text-align: center;
@@ -26,7 +26,7 @@
             margin: 10px 5px;
             &.tab-active {
                 color: black;
-                background-color: _definitions.$yellow;
+                background-color: definitions.$yellow;
                 text-decoration: underline;
             }
         }

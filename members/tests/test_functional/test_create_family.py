@@ -18,6 +18,7 @@ used to log in.
 
 class SignUpTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
+    serialized_rollback = True
 
     def setUp(self):
         self.email = "parent@example.com"

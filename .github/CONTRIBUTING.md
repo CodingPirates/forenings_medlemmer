@@ -52,7 +52,7 @@ You are more than welcome to contribute to the system. This guide documents how 
     following command in a separate terminal:
 
     ```bash
-    docker-compose run web /bin/dart-sass/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
+    docker-compose run web node_modules/.bin/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
     ```
 
     It will compile SASS when you save a file.
@@ -72,6 +72,39 @@ You are more than welcome to contribute to the system. This guide documents how 
 -   [Quickpay][quickpay]: We use QuickPay for payments, `.env.example`
     contains a test api key. Quickpay has a series of cards that can be used
     [for testing][quickpay_cards]
+
+### Local development
+
+Pragmatic development is to use docker for database and run server and/or tests locally
+* Install Poetry
+* Install python dependencies: `poetry install`
+* Install npm
+* Install npm dependencies: `npm install`
+* Copy the sample environment file: `cp .env.example .env`
+
+* boot the database with `docker-compose start database`
+* boot a selenium docker with `docker run -it -p 4444:4444 -p 7900:7900 --network="host" -v /dev/shm:/dev/shm selenium/standalone-chrome`
+* start the virtual env shell and work from there further on with `poetry shell`
+* Run sass: `./node_modules/.bin/sass members/static/members/sass/main.scss`
+* Run collectstatic: `./manage.py collectstatic --no-input --clear`
+* Run the tests: `./manage.py test`
+
+From here on you can boot a development server and optionally populate it with some arbitrary data:
+* Boot development server : ``
+
+You can load some sample data into the local development environment by starting the django console with `./manage.py shell` and then 
+```python
+from members.tests.factories.member_factory import MemberFactory
+MemberFactory.create_batch(20)
+```
+In the same console you can create a password for the first person, so you can login:
+```python
+from members.models import Person
+p = Person.objects.first()
+p.user.set_password('test')
+p.user.save() # store in DB
+p.user.username # show login email
+```
 
 ## Creating a pull request
 

@@ -1,24 +1,29 @@
 {% extends 'members/base.html' %} {% block content %}
-<h2>Aktiviteter i Coding Pirates</h2>
-    <p>
-        Her kan du tilmelde dit barn en aktivitet. Det kan enten være en åben aktivitet der ikke kræver invitation,
-        eller hvis I har modtaget en invitation vil den kunne ses her. De aktiviteter som I allerede er tilmeldt vil
-        også fremgå på denne side.
-    <p>
+<h2>Bliv støttemedlem af en Coding Pirates lokalforening</h2>
+<p>
+  Her kan du melde dig som støttemedlem til en lokalforening.
+<p>
+  Bemærk at et støttemedlemsskab ikke betyder at dit barn kan gå til aktiviteter.
+  Til gengæld støtter du din lokalforening, men du har ikke mulighed for at stemme
+  til den årlige generalforsamling. Du kan også overveje et stemmeberettiget medlemskab
+  som du finder <a href="{%url 'support_membership' %}">her</a>.
   Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye
   events kan du gøre det på afdelingssiden.
   <a class="button" href="{% url "department_signup" %}">
     Gå til Afdelings opskrivninger
   </a>
+  <p>
+    Se også listen over åben arrangementer her.
+    <a class="button" href="{% url "activities" %}">
+      Gå til arrangementer
+    </a>
+    </p>
 </p>
 
-
 <section id="participation">
-  <h2>Tilmeldte aktiviteter</h2>
+  <h2>Nuværende og tidligere støttemedlemsskaber</h2>
   <p>
-    Dette er de aktiviteter jeres børn er tilmeldt. I kan klikke på navnet for
-    hvert arrangement, for at se flere detaljer om hvor og hvornår det foregår.
-    I kan også se deltagerlisten for arrangementet.
+    Se her hvor du eller dit barn er medlem.
   </p>
   {% if participating %}
     <p>
@@ -59,66 +64,15 @@
 
   {% else %}
     <div class="info-box">
-      Der er endnu ingen tilmeldt aktiviteter.
-    </div>
-  {% endif %}
-</section>
-
-<section>
-  <h2>Invitationer</h2>
-  <p>
-    Denne liste indeholder invitationer til aktiviteter, hvor der enten er fri
-    tilmelding (først til mølle) eller invitationer til aktiviteter I har stået
-    på venteliste til. I vil modtage en e-mail på e-mail-adressen
-    {{family.email}} når der er aktiviteter, som I kan tilmelde jer.
-  </p>
-  {% if invites %}
-    <p><i>Vær opmærksom på, at du tilmelder dig den rigtige afdeling!</i></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Navn</th>
-          <th>Aktivitet</th>
-          <th>Afdeling</th>
-          <th>Handling</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for invite in invites %}
-          <tr>
-            <td>{{invite.person.name}}</td>
-            <td>
-              <a href="{%url 'activity_signup' invite.activity.id invite.person.id %}">
-                {{invite.activity.name}}
-              </a>
-            </td>
-            <td>
-              Coding Pirates: {{invite.activity.department.name}}
-            </td>
-            <td>
-              <a class="button-success" href="{%url 'activity_signup' invite.activity.id invite.person.id %}">
-                Tilmeld aktivitet
-              </a>
-              <a class="button-danger" href="{%url 'invitation_decline' family.unique invite.id %}" >
-                Afslå
-              </a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <div class="info-box">
-      Der er endnu ikke åbnet for tilmelding til aktiviteter. Vi sender en e-mail
-      til {{family.email}} når vi er klar til at modtage tilmeldinger.
+      Ingen støttemedlemsskaber.
     </div>
   {% endif %}
 </section>
 
 <section id="open_activities">
-  <h2>Åbne aktiviteter</h2>
-  {% if open_activities %}
-    <p>Denne liste indeholder åbne aktiviteter, hvor der er fri tilmelding</p>
+  <h2>Tilmeld som støttemedlem her</h2>
+  {% if activities %}
+    <p>Liste over lokalforeninger du kan tilmelde dig:</p>
     <table>
       <thead>
         <tr>
@@ -129,7 +83,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for activity in open_activities %}
+        {% for activity in activities %}
           <tr>
             <td>
               Coding Pirates {{activity.department.name}}
@@ -160,7 +114,7 @@
     </table>
   {% else %}
     <div class="info-box">
-      Der er ikke nogen aktiviteter.
+      Der er ikke åbent for indmeldelse i nogen foreninger. Kom tilbage senere.
     </div>
   {% endif %}
 </section>
