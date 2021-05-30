@@ -81,6 +81,15 @@ class ActivitiesTest(StaticLiveServerTestCase):
             activitytype_id="FORENINGSMEDLEMSKAB",
         )
         self.activity_foreningsmedlemskab.save()
+        self.activity_foreningsmedlemskab_old = ActivityFactory.create(
+            open_invite=True,
+            signup_closing=Faker("past_date", start_date="-10d"),
+            min_age=5,
+            max_age=90,
+            name="Foreningsmedlemskab",
+            activitytype_id="FORENINGSMEDLEMSKAB",
+        )
+        self.activity_foreningsmedlemskab_old.save()
         self.activity_foreningsmedlemskab_participate = ActivityFactory.create(
             name="Foreningsmedlemskab deltagelse", activitytype_id="FORENINGSMEDLEMSKAB"
         )
@@ -97,6 +106,15 @@ class ActivitiesTest(StaticLiveServerTestCase):
             activitytype_id="STØTTEMEDLEMSKAB",
         )
         self.activity_støttemedlemskab.save()
+        self.activity_støttemedlemskab_old = ActivityFactory.create(
+            open_invite=True,
+            signup_closing=Faker("past_date", start_date="-10d"),
+            min_age=5,
+            max_age=90,
+            name="Støttemedlemskab",
+            activitytype_id="STØTTEMEDLEMSKAB",
+        )
+        self.activity_støttemedlemskab_old.save()
         self.activity_støttemedlemskab_participate = ActivityFactory.create(
             name="Støttemedlemskab deltagelse", activitytype_id="STØTTEMEDLEMSKAB"
         )
