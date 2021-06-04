@@ -1,4 +1,3 @@
-import datetime
 import os
 import socket
 
@@ -10,11 +9,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from members.tests.factories import (
     ActivityFactory,
-    PersonFactory,
     ActivityParticipantFactory,
     MemberFactory,
 )
-from members.tests.factories.person_factory import UserFactory
+from members.tests.test_functional.functional_helpers import log_in
 
 """
 This test goes to the activities list.
@@ -26,119 +24,41 @@ class ActivitiesTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        self.email = "some_email@bob.gl"
-        self.password = "MySecret"
-        self.member = MemberFactory.create(
-            person=PersonFactory.create(
-                birthday=Faker("date_between", start_date="-50y", end_date="-10y"),
-                user=UserFactory.create(
-                    username=self.email, email=self.email, password=self.password
-                ),
-            )
-        )
-        self.member.person.user.set_password(self.password)
-        self.member.person.user.save()
-        self.member.person.birthday = datetime.date(1980, 1, 10)
+        self.member = MemberFactory.create()
 
-        self.activity_arrangement = ActivityFactory.create(
-            open_invite=True,
-            signup_closing=Faker("future_datetime", end_date="+100d"),
-            min_age=5,
-            max_age=90,
-            name="Arrangement",
-            activitytype_id="ARRANGEMENT",
-        )
-        self.activity_arrangement.save()
-        self.activity_arrangement_participate = ActivityFactory.create(
-            name="Arrangement deltagelse", activitytype_id="ARRANGEMENT"
-        )
-        self.activity_arrangement_participate.save()
-        ActivityParticipantFactory.create(
-            activity=self.activity_arrangement_participate, member=self.member
-        ).save()
-        self.activity_forløb = ActivityFactory.create(
-            open_invite=True,
-            signup_closing=Faker("future_datetime", end_date="+100d"),
-            min_age=5,
-            max_age=90,
-            name="Forløb",
-            activitytype_id="FORLØB",
-        )
-        self.activity_forløb.save()
-        self.activity_forløb_participate = ActivityFactory.create(
-            name="Forløb deltagelse", activitytype_id="FORLØB"
-        )
-        self.activity_forløb_participate.save()
-        ActivityParticipantFactory.create(
-            activity=self.activity_forløb_participate, member=self.member
-        ).save()
-        self.activity_foreningsmedlemskab = ActivityFactory.create(
-            open_invite=True,
-            signup_closing=Faker("future_datetime", end_date="+100d"),
-            min_age=5,
-            max_age=90,
-            name="Foreningsmedlemskab",
-            activitytype_id="FORENINGSMEDLEMSKAB",
-        )
-        self.activity_foreningsmedlemskab.save()
-        self.activity_foreningsmedlemskab_old = ActivityFactory.create(
-            open_invite=True,
-            signup_closing=Faker("past_date", start_date="-10d"),
-            min_age=5,
-            max_age=90,
-            name="Foreningsmedlemskab",
-            activitytype_id="FORENINGSMEDLEMSKAB",
-        )
-        self.activity_foreningsmedlemskab_old.save()
-        self.activity_foreningsmedlemskab_participate = ActivityFactory.create(
-            name="Foreningsmedlemskab deltagelse", activitytype_id="FORENINGSMEDLEMSKAB"
-        )
-        self.activity_foreningsmedlemskab_participate.save()
-        ActivityParticipantFactory.create(
-            activity=self.activity_foreningsmedlemskab_participate, member=self.member
-        ).save()
-        self.activity_støttemedlemskab = ActivityFactory.create(
-            open_invite=True,
-            signup_closing=Faker("future_datetime", end_date="+100d"),
-            min_age=5,
-            max_age=90,
-            name="Støttemedlemskab",
-            activitytype_id="STØTTEMEDLEMSKAB",
-        )
-        self.activity_støttemedlemskab.save()
-        self.activity_støttemedlemskab_old = ActivityFactory.create(
-            open_invite=True,
-            signup_closing=Faker("past_date", start_date="-10d"),
-            min_age=5,
-            max_age=90,
-            name="Støttemedlemskab",
-            activitytype_id="STØTTEMEDLEMSKAB",
-        )
-        self.activity_støttemedlemskab_old.save()
-        self.activity_støttemedlemskab_participate = ActivityFactory.create(
-            name="Støttemedlemskab deltagelse", activitytype_id="STØTTEMEDLEMSKAB"
-        )
-        self.activity_støttemedlemskab_participate.save()
-        ActivityParticipantFactory.create(
-            activity=self.activity_støttemedlemskab_participate, member=self.member
-        ).save()
+        self.activities = {}
+        for activity_type in [
+            "ARRANGEMENT",
+            "FORLØB",
+            "FORENINGSMEDLEMSKAB",
+            "STØTTEMEDLEMSKAB",
+        ]:
+            self.activities[activity_type] = {}
+            for variant in ["participate", "recent", "old"]:
+                self.activities[activity_type][variant] = ActivityFactory.create(
+                    open_invite=True,
+                    min_age=5,
+                    max_age=90,
+                    signup_closing=(
+                        Faker("past_date", start_date="-10d")
+                        if variant == "old"
+                        else Faker("future_datetime", end_date="+100d")
+                    ),
+                    name=f"-{activity_type}-{variant}",
+                    activitytype_id=activity_type,
+                )
+                if variant == "participate":
+                    ActivityParticipantFactory.create(
+                        activity=self.activities[activity_type][variant],
+                        member=self.member,
+                    )
 
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
 
         # Login
-        self.browser.get(f"{self.live_server_url}/account/login")
-        self.browser.save_screenshot("test-screens/login.png")
-        field = self.browser.find_element_by_name("username")
-        field.send_keys(self.email)
-        field = self.browser.find_element_by_name("password")
-        field.send_keys(self.password)
-
-        self.browser.save_screenshot("test-screens/activities_login_filled.png")
-
-        self.browser.find_element_by_xpath("//input[@value='Log ind']").click()
-        self.browser.save_screenshot("test-screens/activities_logged_in.png")
+        log_in(self, self.member.person)
 
     def tearDown(self):
         if not os.path.exists("test-screens"):
@@ -196,8 +116,10 @@ class ActivitiesTest(StaticLiveServerTestCase):
             )
         ]
         self.assertEqual(2, len(activity_names))
-        self.assertIn(self.activity_arrangement_participate.name, activity_names)
-        self.assertIn(self.activity_forløb_participate.name, activity_names)
+        self.assertIn(
+            self.activities["ARRANGEMENT"]["participate"].name, activity_names
+        )
+        self.assertIn(self.activities["FORLØB"]["participate"].name, activity_names)
 
         # Check that the page contains all activities
         activity_names = [
@@ -207,8 +129,8 @@ class ActivitiesTest(StaticLiveServerTestCase):
             )
         ]
         self.assertEqual(2, len(activity_names))
-        self.assertIn(self.activity_arrangement.name, activity_names)
-        self.assertIn(self.activity_forløb.name, activity_names)
+        self.assertIn(self.activities["ARRANGEMENT"]["recent"].name, activity_names)
+        self.assertIn(self.activities["FORLØB"]["recent"].name, activity_names)
 
     def test_membership(self):
         # Loads the members
@@ -224,11 +146,11 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
         self.assertEqual(1, len(activities))
         self.assertEqual(
-            self.activity_foreningsmedlemskab_participate.name,
+            self.activities["FORENINGSMEDLEMSKAB"]["participate"].name,
             activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
         )
         self.assertEqual(
-            self.activity_foreningsmedlemskab_participate.union.name,
+            self.activities["FORENINGSMEDLEMSKAB"]["participate"].union.name,
             activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
         )
 
@@ -238,11 +160,11 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
         self.assertEqual(1, len(activities))
         self.assertEqual(
-            self.activity_foreningsmedlemskab.name,
+            self.activities["FORENINGSMEDLEMSKAB"]["recent"].name,
             activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
         )
         self.assertEqual(
-            self.activity_foreningsmedlemskab.union.name,
+            self.activities["FORENINGSMEDLEMSKAB"]["recent"].union.name,
             activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
         )
 
@@ -260,11 +182,11 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
         self.assertEqual(1, len(activities))
         self.assertEqual(
-            self.activity_støttemedlemskab_participate.name,
+            self.activities["STØTTEMEDLEMSKAB"]["participate"].name,
             activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
         )
         self.assertEqual(
-            self.activity_støttemedlemskab_participate.union.name,
+            self.activities["STØTTEMEDLEMSKAB"]["participate"].union.name,
             activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
         )
 
@@ -273,12 +195,11 @@ class ActivitiesTest(StaticLiveServerTestCase):
             "//section[@id='open_activities']/table/tbody/tr"
         )
         self.assertEqual(1, len(activities))
-        self.assertEqual(1, len(activities))
         self.assertEqual(
-            self.activity_støttemedlemskab.name,
+            self.activities["STØTTEMEDLEMSKAB"]["recent"].name,
             activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
         )
         self.assertEqual(
-            self.activity_støttemedlemskab.union.name,
+            self.activities["STØTTEMEDLEMSKAB"]["recent"].union.name,
             activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
         )
