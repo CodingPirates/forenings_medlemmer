@@ -37,7 +37,7 @@
         <tr>
           <th>Navn</th>
           <th>Aktivitet</th>
-          <th>Afdeling</th>
+          <th>Forening</th>
           <th>Start</th>
           <th>Slut</th>
         </tr>
@@ -56,7 +56,7 @@
                 </a>
               {%endif%}
             </td>
-            <td>{{participation.activity.department.name}}</td>
+            <td>{{participation.activity.union.name}}</td>
             <td>{{participation.activity.start_date}}</td>
             <td>{{participation.activity.end_date}}</td>
           </tr>
@@ -78,7 +78,7 @@
     <table>
       <thead>
         <tr>
-          <th>Afdeling</th>
+          <th>Forening</th>
           <th>Aktivitet</th>
           <th>Beskrivelse</th>
           <th>Handling</th>
@@ -88,7 +88,7 @@
         {% for activity in membership_activities %}
           <tr>
             <td>
-              Coding Pirates {{activity.department.name}}
+              {{activity.union.name}}
             </td>
             <td>{{activity.name}}</td>
             <td>

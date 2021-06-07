@@ -40,7 +40,7 @@ def Membership(request):
                 {
                     "id": curActivity.id,
                     "name": curActivity.name,
-                    "department": curActivity.department,
+                    "union": curActivity.union,
                     "persons": applicablePersons,
                 }
             )

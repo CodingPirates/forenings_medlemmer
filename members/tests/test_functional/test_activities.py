@@ -181,7 +181,6 @@ class ActivitiesTest(StaticLiveServerTestCase):
         self.assertEqual(links[0], links[1])
 
     def test_activities(self):
-
         # Loads the activities
         self.browser.find_element_by_link_text("Arrangementer").click()
         WebDriverWait(self.browser, 10).until(
@@ -220,26 +219,32 @@ class ActivitiesTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/membership_list.png")
 
         # Check that the page contains all participating activities
-        activity_names = [
-            e.text
-            for e in self.browser.find_elements_by_xpath(
-                "//section[@id='participation']/table/tbody/tr/td[@data-label='Aktivitet']"
-            )
-        ]
-        self.assertEqual(1, len(activity_names))
-        self.assertIn(
-            self.activity_foreningsmedlemskab_participate.name, activity_names
+        activities = self.browser.find_elements_by_xpath(
+            "//section[@id='participation']/table/tbody/tr"
+        )
+        self.assertEqual(1, len(activities))
+        self.assertEqual(
+            self.activity_foreningsmedlemskab_participate.name,
+            activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
+        )
+        self.assertEqual(
+            self.activity_foreningsmedlemskab_participate.union.name,
+            activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
         )
 
         # Check that the page contains all activities
-        activity_names = [
-            e.text
-            for e in self.browser.find_elements_by_xpath(
-                "//section[@id='open_activities']/table/tbody/tr/td[@data-label='Aktivitet']"
-            )
-        ]
-        self.assertEqual(1, len(activity_names))
-        self.assertIn(self.activity_foreningsmedlemskab.name, activity_names)
+        activities = self.browser.find_elements_by_xpath(
+            "//section[@id='open_activities']/table/tbody/tr"
+        )
+        self.assertEqual(1, len(activities))
+        self.assertEqual(
+            self.activity_foreningsmedlemskab.name,
+            activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
+        )
+        self.assertEqual(
+            self.activity_foreningsmedlemskab.union.name,
+            activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
+        )
 
     def test_supportmembership(self):
         # Loads the members
@@ -250,21 +255,30 @@ class ActivitiesTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/supportmembership_list.png")
 
         # Check that the page contains all participating activities
-        activity_names = [
-            e.text
-            for e in self.browser.find_elements_by_xpath(
-                "//section[@id='participation']/table/tbody/tr/td[@data-label='Aktivitet']"
-            )
-        ]
-        self.assertEqual(1, len(activity_names))
-        self.assertIn(self.activity_støttemedlemskab_participate.name, activity_names)
+        activities = self.browser.find_elements_by_xpath(
+            "//section[@id='participation']/table/tbody/tr"
+        )
+        self.assertEqual(1, len(activities))
+        self.assertEqual(
+            self.activity_støttemedlemskab_participate.name,
+            activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
+        )
+        self.assertEqual(
+            self.activity_støttemedlemskab_participate.union.name,
+            activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
+        )
 
         # Check that the page contains all activities
-        activity_names = [
-            e.text
-            for e in self.browser.find_elements_by_xpath(
-                "//section[@id='open_activities']/table/tbody/tr/td[@data-label='Aktivitet']"
-            )
-        ]
-        self.assertEqual(1, len(activity_names))
-        self.assertIn(self.activity_støttemedlemskab.name, activity_names)
+        activities = self.browser.find_elements_by_xpath(
+            "//section[@id='open_activities']/table/tbody/tr"
+        )
+        self.assertEqual(1, len(activities))
+        self.assertEqual(1, len(activities))
+        self.assertEqual(
+            self.activity_støttemedlemskab.name,
+            activities[0].find_element_by_xpath("td[@data-label='Aktivitet']").text,
+        )
+        self.assertEqual(
+            self.activity_støttemedlemskab.union.name,
+            activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
+        )
