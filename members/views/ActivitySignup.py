@@ -176,7 +176,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                     payment.save()
 
                     return_link_url = payment.get_quickpaytransaction().get_link_url(
-                        return_url=settings.BASE_URL  # skip trailing slash
+                        return_url=settings.BASE_URL
                         + reverse("activity_view_person", args=[activity.id, person.id])
                     )
 
