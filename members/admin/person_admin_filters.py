@@ -1,16 +1,27 @@
 from django.contrib import admin
 from members.models import Activity, AdminUserInformation
+from datetime import datetime, timedelta
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
     title = "Deltager på"
     parameter_name = "participant_list"
+    limitdays = None
 
     def lookups(self, request, model_admin):
-        activitys = [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
-        for activity in Activity.objects.filter(
+        activitys = []
+        activityList = Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user)
-        ).order_by("department__name", "-start_date"):
+        ).order_by("department__name", "-start_date")
+
+        if self.limitdays is not None:  # Limit the number of shown activities by date
+            activityList = activityList.filter(
+                end_date__gte=datetime.now() - timedelta(days=self.limitdays)
+            )
+        else:  # Only add none and any if not limited
+            activitys += [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
+
+        for activity in activityList:
             activitys.append((str(activity.pk), str(activity)))
 
         return activitys
@@ -26,15 +37,33 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
             return queryset.filter(member__activityparticipant__activity=self.value())
 
 
+class PersonParticipantListFilterLimited(PersonParticipantListFilter):
+    title = "Deltager på (seneste års aktiviteter)"
+    limitdays = 365  # number of days
+
+
 class PersonInvitedListFilter(admin.SimpleListFilter):
     title = "Inviteret til"
     parameter_name = "activity_invited_list"
+    limitdays = None
 
     def lookups(self, request, model_admin):
-        activitys = [("none", "Ikke inviteret til noget"), ("any", "Alle inviterede")]
-        for activity in Activity.objects.filter(
+        activitys = []
+        activityList = Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user)
-        ).order_by("department__name", "-start_date"):
+        ).order_by("department__name", "-start_date")
+
+        if self.limitdays is not None:  # Limit the number of shown activities by date
+            activityList = activityList.filter(
+                end_date__gte=datetime.now() - timedelta(days=self.limitdays)
+            )
+        else:  # Only add none and any if not limited
+            activitys += [
+                ("none", "Ikke inviteret til noget"),
+                ("any", "Alle inviterede"),
+            ]
+
+        for activity in activityList:
             activitys.append((str(activity.pk), str(activity)))
 
         return activitys
@@ -48,6 +77,11 @@ class PersonInvitedListFilter(admin.SimpleListFilter):
             return queryset
         else:
             return queryset.filter(activityinvite__activity=self.value())
+
+
+class PersonInvitedListFilterLimited(PersonInvitedListFilter):
+    title = "Inviteret til (seneste års aktiviteter)"
+    limitdays = 365  # number of days
 
 
 class PersonWaitinglistListFilter(admin.SimpleListFilter):

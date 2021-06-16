@@ -22,7 +22,9 @@ from .person_admin_filters import (
     VolunteerListFilter,
     PersonWaitinglistListFilter,
     PersonInvitedListFilter,
+    PersonInvitedListFilterLimited,
     PersonParticipantListFilter,
+    PersonParticipantListFilterLimited,
 )
 
 from .inlines import (
@@ -51,7 +53,9 @@ class PersonAdmin(admin.ModelAdmin):
         VolunteerListFilter,
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
+        PersonInvitedListFilterLimited,
         PersonParticipantListFilter,
+        PersonParticipantListFilterLimited,
     )
     search_fields = ("name", "family__email", "notes")
     actions = ["invite_many_to_activity_action", "export_emaillist", "export_csv"]
