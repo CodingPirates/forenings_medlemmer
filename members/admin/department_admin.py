@@ -18,6 +18,7 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_filter = (UnionDepartmentFilter,)
     raw_id_fields = ("union",)
     filter_horizontal = ["department_leaders"]
+    ordering = ["name"]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(DepartmentAdmin, self).get_form(request, obj, **kwargs)

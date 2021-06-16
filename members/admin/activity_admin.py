@@ -18,6 +18,7 @@ class ActivityAdmin(admin.ModelAdmin):
     raw_id_fields = ("department",)
     list_filter = ("department", "open_invite", "activitytype")
     save_as = True
+    ordering = ["-start_date"]
 
     # Only view activities on own department
     def get_queryset(self, request):
