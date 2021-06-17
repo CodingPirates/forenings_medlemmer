@@ -19,10 +19,7 @@ class PersonForm(forms.ModelForm):
                     Div(Field("gender"), css_class="col-md-2"),
                     Div(Field("name"), css_class="col-md-10"),
                     Div(
-                        Field(
-                            "birthday",
-                            input_formats=(settings.DATE_INPUT_FORMATS),
-                        ),
+                        Field("birthday", input_formats=(settings.DATE_INPUT_FORMATS),),
                         css_class="col-md-4",
                     ),
                     Div(Field("email"), css_class="col-md-4"),
@@ -39,10 +36,7 @@ class PersonForm(forms.ModelForm):
                     Div(Field("gender"), css_class="col-md-2"),
                     Div(Field("name"), css_class="col-md-10"),
                     Div(
-                        Field(
-                            "birthday",
-                            input_formats=(settings.DATE_INPUT_FORMATS),
-                        ),
+                        Field("birthday", input_formats=(settings.DATE_INPUT_FORMATS),),
                         css_class="col-md-4",
                     ),
                     Div(Field("email"), css_class="col-md-4"),
@@ -54,7 +48,9 @@ class PersonForm(forms.ModelForm):
             self.fields["phone"].required = True
             self.fields["gender"].choices = Person.MEMBER_ADULT_GENDER_CHOICES
 
-        self.fields["birthday"].widget = forms.DateInput(attrs={"type": "date"}, format='%Y-%m-%d')
+        self.fields["birthday"].widget = forms.DateInput(
+            attrs={"type": "date"}, format="%Y-%m-%d"
+        )
         self.fields["streetname"].required = True
         self.fields["housenumber"].required = True
         self.fields["zipcode"].required = True
