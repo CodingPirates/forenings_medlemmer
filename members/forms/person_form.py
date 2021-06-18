@@ -19,7 +19,10 @@ class PersonForm(forms.ModelForm):
                     Div(Field("gender"), css_class="col-md-2"),
                     Div(Field("name"), css_class="col-md-10"),
                     Div(
-                        Field("birthday", input_formats=(settings.DATE_INPUT_FORMATS),),
+                        Field(
+                            "birthday",
+                            input_formats=(settings.DATE_INPUT_FORMATS),
+                        ),
                         css_class="col-md-4",
                     ),
                     Div(Field("email"), css_class="col-md-4"),
@@ -36,7 +39,10 @@ class PersonForm(forms.ModelForm):
                     Div(Field("gender"), css_class="col-md-2"),
                     Div(Field("name"), css_class="col-md-10"),
                     Div(
-                        Field("birthday", input_formats=(settings.DATE_INPUT_FORMATS),),
+                        Field(
+                            "birthday",
+                            input_formats=(settings.DATE_INPUT_FORMATS),
+                        ),
                         css_class="col-md-4",
                     ),
                     Div(Field("email"), css_class="col-md-4"),
