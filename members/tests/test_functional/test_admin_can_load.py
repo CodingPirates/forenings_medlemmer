@@ -15,6 +15,7 @@ This test creates a super user and checks that the admin interface can be loaded
 
 class SignUpTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
+    serialized_rollback = True
 
     def setUp(self):
         self.person = PersonFactory.create()

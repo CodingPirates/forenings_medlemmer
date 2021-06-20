@@ -1,14 +1,14 @@
-@use "_definitions";
+@use "definitions";
 @use "buttons";
 
 body {
     display: grid;
     align-content: space-between;
-    @include _definitions.for-phone {
+    @include definitions.for-phone {
         grid-template-rows: 1fr 12fr 1fr;
     }
     // Desktop horizontal nav bar
-    @include _definitions.for-desktop {
+    @include definitions.for-desktop {
         grid-template-rows: 50px 10fr 1fr;
     }
 }
@@ -16,7 +16,7 @@ body {
 body,
 html {
     height: 100%;
-    font-family: _definitions.$main_font;
+    font-family: definitions.$main_font;
     width: 100%;
 }
 
@@ -27,7 +27,7 @@ section {
 
 .info-box {
     @extend %rounded-rect;
-    background-color: _definitions.$light-grey;
+    background-color: definitions.$light-grey;
     padding: 10px;
     margin: 10px auto;
     width: 66%;
@@ -49,8 +49,8 @@ main {
     @extend %container;
     margin-top: 20px;
     margin-bottom: 20px;
-    max-width: _definitions.$max_width;
-    @include _definitions.for-desktop {
+    max-width: definitions.$max_width;
+    @include definitions.for-desktop {
         width: 90%;
         margin-left: auto;
         margin-right: auto;

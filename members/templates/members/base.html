@@ -27,15 +27,17 @@
 </head>
 
 <body>
-    {% include "members/header.html" %}
+    {% if not skip_context %} {% include "members/header.html" %} {% endif %}
     <main>
         {% block content %}{% endblock %}
     </main>
+    {% if not skip_context %}
     <footer>
         <p>Coding Pirates Denmark - Sverigesgade 20, 1., 5000 Odense C,
         E-mail: <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>
         <abbr title="Telefon">Tlf</abbr>: +45 27 83 65 25,
         CVR: 35 55 23 16</p>
     </footer>
+    {% endif %}
 </body>
 </html>

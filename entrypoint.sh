@@ -11,7 +11,7 @@ then
 fi
 
 # Compile sass
-/bin/dart-sass/sass \
+/nodeapp/node_modules/.bin/sass \
     members/static/members/sass/main.scss members/static/members/css/main.css
 
 python manage.py migrate

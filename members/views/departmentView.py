@@ -10,8 +10,9 @@ def departmentView(request, unique=None):
         request,
         "members/department_list.html",
         {
+            "skip_context": True,
             "departments": filter(
                 lambda dep: dep.isVisible, Department.get_open_departments()
-            )
+            ),
         },
     )

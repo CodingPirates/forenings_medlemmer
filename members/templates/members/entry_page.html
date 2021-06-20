@@ -10,6 +10,7 @@
         <a href="{% url 'family_detail' %}">
           Se familie <i class="fa fa-long-arrow-alt-right"></i>
         </a>
+          <p>Se og ret stamdata for din familie</p>
       </div>
     </div>
     <div>
@@ -28,11 +29,31 @@
     <div>
       <span><i class="fa-calendar fa fa-4x"></i></span>
       <div>
-        <h4>Tilmeld aktivititer</h4>
+        <h4>Tilmeld aktiviteter</h4>
         <a href="{% url "activities" %}">
           Arrangementer <i class="fa fa-long-arrow-alt-right"></i>
         </a>
         <p>Tilmeld til klubaften og andre aktiviteter her</p>
+      </div>
+    </div>
+    <div>
+      <span><i class="fa-users fa fa-4x"></i></span>
+      <div>
+        <h4>Bliv medlem af en lokalforening</h4>
+        <a href="{% url 'membership' %}">
+          Medlemskaber <i class="fa fa-long-arrow-alt-right"></i>
+        </a>
+        <p>Indmeldelse af børn og voksne i en lokalforening.</p>
+      </div>
+    </div>
+    <div>
+      <span><i class="fa-users fa fa-4x"></i></span>
+      <div>
+        <h4>Bliv støttemedlem</h4>
+        <a href="{% url 'support_membership' %}">
+          Støttemedlemskaber <i class="fa fa-long-arrow-alt-right"></i>
+        </a>
+        <p>Donér til Coding Pirates som støttemedlem</p>
       </div>
     </div>
   </div>

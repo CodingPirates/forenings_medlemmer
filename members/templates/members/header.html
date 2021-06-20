@@ -8,6 +8,8 @@
         <a href="{% url "family_detail" %}">Familie</a>
         <a href="{% url "department_signup" %}">Afdelinger</a>
         <a href="{% url "activities" %}">Arrangementer</a>
+        <a href="{% url "membership" %}">Medlemskaber</a>
+        <a href="{% url "support_membership" %}">Støttemedlemskaber</a>
         <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
     {% else %}
         <a href="{% url "entry_page" %}">Tilmeld barn</a>

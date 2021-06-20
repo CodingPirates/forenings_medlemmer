@@ -1,4 +1,4 @@
-@use "_definitions";
+@use "definitions";
 
 .button {
     border-radius: 0.25rem;
@@ -6,7 +6,7 @@
     display: inline-block;
     text-align: center;
     white-space: nowrap;
-    background-color: _definitions.$accent-color;
+    background-color: definitions.$accent-color;
     vertical-align: middle;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -19,7 +19,7 @@
     color: white !important;
     margin: 10px;
     &:hover {
-        background-color: _definitions.$accent-color-muted !important;
+        background-color: definitions.$accent-color-muted !important;
     }
 }
 
@@ -27,7 +27,7 @@
     @extend .button;
     @extend %bg-accent;
     &:hover {
-        background-color: _definitions.$accent-color-muted;
+        background-color: definitions.$accent-color-muted;
         color: black;
     }
 }
@@ -42,33 +42,33 @@
 
 .button-primary-color {
     @extend .button;
-    background-color: _definitions.$primary-color;
+    background-color: definitions.$primary-color;
     &:hover {
-        background-color: _definitions.$primary-color-muted !important;
+        background-color: definitions.$primary-color-muted !important;
         color: black;
     }
 }
 
 .button-danger {
     @extend .button;
-    background-color: _definitions.$danger-color;
-    border-color: _definitions.$danger-color;
+    background-color: definitions.$danger-color;
+    border-color: definitions.$danger-color;
     color: white;
     display: block;
     &:hover {
-        background-color: _definitions.$danger-color-muted !important;
-        border-color: _definitions.$danger-color-muted;
+        background-color: definitions.$danger-color-muted !important;
+        border-color: definitions.$danger-color-muted;
     }
 }
 
 .button-success {
     @extend .button;
-    background-color: _definitions.$success-color;
-    border-color: _definitions.$success-color;
+    background-color: definitions.$success-color;
+    border-color: definitions.$success-color;
     color: white;
     display: block;
     &:hover {
-        background-color: _definitions.$success-color-muted;
-        border-color: _definitions.$success-color-muted;
+        background-color: definitions.$success-color-muted;
+        border-color: definitions.$success-color-muted;
     }
 }

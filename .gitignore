@@ -8,3 +8,4 @@ members/static/members/css
 .sass-cache/
 public_data.zip
 test-screens
+/node_modules
