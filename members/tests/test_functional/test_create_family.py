@@ -38,66 +38,93 @@ class SignUpTest(StaticLiveServerTestCase):
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
 
-        # Enter child details
-        field = self.browser.find_element_by_name("child_name")
-        field.send_keys("Torben Test")
+        for i in range(0, 2):
+            # Enter child details
+            field = self.browser.find_element_by_name("child_name")
+            field.send_keys("Torben Test")
 
-        field = self.browser.find_element_by_name("child_birthday")
-        field.send_keys("05-03-2010")
+            field = self.browser.find_element_by_name("child_birthday")
+            field.send_keys("05-03-2010")
 
-        # Enter parent details
-        field = self.browser.find_element_by_name("parent_name")
-        field.send_keys("Anders Afprøvning")
+            # Enter parent details
+            field = self.browser.find_element_by_name("parent_name")
+            field.send_keys("Anders Afprøvning")
 
-        field = self.browser.find_element_by_name("parent_birthday")
-        field.send_keys("05-03-1980")
+            field = self.browser.find_element_by_name("parent_birthday")
+            field.send_keys("05-03-1980")
 
-        field = self.browser.find_element_by_name("parent_email")
-        field.send_keys(self.email)
+            field = self.browser.find_element_by_name("parent_email")
+            field.send_keys(self.email)
 
-        field = self.browser.find_element_by_name("parent_phone")
-        field.send_keys("12345678")
+            field = self.browser.find_element_by_name("parent_phone")
+            field.send_keys("12345678")
 
-        # Use addresse Autocomplete
-        field = self.browser.find_element_by_name("search_address")
-        field.click()
-        field.send_keys("Sverigesgade 20, 5000")
-        try:
-            address = WebDriverWait(self.browser, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
+            # Use addresse Autocomplete
+            field = self.browser.find_element_by_name("search_address")
+            field.click()
+            field.send_keys("Sverigesgade 20, 5000")
+            try:
+                address = WebDriverWait(self.browser, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
+                )
+                address.click()
+            except Exception:
+                self.fail("Autocomplete not working")
+
+            self.assertEqual(
+                "Sverigesgade 20, 5000 Odense C", field.get_attribute("value")
             )
-            address.click()
-        except Exception:
-            self.fail("Autocomplete not working")
+            self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
-        self.assertEqual("Sverigesgade 20, 5000 Odense C", field.get_attribute("value"))
-        self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
+            # First run checks that the form went through succesfully
+            if i == 0:
+                # Submit form
+                self.browser.find_element_by_name("submit").click()
+                self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
 
-        # Submit form
-        self.browser.find_element_by_name("submit").click()
-        self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
-        # Check that redirect and get password
-        self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
-        password = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'Adgangskoden er')]]"
-        )[0].text.split(" ")[-1]
+                # Check that redirect and get password
+                self.assertEqual(
+                    self.browser.current_url.split("/")[-2], "user_created"
+                )
+                password = self.browser.find_elements_by_xpath(
+                    "//*[text()[contains(.,'Adgangskoden er')]]"
+                )[0].text.split(" ")[-1]
 
-        # Go to login page,
-        self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'Gå til log ind')]]"
-        )[0].click()
+                # Go to login page,
+                self.browser.find_elements_by_xpath(
+                    "//*[text()[contains(.,'Gå til log ind')]]"
+                )[0].click()
 
-        # enter email and password
-        field = self.browser.find_element_by_name("username")
-        field.send_keys(self.email)
+                # enter email and password
+                field = self.browser.find_element_by_name("username")
+                field.send_keys(self.email)
 
-        field = self.browser.find_element_by_name("password")
-        field.send_keys(password)
+                field = self.browser.find_element_by_name("password")
+                field.send_keys(password)
 
-        self.browser.find_element_by_xpath("//input[@type='submit']").click()
+                self.browser.find_element_by_xpath("//input[@type='submit']").click()
 
-        # Check that we were redirectet to overview page
-        elements = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'For yderligere hjælp med at bruge denne side')]]"
-        )
-        self.assertGreater(len(elements), 0)
+                # Check that we were redirectet to overview page
+                elements = self.browser.find_elements_by_xpath(
+                    "//*[text()[contains(.,'For yderligere hjælp med at bruge denne side')]]"
+                )
+                self.assertGreater(len(elements), 0)
+            # Second run checks that the form fails
+            elif i == 1:
+                # Make sure that the form is case-insensitive
+                field = self.browser.find_element_by_name("parent_email")
+                field.clear()
+                field.send_keys(self.email.capitalize())
+
+                # Submit form
+                self.browser.find_element_by_name("submit").click()
+
+                # Check that doublet families cannot be created
+                self.browser.save_screenshot("test-screens/sign_up_screen_4.png")
+                self.assertEquals(
+                    1, len(self.browser.find_elements_by_id("error_1_id_parent_email"))
+                )
+
+            # Go back for next iteration
+            self.browser.find_elements_by_id("login-logout")[0].click()
+            self.browser.get(self.live_server_url)
