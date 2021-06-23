@@ -22,9 +22,9 @@ nav {
         @extend %rounded-rect;
         color: white;
         padding: 0 10px;
+        text-decoration: none;
         &:hover {
             color: #cccccc;
-            text-decoration: none;
         }
         @include definitions.for-phone {
             // Bigger buttons on phone
