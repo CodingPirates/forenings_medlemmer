@@ -4,7 +4,6 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 
 from members.models.department import Department
-from members.models.person import Person
 
 
 class vol_emailForm(forms.Form):
