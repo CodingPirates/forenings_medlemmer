@@ -6,9 +6,6 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from members.forms import vol_emailForm
 from members.models.department import Department
-from members.models.family import Family
-from members.models.person import Person
-from members.models.volunteer import Volunteer
 from django.contrib.auth.models import User
 
 
