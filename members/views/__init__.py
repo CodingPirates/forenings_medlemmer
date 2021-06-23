@@ -18,3 +18,5 @@ from members.views.Activities import Activities
 from members.views.Membership import Membership
 from members.views.SupportMembership import SupportMembership
 from members.views.AdminSignup import AdminSignup
+from members.views.volunteerEmail import volunteerEmail
+from members.views.volunteerEmailSentView import volunteerEmailSentView

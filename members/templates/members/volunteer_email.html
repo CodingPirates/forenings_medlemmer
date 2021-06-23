@@ -1,0 +1,15 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+        <div>
+            <p>Nedenfor kan du udfylde informationer så du kan komme i kontakt med den rette afdeling.</p>
+            <p>Du kan for eksempel vælge en afdeling tæt på hvor du bor eller arbejder.</p>
+            <p>Hvis du er i tvivl og har brug for ekstra hjælp, kan du kontakte os på </p>
+            <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            {% crispy vol_emailform %}
+          </div>
+        </div>
+{% endblock %}
