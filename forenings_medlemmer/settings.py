@@ -78,7 +78,7 @@ assert not BASE_URL.endswith(
 ), f"BASE_URL environment variable must not end with '/'. It is set to '{BASE_URL}'."
 
 INSTALLED_APPS = (
-    "bootstrap4",
+    "django_bootstrap5",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -87,13 +87,15 @@ INSTALLED_APPS = (
     "corsheaders",
     "members",
     "crispy_forms",
+    "crispy_bootstrap5",
     "django_cron",
     "django.contrib.admin",
     "graphene_django",
     "django_extensions",
 )
 
-CRISPY_TEMPLATE_PACK = "bootstrap4"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",

@@ -27,17 +27,14 @@ tests = ["pytest", "pytest-asyncio"]
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.9.1"
+version = "4.9.3"
 description = "Screen-scraping library"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-soupsieve = [
-    ">1.2",
-    "<2.0",
-]
+soupsieve = {version = ">1.2", markers = "python_version >= \"3.0\""}
 
 [package.extras]
 html5lib = ["html5lib"]
@@ -113,6 +110,21 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
 toml = ["toml"]
 
 [[package]]
+name = "crispy-bootstrap5"
+version = "0.4"
+description = "Bootstrap5 template pack for django-crispy-forms"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+django = ">=2.2"
+django-crispy-forms = ">=1.9.2"
+
+[package.extras]
+test = ["pytest", "pytest-django"]
+
+[[package]]
 name = "dj-database-url"
 version = "0.5.0"
 description = "Use Database URLs in your Django Application."
@@ -146,19 +158,16 @@ argon2 = ["argon2-cffi (>=16.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-bootstrap4"
-version = "2.2.0"
-description = "Bootstrap support for Django projects"
+name = "django-bootstrap5"
+version = "2.0.1"
+description = "Bootstrap 5 for Django"
 category = "main"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = ">=3.6"
 
 [package.dependencies]
-beautifulsoup4 = ">=4.8.0,<5.0.0"
-django = ">=2.2,<4.0"
-
-[package.extras]
-docs = ["sphinx (>=2.4,<3.0)", "sphinx_rtd_theme (>=0.4.3,<0.5.0)", "m2r (>=0.2.1,<0.3.0)"]
+beautifulsoup4 = ">=4.8.0"
+Django = ">=2.2"
 
 [[package]]
 name = "django-common-helpers"
@@ -602,11 +611,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "soupsieve"
-version = "1.9.6"
+version = "2.2.1"
 description = "A modern CSS selector implementation for Beautiful Soup."
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [[package]]
 name = "sqlparse"
@@ -694,7 +703,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8.0"
-content-hash = "19473cd66efb2672fb22baa53f1e703edb4fe7788a8d53e7149ef544cb9a2760"
+content-hash = "95f1ebad439491b96bd237a244aae99a5998a7bcb9d96caed9a09c0eead6fabc"
 
 [metadata.files]
 aniso8601 = [
@@ -710,9 +719,9 @@ asgiref = [
     {file = "asgiref-3.2.10.tar.gz", hash = "sha256:7e51911ee147dd685c3c8b805c0ad0cb58d360987b56953878f8c06d2d1c6f1a"},
 ]
 beautifulsoup4 = [
-    {file = "beautifulsoup4-4.9.1-py2-none-any.whl", hash = "sha256:e718f2342e2e099b640a34ab782407b7b676f47ee272d6739e60b8ea23829f2c"},
-    {file = "beautifulsoup4-4.9.1-py3-none-any.whl", hash = "sha256:a6237df3c32ccfaee4fd201c8f5f9d9df619b93121d01353a64a73ce8c6ef9a8"},
-    {file = "beautifulsoup4-4.9.1.tar.gz", hash = "sha256:73cc4d115b96f79c7d77c1c7f7a0a8d4c57860d1041df407dd1aae7f07a77fd7"},
+    {file = "beautifulsoup4-4.9.3-py2-none-any.whl", hash = "sha256:4c98143716ef1cb40bf7f39a8e3eec8f8b009509e74904ba3a7b315431577e35"},
+    {file = "beautifulsoup4-4.9.3-py3-none-any.whl", hash = "sha256:fff47e031e34ec82bf17e00da8f592fe7de69aeea38be00523c04623c04fb666"},
+    {file = "beautifulsoup4-4.9.3.tar.gz", hash = "sha256:84729e322ad1d5b4d25f805bfa05b902dd96450f43842c4e99067d5e1369eb25"},
 ]
 black = [
     {file = "black-20.8b1.tar.gz", hash = "sha256:1c02557aa099101b9d21496f8a914e9ed2222ef70336404eeeac8edba836fbea"},
@@ -770,6 +779,10 @@ coverage = [
     {file = "coverage-5.3-cp39-cp39-win_amd64.whl", hash = "sha256:47a11bdbd8ada9b7ee628596f9d97fbd3851bd9999d398e9436bd67376dbece7"},
     {file = "coverage-5.3.tar.gz", hash = "sha256:280baa8ec489c4f542f8940f9c4c2181f0306a8ee1a54eceba071a449fb870a0"},
 ]
+crispy-bootstrap5 = [
+    {file = "crispy-bootstrap5-0.4.tar.gz", hash = "sha256:04fad1dd060467278a62a3e5755b6b3dc15d4b1306db1de774a618e8dc5252a5"},
+    {file = "crispy_bootstrap5-0.4-py3-none-any.whl", hash = "sha256:6abe36a804d50d13bd20214e0c067c0b530c03074b64cf87c0cb5762b94c0779"},
+]
 dj-database-url = [
     {file = "dj-database-url-0.5.0.tar.gz", hash = "sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163"},
     {file = "dj_database_url-0.5.0-py2.py3-none-any.whl", hash = "sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9"},
@@ -782,9 +795,9 @@ django = [
     {file = "Django-3.1.1-py3-none-any.whl", hash = "sha256:b5fbb818e751f660fa2d576d9f40c34a4c615c8b48dd383f5216e609f383371f"},
     {file = "Django-3.1.1.tar.gz", hash = "sha256:59c8125ca873ed3bdae9c12b146fbbd6ed8d0f743e4cf5f5817af50c51f1fc2f"},
 ]
-django-bootstrap4 = [
-    {file = "django-bootstrap4-2.2.0.tar.gz", hash = "sha256:1c0a931b4245a0dcd5051ea1b244ac130a328374ce8e85254c75eb072a737201"},
-    {file = "django_bootstrap4-2.2.0-py3-none-any.whl", hash = "sha256:32cc0f914ace4cef935c0d3f786dde2a52f0ea1be72153f6e356c0aa8f3925e1"},
+django-bootstrap5 = [
+    {file = "django-bootstrap5-2.0.1.tar.gz", hash = "sha256:35f152a83a2f9c8760bd0df9e6a4862fa121a627c7beec93d5eb61f29c0c3364"},
+    {file = "django_bootstrap5-2.0.1-py3-none-any.whl", hash = "sha256:97843e9db4b0102ee5f70a24f5205e36b93728a9b388c1336fcada35415b0445"},
 ]
 django-common-helpers = [
     {file = "django-common-helpers-0.9.2.tar.gz", hash = "sha256:2d56be6fa261d829a6a224f189bf276267b9082a17d613fe5f015dd4d65c17b4"},
@@ -961,8 +974,8 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 soupsieve = [
-    {file = "soupsieve-1.9.6-py2.py3-none-any.whl", hash = "sha256:feb1e937fa26a69e08436aad4a9037cd7e1d4c7212909502ba30701247ff8abd"},
-    {file = "soupsieve-1.9.6.tar.gz", hash = "sha256:7985bacc98c34923a439967c1a602dc4f1e15f923b6fcf02344184f86cc7efaa"},
+    {file = "soupsieve-2.2.1-py3-none-any.whl", hash = "sha256:c2c1c2d44f158cdbddab7824a9af8c4f83c76b1e23e049479aa432feb6c4c23b"},
+    {file = "soupsieve-2.2.1.tar.gz", hash = "sha256:052774848f448cf19c7e959adf5566904d525f33a3f8b6ba6f6f8f26ec7de0cc"},
 ]
 sqlparse = [
     {file = "sqlparse-0.3.1-py2.py3-none-any.whl", hash = "sha256:022fb9c87b524d1f7862b3037e541f68597a730a8843245c349fc93e1643dc4e"},
