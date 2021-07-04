@@ -32,7 +32,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_final.png")
         self.browser.quit()
 
-    def test_entry_page(self):
+    def test_account_create(self):
         # Loads the front page
         self.browser.get(self.live_server_url)
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)

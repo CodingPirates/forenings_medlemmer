@@ -50,7 +50,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.quit()
 
     @override_settings(DEBUG=True)
-    def test_entry_page(self):
+    def test_account_create(self):
         log_in(self, self.person)
 
         # Goes to activity sign up screen for first kid

@@ -63,43 +63,6 @@ class ActivitiesTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/activities_list_final.png")
         self.browser.quit()
 
-    def test_entry_page_as_member(self):
-        # Login
-        log_in(self, self.member.person)
-
-        self.assertIn(
-            "Jeres familie",
-            [
-                e.text
-                for e in self.browser.find_elements_by_xpath(
-                    "//body/descendant-or-self::*"
-                )
-            ],
-        )
-        self.browser.find_element_by_link_text("Se familie")
-        self.browser.find_element_by_link_text("Afdelinger")
-        links = list(
-            map(
-                lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Arrangementer"),
-            )
-        )
-        self.assertEqual(links[0], links[1])
-        links = list(
-            map(
-                lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Medlemskaber"),
-            )
-        )
-        self.assertEqual(links[0], links[1])
-        links = list(
-            map(
-                lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Støttemedlemskaber"),
-            )
-        )
-        self.assertEqual(links[0], links[1])
-
     def test_activities_as_member(self):
         # Login
         log_in(self, self.member.person)
