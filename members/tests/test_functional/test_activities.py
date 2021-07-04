@@ -57,16 +57,16 @@ class ActivitiesTest(StaticLiveServerTestCase):
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
 
-        # Login
-        log_in(self, self.member.person)
-
     def tearDown(self):
         if not os.path.exists("test-screens"):
             os.mkdir("test-screens")
         self.browser.save_screenshot("test-screens/activities_list_final.png")
         self.browser.quit()
 
-    def test_entry_page(self):
+    def test_entry_page_as_member(self):
+        # Login
+        log_in(self, self.member.person)
+
         self.assertIn(
             "Jeres familie",
             [
@@ -100,7 +100,10 @@ class ActivitiesTest(StaticLiveServerTestCase):
         )
         self.assertEqual(links[0], links[1])
 
-    def test_activities(self):
+    def test_activities_as_member(self):
+        # Login
+        log_in(self, self.member.person)
+
         # Loads the activities
         self.browser.find_element_by_link_text("Arrangementer").click()
         WebDriverWait(self.browser, 10).until(
@@ -132,7 +135,10 @@ class ActivitiesTest(StaticLiveServerTestCase):
         self.assertIn(self.activities["ARRANGEMENT"]["recent"].name, activity_names)
         self.assertIn(self.activities["FORLØB"]["recent"].name, activity_names)
 
-    def test_membership(self):
+    def test_membership_as_member(self):
+        # Login
+        log_in(self, self.member.person)
+
         # Loads the members
         self.browser.find_element_by_link_text("Medlemskaber").click()
         WebDriverWait(self.browser, 10).until(
@@ -168,7 +174,10 @@ class ActivitiesTest(StaticLiveServerTestCase):
             activities[0].find_element_by_xpath("td[@data-label='Forening']").text,
         )
 
-    def test_supportmembership(self):
+    def test_supportmembership_as_member(self):
+        # Login
+        log_in(self, self.member.person)
+
         # Loads the members
         self.browser.find_element_by_link_text("Støttemedlemskaber").click()
         WebDriverWait(self.browser, 10).until(
