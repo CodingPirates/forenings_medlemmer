@@ -27,7 +27,7 @@ from django.views.decorators.csrf import csrf_exempt
 urlpatterns = [
     url(r"^$", EntryPage, name="entry_page"),
     url(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
-    # url(r"^account/create/$", AccountCreate, name="account_create"),
+    url(r"^account/create/$", AccountCreate, name="account_create"),
     url(
         r"^account/login/$",
         auth_views.LoginView.as_view(template_name="members/login.html"),
