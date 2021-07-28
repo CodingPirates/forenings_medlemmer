@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 from members.forms import vol_emailForm
-from members.models import Department, EmailTemplate, EmailItem
+from members.models import Department, EmailTemplate
 from .factories import DepartmentFactory, ActivityFactory
 
 
