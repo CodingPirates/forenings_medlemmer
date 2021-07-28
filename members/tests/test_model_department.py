@@ -79,6 +79,5 @@ class TestModelDepartment(TestCase):
         if form.is_valid():
             department.new_volunteer_email_dep_head(form)
         email_amount += 1
-        email = EmailItem.objects.all()
         call_command("runcrons")
         self.assertEqual(len(mail.outbox), email_amount)
