@@ -4,7 +4,7 @@ from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
-from members.forms import vol_emailForm
+from members.forms import VolEmailForm
 from members.models import Department, EmailTemplate
 from .factories import DepartmentFactory, ActivityFactory
 
@@ -63,7 +63,7 @@ class TestModelDepartment(TestCase):
     def test_send_new_volunteer(self):
         email_amount = len(mail.outbox)
         department = Department.objects.get(pk=self.department.pk)
-        form = vol_emailForm(
+        form = VolEmailForm(
             data={
                 "form_id": "vol_email",
                 "volunteer_email": "test@test.dk",

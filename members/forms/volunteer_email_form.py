@@ -6,9 +6,9 @@ from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 from members.models.department import Department
 
 
-class vol_emailForm(forms.Form):
+class VolEmailForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(vol_emailForm, self).__init__(*args, **kwargs)
+        super(VolEmailForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.form_action = "volunteer_email"
@@ -45,7 +45,7 @@ class vol_emailForm(forms.Form):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     volunteer_department = forms.ModelChoiceField(
-        queryset=Department.objects.filter(closed_dtm__isnull=True),
+        queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
         required=True,
         label="Afdeling",
         empty_label="-",

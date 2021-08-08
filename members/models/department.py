@@ -55,7 +55,7 @@ class Department(models.Model):
         )
         context = {
             "department": self,
-            "volunteer_name": volunteer_form.cleaned_data["volunteer_email"],
+            "volunteer_name": volunteer_form.cleaned_data["volunteer_name"],
             "volunteer_email": volunteer_form.cleaned_data["volunteer_email"],
             "volunteer_phone": volunteer_form.cleaned_data["volunteer_phone"],
             "volunteer_birthday": volunteer_form.cleaned_data["volunteer_birthday"],
