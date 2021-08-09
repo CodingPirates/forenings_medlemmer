@@ -29,9 +29,7 @@ class Department(models.Model):
     isOpening = models.BooleanField("Er afdelingen under opstart", default=False)
     website = models.URLField("Hjemmeside", blank=True)
     union = models.ForeignKey(
-        "Union",
-        verbose_name="Lokalforening",
-        on_delete=models.PROTECT,
+        "Union", verbose_name="Lokalforening", on_delete=models.PROTECT
     )
 
     def no_members(self):
@@ -48,6 +46,22 @@ class Department(models.Model):
             idname="VOL_NEW"
         )
         context = {"department": self, "volunteer_name": volunteer_name}
+        new_vol_email.makeEmail(self, context)
+
+    def new_volunteer_email_dep_head(self, volunteer_form):
+        # First fetch department leaders email
+        new_vol_email = members.models.emailtemplate.EmailTemplate.objects.get(
+            idname="VOL_NEW_DEP_HEAD"
+        )
+        context = {
+            "department": self,
+            "volunteer_name": volunteer_form.cleaned_data["volunteer_name"],
+            "volunteer_email": volunteer_form.cleaned_data["volunteer_email"],
+            "volunteer_phone": volunteer_form.cleaned_data["volunteer_phone"],
+            "volunteer_birthday": volunteer_form.cleaned_data["volunteer_birthday"],
+            "volunteer_zipcode": volunteer_form.cleaned_data["volunteer_zipcode"],
+            "volunteer_city": volunteer_form.cleaned_data["volunteer_city"],
+        }
         new_vol_email.makeEmail(self, context)
 
     @staticmethod
