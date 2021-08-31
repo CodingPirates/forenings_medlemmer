@@ -18,8 +18,6 @@ from members.views import (
     Membership,
     SupportMembership,
     AdminSignup,
-    volunteerEmail,
-    volunteerEmailSentView,
 )
 from django.contrib.auth import views as auth_views
 from graphene_django.views import GraphQLView
@@ -114,6 +112,4 @@ urlpatterns = [
     url(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     url(r"^department_signup$", DepartmentSignView, name="department_signup"),
     url(r"^departments$", departmentView, name="department_view"),
-    url(r"^volunteer_signup$", volunteerEmail, name="volunteer_email"),
-    url(r"^volunteer_email_sent", volunteerEmailSentView, name="vol_email_sent"),
 ]
