@@ -3,16 +3,17 @@
     <a id="toggle" class="active" href="#" onClick="toggleNav()">
         <i class="fa fa-bars fa-2x"></i>
     </a>
+    <a href="{% url "entry_page" %}">Oversigt</a>
+    <a href="{% url "department_signup" %}">Afdelinger</a>
+    <a href="{% url "activities" %}">Arrangementer</a>
+    <a href="{% url "membership" %}">Medlemskaber</a>
+    <a href="{% url "support_membership" %}">Støttemedlemskaber</a>
+    <div class="account-sep"></div>
     {% if user.is_authenticated %}
-        <a href="{% url "entry_page" %}">Oversigt</a>
         <a href="{% url "family_detail" %}">Familie</a>
-        <a href="{% url "department_signup" %}">Afdelinger</a>
-        <a href="{% url "activities" %}">Arrangementer</a>
-        <a href="{% url "membership" %}">Medlemskaber</a>
-        <a href="{% url "support_membership" %}">Støttemedlemskaber</a>
         <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
     {% else %}
-        <a href="{% url "entry_page" %}">Tilmeld barn</a>
+        <a href="{% url "account_create" %}">Tilmeld barn</a>
         <a href="{% url "volunteer_signup" %}">Bliv frivillig</a>
         <a id="login-logout" href="{% url 'person_login' %}">Log ind</a>
     {% endif %}
