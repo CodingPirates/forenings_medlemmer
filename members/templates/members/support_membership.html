@@ -22,58 +22,60 @@
     </a>
   </p>
 
-  <section id="participation">
-    <h2>Nuværende og tidligere støttemedlemsskaber</h2>
-    <p>
-      Se her hvor du eller dit barn er medlem.
-    </p>
-    {% if participating %}
+  {% if family %}
+    <section id="participation">
+      <h2>Nuværende og tidligere støttemedlemsskaber</h2>
       <p>
-        Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
-        registreret. Tryk på knappen for at betale.
+        Se her hvor du eller dit barn er medlem.
       </p>
-      <table>
-        <thead>
-        <tr>
-          <th>Navn</th>
-          <th>Aktivitet</th>
-          <th>Forening</th>
-          <th>Start</th>
-          <th>Slut</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for participation in participating %}
+      {% if participating %}
+        <p>
+          Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
+          registreret. Tryk på knappen for at betale.
+        </p>
+        <table>
+          <thead>
           <tr>
-            <td>{{ participation.member.person.name }}</td>
-            <td>
-              <a href="{% url 'activity_view_person' participation.activity.id participation.member.person.id %}">
-                {{ participation.activity.name }}
-              </a>
-              {% if not participation.paid %}
-                <a class="button-danger" href="{{ participation.get_payment_link }}">
-                  Betal
-                </a>
-              {% endif %}
-            </td>
-            <td>{{ participation.activity.union.name }}</td>
-            <td>{{ participation.activity.start_date }}</td>
-            <td>{{ participation.activity.end_date }}</td>
+            <th>Navn</th>
+            <th>Aktivitet</th>
+            <th>Forening</th>
+            <th>Start</th>
+            <th>Slut</th>
           </tr>
-        {% endfor %}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+          {% for participation in participating %}
+            <tr>
+              <td>{{ participation.member.person.name }}</td>
+              <td>
+                <a href="{% url 'activity_view_person' participation.activity.id participation.member.person.id %}">
+                  {{ participation.activity.name }}
+                </a>
+                {% if not participation.paid %}
+                  <a class="button-danger" href="{{ participation.get_payment_link }}">
+                    Betal
+                  </a>
+                {% endif %}
+              </td>
+              <td>{{ participation.activity.union.name }}</td>
+              <td>{{ participation.activity.start_date }}</td>
+              <td>{{ participation.activity.end_date }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
 
-    {% else %}
-      <div class="info-box">
-        Ingen støttemedlemsskaber.
-      </div>
-    {% endif %}
-  </section>
+      {% else %}
+        <div class="info-box">
+          Ingen støttemedlemsskaber.
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
 
-  <section id="open_activities">
+  <section id="current_activities">
     <h2>Tilmeld som støttemedlem her</h2>
-    {% if activities %}
+    {% if current_activities %}
       <p>Liste over lokalforeninger du kan tilmelde dig:</p>
       <table>
         <thead>
@@ -85,7 +87,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for activity in activities %}
+        {% for activity in current_activities %}
           <tr>
             <td>
               {{ activity.union.name }}

@@ -6,7 +6,7 @@ from members.views import (
     AdminSignup,
     ConfirmFamily,
     DeclineInvitation,
-    DepartmentSignView,
+    DepartmentSignup,
     EntryPage,
     FamilyDetails,
     Membership,
@@ -112,6 +112,6 @@ urlpatterns = [
     ),
     url(r"^activity/(?P<activity_id>[\d]+)/$", ActivitySignup, name="activity_view"),
     url(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
-    url(r"^department_signup$", DepartmentSignView, name="department_signup"),
+    url(r"^department_signup$", DepartmentSignup, name="department_signup"),
     url(r"^departments$", departmentView, name="department_view"),
 ]

@@ -5,7 +5,7 @@ from members.views.ActivitySignup import ActivitySignup
 from members.views.AdminSignup import AdminSignup
 from members.views.ConfirmFamily import ConfirmFamily
 from members.views.DeclineInvitation import DeclineInvitation
-from members.views.DepartmentSignView import DepartmentSignView
+from members.views.DepartmentSignup import DepartmentSignup
 from members.views.EntryPage import EntryPage
 from members.views.FamilyDetails import FamilyDetails
 from members.views.Membership import Membership
