@@ -1,42 +1,43 @@
-{% extends 'members/base.html' %} {% block content %}
-<h2>Opskrivninger i Coding Pirates</h2>
+{% extends 'members/base.html' %}
+{% block content %}
+  <h2>Opskrivninger i Coding Pirates</h2>
 
-<p>
-  De fleste afdelinger starter nye hold to gange om året. Som regel i februar og
-  september. Du kan skrive dit barn op til en eller flere afdelinger her. Næste
-  gang afdelingen åbner op for nye tilmeldinger vil I modtage en mail med en
-  invitation. Under menupunktet Arrangementer kan I se afdelinger der har åbent
-  for tilmeldinger allerede nu og se invitationer sendt til jer.
-  <a class="button" href="{% url "activities" %}">Gå til Arrangementer</a>
-</p>
+  <p>
+    De fleste afdelinger starter nye hold to gange om året. Som regel i februar og
+    september. Du kan skrive dit barn op til en eller flere afdelinger her. Næste
+    gang afdelingen åbner op for nye tilmeldinger vil I modtage en mail med en
+    invitation. Under menupunktet Arrangementer kan I se afdelinger der har åbent
+    for tilmeldinger allerede nu og se invitationer sendt til jer.
+    <a class="button" href="{% url "activities" %}">Gå til Arrangementer</a>
+  </p>
 
-<div class="tabs">
-  <ul>
-    <li>Opskriv til Afdelinger</li>
-    <li>Se opskrivninger</li>
-  </ul>
+  <div class="tabs">
+    <ul>
+      <li>Opskriv til Afdelinger</li>
+      <li>Se opskrivninger</li>
+    </ul>
 
-  <section>
-    {% regroup departments by address.region as departments_region %}
-    <h2>Opskrivninger til Venteliste</h2>
-    <p>
-      Opskriv jer kun de afdelinger, der har interesse for jer. Det er en god
-      ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye
-      afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun
-      tilbud om at komme med på de afdelinger de har skrevet sig op til. Se
-      jeres nuværende ventelistestatus under "Se Pladser"
-    </p>
+    <section>
+      {% regroup departments by address.region as departments_region %}
+      <h2>Opskrivninger til Venteliste</h2>
+      <p>
+        Opskriv jer kun de afdelinger, der har interesse for jer. Det er en god
+        ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye
+        afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun
+        tilbud om at komme med på de afdelinger de har skrevet sig op til. Se
+        jeres nuværende ventelistestatus under "Se Pladser"
+      </p>
 
-    <div class="tabs">
-      <ul>
-        {% for region in departments_region%}
-          <li>{{region.grouper}}</li>
-        {% endfor %}
-      </ul>
-        {% for region in departments_region%}
+      <div class="tabs">
+        <ul>
+          {% for region in departments_region %}
+            <li>{{ region.grouper }}</li>
+          {% endfor %}
+        </ul>
+        {% for region in departments_region %}
           <section>
-          <table>
-            <thead>
+            <table>
+              <thead>
               <tr>
                 <th>Afdeling</th>
                 <th>Kontaktperson</th>
@@ -44,104 +45,104 @@
                 <th>Åbningstid</th>
                 <th>Opskriv til ventelister</th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {% for department in region.list %}
                 <tr>
                   <td>
                     {% if department.website != "" %}
-                      <a href="{{department.website}}" target="_blank">
-                        {{department}}
-                                </a>
-                            {% else %}
-                                {{department}}
-                            {% endif %}
-                        </td>
-                        <td>
-                          {{department.responsible_name}} <br>
-                          <a href="mailto:{{department.object.department_email}}">
-                            {{department.department_email}}
+                      <a href="{{ department.website }}" target="_blank">
+                        {{ department }}
+                      </a>
+                    {% else %}
+                      {{ department }}
+                    {% endif %}
+                  </td>
+                  <td>
+                    {{ department.responsible_name }} <br>
+                    <a href="mailto:{{ department.object.department_email }}">
+                      {{ department.department_email }}
+                    </a>
+                  </td>
+                  <td>{{ department.address }}</td>
+                  <td>{{ department.open_hours }}</td>
+                  <td>
+                    {% for child in children %}
+                      <div>
+                        {% if department in child.departments_is_waiting %}
+                          {{ child.person.firstname }} er opskrevet
+                        {% else %}
+                          <a
+                              class="button"
+                              href="{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
+                          >
+                            Opskriv: {{ child.person.firstname }}
                           </a>
-                        </td>
-                        <td>{{department.address}}</td>
-                        <td>{{department.open_hours}}</td>
-                        <td>
-                          {% for child in children %}
-                            <div>
-                              {% if department in child.departments_is_waiting %}
-                                {{child.person.firstname}} er opskrevet
-                              {% else %}
-                                  <a
-                                    class="button"
-                                    href= "{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
-                                  >
-                                    Opskriv: {{child.person.firstname}}
-                                  </a>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor%}
-            </tbody>
-          </table>
-        </section>
-      {% endfor %}
-    </div>
-  </section>
-  <section>
-
-  <section>
-    <h2>Pladser på ventelister</h2>
-    <p>
-      Pladser på venteliste af vejledende. Den enkelte afdeling kan vælge at
-      prioritere børn længere nede på listen for at få den bedst mulige
-      fordeling af børn på holdet. Dit barns plads på ventelisten bliver
-      beregnet ud fra, hvornår barnet er oprettet i systemet. Det er altså
-      barnets anciennitet, der bestemmer pladsen på ventelisten til samtlige
-      afdelinger, barnet er skrevet op på. Jo højere anciennitet, des bedre
-      plads på ventelisten(erne). Bemærk at jeres position på ventelisten
-      afgøres ud fra barnets oprettelses tidspunkt i systemet - ikke tidspunktet
-      I melder jeg på ventelisterne nedenfor! I kan derfor frit tilmelde og
-      framelde jer ventelisterne uden at miste en position på listen.
-    </p>
-    {% for child in children %}
-    <section>
-      <h4>Venteliste Oversigt for: {{child.person.name}}</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Afdeling</th>
-            <th>Plads på venteliste</th>
-            <th>Afmeld</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for department, waitinglist_place in child.waitinglists %}
-            <tr>
-              <td>
-                {% if department.website %}
-                  <a href="{{department.website}}">{{department}}</a>
-                {% else %}
-                  {{department}}
-                {% endif %}
-              </td>
-              <td>{{waitinglist_place}}</td>
-              <td>
-                <a
-                  class="button-danger"
-                  href="{% url 'waiting_list_subscription' child.person.id department.id 'unsubscribe' %}"
-                  >
-                  Afmeld: {{child.person.firstname}}
-                  </a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </section>
+        {% endfor %}
+      </div>
     </section>
-    {% endfor %}
-  </section>
-</div>
+    <section>
+
+      <section>
+        <h2>Pladser på ventelister</h2>
+        <p>
+          Pladser på venteliste af vejledende. Den enkelte afdeling kan vælge at
+          prioritere børn længere nede på listen for at få den bedst mulige
+          fordeling af børn på holdet. Dit barns plads på ventelisten bliver
+          beregnet ud fra, hvornår barnet er oprettet i systemet. Det er altså
+          barnets anciennitet, der bestemmer pladsen på ventelisten til samtlige
+          afdelinger, barnet er skrevet op på. Jo højere anciennitet, des bedre
+          plads på ventelisten(erne). Bemærk at jeres position på ventelisten
+          afgøres ud fra barnets oprettelses tidspunkt i systemet - ikke tidspunktet
+          I melder jeg på ventelisterne nedenfor! I kan derfor frit tilmelde og
+          framelde jer ventelisterne uden at miste en position på listen.
+        </p>
+        {% for child in children %}
+          <section>
+            <h4>Venteliste Oversigt for: {{ child.person.name }}</h4>
+            <table>
+              <thead>
+              <tr>
+                <th>Afdeling</th>
+                <th>Plads på venteliste</th>
+                <th>Afmeld</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for department, waitinglist_place in child.waitinglists %}
+                <tr>
+                  <td>
+                    {% if department.website %}
+                      <a href="{{ department.website }}">{{ department }}</a>
+                    {% else %}
+                      {{ department }}
+                    {% endif %}
+                  </td>
+                  <td>{{ waitinglist_place }}</td>
+                  <td>
+                    <a
+                        class="button-danger"
+                        href="{% url 'waiting_list_subscription' child.person.id department.id 'unsubscribe' %}"
+                    >
+                      Afmeld: {{ child.person.firstname }}
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </section>
+        {% endfor %}
+      </section>
+  </div>
 
 {% endblock %}

@@ -1,39 +1,40 @@
-{% extends 'members/base.html' %} {% block content %}
-<h2>Bliv medlem af en Coding Pirates lokalforening</h2>
-    <p>
-        Her kan du melde dig eller dit barn ind i en forening.
-    </p>
-    <p>
-        Bemærk at medlemskab ikke betyder at dit barn kan gå til aktiviteter. Deltagelse i sæsonaktiviteter vil
-        automatisk være medlemmer af lokalforeningen. Som medlem støtter du din lokalforening og har mulighed for at
-        stemme til generalforsamlinger i både lokalforeningen og i hos Coding Pirates Denmark.
-    </p>
-    <p>
-        Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye events kan du gøre det på
-        afdelingssiden.
-    </p>
-    <a class="button" href="{% url "department_signup" %}">
-        Gå til Afdelings opskrivninger
-    </a>
-    <p>
-        Se også listen over åben arrangementer her.
-    </p>
-    <a class="button" href="{% url "activities" %}">
-        Gå til arrangementer
-    </a>
-
-<section id="participation">
-  <h2>Nuværende og tidligere medlemsskaber</h2>
+{% extends 'members/base.html' %}
+{% block content %}
+  <h2>Bliv medlem af en Coding Pirates lokalforening</h2>
   <p>
-    Se her hvor du eller dit barn er medlem.
+    Her kan du melde dig eller dit barn ind i en forening.
   </p>
-  {% if participating %}
+  <p>
+    Bemærk at medlemskab ikke betyder at dit barn kan gå til aktiviteter. Deltagelse i sæsonaktiviteter vil
+    automatisk være medlemmer af lokalforeningen. Som medlem støtter du din lokalforening og har mulighed for at
+    stemme til generalforsamlinger i både lokalforeningen og i hos Coding Pirates Denmark.
+  </p>
+  <p>
+    Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye events kan du gøre det på
+    afdelingssiden.
+  </p>
+  <a class="button" href="{% url "department_signup" %}">
+    Gå til Afdelings opskrivninger
+  </a>
+  <p>
+    Se også listen over åben arrangementer her.
+  </p>
+  <a class="button" href="{% url "activities" %}">
+    Gå til arrangementer
+  </a>
+
+  <section id="participation">
+    <h2>Nuværende og tidligere medlemsskaber</h2>
     <p>
-      Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
-      registreret. Tryk på knappen for at betale.
+      Se her hvor du eller dit barn er medlem.
     </p>
-    <table>
-      <thead>
+    {% if participating %}
+      <p>
+        Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
+        registreret. Tryk på knappen for at betale.
+      </p>
+      <table>
+        <thead>
         <tr>
           <th>Navn</th>
           <th>Aktivitet</th>
@@ -41,61 +42,61 @@
           <th>Start</th>
           <th>Slut</th>
         </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
         {% for participation in participating %}
           <tr>
-            <td>{{participation.member.person.name}}</td>
+            <td>{{ participation.member.person.name }}</td>
             <td>
-              <a href="{%url 'activity_view_person' participation.activity.id participation.member.person.id %}">
-                {{participation.activity.name}}
+              <a href="{% url 'activity_view_person' participation.activity.id participation.member.person.id %}">
+                {{ participation.activity.name }}
               </a>
               {% if not participation.paid %}
-                <a class="button-danger" href="{{participation.get_payment_link}}">
+                <a class="button-danger" href="{{ participation.get_payment_link }}">
                   Betal
                 </a>
-              {%endif%}
+              {% endif %}
             </td>
-            <td>{{participation.activity.union.name}}</td>
-            <td>{{participation.activity.start_date}}</td>
-            <td>{{participation.activity.end_date}}</td>
+            <td>{{ participation.activity.union.name }}</td>
+            <td>{{ participation.activity.start_date }}</td>
+            <td>{{ participation.activity.end_date }}</td>
           </tr>
         {% endfor %}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
 
-  {% else %}
-    <div class="info-box">
-      Ingen medlemsskaber.
-    </div>
-  {% endif %}
-</section>
+    {% else %}
+      <div class="info-box">
+        Ingen medlemsskaber.
+      </div>
+    {% endif %}
+  </section>
 
-<section id="open_activities">
-  <h2>Tilmeld som medlem her</h2>
-  {% if membership_activities %}
-    <p>Liste over lokalforeninger du kan tilmelde dig:</p>
-    <table>
-      <thead>
+  <section id="open_activities">
+    <h2>Tilmeld som medlem her</h2>
+    {% if membership_activities %}
+      <p>Liste over lokalforeninger du kan tilmelde dig:</p>
+      <table>
+        <thead>
         <tr>
           <th>Forening</th>
           <th>Aktivitet</th>
           <th>Beskrivelse</th>
           <th>Handling</th>
         </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
         {% for activity in membership_activities %}
           <tr>
             <td>
-              {{activity.union.name}}
+              {{ activity.union.name }}
             </td>
-            <td>{{activity.name}}</td>
+            <td>{{ activity.name }}</td>
             <td>
               <a
-                class="button"
-                href="{%url 'activity_view_family' activity.id %}"
-                target="_blank"
+                  class="button"
+                  href="{% url 'activity_view_family' activity.id %}"
+                  target="_blank"
               >
                 Læs mere
               </a>
@@ -103,8 +104,8 @@
             <td>
               {% for person in activity.persons %}
                 <a
-                  class="button-success"
-                  href="{%url 'activity_signup' activity.id person.id %}"
+                    class="button-success"
+                    href="{% url 'activity_signup' activity.id person.id %}"
                 >
                   Tilmeld {{ person.firstname }} aktivitet
                 </a>
@@ -112,12 +113,12 @@
             </td>
           </tr>
         {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <div class="info-box">
-      Der er ikke åbent for indmeldelse i nogen foreninger. Kom tilbage senere.
-    </div>
-  {% endif %}
-</section>
+        </tbody>
+      </table>
+    {% else %}
+      <div class="info-box">
+        Der er ikke åbent for indmeldelse i nogen foreninger. Kom tilbage senere.
+      </div>
+    {% endif %}
+  </section>
 {% endblock %}
