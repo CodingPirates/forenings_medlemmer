@@ -12,7 +12,7 @@ def SupportMembership(request):
     current_activities = Activity.objects.filter(
         signup_closing__gte=timezone.now(),
         activitytype__in=["STØTTEMEDLEMSKAB"],
-    ).order_by("zipcode")
+    ).order_by("start_date")
 
     family = None
     participating = None

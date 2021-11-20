@@ -1,7 +1,9 @@
 import os
 import socket
 
+from dateutil.relativedelta import relativedelta
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.utils import timezone
 from factory import Faker
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -25,6 +27,8 @@ class ActivitiesTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.member = MemberFactory.create()
+        self.member.person.birthday = timezone.now() - relativedelta(years=10)
+        self.member.person.save()
 
         self.activities = {}
         for activity_type in [
@@ -40,14 +44,17 @@ class ActivitiesTest(StaticLiveServerTestCase):
                     min_age=5,
                     max_age=90,
                     signup_closing=(
-                        Faker("past_date", start_date="-10d")
+                        Faker("date_time_between", start_date="-100d", end_date="-2d")
                         if variant == "old"
-                        else Faker("future_datetime", end_date="+100d")
+                        else Faker(
+                            "date_time_between", start_date="+2d", end_date="+100d"
+                        )
                     ),
                     name=f"-{activity_type}-{variant}",
-                    zipcode={"participate": 1111, "recent": 2222, "old": 3333}[
-                        variant
-                    ],  # To ensure predictable order
+                    start_date=timezone.now()
+                    - relativedelta(
+                        month={"participate": 1, "recent": 2, "old": 3}[variant]
+                    ),  # To ensure predictable order
                     activitytype_id=activity_type,
                 )
                 if variant == "participate":
