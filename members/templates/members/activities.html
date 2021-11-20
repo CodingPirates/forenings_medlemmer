@@ -79,6 +79,7 @@
                     <tr>
                         <th>Navn</th>
                         <th>Aktivitet</th>
+                        <th>Alder</th>
                         <th>Afdeling</th>
                         <th>Handling</th>
                     </tr>
@@ -94,6 +95,9 @@
                             </td>
                             <td>
                                 Coding Pirates: {{ invite.activity.department.name }}
+                            </td>
+                            <td>
+                                Coding Pirates: {{ invite.activity.min_age }} - {{ invite.activity.max_age }}
                             </td>
                             <td>
                                 <a class="button-success"
@@ -126,6 +130,7 @@
                 <tr>
                     <th>Afdeling</th>
                     <th>Aktivitet</th>
+                    <th>Alder</th>
                     <th>Beskrivelse</th>
                     <th>Handling</th>
                 </tr>
@@ -137,6 +142,7 @@
                             Coding Pirates {{ activity.department.name }}
                         </td>
                         <td>{{ activity.name }}</td>
+                        <td>{{ activity.min_age }} - {{ activity.max_age }}</td>
                         <td>
                             <a
                                     class="button"
