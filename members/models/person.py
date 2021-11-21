@@ -1,11 +1,12 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
 import logging
 import json
+
+from .address import Address
 
 logger = logging.getLogger(__name__)
 
@@ -81,9 +82,9 @@ class Person(models.Model):
         return self.name
 
     def address(self):
-        return format_address(self.streetname, self.housenumber, self.floor, self.door)
+        return Address.formatted_street(self)
 
-    def addressWithZip(self):
+    def address_with_zip(self):
         return self.address() + ", " + self.zipcode + " " + self.city
 
     def age_from_birthdate(self, date):
@@ -116,7 +117,7 @@ class Person(models.Model):
             addressID = 0
             dist = 0
             req = "https://dawa.aws.dk/datavask/adresser?betegnelse="
-            req += quote_plus(self.addressWithZip())
+            req += quote_plus(self.address_with_zip())
             try:
                 washed = json.loads(requests.get(req).text)
                 addressID = washed["resultater"][0]["adresse"]["id"]

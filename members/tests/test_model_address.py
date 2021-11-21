@@ -31,8 +31,8 @@ class TestModelAddress(TestCase):
             placename="Himmelev",
         )
         self.assertEqual(str(simple_address), "piratvej 10, 2300 København")
-        self.assertEqual(str(appartment_address), "Skibgade 42 3 th, 7000 Århus")
-        self.assertEqual(str(row_house_address), "Kabys 314 C, 7000 Århus")
+        self.assertEqual(str(appartment_address), "Skibgade 42, 3. th., 7000 Århus")
+        self.assertEqual(str(row_house_address), "Kabys 314, C., 7000 Århus")
         self.assertEqual(
             str(placename_address), "Himmelev Bygade 3, Himmelev, 4000 Roskilde"
         )

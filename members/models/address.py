@@ -46,9 +46,7 @@ class Address(models.Model):
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
 
     def __str__(self):
-        address = f"{self.streetname} {self.housenumber}"
-        address = f"{address} {self.floor}" if self.floor != "" else address
-        address = f"{address} {self.door}" if self.door != "" else address
+        address = self.__class__.formatted_street(self)
         address = f"{address}, {self.placename}" if self.placename != "" else address
         return f"{address}, {self.zipcode} {self.city}"
 
@@ -56,6 +54,17 @@ class Address(models.Model):
         if settings.USE_DAWA_ON_SAVE and not self.dawa_overwrite:
             self.get_dawa_data()
         super().save(*args, **kwargs)
+
+    @classmethod
+    def formatted_street(cls, adr):
+        result = f"{adr.streetname} {adr.housenumber}"
+        if adr.floor or adr.door:
+            result = result + ","
+        if adr.floor:
+            result = result + f" {adr.floor}."
+        if adr.door:
+            result = result + f" {adr.door}."
+        return result
 
     def get_dawa_data(self):
         if self.dawa_id == "":
