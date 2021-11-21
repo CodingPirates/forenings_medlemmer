@@ -85,10 +85,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                 "Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)"
             )
 
-        if (
-            activity.max_age < person.age_years()
-            or activity.min_age > person.age_years()
-        ):
+        if not (activity.min_age <= person.age_years() <= activity.max_age):
             return HttpResponse(
                 "Barnet skal være mellem "
                 + str(activity.min_age)
