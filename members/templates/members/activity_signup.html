@@ -80,6 +80,12 @@
             {{ union.name }}
           </p>
         </div>
+        <div class="col-lg-6">
+          <p>
+            <strong>Aldersbegrænsning:</strong><br>
+            {{ activity.min_age }} - {{ activity.max_age }} år.
+          </p>
+        </div>
       </div>
       {% if not view_only_mode %}
       <hr>
