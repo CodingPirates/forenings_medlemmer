@@ -51,6 +51,9 @@ class ActivitiesTest(StaticLiveServerTestCase):
                         )
                     ),
                     start_date=timezone.now() + relativedelta(days=10),
+                    zipcode={"participate": 1111, "recent": 2222, "old": 3333}[
+                        variant
+                    ],  # To ensure predictable order
                     name=f"-{activity_type}-{variant}",
                     activitytype_id=activity_type,
                 )
