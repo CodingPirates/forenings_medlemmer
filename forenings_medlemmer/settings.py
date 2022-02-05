@@ -122,8 +122,9 @@ GRAPHENE = {"SCHEMA": "members.schema.schema"}
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 # DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
 
-if env.bool('USE_SQLITE', False):
-    DATABASES = {"default": {
+if env.bool("USE_SQLITE", False):
+    DATABASES = {
+        "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": "members.db",
         }
