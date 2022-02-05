@@ -13,7 +13,6 @@ authors = ["Benjamin Rotendahl <Benjamin@Rotendahl.dk>"]
 
 [tool.poetry.dependencies]
 python = "^3.8.0"
-black = "20.8b1"
 codecov = "2.1.9"
 dj-database-url = "0.5.0"
 dj-email-url = "1.0.1"
@@ -36,3 +35,4 @@ tqdm = "4.53.0"
 whitenoise = "5.2.0"
 pydotplus = "2.0.2"
 selenium = "3.141.0"
+black = "^22.1.0"
