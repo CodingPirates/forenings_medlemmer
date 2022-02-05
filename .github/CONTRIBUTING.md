@@ -128,6 +128,10 @@ p.user.username # show login email
 9.  The backend is [Heroku][heroku], we can use their "review apps" to create
     a temporary server for each pull request.
 
+## Deploying
+
+See [DEPLOYING.md](DEPLOYING.md) for instructions on deploying to test, staging and production environments.
+
 [test_guide]: https://github.com/CodingPirates/forenings_medlemmer/wiki/Writing-tests
 
 [heroku]: https://heroku.com
