@@ -9,7 +9,7 @@ omit = ["*/tests/*", "members/migrations"]
 name = "forenings_medlemmer"
 version = "1.2"
 description = "Forenings system for Coding Pirates"
-authors = ["Benjamin Rotendahl <Benjamin@Rotendahl.dk>"]
+authors = ["Benjamin Rotendahl <Benjamin@Rotendahl.dk>", "Kristoffer Rath Hansen <kristoffer@codingpirates.dk>"]
 
 [tool.poetry.dependencies]
 python = "^3.8.0"

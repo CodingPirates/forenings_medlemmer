@@ -46,7 +46,7 @@ class SignUpTest(StaticLiveServerTestCase):
     def tearDown(self):
         if not os.path.exists("test-screens"):
             os.mkdir("test-screens")
-        self.browser.save_screenshot("test-screens/payment_status.png")
+        # self.browser.save_screenshot("test-screens/payment_status.png")
         self.browser.quit()
 
     @override_settings(DEBUG=True)
