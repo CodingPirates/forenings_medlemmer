@@ -12,58 +12,6 @@
   </a>
 </p>
 
-
-<section id="participation">
-  <h2>Tilmeldte aktiviteter</h2>
-  <p>
-    Dette er de aktiviteter jeres børn er tilmeldt. I kan klikke på navnet for
-    hvert arrangement, for at se flere detaljer om hvor og hvornår det foregår.
-    I kan også se deltagerlisten for arrangementet.
-  </p>
-  {% if participating %}
-    <p>
-      Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
-      registreret. Tryk på knappen for at betale.
-    </p>
-    <table>
-      <thead>
-        <tr>
-          <th>Navn</th>
-          <th>Aktivitet</th>
-          <th>Afdeling</th>
-          <th>Start</th>
-          <th>Slut</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for participation in participating %}
-          <tr>
-            <td>{{participation.member.person.name}}</td>
-            <td>
-              <a href="{%url 'activity_view_person' participation.activity.id participation.member.person.id %}">
-                {{participation.activity.name}}
-              </a>
-              {% if not participation.paid %}
-                <a class="button-danger" href="{{participation.get_payment_link}}">
-                  Betal
-                </a>
-              {%endif%}
-            </td>
-            <td>{{participation.activity.department.name}}</td>
-            <td>{{participation.activity.start_date}}</td>
-            <td>{{participation.activity.end_date}}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-  {% else %}
-    <div class="info-box">
-      Der er endnu ingen tilmeldt aktiviteter.
-    </div>
-  {% endif %}
-</section>
-
 <section>
   <h2>Invitationer</h2>
   <p>
@@ -161,6 +109,57 @@
   {% else %}
     <div class="info-box">
       Der er ikke nogen aktiviteter.
+    </div>
+  {% endif %}
+</section>
+
+<section id="participation">
+  <h2>Tilmeldte aktiviteter</h2>
+  <p>
+    Dette er de aktiviteter jeres børn er tilmeldt. I kan klikke på navnet for
+    hvert arrangement, for at se flere detaljer om hvor og hvornår det foregår.
+    I kan også se deltagerlisten for arrangementet.
+  </p>
+  {% if participating %}
+    <p>
+      Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
+      registreret. Tryk på knappen for at betale.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Navn</th>
+          <th>Aktivitet</th>
+          <th>Afdeling</th>
+          <th>Start</th>
+          <th>Slut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for participation in participating %}
+          <tr>
+            <td>{{participation.member.person.name}}</td>
+            <td>
+              <a href="{%url 'activity_view_person' participation.activity.id participation.member.person.id %}">
+                {{participation.activity.name}}
+              </a>
+              {% if not participation.paid %}
+                <a class="button-danger" href="{{participation.get_payment_link}}">
+                  Betal
+                </a>
+              {%endif%}
+            </td>
+            <td>{{participation.activity.department.name}}</td>
+            <td>{{participation.activity.start_date}}</td>
+            <td>{{participation.activity.end_date}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {% else %}
+    <div class="info-box">
+      Der er endnu ingen tilmeldt aktiviteter.
     </div>
   {% endif %}
 </section>
