@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0025_activitytype'),
+        ("members", "0025_activitytype"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='activity',
-            name='price_in_dkk',
-            field=models.DecimalField(decimal_places=2, default=500, help_text='På prisen for aktiviteten fratrækker vi automatisk 100 kr. pr. barn hvis det er en sæsonaktivitet.', max_digits=10, verbose_name='Pris'),
+            model_name="activity",
+            name="price_in_dkk",
+            field=models.DecimalField(
+                decimal_places=2,
+                default=500,
+                help_text="På prisen for aktiviteten fratrækker vi automatisk 100 kr. pr. barn hvis det er en sæsonaktivitet.",
+                max_digits=10,
+                verbose_name="Pris",
+            ),
         ),
     ]
