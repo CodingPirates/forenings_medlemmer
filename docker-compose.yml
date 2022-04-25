@@ -28,6 +28,7 @@ services:
       - ADMINS=$ADMINS
       - SENTRY_DSN=$SENTRY_DSN
       - MODE=$MODE
+      - USE_SQLITE=False
 
   database:
     image: postgres:11.2-alpine

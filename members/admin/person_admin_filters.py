@@ -1,5 +1,31 @@
 from django.contrib import admin
+from django.utils import timezone
 from members.models import Activity, AdminUserInformation
+
+
+class PersonParticipantActiveListFilter(admin.SimpleListFilter):
+    title = "Deltager på (aktive)"
+    parameter_name = "participant_list_active"
+
+    def lookups(self, request, _model_admin):
+        return [
+            (str(a.pk), str(a))
+            for a in Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user),
+                activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+                end_date__gte=timezone.now(),
+            ).order_by("department__name", "-start_date")
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return queryset.filter(member__activityparticipant__isnull=True)
+        elif self.value() == "any":
+            return queryset.exclude(member__activityparticipant__isnull=True)
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(member__activityparticipant__activity=self.value())
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
