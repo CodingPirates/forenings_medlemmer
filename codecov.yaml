@@ -1,2 +1,8 @@
 ignore:
   - "members/tests" # wildcards accepted
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 2%  # the leniency in hitting the target

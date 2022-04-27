@@ -11,7 +11,7 @@ class signupForm(forms.Form):
         super(signupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
-        self.helper.form_action = "entry_page"
+        self.helper.form_action = "account_create"
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden("form_id", "signup", id="id_form_id"),

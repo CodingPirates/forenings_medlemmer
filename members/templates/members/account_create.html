@@ -1,0 +1,12 @@
+{% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
+{% block content %}
+
+  <h1>Tilmelding til Coding Pirates</h1>
+  <p>
+    Indtast barnets og forældrenes informationer, for at tilmelde en Coding
+    Pirates-workshop, eller for at komme med på ventelisten.
+  </p>
+  <div id="signup-form">
+      {% crispy signupform %}
+  </div>
+{% endblock %}

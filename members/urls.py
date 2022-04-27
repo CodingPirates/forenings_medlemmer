@@ -1,25 +1,24 @@
 from django.conf.urls import url
 from members.views import (
+    AccountCreate,
+    Activities,
+    ActivitySignup,
+    AdminSignup,
+    ConfirmFamily,
+    DeclineInvitation,
+    DepartmentSignView,
+    EntryPage,
     FamilyDetails,
+    Membership,
     PersonCreate,
     PersonUpdate,
-    WaitingListSetSubscription,
-    DeclineInvitation,
-    EntryPage,
-    userCreated,
-    ConfirmFamily,
     QuickpayCallback,
-    ActivitySignup,
-    DepartmentSignView,
-    paymentGatewayErrorView,
-    volunteerSignup,
-    departmentView,
-    Activities,
-    Membership,
     SupportMembership,
-    AdminSignup,
-    volunteerEmail,
-    volunteerEmailSentView,
+    WaitingListSetSubscription,
+    departmentView,
+    paymentGatewayErrorView,
+    userCreated,
+    volunteerSignup,
 )
 from django.contrib.auth import views as auth_views
 from graphene_django.views import GraphQLView
@@ -28,6 +27,7 @@ from django.views.decorators.csrf import csrf_exempt
 urlpatterns = [
     url(r"^$", EntryPage, name="entry_page"),
     url(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    url(r"^account/create/$", AccountCreate, name="account_create"),
     url(
         r"^account/login/$",
         auth_views.LoginView.as_view(template_name="members/login.html"),
@@ -114,6 +114,4 @@ urlpatterns = [
     url(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     url(r"^department_signup$", DepartmentSignView, name="department_signup"),
     url(r"^departments$", departmentView, name="department_view"),
-    url(r"^volunteer_signup$", volunteerEmail, name="volunteer_email"),
-    url(r"^volunteer_email_sent", volunteerEmailSentView, name="vol_email_sent"),
 ]

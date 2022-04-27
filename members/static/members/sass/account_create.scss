@@ -1,0 +1,10 @@
+@use "definitions";
+@use "buttons";
+
+
+#signup-form {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 1.25rem;
+    background-clip: border-box;
+    border-radius: 0.25rem;
+}
