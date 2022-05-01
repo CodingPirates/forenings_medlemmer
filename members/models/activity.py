@@ -13,6 +13,16 @@ class Activity(models.Model):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1)
     name = models.CharField("Navn", max_length=200)
+    activitytype = models.ForeignKey(
+        "ActivityType",
+        on_delete=models.CASCADE,
+        default="FORLØB",
+        verbose_name="Aktivitetstype",
+        help_text="Angiv typen af aktivtet. "
+        + "Brugere vil se Forløb og Arrangementer under Aktiviteter. "
+        + "Medlemskab og Støttemedlemskab vil blive vist på separate sider. "
+        + "Normalt vil det kun være sekretariatet der oprettet aktiviteter for medlemskaber.",
+    )
     open_hours = models.CharField("Tidspunkt", max_length=200)
     responsible_name = models.CharField("Ansvarlig", max_length=200)
     responsible_contact = models.EmailField("E-mail")
@@ -31,7 +41,7 @@ class Activity(models.Model):
     signup_closing = models.DateField("Tilmelding lukker", null=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
-    help_price = "På prisen for aktiviteten fratrækker vi automatisk 75 kr."
+    help_price = "På prisen for aktiviteten fratrækker vi automatisk 100 kr."
     help_price += " pr. barn hvis det er en sæsonaktivitet."
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=500, help_text=help_price

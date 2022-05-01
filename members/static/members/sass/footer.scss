@@ -1,4 +1,4 @@
-@use "_definitions";
+@use "definitions";
 
 footer {
     @extend %bg-primary;
@@ -14,7 +14,7 @@ footer {
     > p > a {
         color: white;
     }
-    @include _definitions.for-desktop {
+    @include definitions.for-desktop {
         max-height: 75px;
     }
 }

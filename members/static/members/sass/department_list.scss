@@ -1,14 +1,14 @@
-@use "_definitions";
+@use "definitions";
 
 #department-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     > div {
-        @include _definitions.for-desktop {
+        @include definitions.for-desktop {
             width: 30%;
         }
-        @include _definitions.for-phone {
+        @include definitions.for-phone {
             width: 90%;
             font-size: 1.3em;
         }

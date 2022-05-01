@@ -22,7 +22,7 @@ class QuickpayTransaction(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        """ On creation make quickpay order_id from payment id """
+        """On creation make quickpay order_id from payment id"""
         if self.pk is None:
             if settings.DEBUG:
                 self.order_id = f"dev{timezone.now().timestamp()}"
@@ -126,7 +126,7 @@ class QuickpayTransaction(models.Model):
 
         status, body, headers = client.post(
             f"/payments/{self.transaction_id}/capture",
-            amount=self.payment.amount_ore,
+            body={"amount": self.payment.amount_ore},
             raw=True,
         )
 

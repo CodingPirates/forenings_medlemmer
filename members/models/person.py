@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -107,6 +105,8 @@ class Person(models.Model):
         return self.name.partition(" ")[0]
 
     def update_dawa_data(self):
+        if self.address_invalid:
+            return None
         if (
             self.dawa_id is None
             or self.latitude is None
@@ -151,6 +151,8 @@ class Person(models.Model):
                 except Exception as error:
                     logger.error("Couldn't find coordinates for " + self.name)
                     logger.error("Error " + str(error))
+                    self.address_invalid = True
+                    self.save()
                     return None
             else:
                 self.address_invalid = True

@@ -1,6 +1,4 @@
-from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
-from members.forms import signupForm
 from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponseRedirect
@@ -8,7 +6,6 @@ from django.contrib.auth.models import User
 from members.models.family import Family
 from members.models.person import Person
 from members.views import Overview
-
 
 @xframe_options_exempt
 def EntryPage(request):

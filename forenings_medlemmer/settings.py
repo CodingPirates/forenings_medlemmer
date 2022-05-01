@@ -73,7 +73,9 @@ else:
 
 ALLOWED_HOSTS = [host.replace(" ", "") for host in env.list("ALLOWED_HOSTS")]
 BASE_URL = os.environ["BASE_URL"]
-
+assert not BASE_URL.endswith(
+    "/"
+), f"BASE_URL environment variable must not end with '/'. It is set to '{BASE_URL}'."
 
 INSTALLED_APPS = (
     "bootstrap4",
@@ -118,7 +120,17 @@ GRAPHENE = {"SCHEMA": "members.schema.schema"}
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
+# DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
+
+if env.bool("USE_SQLITE", False):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "members.db",
+        }
+    }
+else:
+    DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

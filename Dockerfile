@@ -1,12 +1,22 @@
 FROM python:3.8
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y graphviz
+RUN apt-get update && apt-get install -y \
+    graphviz \
+    nodejs \
+    npm
 
-RUN wget -O /tmp/sass.tar.gz  https://github.com/sass/dart-sass/releases/download/1.25.0/dart-sass-1.25.0-linux-x64.tar.gz \
-    && tar xf /tmp/sass.tar.gz -C /bin \
-    && chmod -R a+rx /bin/dart-sass/
+RUN npm install -g npm
+
+# This is not a nice way to install npm packages, but it is the
+# closest it gets similar to venv-way of installing project-specific
+# packages.
+RUN mkdir -p /nodeapp
+WORKDIR /nodeapp
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+RUN npm install
+WORKDIR /app
 
 COPY pyproject.toml  pyproject.toml
 COPY poetry.lock poetry.lock
