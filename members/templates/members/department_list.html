@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-<script src='{% static "members/js/department_map.js" %}''></script>
+<script src='{% static "members/js/department_map.js" %}'></script>
 
 
 <div style="height:500px;" id="map"></div>
@@ -30,7 +30,7 @@
         </li>
 
         <li>
-          <strong>Adresse:</strong> {{department.address}} 
+          <strong>Adresse:</strong> {{department.address}}
           <i class="fas fa-map-marker-alt" onclick=' focusOnMap("{{department.id}}")'></i>
         </li>
 
