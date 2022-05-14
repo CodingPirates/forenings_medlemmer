@@ -4,6 +4,7 @@ const base_url = window.location.href
   .join("/");
 
 var map;
+var markers = {};
 
 let department_request = fetch(`${base_url}/graphql`, {
   method: "POST",
@@ -36,9 +37,13 @@ document.addEventListener("DOMContentLoaded", event => {
   ).addTo(map);
 
   department_request.then(departments => {
-      departments.map(department => addToMap(department))
+    departments.map(department => addToMap(department))
   });
 });
+
+function focusOnMap(id) {
+  map.setView(markers["" + id]._latlng, 12);
+}
 
 function addToMap(department) {
   if (
@@ -52,6 +57,7 @@ function addToMap(department) {
     department.address.latitude,
     department.address.longitude
   ]).addTo(map);
+  markers[department.id] = marker;
   let departmentHTML = document
     .getElementById(`department-${department.id}`)
     .cloneNode(true);
