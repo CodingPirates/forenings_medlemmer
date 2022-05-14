@@ -36,10 +36,10 @@ nav {
             text-align: center !important;
         }
     }
-}
-#login-logout {
-    text-align: right;
-    flex-grow: 2;
+    > .account-sep {
+        text-align: right;
+        flex-grow: 2;
+    }
 }
 
 .inactive {

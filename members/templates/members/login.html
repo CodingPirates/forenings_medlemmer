@@ -30,6 +30,18 @@
                 </div>
             </div>
         </div>
+        <div class="row center">
+            <div class="loginBox col-lg-6 col-md-7 col-sm-8 col-11 ">
+                <div class="loginTitle"><span>Opret bruger</span></div>
+                    <a href="{% url 'account_create' %}" title="Tilmeld barn" class="button-primary-color block-button">
+                        Tilmeld barn
+                    </a>
+                    <a href="{% url 'volunteer_signup' %}" title="Bliv frivillig" class="button-primary-color block-button">
+                        Bliv frivillig
+                    </a>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 {% endblock %}

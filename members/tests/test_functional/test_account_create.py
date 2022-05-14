@@ -16,7 +16,7 @@ used to log in.
 """
 
 
-class SignUpTest(StaticLiveServerTestCase):
+class AccountCreateTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
     serialized_rollback = True
 
@@ -32,9 +32,9 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_final.png")
         self.browser.quit()
 
-    def test_entry_page(self):
+    def test_account_create(self):
         # Loads the front page
-        self.browser.get(self.live_server_url)
+        self.browser.get(f"{self.live_server_url}/account/create")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
 
@@ -96,8 +96,5 @@ class SignUpTest(StaticLiveServerTestCase):
 
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
 
-        # Check that we were redirectet to overview page
-        elements = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'For yderligere hjælp med at bruge denne side')]]"
-        )
-        self.assertGreater(len(elements), 0)
+        # Check that we were redirectet to front page
+        self.assertEqual(f"{self.live_server_url}/", self.browser.current_url)

@@ -29,9 +29,8 @@ class ActivityInvite(models.Model):
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
-        if (
-            self.person.age_years() < self.activity.min_age
-            or self.person.age_years() > self.activity.max_age
+        if not (
+            self.activity.min_age <= self.person.age_years() <= self.activity.max_age
         ):
             raise ValidationError(
                 "Aktiviteten er kun for personer mellem "

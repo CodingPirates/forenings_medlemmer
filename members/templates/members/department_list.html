@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-<script src="{% static "members/js/department_map.js" %}"></script>
+<script src='{% static "members/js/department_map.js" %}'></script>
 
 
 <div style="height:500px;" id="map"></div>
@@ -12,50 +12,53 @@
 <div class="tabs">
   <ul>
     {% for region in departments_region%}
-      <li>{{region.grouper}}</li>
+    <li>{{region.grouper}}</li>
     {% endfor %}
   </ul>
   {% for region in departments_region%}
-    <section id="department-container">
-      {% for department in region.list%}
-        <div id="department-{{department.pk}}">
-          <ul>
-            <li>
-              <strong>Coding Pirates: </strong>
-              {% if department.website != '' %}
-                <a href={{department.website}} target="_blank">{{department.name}}</a>
-              {% else %}
-                {{department.name}}
-              {% endif %}
-            </li>
+  <section id="department-container">
+    {% for department in region.list%}
+    <div id="department-{{department.pk}}">
+      <ul>
+        <li>
+          <strong>Coding Pirates: </strong>
+          {% if department.website != '' %}
+          <a href={{department.website}} target="_blank">{{department.name}}</a>
+          {% else %}
+          {{department.name}}
+          {% endif %}
+        </li>
 
-            <li><strong>Adresse:</strong> {{department.address}}</li>
+        <li>
+          <strong>Adresse:</strong> {{department.address}}
+          <i class="fas fa-map-marker-alt" onclick=' focusOnMap("{{department.id}}")'></i>
+        </li>
 
-            <li>
-              <strong>Afdelingsleder: </strong>
-              {% if department.department_leaders.all %}
-                {{department.department_leaders.all.0}}
-                {# TODO move to only department leaders once responsible_name is removed #}
-              {% else %}
-                {{department.responsible_name}}
-              {% endif %}
-            </li>
+        <li>
+          <strong>Afdelingsleder: </strong>
+          {% if department.department_leaders.all %}
+          {{department.department_leaders.all.0}}
+          {# TODO move to only department leaders once responsible_name is removed #}
+          {% else %}
+          {{department.responsible_name}}
+          {% endif %}
+        </li>
 
-            <li>
-              <strong>Email:</strong>
-              <a href="mailto:{{department.department_email}}">
-                 {{department.department_email}}
-              </a>
-            </li>
+        <li>
+          <strong>Email:</strong>
+          <a href="mailto:{{department.department_email}}">
+            {{department.department_email}}
+          </a>
+        </li>
 
-            <li>
-              <strong>Tidspunkt: </strong>
-              {{department.open_hours}}
-            </li>
-          </ul>
-        </div>
-      {% endfor %}
-    </section>
+        <li>
+          <strong>Tidspunkt: </strong>
+          {{department.open_hours}}
+        </li>
+      </ul>
+    </div>
+    {% endfor %}
+  </section>
   {% endfor %}
 </div>
 {% endblock %}
