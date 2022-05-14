@@ -6,6 +6,7 @@ from crispy_forms.bootstrap import FormActions
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 
+
 class ActivitySignupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ActivitySignupForm, self).__init__(*args, **kwargs)
