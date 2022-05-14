@@ -4,6 +4,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
@@ -74,7 +75,8 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
         # Submit form
-        self.browser.find_element_by_name("submit").click()
+        field.send_keys(Keys.TAB)
+        field.send_keys(Keys.ENTER)
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
         # Check that redirect and get password
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")

@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 88
-target-version = ['py37', 'py38', 'py310']
+target-version = ['py37', 'py38']
 
 [tool.coverage.run]
 omit = ["*/tests/*", "members/migrations"]

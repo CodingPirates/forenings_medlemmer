@@ -71,6 +71,8 @@ if DEBUG:
 else:
     logger.info("RUNNING IN PRODUCTION")
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 ALLOWED_HOSTS = [host.replace(" ", "") for host in env.list("ALLOWED_HOSTS")]
 BASE_URL = os.environ["BASE_URL"]
 assert not BASE_URL.endswith(
