@@ -6,7 +6,6 @@ from crispy_forms.bootstrap import FormActions
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 
-
 class ActivitySignupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ActivitySignupForm, self).__init__(*args, **kwargs)
@@ -57,7 +56,10 @@ class ActivitySignupForm(forms.Form):
                         ),
                         FormActions(
                             Submit(
-                                "submit", "Tilmeld og betal", css_class="btn-success"
+                                "submit", "Tilmeld og betal", css_class="button-success"
+                            ),
+                            HTML(
+                                "<a href='{%url 'invitation_decline' family.unique invitation.id %}'><button type='button' class='button-danger'>Afslå invitationen</button></a>",
                             ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
