@@ -9,3 +9,4 @@ public_data.zip
 test-screens
 /node_modules
 members.db
+*.bak
