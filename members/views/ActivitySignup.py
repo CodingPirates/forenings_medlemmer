@@ -55,7 +55,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         person = None
 
     if not activity.open_invite:
-        """ Make sure valid not expired invitation to event exists """
+        """Make sure valid not expired invitation to event exists"""
         try:
             invitation = ActivityInvite.objects.get(
                 activity=activity, person=person, expire_dtm__gte=timezone.now()

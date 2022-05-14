@@ -52,7 +52,7 @@ class ActivityParticipant(models.Model):
             return 'javascript:alert("Kan ikke betales her:  Kontakt Coding Pirates for hjælp");'
 
     def save(self, *args, **kwargs):
-        """ On creation if seasonal - clear all waiting lists """
+        """On creation if seasonal - clear all waiting lists"""
         if not self.id:
             if self.activity.is_season():
                 # remove from all waiting lists
