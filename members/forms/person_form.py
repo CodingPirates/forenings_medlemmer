@@ -142,7 +142,7 @@ class PersonForm(forms.ModelForm):
             "phone",
             "dawa_id",
         ]
-        labels = {"birthday": "Fødselsdato (mm-dd-åååå)"}
+        labels = {"birthday": "Fødselsdato (dd-mm-åååå)"}
         error_messages = {
             "birthday": {"invalid": "Indtast en gyldig dato. (dd-mm-åååå)"}
         }
