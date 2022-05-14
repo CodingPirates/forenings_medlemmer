@@ -35,8 +35,9 @@ class Person(models.Model):
     )
     MALE = "MA"
     FEMALE = "FM"
-    MEMBER_GENDER_CHOICES = ((MALE, "Dreng"), (FEMALE, "Pige"))
-    MEMBER_ADULT_GENDER_CHOICES = ((MALE, "Mand"), (FEMALE, "Kvinde"))
+    SELECT_GENDER_TEXT = "(Vælg køn)"
+    MEMBER_GENDER_CHOICES = (("", SELECT_GENDER_TEXT), (MALE, "Dreng"), (FEMALE, "Pige"))
+    MEMBER_ADULT_GENDER_CHOICES = (("", SELECT_GENDER_TEXT), (MALE, "Mand"), (FEMALE, "Kvinde"))
     membertype = models.CharField(
         "Type", max_length=2, choices=MEMBER_TYPE_CHOICES, default=PARENT
     )
