@@ -10,7 +10,7 @@ table {
 }
 
 .button-accent, #user-action-container > div > div > a {
-  background-color: #ff9900 !important;
+  background-color: #ff9900;
 }
 
 nav, main {
@@ -29,7 +29,6 @@ nav > a, #user-action-container > div, section, .info-box {
   border-radius: 0.25rem;
   text-align: center;
   display: inline-block;
-  text-align: center;
   white-space: nowrap;
   background-color: #ff9900;
   vertical-align: middle;
@@ -41,16 +40,17 @@ nav > a, #user-action-container > div, section, .info-box {
   padding: 0.375rem 0.75rem;
   font-size: 1.1rem;
   line-height: 1.5;
-  color: white !important;
+  color: white;
   margin: 10px;
+  text-decoration: none;
 }
 .button:hover, .action-list a:hover, .button-success:hover, .button-danger:hover, .button-primary-color:hover, .block-button:hover, .button-accent:hover, #user-action-container > div > div > a:hover {
-  background-color: #ed9224 !important;
+  background-color: #ed9224;
+  color: white;
 }
 
 .button-accent:hover, #user-action-container > div > div > a:hover {
   background-color: #ed9224;
-  color: black;
 }
 
 .block-button {
@@ -141,6 +141,10 @@ main {
     margin-left: auto;
     margin-right: auto;
   }
+}
+
+a {
+  text-decoration: none;
 }
 
 h5.card-title {
@@ -251,10 +255,10 @@ nav img {
 nav > a {
   color: white;
   padding: 0 10px;
+  text-decoration: none;
 }
 nav > a:hover {
   color: #cccccc;
-  text-decoration: none;
 }
 @media only screen and (max-width: 667px) {
   nav > a {
@@ -425,7 +429,7 @@ table tr {
 .tabs > ul li.tab-active {
   color: black;
   background-color: #ffff00;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 #department-container {
