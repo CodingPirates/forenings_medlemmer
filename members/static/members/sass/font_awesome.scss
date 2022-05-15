@@ -1,0 +1,6 @@
+@use "definitions";
+
+.fa-action {
+    color: definitions.$accent-color;
+    cursor: pointer;
+}
