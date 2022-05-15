@@ -116,6 +116,21 @@ python-versions = ">=3.7"
 toml = ["tomli"]
 
 [[package]]
+name = "crispy-bootstrap5"
+version = "0.4"
+description = "Bootstrap5 template pack for django-crispy-forms"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+django = ">=2.2"
+django-crispy-forms = ">=1.9.2"
+
+[package.extras]
+test = ["pytest", "pytest-django"]
+
+[[package]]
 name = "dj-database-url"
 version = "0.5.0"
 description = "Use Database URLs in your Django Application."
@@ -149,19 +164,16 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-bootstrap4"
-version = "2.2.0"
-description = "Bootstrap support for Django projects"
+name = "django-bootstrap5"
+version = "2.1.2"
+description = "Bootstrap 5 for Django"
 category = "main"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = ">=3.6"
 
 [package.dependencies]
-beautifulsoup4 = ">=4.8.0,<5.0.0"
-django = ">=2.2,<4.0"
-
-[package.extras]
-docs = ["sphinx (>=2.4,<3.0)", "sphinx_rtd_theme (>=0.4.3,<0.5.0)", "m2r (>=0.2.1,<0.3.0)"]
+beautifulsoup4 = ">=4.8.0"
+Django = ">=2.2"
 
 [[package]]
 name = "django-common-helpers"
@@ -705,7 +717,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8.0"
-content-hash = "296555330cc841176131901583341b9647e97ed3c9feaeaa8eab700be245a5f8"
+content-hash = "e6bc05913b6b53a0860b85863c5734fc5c56f673deb47417e63cff61cf637852"
 
 [metadata.files]
 aniso8601 = [
@@ -809,6 +821,10 @@ coverage = [
     {file = "coverage-6.3.3-pp36.pp37.pp38-none-any.whl", hash = "sha256:d522f1dc49127eab0bfbba4e90fa068ecff0899bbf61bf4065c790ddd6c177fe"},
     {file = "coverage-6.3.3.tar.gz", hash = "sha256:2781c43bffbbec2b8867376d4d61916f5e9c4cc168232528562a61d1b4b01879"},
 ]
+crispy-bootstrap5 = [
+    {file = "crispy-bootstrap5-0.4.tar.gz", hash = "sha256:04fad1dd060467278a62a3e5755b6b3dc15d4b1306db1de774a618e8dc5252a5"},
+    {file = "crispy_bootstrap5-0.4-py3-none-any.whl", hash = "sha256:6abe36a804d50d13bd20214e0c067c0b530c03074b64cf87c0cb5762b94c0779"},
+]
 dj-database-url = [
     {file = "dj-database-url-0.5.0.tar.gz", hash = "sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163"},
     {file = "dj_database_url-0.5.0-py2.py3-none-any.whl", hash = "sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9"},
@@ -821,9 +837,9 @@ django = [
     {file = "Django-3.2-py3-none-any.whl", hash = "sha256:0604e84c4fb698a5e53e5857b5aea945b2f19a18f25f10b8748dbdf935788927"},
     {file = "Django-3.2.tar.gz", hash = "sha256:21f0f9643722675976004eb683c55d33c05486f94506672df3d6a141546f389d"},
 ]
-django-bootstrap4 = [
-    {file = "django-bootstrap4-2.2.0.tar.gz", hash = "sha256:1c0a931b4245a0dcd5051ea1b244ac130a328374ce8e85254c75eb072a737201"},
-    {file = "django_bootstrap4-2.2.0-py3-none-any.whl", hash = "sha256:32cc0f914ace4cef935c0d3f786dde2a52f0ea1be72153f6e356c0aa8f3925e1"},
+django-bootstrap5 = [
+    {file = "django-bootstrap5-2.1.2.tar.gz", hash = "sha256:ac05ca69b990e62657c0bf40db14946c22fd64c7fb9dfe094a9f22ecc58f86c5"},
+    {file = "django_bootstrap5-2.1.2-py3-none-any.whl", hash = "sha256:0021355df9212c511876e3f5336ba470416a6dd52f61bf5acec5bb783ab41ff5"},
 ]
 django-common-helpers = [
     {file = "django-common-helpers-0.9.2.tar.gz", hash = "sha256:2d56be6fa261d829a6a224f189bf276267b9082a17d613fe5f015dd4d65c17b4"},
