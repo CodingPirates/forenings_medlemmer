@@ -717,7 +717,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8.0"
-content-hash = "41342730c3b1267596e5632906776d18bc068ca6be5bded716a737ba898c49fb"
+content-hash = "296555330cc841176131901583341b9647e97ed3c9feaeaa8eab700be245a5f8"
 
 [metadata.files]
 aniso8601 = [
