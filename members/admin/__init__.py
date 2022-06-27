@@ -270,7 +270,7 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
         activitys = []
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
-            start_date__year__lte=timezone.now().year-2,
+            start_date__year__lte=timezone.now().year - 2,
         ).order_by("department__name", "-start_date"):
             activitys.append((str(activity.pk), str(activity)))
         return activitys
@@ -280,6 +280,7 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
             return queryset
         else:
             return queryset.filter(activity=self.value())
+
 
 class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
     # Title shown in filter view
@@ -303,9 +304,10 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(activity=self.value())
 
+
 class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     # Title shown in filter view
-    title = "Efter aktivitet (år " + str(timezone.now().year-1) + ")"
+    title = "Efter aktivitet (år " + str(timezone.now().year - 1) + ")"
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
@@ -314,7 +316,7 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
         activitys = []
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
-            start_date__year=timezone.now().year-1,
+            start_date__year=timezone.now().year - 1,
         ).order_by("department__name", "-start_date"):
             activitys.append((str(activity.pk), str(activity)))
         return activitys
@@ -336,9 +338,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "note",
     ]
     list_filter = (
-        ActivityParticipantListCurrentYearFilter, 
+        ActivityParticipantListCurrentYearFilter,
         ActivityParticipantListLastYearFilter,
-        ActivityParticipantListFilter, 
+        ActivityParticipantListFilter,
         ParticipantPaymentListFilter,
     )
     list_display_links = ("member",)
