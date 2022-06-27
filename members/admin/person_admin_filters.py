@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.utils import timezone
 from members.models import Activity, AdminUserInformation
 
+
 class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
-    title = "Deltager på (år " + str(timezone.now().year) +")"
+    title = "Deltager på (år " + str(timezone.now().year) + ")"
     parameter_name = "participant_list_active"
 
     def lookups(self, request, _model_admin):
@@ -26,8 +27,9 @@ class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(member__activityparticipant__activity=self.value())
 
+
 class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
-    title = "Deltager på (år " + str(timezone.now().year-1) +")"
+    title = "Deltager på (år " + str(timezone.now().year - 1) + ")"
     parameter_name = "participant_list_active"
 
     def lookups(self, request, _model_admin):
@@ -36,7 +38,7 @@ class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
             for a in Activity.objects.filter(
                 department__in=AdminUserInformation.get_departments_admin(request.user),
                 activitytype__id__in=["FORLØB", "ARRANGEMENT"],
-                start_date__year=timezone.now().year-1,
+                start_date__year=timezone.now().year - 1,
             ).order_by("department__name", "-start_date")
         ]
 
@@ -49,8 +51,6 @@ class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
             return queryset
         else:
             return queryset.filter(member__activityparticipant__activity=self.value())
-
-
 
 
 class PersonParticipantActiveListFilter(admin.SimpleListFilter):
