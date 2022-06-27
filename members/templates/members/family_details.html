@@ -1,5 +1,7 @@
 {% extends 'members/base.html' %} {% load static %} {% block content %}
 
+{% include 'members/notifications.html' %}
+
 <h1>Familiedetaljer</h1>
 <p>
   Din familie er registreret på e-mail adressen <a class="text-info">
@@ -32,7 +34,7 @@
       </a>
     </li>
   </ul>
-  
+
   {% if family.person_set.count > 0 %}
     <table>
       <thead>
