@@ -1,18 +1,9 @@
 {% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
 {% block content %}
 
-{% if user.is_authenticated %}
+{% include 'members/notifications.html' %}
+
   <div id="user-action-container">
-    <div>
-      <span><i class="fa-users fa fa-4x"></i></span>
-      <div>
-        <h4>Jeres familie</h4>
-        <a href="{% url 'family_detail' %}">
-          Se familie <i class="fa fa-long-arrow-alt-right"></i>
-        </a>
-          <p>Se og ret stamdata for din familie</p>
-      </div>
-    </div>
     <div>
       <span><i class="fa-list-ol fa fa-4x"></i></span>
       <div>
@@ -21,7 +12,7 @@
           Afdelinger <i class="fa fa-long-arrow-alt-right"></i>
         </a>
         <p>
-          Her kan du opskrive dig som interesseret til en af vores 
+          Her kan du opskrive dig som interesseret til en af vores
           afdelinger til næste gang vi starter nye hold op
         </p>
       </div>
@@ -65,14 +56,4 @@
     <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>.
   </p>
 
-{% else %}
-  <h1>Tilmelding til Coding Pirates</h1>
-  <p>
-    Indtast barnets og forældrenes informationer, for at tilmelde en Coding
-    Pirates-workshop, eller for at komme med på ventelisten.
-  </p>
-  <div id="signup-form">
-      {% crispy signupform %}
-  </div>
-{% endif %}
 {% endblock %}

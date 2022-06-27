@@ -4,6 +4,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
@@ -16,7 +17,7 @@ used to log in.
 """
 
 
-class SignUpTest(StaticLiveServerTestCase):
+class AccountCreateTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
     serialized_rollback = True
 
@@ -32,9 +33,9 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_final.png")
         self.browser.quit()
 
-    def test_entry_page(self):
+    def test_account_create(self):
         # Loads the front page
-        self.browser.get(self.live_server_url)
+        self.browser.get(f"{self.live_server_url}/account/create")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
 
@@ -74,7 +75,8 @@ class SignUpTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
         # Submit form
-        self.browser.find_element_by_name("submit").click()
+        field.send_keys(Keys.TAB)
+        field.send_keys(Keys.ENTER)
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
         # Check that redirect and get password
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
@@ -96,8 +98,5 @@ class SignUpTest(StaticLiveServerTestCase):
 
         self.browser.find_element_by_xpath("//input[@type='submit']").click()
 
-        # Check that we were redirectet to overview page
-        elements = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'For yderligere hjælp med at bruge denne side')]]"
-        )
-        self.assertGreater(len(elements), 0)
+        # Check that we were redirectet to front page
+        self.assertEqual(f"{self.live_server_url}/", self.browser.current_url)
