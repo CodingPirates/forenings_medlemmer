@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.utils.html import format_html
 from django.forms import Textarea
+from django.utils import timezone
 
 from members.models import (
     Address,
@@ -260,7 +261,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 class ActivityParticipantListFilter(admin.SimpleListFilter):
     # Title shown in filter view
-    title = "Efter aktivitet"
+    title = "Efter aktivitet (før år " + str(timezone.now().year - 1) + ")"
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
@@ -268,7 +269,52 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         activitys = []
         for activity in Activity.objects.filter(
-            department__in=AdminUserInformation.get_departments_admin(request.user)
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            start_date__year__lte=timezone.now().year-2,
+        ).order_by("department__name", "-start_date"):
+            activitys.append((str(activity.pk), str(activity)))
+        return activitys
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(activity=self.value())
+
+class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = "Efter aktivitet (år " + str(timezone.now().year) + ")"
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = "activity"
+
+    def lookups(self, request, model_admin):
+        activitys = []
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            start_date__year=timezone.now().year,
+        ).order_by("department__name", "-start_date"):
+            activitys.append((str(activity.pk), str(activity)))
+        return activitys
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(activity=self.value())
+
+class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = "Efter aktivitet (år " + str(timezone.now().year-1) + ")"
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = "activity"
+
+    def lookups(self, request, model_admin):
+        activitys = []
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            start_date__year=timezone.now().year-1,
         ).order_by("department__name", "-start_date"):
             activitys.append((str(activity.pk), str(activity)))
         return activitys
@@ -289,7 +335,12 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity",
         "note",
     ]
-    list_filter = (ActivityParticipantListFilter, ParticipantPaymentListFilter)
+    list_filter = (
+        ActivityParticipantListCurrentYearFilter, 
+        ActivityParticipantListLastYearFilter,
+        ActivityParticipantListFilter, 
+        ParticipantPaymentListFilter,
+    )
     list_display_links = ("member",)
     raw_id_fields = ("activity", "member")
     search_fields = ("member__person__name",)
@@ -366,7 +417,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         (
             None,
             {
-                "description": '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson. Herefter kan du vælge de personer på listen, du ønsker at invitere og vælge "Inviter alle valgte til en aktivitet" fra rullemenuen foroven.</p>',
+                "description": '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. GÃ¥ derind og filtrer efter f.eks. bÃ¸rn pÃ¥ venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer pÃ¥ forrige sÃ¦son. Herefter kan du vÃ¦lge de personer pÃ¥ listen, du Ã¸nsker at invitere og vÃ¦lge "Inviter alle valgte til en aktivitet" fra rullemenuen foroven.</p>',
                 "fields": (
                     "person",
                     "activity",
