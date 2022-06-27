@@ -10,7 +10,6 @@ from django.utils import timezone
 from django.urls import reverse
 from django.utils.html import format_html
 from django.forms import Textarea
-from django.utils import timezone
 
 from members.models import (
     Address,
