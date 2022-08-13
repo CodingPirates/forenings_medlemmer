@@ -41,7 +41,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
         # Gender
         field = Select(self.browser.find_element_by_name("child_gender"))
-        field.select_by_index(1)
+        field.select_by_value("MA")
 
         # Enter child details
         field = self.browser.find_element_by_name("child_name")
@@ -51,6 +51,9 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys("05-03-2010")
 
         # Enter parent details
+        field = Select(self.browser.find_element_by_name("parent_gender"))
+        field.select_by_value("MA")
+
         field = self.browser.find_element_by_name("parent_name")
         field.send_keys("Anders Afprøvning")
 
