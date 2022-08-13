@@ -163,7 +163,6 @@ def ActivitySignup(request, activity_id, person_id=None):
                         activityparticipant=participant,
                         person=person,
                         family=family,
-                        invitation=invitation,
                         body_text=timezone.now().strftime("%Y-%m-%d")
                         + " Betaling for "
                         + activity.name
