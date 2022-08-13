@@ -2,7 +2,7 @@ import socket
 import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -38,6 +38,10 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.get(f"{self.live_server_url}/account/create")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
+
+        # Gender
+        field = Select(self.browser.find_element_by_name("child_gender"))
+        field.select_by_index(1)
 
         # Enter child details
         field = self.browser.find_element_by_name("child_name")
