@@ -3,6 +3,56 @@ from django.utils import timezone
 from members.models import Activity, AdminUserInformation
 
 
+class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
+    title = "Deltager på (år " + str(timezone.now().year) + ")"
+    parameter_name = "participant_list_active"
+
+    def lookups(self, request, _model_admin):
+        return [
+            (str(a.pk), str(a))
+            for a in Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user),
+                activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+                start_date__year=timezone.now().year,
+            ).order_by("department__name", "-start_date")
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return queryset.filter(member__activityparticipant__isnull=True)
+        elif self.value() == "any":
+            return queryset.exclude(member__activityparticipant__isnull=True)
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(member__activityparticipant__activity=self.value())
+
+
+class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
+    title = "Deltager på (år " + str(timezone.now().year - 1) + ")"
+    parameter_name = "participant_list_active"
+
+    def lookups(self, request, _model_admin):
+        return [
+            (str(a.pk), str(a))
+            for a in Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user),
+                activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+                start_date__year=timezone.now().year - 1,
+            ).order_by("department__name", "-start_date")
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return queryset.filter(member__activityparticipant__isnull=True)
+        elif self.value() == "any":
+            return queryset.exclude(member__activityparticipant__isnull=True)
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(member__activityparticipant__activity=self.value())
+
+
 class PersonParticipantActiveListFilter(admin.SimpleListFilter):
     title = "Deltager på (aktive)"
     parameter_name = "participant_list_active"
@@ -104,7 +154,7 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
 
 
 class VolunteerListFilter(admin.SimpleListFilter):
-    title = "frivillig i"
+    title = "Frivillig i"
     parameter_name = "volunteer"
 
     def lookups(self, request, model_admin):

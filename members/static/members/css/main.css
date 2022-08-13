@@ -460,4 +460,9 @@ table tr {
   list-style-type: none;
 }
 
+.fa-action {
+  color: #ff9900;
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=main.css.map */
