@@ -59,9 +59,6 @@ class ActivitySignupForm(forms.Form):
                             Submit(
                                 "submit", "Tilmeld og betal", css_class="button-success"
                             ),
-                            HTML(
-                                "<a href='{%url 'invitation_decline' family.unique invitation.id %}'><button type='button' class='button-danger'>Afslå invitationen</button></a>",
-                            ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
                     ),
