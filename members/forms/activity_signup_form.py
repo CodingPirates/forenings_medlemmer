@@ -3,7 +3,6 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, HTML, Div
 from crispy_forms.bootstrap import FormActions
 
-from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 
