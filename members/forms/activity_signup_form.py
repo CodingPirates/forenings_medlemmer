@@ -3,6 +3,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, HTML, Div
 from crispy_forms.bootstrap import FormActions
 
+from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 
@@ -58,9 +59,6 @@ class ActivitySignupForm(forms.Form):
                         FormActions(
                             Submit(
                                 "submit", "Tilmeld og betal", css_class="button-success"
-                            ),
-                            HTML(
-                                "<a href='{%url 'invitation_decline' family.unique invitation.id %}'><button type='button' class='button-danger'>Afslå invitationen</button></a>",
                             ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
