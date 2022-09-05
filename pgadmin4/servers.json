@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "forenings_medlemmer",
+            "Group": "Servers",
+            "Port": 5432,
+            "Username": "postgres_user",
+            "Host": "database",
+            "SSLMode": "prefer",
+            "MaintenanceDB": "postgres"
+        }
+    }
+}
