@@ -31,6 +31,11 @@ You are more than welcome to contribute to the system. This guide documents how 
 -   To create a super user for the admin interface you can run
     `docker-compose run web ./manage.py createsuperuser`
 
+-   A pgAdmin container is configured as part of Docker Compose, and can be accessed on http://localhost:5050.
+    Log in with credentials `admin@example.com`/`admin`. Connection to database has been configured in
+    `pgadmin/servers.json` file, you just need to provide password to database when asked (can be found
+    in your `.env` file)
+
 ## Primary Frameworks/Systems used
 
 -   [Django][django]: The base web framework used. The link is to their great
