@@ -15,12 +15,8 @@ from members.models.person import Person
 from members.utils.user import user_to_person, has_user
 
 
-@login_required
-@user_passes_test(has_user, "/admin_signup/")
 def ActivitySignup(request, activity_id, person_id=None):
-    # TODO: is should be possible to view an activity without loggin in
     if person_id is None:
-        # View only mode
         view_only_mode = True
     else:
         view_only_mode = False
@@ -32,10 +28,10 @@ def ActivitySignup(request, activity_id, person_id=None):
     if request.resolver_match.url_name == "activity_view_person":
         view_only_mode = True
 
-    family = user_to_person(request.user).family
-
+    family = None
     if person_id:
         try:
+            family = user_to_person(request.user).family
             person = family.person_set.get(pk=person_id)
 
             # Check not already signed up

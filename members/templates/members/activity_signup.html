@@ -31,7 +31,7 @@
           <p>
           <strong>Ansvarlig:</strong><br>
           {{ activity.responsible_name}}<br>
-          <a href="mailto:{{activity.responsible_contact}}">{{activity.responsible_contact}}</a>
+          {% if person %}<a href="mailto:{{activity.responsible_contact}}">{{activity.responsible_contact}}</a>{% endif %}
           </p>
         </div>
         <div class="col-lg-6">
@@ -92,7 +92,11 @@
       {% crispy signupform %}
 
       {% else %}
-        {% if participating %}
+        {% if not person %}
+        <hr>
+        <a href="{% url 'person_login' %}">Log ind</a> eller <a href="{% url 'account_create' %}">tilmeld dit barn</a> for at tilmelde dig denne aktivitet.
+        {% else %}
+          {% if participating %}
 
           <hr/>
 
@@ -101,15 +105,16 @@
               <h2 class="card-title">{{person.name}} er tilmeldt dette arrangement</h2>
             </div>
           </div>
-        {% endif %}
-        {% if signup_closed and not participating %}
+          {% endif %}
+          {% if signup_closed and not participating %}
           <hr>
             <div class="alert alert-primary">
               <p>Arrangementet er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
             </div>
-        {% endif %}
-        {% if family %}
+          {% endif %}
+          {% if family %}
           <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
+          {% endif %}
         {% endif %}
       {% endif %}
     </div>
