@@ -15,7 +15,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
     def setUp(self):
         self.activity_1 = ActivityFactory.create(
             name="Test Aktivitet",
-            signup_closing=(timezone.now() + timedelta(days=5)).date()
+            signup_closing=(timezone.now() + timedelta(days=5)).date(),
         )
         self.activity_1.save()
         self.browser = webdriver.Remote(
