@@ -85,6 +85,7 @@ class Person(models.Model):
         default=None,
     )
     address_invalid = models.BooleanField("Ugyldig adresse", default=False)
+    anonymized = models.DateTimeField('Anonymiseret', null=True, blank=True)
 
     def __str__(self):
         return self.name

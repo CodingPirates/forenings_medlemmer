@@ -23,7 +23,7 @@ class Family(models.Model):
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     confirmed_dtm = models.DateTimeField("Bekræftet", null=True, blank=True)
     last_visit_dtm = models.DateTimeField("Sidst besøgt", null=True, blank=True)
-    deleted_dtm = models.DateTimeField("Slettet", null=True, blank=True)
+    anonymized = models.DateTimeField('Anonymiseret', null=True, blank=True)
 
     def get_abosolute_url(self):
         return reverse("family_form")
