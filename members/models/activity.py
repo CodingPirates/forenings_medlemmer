@@ -10,8 +10,8 @@ class Activity(models.Model):
         verbose_name_plural = "Aktiviteter"
         ordering = ["department__address__zipcode", "start_date"]
 
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
-    union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1)
+    department = models.ForeignKey("Department", on_delete=models.CASCADE, verbose_name="Afdeling")
+    union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1, verbose_name="Forening")
     name = models.CharField("Navn", max_length=200)
     activitytype = models.ForeignKey(
         "ActivityType",

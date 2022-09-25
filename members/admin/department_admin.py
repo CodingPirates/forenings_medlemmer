@@ -13,7 +13,6 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         return queryset if self.value() is None else queryset.filter(union=self.value())
 
-
 class DepartmentAdmin(admin.ModelAdmin):
     list_filter = (UnionDepartmentFilter,)
     raw_id_fields = ("union",)
@@ -62,4 +61,4 @@ class DepartmentAdmin(admin.ModelAdmin):
             },
         ),
     ]
-    list_display = ("name", "address")
+    list_display = ("union", "name", "address","description","isVisible","isOpening","created","closed_dtm")
