@@ -23,6 +23,9 @@ from .person_admin_filters import (
     PersonWaitinglistListFilter,
     PersonInvitedListFilter,
     PersonParticipantListFilter,
+    PersonParticipantCurrentYearListFilter,
+    PersonParticipantLastYearListFilter,
+    PersonParticipantActiveListFilter,
 )
 
 from .inlines import (
@@ -52,6 +55,9 @@ class PersonAdmin(admin.ModelAdmin):
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
         PersonParticipantListFilter,
+        PersonParticipantActiveListFilter,
+        PersonParticipantCurrentYearListFilter,
+        PersonParticipantLastYearListFilter,
     )
     search_fields = ("name", "family__email", "notes")
     actions = ["invite_many_to_activity_action", "export_emaillist", "export_csv"]

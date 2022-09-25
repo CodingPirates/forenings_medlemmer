@@ -1,4 +1,4 @@
-import datetime
+from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -30,10 +30,10 @@ def SupportMembership(request):
         for curActivity in current_activities:
             applicablePersons = Person.objects.filter(
                 family=family,  # only members of this family
-                birthday__lte=timezone.now()
-                - datetime.timedelta(days=curActivity.min_age * 365),  # old enough
-                birthday__gt=timezone.now()
-                - datetime.timedelta(days=curActivity.max_age * 365),  # not too old
+                birthday__lte=curActivity.start_date
+                - relativedelta(years=curActivity.min_age),  # old enough
+                birthday__gt=curActivity.start_date
+                - relativedelta(years=curActivity.max_age + 1),  # not too old
             ).exclude(
                 member__activityparticipant__activity=curActivity
             )  # not already participating

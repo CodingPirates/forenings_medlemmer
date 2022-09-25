@@ -1,0 +1,20 @@
+{% load static %}
+
+<link href="{% static "members/css/notification.css" %}" rel="stylesheet" type="text/css" />
+
+<div>
+    {% for invitation in invites %}
+    <div class="alert alert-info notification" role="alert" style="">
+        <div>
+            {{ invitation.person.name }}
+            er blevet inviteret til "{{ invitation.activity.name }}"
+            hos Coding Pirates {{invitation.activity.department.name}}.
+        </div>
+        <div>
+            <a class="btn btn-primary" href="{% url 'activity_signup' invitation.activity.id invitation.person.id %}">
+                Åbn aktiviteten her
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>

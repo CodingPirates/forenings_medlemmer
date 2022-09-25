@@ -57,7 +57,7 @@ class ActivitySignupForm(forms.Form):
                         ),
                         FormActions(
                             Submit(
-                                "submit", "Tilmeld og betal", css_class="btn-success"
+                                "submit", "Tilmeld og betal", css_class="button-success"
                             ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
