@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, user_passes_test
 
 from members.forms import ActivitySignupForm
 from members.models.activity import Activity
@@ -12,7 +11,7 @@ from members.models.activityparticipant import ActivityParticipant
 from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
-from members.utils.user import user_to_person, has_user
+from members.utils.user import user_to_person
 
 
 def ActivitySignup(request, activity_id, person_id=None):
