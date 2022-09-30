@@ -78,7 +78,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         except Exception:
             self.fail("Autocomplete not working")
 
-        self.assertEqual("Sverigesgade 20, 5000 Odense C", field.get_attribute("value"))
+        self.assertEqual("C/O Coworking Plus, Kochsgade 31D, 5000 Odense C", field.get_attribute("value"))
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
         # Submit form
