@@ -10,7 +10,7 @@ class Volunteer(models.Model):
         verbose_name_plural = "Frivillige"
 
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
+    department = models.ForeignKey("Department", on_delete=models.CASCADE, verbose_name="Afdeling")
 
     def has_certificate(self):
         return self.person.has_certificate
