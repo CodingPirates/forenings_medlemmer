@@ -1,5 +1,16 @@
 from django.contrib import admin
 from members.models import Department
+from members.models import ActivityParticipant
+
+class ActivityParticipantInline(admin.TabularInline):
+    model = ActivityParticipant
+    extra = 0
+    fields=("member",)
+    readonly_fields=fields
+    raw_id_fields=("member",)
+    
+    def get_queryset(self, request):
+        return ActivityParticipant.objects.all()
 
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -20,11 +31,12 @@ class ActivityAdmin(admin.ModelAdmin):
     raw_id_fields = ("department",)
     list_filter = ("union", "department", "open_invite", "activitytype")
     save_as = True
+    inlines = [ActivityParticipantInline]
 
     def startend(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
 
-    startend.short_description = 'Periode'
+    startend.short_description = "Periode"
 
     def age(self, obj):
         return str(obj.min_age) + " - " + str(obj.max_age)

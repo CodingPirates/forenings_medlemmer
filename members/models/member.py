@@ -22,4 +22,4 @@ class Member(models.Model):
     name.short_description = "Navn"
 
     def __str__(self):
-        return "{}, {}".format(self.person, self.department)
+        return "{}".format(self.person)

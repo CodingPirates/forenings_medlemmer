@@ -4,6 +4,7 @@ from django.db import models
 import members.models.payment
 import members.models.member
 import members.models.waitinglist
+import members.models.payment
 from django.utils import timezone
 
 
@@ -16,7 +17,9 @@ class ActivityParticipant(models.Model):
     added_dtm = models.DateField("Tilmeldt", default=timezone.now)
     activity = models.ForeignKey("Activity", on_delete=models.PROTECT)
     member = models.ForeignKey("Member", on_delete=models.CASCADE)
+    #fields=["member__person__name", "members__models__payment__accepted_dtm"]
     note = models.TextField("Besked / Note til arrangement", blank=True)
+    paid = models.DateField("Betalt")
     PHOTO_OK = "OK"
     PHOTO_NOTOK = "NO"
     PHOTO_PERMISSION_CHOICES = (
@@ -34,9 +37,7 @@ class ActivityParticipant(models.Model):
     )
 
     def __str__(self):
-        return self.member.__str__()
-        # + ", " + self.activity.name
-        # No reason to show an activity here - looks like it's the first activity for the given user
+        return self.member.__str__() + ", " + self.activity.name
 
     def paid(self):
         # not paid if unconfirmed payments on this activity participation

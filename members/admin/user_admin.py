@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+from copy import deepcopy
 from members.models import AdminUserInformation, Person
 
 
@@ -17,3 +19,17 @@ class PersonInline(admin.StackedInline):
 
 class UserAdmin(UserAdmin):
     inlines = (AdminUserInformationInline, PersonInline)
+    
+    def get_queryset(self, request):
+        qs = super(UserAdmin, self).get_queryset(request)
+        
+        #Following will hide superusers for normal admins !
+        #if not request.user.is_superuser:
+        #    return qs.filter(is_superuser=False)
+        return qs
+    
+    def get_list_filter(self, request):
+        if request.user.is_superuser:
+            return ["is_staff", "is_superuser", "is_active", "groups__id"]
+        else:
+            return ["is_staff", "is_active", "groups__id"]
