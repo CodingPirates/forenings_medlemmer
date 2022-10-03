@@ -21,7 +21,9 @@ class ActivityInvite(models.Model):
         verbose_name_plural = "Invitationer"
         unique_together = ("activity", "person")
 
-    activity = models.ForeignKey("Activity", on_delete=models.CASCADE, verbose_name="Aktivitet")
+    activity = models.ForeignKey(
+        "Activity", on_delete=models.CASCADE, verbose_name="Aktivitet"
+    )
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
     invite_dtm = models.DateField("Inviteret", default=timezone.now)
     expire_dtm = models.DateField("Udløber", default=_defaultInviteExpiretime)

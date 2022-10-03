@@ -48,15 +48,19 @@ class Union(models.Model):
         null=True,
         blank=True,
         related_name="secretary",
-        verbose_name="Sekretær"
+        verbose_name="Sekretær",
     )
     secretary_old = models.CharField("Sekretær", max_length=200, blank=True)
     secretary_email_old = models.EmailField("Sekretærens email", blank=True)
     union_email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
     founded = models.DateField("Stiftet", blank=True, null=True)
-    address = models.ForeignKey("Address", on_delete=models.PROTECT, verbose_name="Adresse")
-    board_members = models.ManyToManyField("Person", blank=True, verbose_name="Menige medlemmer")
+    address = models.ForeignKey(
+        "Address", on_delete=models.PROTECT, verbose_name="Adresse"
+    )
+    board_members = models.ManyToManyField(
+        "Person", blank=True, verbose_name="Menige medlemmer"
+    )
     board_members_old = models.TextField("Menige medlemmer", blank=True)
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",
