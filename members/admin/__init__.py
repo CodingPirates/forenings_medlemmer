@@ -264,7 +264,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
-    # Title shown in filter view
+    # Title shown in filter view. \u2264 : ≤ (mindre end eller lig med)
     title = "Efter aktivitet (\u2264 år " + str(timezone.now().year - 2) + ")"
 
     # Parameter for the filter that will be used in the URL query.
@@ -287,7 +287,7 @@ class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
-    # Title shown in filter view
+    # Title shown in filter view. \u2265 : ≥ (større end eller lig med)
     title = "Efter aktivitet (\u2265 år " + str(timezone.now().year) + ")"
 
     # Parameter for the filter that will be used in the URL query.
