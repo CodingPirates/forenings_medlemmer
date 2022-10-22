@@ -69,7 +69,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         # Use addresse Autocomplete
         field = self.browser.find_element_by_name("search_address")
         field.click()
-        field.send_keys("Sverigesgade 20, 5000")
+        field.send_keys("Kochsgade 31D, 5000")
         try:
             address = WebDriverWait(self.browser, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
@@ -78,7 +78,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         except Exception:
             self.fail("Autocomplete not working")
 
-        self.assertEqual("C/O Coworking Plus, Kochsgade 31D, 5000 Odense C", field.get_attribute("value"))
+        self.assertEqual("Kochsgade 31D, 5000 Odense C", field.get_attribute("value"))
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
         # Submit form
