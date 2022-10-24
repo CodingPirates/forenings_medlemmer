@@ -383,12 +383,11 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     )
     list_display_links = (
-     "added_dtm", 
-     "photo_permission",
-     "note",
+        "added_dtm", 
+        "photo_permission",
+        "note",
     )
     date_hierarchy = "activity__start_date"
-    
     raw_id_fields = ("activity", )
     search_fields = ("member__person__name", "activity__name",)
     actions = [
@@ -425,30 +424,35 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         link = '<a href="%s">%s</a>' % (url, item.member.person.name)
         return mark_safe(link)
     activity_person_link.short_description = "Deltager"
+    activity_person_link.admin_order_field = "member__person__name"
 
     def activity_family_email_link(self, item):
         url = reverse("admin:members_family_change", args=[item.member.person.family_id])
         link = '<a href="%s">%s</a>' % (url, item.member.person.family.email)
         return mark_safe(link)
     activity_family_email_link.short_description = "Familie"
+    activity_family_email_link.admin_order_field = "member__person__family__email"
 
     def activity_link(self, item):
         url = reverse("admin:members_activity_change", args=[item.activity.id])
         link = '<a href="%s">%s</a>' % (url, item.activity.name)
         return mark_safe(link)
     activity_link.short_description = "Aktivitet"
+    activity_link.admin_order_field = "activity__name"
 
     def activity_union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.activity.union_id])
         link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
         return mark_safe(link)
     activity_union_link.short_description = "Forening"
+    activity_union_link.admin_order_field = "activity__union__name"
 
     def activity_department_link(self, item):
         url = reverse("admin:members_department_change", args=[item.activity.department_id])
         link = '<a href="%s">%s</a>' % (url, item.activity.department.name)
         return mark_safe(link)
     activity_department_link.short_description = "Afdeling"
+    activity_department_link.admin_order_field = "activity__department__name"
 
     def activity_payment_info_txt(self, item):
         try:
