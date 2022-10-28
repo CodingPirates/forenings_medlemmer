@@ -7,6 +7,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -35,7 +37,9 @@ from members.models import (
     department,
     union,
 )
+import urllib
 import members.models.payment
+
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
@@ -295,8 +299,15 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
+    #def choices(self, changelist):
+    #    choices = list(super().choices(changelist))
+    #    choices[0]['display'] = f'Alle akvititeter i {str(timezone.now().year)}'
+    #    return choices
+
     def lookups(self, request, model_admin):
-        activitys = []
+        activitys = [
+        #    ("none", "Intet filter"), 
+        ]
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year=timezone.now().year,
@@ -306,7 +317,10 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() is None:
-            return queryset
+           # return queryset.filter(activity__start_date__year=timezone.now().year)
+           return queryset
+        #if self.value() == "none":
+        #    return queryset.exclude(activity__isnull = True)
         else:
             return queryset.filter(activity=self.value())
 
@@ -318,8 +332,16 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
+    #def choices(self, changelist):
+    #    choices = list(super().choices(changelist))
+#        choices[0]['display'] = f'Alle akvititeter i {str(timezone.now().year)}'
+    #    choices[0]['display'] = 'Intet filter'
+    #    return choices
+
     def lookups(self, request, model_admin):
-        activitys = []
+        activitys = [
+            #("all", f'Alle aktiviteter i {str(timezone.now().year - 1)}')
+        ]
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year=timezone.now().year - 1,
@@ -330,6 +352,10 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
+            #return queryset.exclude(activity__isnull = True)
+        #elif self.value() == "all":
+        #    return queryset
+            #return queryset.filter(activity__start_date__year=timezone.now().year-1)
         else:
             return queryset.filter(activity=self.value())
 
@@ -396,6 +422,18 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "export_csv_full1", 
         "export_csv_full2", 
     ]
+
+    def changelist_view(self, request, extra_context=None):
+        if request.GET:
+            return super().changelist_view(request, extra_context=extra_context)
+        date = timezone.now().date()
+        #params = ['day', 'month', 'year']
+        params = ['year']
+        field_keys = ['{}__{}'.format(self.date_hierarchy, i) for i in params]
+        field_values = [getattr(date, i) for i in params]
+        query_params = dict(zip(field_keys, field_values))
+        url = '{}?{}'.format(request.path, urllib.parse.urlencode(query_params))
+        return redirect(url)
 
     def person_age_years(self, item):
         return item.member.person.age_years()
