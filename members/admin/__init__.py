@@ -402,13 +402,8 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     date_hierarchy = "activity__start_date"
 
     list_filter = (
-<<<<<<< Updated upstream
         ActivityParticipantUnionFilter,
         ActivityParticipantDepartmentFilter,
-=======
-        "activity__union",
-        "activity__department",
->>>>>>> Stashed changes
         ActivityParticipantListCurrentYearFilter,
         ActivityParticipantListLastYearFilter,
         ActivityParticipantListFilter,
@@ -794,8 +789,3 @@ class EquipmentAdmin(admin.ModelAdmin):
 
 admin.site.register(Equipment, EquipmentAdmin)
 
-
-class report(admin.ModelAdmin):
-    pass
-
-admin.site.register(report)
