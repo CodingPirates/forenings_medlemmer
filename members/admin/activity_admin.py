@@ -1,12 +1,14 @@
 from django.contrib import admin
 from members.models import Department
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "union",
-        "department",
+        "union_link",
+        "department_link",
         "activitytype",
         "start_end",
         "open_invite",
@@ -33,6 +35,24 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.min_age) + " - " + str(obj.max_age)
 
     age.short_description = "Alder"
+
+    def union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.union_id])
+        link = '<a href="%s">%s</a>' % (url, item.union.name)
+        return mark_safe(link)
+
+    union_link.short_description = "Forening"
+    union_link.admin_order_field = "activity__union__name"
+
+    def department_link(self, item):
+        url = reverse(
+            "admin:members_department_change", args=[item.department_id]
+        )
+        link = '<a href="%s">%s</a>' % (url, item.department.name)
+        return mark_safe(link)
+
+    department_link.short_description = "Afdeling"
+    department_link.admin_order_field = "activity__department__name"
 
     # Only view activities on own department
     def get_queryset(self, request):

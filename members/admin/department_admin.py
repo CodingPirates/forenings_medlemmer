@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from members.models import Union, Address
 
@@ -16,7 +18,7 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
 class DepartmentAdmin(admin.ModelAdmin):
     list_filter = (UnionDepartmentFilter,)
-    raw_id_fields = ("union",)
+    raw_id_fields = ("union", )
     filter_horizontal = ["department_leaders"]
 
     def get_form(self, request, obj=None, **kwargs):
@@ -63,8 +65,8 @@ class DepartmentAdmin(admin.ModelAdmin):
         ),
     ]
     list_display = (
-        "union",
-        "name",
+        "department_union_link",
+        "department_link",
         "address",
         "description",
         "isVisible",
@@ -72,3 +74,26 @@ class DepartmentAdmin(admin.ModelAdmin):
         "created",
         "closed_dtm",
     )
+
+    def department_union_name(self, item):
+        return item.union.name
+
+    department_union_name.short_description = "Forening"
+
+
+    def department_union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.union_id])
+        link = '<a href="%s">%s</a>' % (url, item.union.name)
+        return mark_safe(link)
+
+    department_union_link.short_description = "Forening"
+    # department_union_link.admin_order_field = "department__union__name"
+    department_union_link.admin_order_field = "union__name"
+
+    def department_link(self, item):
+        url = reverse("admin:members_department_change", args=[item.id])
+        link = '<a href="%s">%s</a>' % (url, item.name)
+        return mark_safe(link)
+    
+    department_link.short_description = "Afdeling"
+    department_link.admin_order_field = "department_name"
