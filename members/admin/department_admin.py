@@ -62,4 +62,13 @@ class DepartmentAdmin(admin.ModelAdmin):
             },
         ),
     ]
-    list_display = ("name", "address")
+    list_display = (
+        "union",
+        "name",
+        "address",
+        "description",
+        "isVisible",
+        "isOpening",
+        "created",
+        "closed_dtm",
+    )

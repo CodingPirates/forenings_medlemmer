@@ -5,19 +5,31 @@ from members.models import Department
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "union",
         "department",
         "activitytype",
-        "start_date",
+        "start_end",
         "open_invite",
         "price_in_dkk",
         "max_participants",
+        "age",
     )
     date_hierarchy = "start_date"
     search_fields = ("name", "department__name")
     list_per_page = 20
     raw_id_fields = ("department",)
-    list_filter = ("department", "open_invite", "activitytype")
+    list_filter = ("union", "department", "open_invite", "activitytype")
     save_as = True
+
+    def start_end(self, obj):
+        return str(obj.start_date) + " - " + str(obj.end_date)
+
+    start_end.short_description = "Periode"
+
+    def age(self, obj):
+        return str(obj.min_age) + " - " + str(obj.max_age)
+
+    age.short_description = "Alder"
 
     # Only view activities on own department
     def get_queryset(self, request):
