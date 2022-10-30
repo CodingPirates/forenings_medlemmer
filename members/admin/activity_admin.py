@@ -16,7 +16,10 @@ class ActivityAdmin(admin.ModelAdmin):
     date_hierarchy = "start_date"
     search_fields = ("name", "department__name")
     list_per_page = 20
-    raw_id_fields = ("union", "department",)
+    raw_id_fields = (
+        "union",
+        "department",
+    )
     list_filter = ("union", "department", "open_invite", "activitytype")
     save_as = True
 

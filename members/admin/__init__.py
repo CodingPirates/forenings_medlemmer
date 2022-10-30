@@ -299,14 +299,14 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
-    #def choices(self, changelist):
+    # def choices(self, changelist):
     #    choices = list(super().choices(changelist))
     #    choices[0]['display'] = f'Alle akvititeter i {str(timezone.now().year)}'
     #    return choices
 
     def lookups(self, request, model_admin):
         activitys = [
-        #    ("none", "Intet filter"), 
+            #    ("none", "Intet filter"),
         ]
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
@@ -317,9 +317,9 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() is None:
-           # return queryset.filter(activity__start_date__year=timezone.now().year)
-           return queryset
-        #if self.value() == "none":
+            # return queryset.filter(activity__start_date__year=timezone.now().year)
+            return queryset
+        # if self.value() == "none":
         #    return queryset.exclude(activity__isnull = True)
         else:
             return queryset.filter(activity=self.value())
@@ -332,15 +332,15 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
-    #def choices(self, changelist):
+    # def choices(self, changelist):
     #    choices = list(super().choices(changelist))
-#        choices[0]['display'] = f'Alle akvititeter i {str(timezone.now().year)}'
+    #        choices[0]['display'] = f'Alle akvititeter i {str(timezone.now().year)}'
     #    choices[0]['display'] = 'Intet filter'
     #    return choices
 
     def lookups(self, request, model_admin):
         activitys = [
-            #("all", f'Alle aktiviteter i {str(timezone.now().year - 1)}')
+            # ("all", f'Alle aktiviteter i {str(timezone.now().year - 1)}')
         ]
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
@@ -352,12 +352,13 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
-            #return queryset.exclude(activity__isnull = True)
-        #elif self.value() == "all":
+            # return queryset.exclude(activity__isnull = True)
+        # elif self.value() == "all":
         #    return queryset
-            #return queryset.filter(activity__start_date__year=timezone.now().year-1)
+        # return queryset.filter(activity__start_date__year=timezone.now().year-1)
         else:
             return queryset.filter(activity=self.value())
+
 
 class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     title = "Lokalforening"
@@ -365,25 +366,30 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [(str(union.pk), str(union)) for union in Union.objects.all()]
-    
+
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
         else:
-            return queryset.filter(activity__union__pk = self.value())
+            return queryset.filter(activity__union__pk=self.value())
+
 
 class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     title = "Afdeling"
     parameter_name = "department"
 
     def lookups(self, request, model_admin):
-        return [(str(department.pk), str(department)) for department in Department.objects.all()]
-    
+        return [
+            (str(department.pk), str(department))
+            for department in Department.objects.all()
+        ]
+
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
         else:
             return queryset.filter(activity__department__pk=self.value())
+
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = [
@@ -408,33 +414,35 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         ActivityParticipantListLastYearFilter,
         ActivityParticipantListFilter,
         ParticipantPaymentListFilter,
-
     )
     list_display_links = (
-        "added_dtm", 
+        "added_dtm",
         "photo_permission",
         "note",
     )
     date_hierarchy = "activity__start_date"
-    raw_id_fields = ("activity", )
-    search_fields = ("member__person__name", "activity__name",)
+    raw_id_fields = ("activity",)
+    search_fields = (
+        "member__person__name",
+        "activity__name",
+    )
     actions = [
-        "export_csv_simple1", 
-        "export_csv_simple2", 
-        "export_csv_full1", 
-        "export_csv_full2", 
+        "export_csv_simple1",
+        "export_csv_simple2",
+        "export_csv_full1",
+        "export_csv_full2",
     ]
 
     def changelist_view(self, request, extra_context=None):
         if request.GET:
             return super().changelist_view(request, extra_context=extra_context)
         date = timezone.now().date()
-        #params = ['day', 'month', 'year']
-        params = ['year']
-        field_keys = ['{}__{}'.format(self.date_hierarchy, i) for i in params]
+        # params = ['day', 'month', 'year']
+        params = ["year"]
+        field_keys = ["{}__{}".format(self.date_hierarchy, i) for i in params]
         field_values = [getattr(date, i) for i in params]
         query_params = dict(zip(field_keys, field_values))
-        url = '{}?{}'.format(request.path, urllib.parse.urlencode(query_params))
+        url = "{}?{}".format(request.path, urllib.parse.urlencode(query_params))
         return redirect(url)
 
     def person_age_years(self, item):
@@ -451,25 +459,30 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return qs.filter(activity__department__adminuserinformation__user=request.user)
 
     def activity_person_gender(self, item):
-        if item.member.person.gender == 'MA':
+        if item.member.person.gender == "MA":
             return "Dreng"
-        elif item.member.person.gender == 'FM':
+        elif item.member.person.gender == "FM":
             return "Pige"
         else:
             return "andet"
+
     activity_person_gender.short_description = "Køn"
 
     def activity_person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.member.person_id])
         link = '<a href="%s">%s</a>' % (url, item.member.person.name)
         return mark_safe(link)
+
     activity_person_link.short_description = "Deltager"
     activity_person_link.admin_order_field = "member__person__name"
 
     def activity_family_email_link(self, item):
-        url = reverse("admin:members_family_change", args=[item.member.person.family_id])
+        url = reverse(
+            "admin:members_family_change", args=[item.member.person.family_id]
+        )
         link = '<a href="%s">%s</a>' % (url, item.member.person.family.email)
         return mark_safe(link)
+
     activity_family_email_link.short_description = "Familie"
     activity_family_email_link.admin_order_field = "member__person__family__email"
 
@@ -477,6 +490,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         url = reverse("admin:members_activity_change", args=[item.activity.id])
         link = '<a href="%s">%s</a>' % (url, item.activity.name)
         return mark_safe(link)
+
     activity_link.short_description = "Aktivitet"
     activity_link.admin_order_field = "activity__name"
 
@@ -484,13 +498,17 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         url = reverse("admin:members_union_change", args=[item.activity.union_id])
         link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
         return mark_safe(link)
+
     activity_union_link.short_description = "Forening"
     activity_union_link.admin_order_field = "activity__union__name"
 
     def activity_department_link(self, item):
-        url = reverse("admin:members_department_change", args=[item.activity.department_id])
+        url = reverse(
+            "admin:members_department_change", args=[item.activity.department_id]
+        )
         link = '<a href="%s">%s</a>' % (url, item.activity.department.name)
         return mark_safe(link)
+
     activity_department_link.short_description = "Afdeling"
     activity_department_link.admin_order_field = "activity__department__name"
 
@@ -499,17 +517,21 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             return item.payment_info(False)
         except:
             return "INGEN BETALINGSINFO"
+
     activity_payment_info_txt.short_description = "Betalingsinfo"
-    
+
     def activity_payment_info_html(self, item):
         try:
             return item.payment_info(True)
         except:
-            return format_html("<span style=\'color:red\'><b>INGEN BETALINGSINFO</b></span>")
+            return format_html(
+                "<span style='color:red'><b>INGEN BETALINGSINFO</b></span>"
+            )
+
     activity_payment_info_html.short_description = "Betalingsinfo"
 
     def export_csv_simple1(self, request, queryset):
-        result_string='"Navn", "Alder, "Køn"\n'
+        result_string = '"Navn", "Alder, "Køn"\n'
         gender = "andet"
         today = timezone.now().date()
         for p in queryset:
@@ -520,22 +542,31 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             else:
                 gender = p.member.person.gender
             birthday = p.member.person.birthday
-            age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+            age = (
+                today.year
+                - birthday.year
+                - ((today.month, today.day) < (birthday.month, birthday.day))
+            )
 
             result_string = (
                 result_string
                 + p.member.person.name
-                + ";" + str(age)
-                + ";" + gender
+                + ";"
+                + str(age)
+                + ";"
+                + gender
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
+
     export_csv_simple1.short_description = "CSV Export (Navn; Alder; Køn)"
 
     def export_csv_simple2(self, request, queryset):
-        result_string='"Navn", "Alder, "Køn"; "forældre navn"; "forældre email"; "forældre tlf"\n'
+        result_string = (
+            '"Navn", "Alder, "Køn"; "forældre navn"; "forældre email"; "forældre tlf"\n'
+        )
         gender = "andet"
         today = timezone.now().date()
         for p in queryset:
@@ -546,7 +577,11 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             else:
                 gender = p.member.person.gender
             birthday = p.member.person.birthday
-            age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+            age = (
+                today.year
+                - birthday.year
+                - ((today.month, today.day) < (birthday.month, birthday.day))
+            )
 
             parent = p.member.person.family.get_first_parent()
             if parent:
@@ -564,21 +599,28 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             result_string = (
                 result_string
                 + p.member.person.name
-                + ";" + str(age)
-                + ";" + gender
-                + ";" + parent_name
-                + ";" + parent_email
-                + ";" + parent_phone
+                + ";"
+                + str(age)
+                + ";"
+                + gender
+                + ";"
+                + parent_name
+                + ";"
+                + parent_email
+                + ";"
+                + parent_phone
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
-    export_csv_simple2.short_description = "CSV Export (Navn; Alder; Køn; forældre-navn; forældre-email; forældre-telefon)"
+    export_csv_simple2.short_description = (
+        "CSV Export (Navn; Alder; Køn; forældre-navn; forældre-email; forældre-telefon)"
+    )
 
     def export_csv_full1(self, request, queryset):
-        result_string='"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Betalingsinfo"\n'
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Betalingsinfo"\n'
         gender = "andet"
         today = timezone.now().date()
         for p in queryset:
@@ -589,27 +631,39 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             else:
                 gender = p.member.person.gender
             birthday = p.member.person.birthday
-            age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+            age = (
+                today.year
+                - birthday.year
+                - ((today.month, today.day) < (birthday.month, birthday.day))
+            )
 
             result_string = (
                 result_string
                 + p.activity.union.name
-                + ";" + p.activity.department.name
-                + ";" + p.activity.name
-                + ";" + p.member.person.name
-                + ";" + str(age)
-                + ";" + gender
-                + ";" + self.activity_payment_info_txt(p)
+                + ";"
+                + p.activity.department.name
+                + ";"
+                + p.activity.name
+                + ";"
+                + p.member.person.name
+                + ";"
+                + str(age)
+                + ";"
+                + gender
+                + ";"
+                + self.activity_payment_info_txt(p)
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
-    export_csv_full1.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Betalingsinfo)"
+    export_csv_full1.short_description = (
+        "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Betalingsinfo)"
+    )
 
     def export_csv_full2(self, request, queryset):
-        result_string='"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"\n'
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"\n'
         gender = "andet"
         today = timezone.now().date()
         for p in queryset:
@@ -620,7 +674,11 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             else:
                 gender = p.member.person.gender
             birthday = p.member.person.birthday
-            age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
+            age = (
+                today.year
+                - birthday.year
+                - ((today.month, today.day) < (birthday.month, birthday.day))
+            )
 
             parent = p.member.person.family.get_first_parent()
             if parent:
@@ -638,15 +696,24 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             result_string = (
                 result_string
                 + p.activity.union.name
-                + ";" + p.activity.department.name
-                + ";" + p.activity.name
-                + ";" + p.member.person.name
-                + ";" + str(age)
-                + ";" + gender
-                + ";" + self.activity_payment_info_txt(p)
-                + ";" + parent_name
-                + ";" + parent_email
-                + ";" + parent_phone
+                + ";"
+                + p.activity.department.name
+                + ";"
+                + p.activity.name
+                + ";"
+                + p.member.person.name
+                + ";"
+                + str(age)
+                + ";"
+                + gender
+                + ";"
+                + self.activity_payment_info_txt(p)
+                + ";"
+                + parent_name
+                + ";"
+                + parent_email
+                + ";"
+                + parent_phone
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
@@ -654,6 +721,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return response
 
     export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon)"
+
 
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
 
@@ -788,4 +856,3 @@ class EquipmentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Equipment, EquipmentAdmin)
-
