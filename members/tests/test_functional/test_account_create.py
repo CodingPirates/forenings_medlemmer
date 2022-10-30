@@ -79,7 +79,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
             self.fail("Autocomplete not working")
 
         self.assertEqual(
-            "C/O Coworking Plus, Kochsgade 31D, 5000 Odense C",
+            "Kochsgade 31D, 5000 Odense C",
             field.get_attribute("value"),
         )
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
