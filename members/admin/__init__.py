@@ -360,7 +360,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         elif item.member.person.gender == "FE":
             return "Pige"
         else:
-            return "andet"
+            return "Andet"
     
     person_gender.short_description = "Køn"
 
