@@ -16,8 +16,12 @@ class ActivityParticipant(models.Model):
         unique_together = ("activity", "member")
 
     added_dtm = models.DateField("Tilmeldt", default=timezone.now)
-    activity = models.ForeignKey("Activity", on_delete=models.PROTECT)
-    member = models.ForeignKey("Member", on_delete=models.CASCADE)
+    activity = models.ForeignKey(
+        "Activity", on_delete=models.PROTECT, verbose_name="Aktivitet"
+    )
+    member = models.ForeignKey(
+        "Member", on_delete=models.CASCADE, verbose_name="Medlem"
+    )
     note = models.TextField("Besked / Note til arrangement", blank=True)
     PHOTO_OK = "OK"
     PHOTO_NOTOK = "NO"
