@@ -5,6 +5,7 @@ staticfiles
 test-results
 .coverage
 .sass-cache/
+.vscode/
 public_data.zip
 test-screens
 /node_modules
