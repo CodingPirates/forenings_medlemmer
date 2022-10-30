@@ -27,10 +27,11 @@ def ActivitySignup(request, activity_id, person_id=None):
     if request.resolver_match.url_name == "activity_view_person":
         view_only_mode = True
 
+    family = None
     if request.user and not request.user.is_anonymous:
-        family = user_to_person(request.user).family
-    else:
-        family = None
+        person = user_to_person(request.user)
+        if person:
+            family = user_to_person(request.user).family
 
     family_participants = [] # participants from current family
     if family:
