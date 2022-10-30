@@ -1,4 +1,3 @@
-from logging import exception
 from uuid import uuid4
 from django import forms
 from django.contrib import admin
@@ -8,10 +7,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
-# from django.contrib.auth.admin import UserAdmin
 from django.db.models.functions import Lower
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -37,7 +34,6 @@ from members.models import (
     EquipmentLoan,
     EmailTemplate,
 )
-import urllib
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
