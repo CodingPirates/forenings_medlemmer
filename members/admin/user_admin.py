@@ -18,7 +18,15 @@ class PersonInline(admin.StackedInline):
 class UserAdmin(UserAdmin):
     inlines = (AdminUserInformationInline, PersonInline)
 
-    list_display = ("username", "email", "first_name", "last_name", "is_staff", "is_active", "last_login")
+    list_display = (
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "is_active",
+        "last_login",
+    )
 
     def get_queryset(self, request):
         qs = super(UserAdmin, self).get_queryset(request)
@@ -35,4 +43,3 @@ class UserAdmin(UserAdmin):
             return ["is_staff", "is_active"]
 
     # Note 20221030 by MHewel: get_list_filter could also return "groups__id", but this is id of group. Disabled for now, have to find a way to show group name
-

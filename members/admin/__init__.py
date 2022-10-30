@@ -544,9 +544,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     def activity_payment_info_html(self, item):
         if item.activity.price_in_dkk == 0.00:
-            return format_html(
-                    "<span style='color:green'><b>Gratis</b></span>"
-                ) 
+            return format_html("<span style='color:green'><b>Gratis</b></span>")
         else:
             try:
                 return item.payment_info(True)
