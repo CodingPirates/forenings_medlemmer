@@ -11,3 +11,4 @@ test-screens
 /node_modules
 members.db
 *.bak
+.vs/
