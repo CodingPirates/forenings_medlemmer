@@ -364,7 +364,7 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     parameter_name = "union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union)) for union in Union.objects.all()]
+        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -430,24 +430,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "member__person__name",
         "activity__name",
     )
+
     actions = [
         #        "export_csv_simple1",
         #        "export_csv_simple2",
         #        "export_csv_full1",
         "export_csv_full2",
     ]
-
-    def changelist_view(self, request, extra_context=None):
-        if request.GET:
-            return super().changelist_view(request, extra_context=extra_context)
-        date = timezone.now().date()
-        # params = ['day', 'month', 'year']
-        params = ["year"]
-        field_keys = ["{}__{}".format(self.date_hierarchy, i) for i in params]
-        field_values = [getattr(date, i) for i in params]
-        query_params = dict(zip(field_keys, field_values))
-        url = "{}?{}".format(request.path, urllib.parse.urlencode(query_params))
-        return redirect(url)
 
     def person_age_years(self, item):
         return item.member.person.age_years()

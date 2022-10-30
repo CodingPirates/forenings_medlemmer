@@ -12,6 +12,7 @@ class Union(models.Model):
         ordering = ["name"]
 
     name = models.CharField("Foreningens navn", max_length=200)
+
     chairman = models.ForeignKey(
         "Person",
         on_delete=models.PROTECT,
@@ -80,7 +81,8 @@ class Union(models.Model):
     )
 
     def __str__(self):
-        return "Foreningen for " + self.name
+        # return "Foreningen for " + self.name
+        return self.name
 
     def clean(self):
         if self.bank_main_org is False and not self.bank_account:

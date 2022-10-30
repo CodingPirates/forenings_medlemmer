@@ -41,8 +41,7 @@ class ActivityParticipant(models.Model):
     )
 
     def __str__(self):
-        return self.member.__str__()
-        # + ", " + self.activity.name
+        return self.member.__str__() + ", " + self.activity.name
         # No reason to show an activity here - looks like it's the first activity for the given user
 
     def paid(self):
