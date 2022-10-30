@@ -428,9 +428,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity__name",
     )
     actions = [
-#        "export_csv_simple1",
-#        "export_csv_simple2",
-#        "export_csv_full1",
+        #        "export_csv_simple1",
+        #        "export_csv_simple2",
+        #        "export_csv_full1",
         "export_csv_full2",
     ]
 
