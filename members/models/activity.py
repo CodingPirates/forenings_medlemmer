@@ -70,8 +70,10 @@ class Activity(models.Model):
     is_historic.short_description = "Historisk?"
 
     def __str__(self):
-        return self.department.name
-        # + ", " + self.name
+        return self.department.name + ", " + self.name
+
+    def filterinfo(self):
+        return self.department.name + ": " + self.name
 
     def is_season(self):
         return (self.end_date - self.start_date).days > 30

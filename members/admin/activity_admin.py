@@ -33,7 +33,7 @@ class ActivityAdmin(admin.ModelAdmin):
         "union",
         "department",
     )
-    list_filter = ("union", "department", "open_invite", "activitytype")
+    list_filter = ("union__name", "department", "open_invite", "activitytype")
     save_as = True
     inlines = [ActivityParticipantInline]
 

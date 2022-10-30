@@ -7,10 +7,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
-# from django.contrib.auth.admin import UserAdmin
 from django.db.models.functions import Lower
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -36,7 +34,6 @@ from members.models import (
     EquipmentLoan,
     EmailTemplate,
 )
-import urllib
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
@@ -363,7 +360,7 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     parameter_name = "union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union)) for union in Union.objects.all()]
+        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -429,24 +426,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "member__person__name",
         "activity__name",
     )
+
     actions = [
         #        "export_csv_simple1",
         #        "export_csv_simple2",
         #        "export_csv_full1",
         "export_csv_full2",
     ]
-
-    def changelist_view(self, request, extra_context=None):
-        if request.GET:
-            return super().changelist_view(request, extra_context=extra_context)
-        date = timezone.now().date()
-        # params = ['day', 'month', 'year']
-        params = ["year"]
-        field_keys = ["{}__{}".format(self.date_hierarchy, i) for i in params]
-        field_values = [getattr(date, i) for i in params]
-        query_params = dict(zip(field_keys, field_values))
-        url = "{}?{}".format(request.path, urllib.parse.urlencode(query_params))
-        return redirect(url)
 
     def person_age_years(self, item):
         return item.member.person.age_years()
@@ -531,20 +517,26 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_department_link.admin_order_field = "activity__department__name"
 
     def activity_payment_info_txt(self, item):
-        try:
-            return item.payment_info(False)
-        except Exception:
-            return "INGEN BETALINGSINFO"
+        if item.activity.price_in_dkk == 0.00:
+            return "Gratis"
+        else:
+            try:
+                return item.payment_info(False)
+            except Exception:
+                return "Andet er aftalt"
 
     activity_payment_info_txt.short_description = "Betalingsinfo"
 
     def activity_payment_info_html(self, item):
-        try:
-            return item.payment_info(True)
-        except Exception:
-            return format_html(
-                "<span style='color:red'><b>INGEN BETALINGSINFO</b></span>"
-            )
+        if item.activity.price_in_dkk == 0.00:
+            return format_html("<span style='color:green'><b>Gratis</b></span>")
+        else:
+            try:
+                return item.payment_info(True)
+            except Exception:
+                return format_html(
+                    "<span style='color:red'><b>Andet er aftalt</b></span>"
+                )
 
     activity_payment_info_html.short_description = "Betalingsinfo"
 

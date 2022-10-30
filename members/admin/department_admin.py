@@ -8,7 +8,7 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
     parameter_name = "Union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union)) for union in Union.objects.all()]
+        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
 
     def queryset(self, request, queryset):
         return queryset if self.value() is None else queryset.filter(union=self.value())
