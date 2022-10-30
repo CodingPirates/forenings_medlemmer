@@ -52,6 +52,7 @@ class ActivityParticipant(models.Model):
         )
 
     def payment_info(self, format_as_html: bool):
+        ymdhm = "%Y-%m-%d %H:%M"
         payment = members.models.payment.Payment.objects.get(activityparticipant=self)
         if format_as_html:
             html_error_pre = "<span style='color:red'><b>"
@@ -66,28 +67,28 @@ class ActivityParticipant(models.Model):
 
         result_string = "asdf"
         if payment.refunded_dtm is not None:
-            result_string = f'{html_warn_pre}Refunderet{html_post}:{payment.refunded_dtm.strftime("%Y-%m-%d %H-%M")}. '
+            result_string = f'{html_warn_pre}Refunderet{html_post}:{payment.refunded_dtm.strftime(ymdhm)}. '
             if payment.confirmed_dtm is not None:
                 result_string += (
-                    f'Betalt:{payment.confirmed_dtm.strftime("%Y-%m-%d %H-%M")}. '
+                    f'Betalt:{payment.confirmed_dtm.strftime(ymdhm)}. '
                 )
             else:
                 result_string += (
-                    f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+                    f'(Oprettet:{payment.added.strftime(ymdhm)})'
                 )
 
         elif payment.rejected_dtm is not None:
-            result_string = f'{html_error_pre}Afvist:{html_post}{payment.rejected_dtm.strftime("%Y-%m-%d %H-%M")}. '
-            result_string += f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+            result_string = f'{html_error_pre}Afvist:{html_post}{payment.rejected_dtm.strftime(ymdhm)}. '
+            result_string += f'(Oprettet:{payment.added.strftime(ymdhm)})'
         elif payment.cancelled_dtm is not None:
-            result_string = f'{html_error_pre}Cancelled:{html_post}{payment.cancelled_dtm.strftime("%Y-%m-%d %H-%M")}. '
-            result_string += f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+            result_string = f'{html_error_pre}Cancelled:{html_post}{payment.cancelled_dtm.strftime(ymdhm)}. '
+            result_string += f'(Oprettet:{payment.added.strftime(ymdhm)})'
         else:
             if payment.confirmed_dtm is not None:
-                result_string = f'{html_good_pre}Betalt:{html_post}{payment.confirmed_dtm.strftime("%Y-%m-%d %H-%M")}. '
+                result_string = f'{html_good_pre}Betalt:{html_post}{payment.confirmed_dtm.strftime(ymdhm)}. '
             else:
                 result_string = f"{html_error_pre}IKKE BETALT.{html_post} "
-            result_string += f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+            result_string += f'(Oprettet:{payment.added.strftime(ymdhm)})'
 
         if format_as_html:
             return format_html(result_string)
