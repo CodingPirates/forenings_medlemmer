@@ -885,8 +885,6 @@ class AdminUserInformationInline(admin.StackedInline):
 class CustomUserAdmin(UserAdmin):
     inlines = [AdminUserInformationInline, PersonInline]
 
-    readonly_fields = ["date_joined", "last_login", "username"]
-
     def get_fieldsets(self, request, obj=None):
         fieldsets = super(UserAdmin, self).get_fieldsets(request, obj)
         if not obj:
