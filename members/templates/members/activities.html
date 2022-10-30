@@ -113,9 +113,13 @@
                                 {% endif %}
                                 {% for child in children %}
                                     {% if activity.open_invite %}
-                                        <a class="button-success" href="{% url 'activity_signup' activity.id child.person.id %}">
-                                            Tilmeld {{ child.person.firstname }}
-                                        </a>
+                                        {% if activity.id in child.participating_activities %}
+                                            <div class="center">{{ child.person.firstname }} er tilmeldt</div>
+                                        {% else %}
+                                            <a class="button-success" href="{% url 'activity_signup' activity.id child.person.id %}">
+                                                Tilmeld {{ child.person.firstname }}
+                                            </a>
+                                        {% endif %}
                                     {% else %}
                                         {% if activity.department in child.departments_is_waiting %}
                                             <div class="center">{{ child.person.firstname }} er opskrevet</div>
