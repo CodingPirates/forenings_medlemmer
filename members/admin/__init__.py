@@ -5,6 +5,9 @@ from django.db import models
 from django.db.models import Q
 
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+# from django.contrib.auth.admin import UserAdmin
 from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -13,6 +16,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.forms import Textarea
+from copy import deepcopy
 
 from members.models import (
     Address,
@@ -85,8 +89,9 @@ class PersonInline(admin.TabularInline):
     admin_link.short_description = "Navn"
 
     model = Person
-    fields = ("admin_link", "membertype", "zipcode", "added", "notes")
+    fields = ("admin_link", "membertype", "zipcode", "added", "notes", "email")
     readonly_fields = fields
+    can_delete = False
     extra = 0
 
 
@@ -262,9 +267,9 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
             )
 
 
-class ActivityParticipantListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
-    title = "Efter aktivitet (før år " + str(timezone.now().year - 1) + ")"
+class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
+    # Title shown in filter view. \u2264 : ≤ (mindre end eller lig med)
+    title = "Efter aktivitet (\u2264 år " + str(timezone.now().year - 2) + ")"
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
@@ -286,8 +291,8 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
-    # Title shown in filter view
-    title = "Efter aktivitet (år " + str(timezone.now().year) + ")"
+    # Title shown in filter view. \u2265 : ≥ (større end eller lig med)
+    title = "Efter aktivitet (\u2265 år " + str(timezone.now().year) + ")"
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
@@ -303,7 +308,7 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
         ]
         for act in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
-            start_date__year=timezone.now().year,
+            start_date__year__gte=timezone.now().year,
         ).order_by("department__name", "-start_date"):
             activitys.append((str(act.pk), str(act)))
         return activitys
@@ -320,7 +325,7 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
 
 class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     # Title shown in filter view
-    title = "Efter aktivitet (år " + str(timezone.now().year - 1) + ")"
+    title = "Efter aktivitet (= år " + str(timezone.now().year - 1) + ")"
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
@@ -406,9 +411,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         ActivityParticipantDepartmentFilter,
         ActivityParticipantListCurrentYearFilter,
         ActivityParticipantListLastYearFilter,
-        ActivityParticipantListFilter,
+        ActivityParticipantListOldYearsFilter,
         ParticipantPaymentListFilter,
     )
+    # list_display_links = ("member",)
+    # raw_id_fields = ("activity", "member")
+    # search_fields = ("member__person__name",)
+    # Member.short_description = "Navn"
     list_display_links = (
         "added_dtm",
         "photo_permission",
@@ -778,6 +787,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     )
     list_filter = (ActivivtyInviteActivityListFilter,)
     search_fields = ("person__name",)
+
     list_display_links = None
     form = ActivityInviteAdminForm
 
@@ -860,10 +870,47 @@ class EquipmentAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
-# class AdminUserInformationAdmin(admin.ModelAdmin):
-#    raw_id_fields = ("person",)
-
-# admin.site.register(AdminUserInformation, AdminUserInformationAdmin)
-
-
 admin.site.register(Equipment, EquipmentAdmin)
+
+User = get_user_model()
+admin.site.unregister(User)
+
+
+class AdminUserInformationInline(admin.StackedInline):
+    model = AdminUserInformation
+    filter_horizontal = ("departments", "unions")
+    can_delete = False
+
+
+class CustomUserAdmin(UserAdmin):
+    inlines = [AdminUserInformationInline, PersonInline]
+
+    readonly_fields = ["date_joined", "last_login", "username"]
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super(UserAdmin, self).get_fieldsets(request, obj)
+        if not obj:
+            return fieldsets
+
+        if not request.user.is_superuser:  # or request.user.pk == obj.pk:  #
+            fieldsets = deepcopy(fieldsets)
+            for fieldset in fieldsets:
+                if "is_superuser" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("is_superuser")
+                        # break
+                if "user_permissions" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("user_permissions")
+                        # break
+                if "username" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("username")
+                        # break
+        return fieldsets
+
+
+admin.site.register(User, CustomUserAdmin)
