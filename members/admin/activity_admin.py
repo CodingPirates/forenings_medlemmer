@@ -20,7 +20,7 @@ class ActivityAdmin(admin.ModelAdmin):
         "union",
         "department",
         "activitytype",
-        "startend",
+        "start_end",
         "open_invite",
         "price_in_dkk",
         "max_participants",
@@ -38,6 +38,16 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.start_date) + " - " + str(obj.end_date)
 
     startend.short_description = "Periode"
+
+    def age(self, obj):
+        return str(obj.min_age) + " - " + str(obj.max_age)
+
+    age.short_description = "Alder"
+
+    def start_end(self, obj):
+        return str(obj.start_date) + " - " + str(obj.end_date)
+
+    start_end.short_description = "Periode"
 
     def age(self, obj):
         return str(obj.min_age) + " - " + str(obj.max_age)

@@ -69,7 +69,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         # Use addresse Autocomplete
         field = self.browser.find_element_by_name("search_address")
         field.click()
-        field.send_keys("Sverigesgade 20, 5000")
+        field.send_keys("Kochsgade 31D, 5000")
         try:
             address = WebDriverWait(self.browser, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))

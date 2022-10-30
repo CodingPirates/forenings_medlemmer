@@ -363,8 +363,10 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     def person_gender(self, item):
         if item.member.person.gender == "MA":
             return "Dreng"
-        else:
+        elif item.member.person.gender == "FE":
             return "Pige"
+        else:
+            return "Andet"
 
     person_gender.short_description = "Køn"
 
