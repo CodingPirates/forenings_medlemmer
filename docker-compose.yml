@@ -43,6 +43,19 @@ services:
     ports:
       - "5432${DB_PORT}"
 
+  pgadmin:
+    image: dpage/pgadmin4
+    networks:
+      - webnet
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - ${PWD}/pgadmin4/servers.json:/pgadmin4/servers.json
+
   selenium:
     image: selenium/standalone-chrome
     networks:

@@ -11,7 +11,9 @@ class WaitingList(models.Model):
         ordering = ["on_waiting_list_since"]
 
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
+    department = models.ForeignKey(
+        "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
+    )
     on_waiting_list_since = models.DateTimeField(
         "Venteliste position", blank=False, null=False
     )
