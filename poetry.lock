@@ -1,10 +1,13 @@
 [[package]]
 name = "aniso8601"
-version = "7.0.0"
+version = "9.0.1"
 description = "A library for parsing ISO 8601 strings."
 category = "main"
 optional = false
 python-versions = "*"
+
+[package.extras]
+dev = ["black", "coverage", "isort", "pre-commit", "pyenchant", "pylint"]
 
 [[package]]
 name = "asgiref"
@@ -175,17 +178,6 @@ beautifulsoup4 = ">=4.8.0"
 Django = ">=2.2"
 
 [[package]]
-name = "django-common-helpers"
-version = "0.9.2"
-description = "Common things every Django app needs!"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-Django = ">=1.8.0"
-
-[[package]]
 name = "django-cors-headers"
 version = "3.5.0"
 description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
@@ -206,15 +198,14 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "django-cron"
-version = "0.5.1"
+version = "0.6.0"
 description = "Running python crons in a Django project"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-Django = ">=1.8.0"
-django-common-helpers = ">=0.6.4"
+Django = ">=3.2"
 
 [[package]]
 name = "django-extensions"
@@ -294,74 +285,60 @@ python-dateutil = ">=2.7"
 
 [[package]]
 name = "graphene"
-version = "2.1.9"
+version = "3.1.1"
 description = "GraphQL Framework for Python"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-aniso8601 = ">=3,<=7"
-graphql-core = ">=2.1,<3"
-graphql-relay = ">=2,<3"
-six = ">=1.10.0,<2"
+aniso8601 = ">=8,<10"
+graphql-core = ">=3.1,<3.3"
+graphql-relay = ">=3.1,<3.3"
 
 [package.extras]
-django = ["graphene-django"]
-sqlalchemy = ["graphene-sqlalchemy"]
-test = ["coveralls", "fastdiff (==0.2.0)", "iso8601", "mock", "promise", "pytest", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytz", "six", "snapshottest"]
+dev = ["black (==22.3.0)", "coveralls (>=3.3,<4)", "flake8 (>=4,<5)", "iso8601 (>=1,<2)", "mock (>=4,<5)", "promise (>=2.3,<3)", "pytest (>=6,<7)", "pytest-asyncio (>=0.16,<2)", "pytest-benchmark (>=3.4,<4)", "pytest-cov (>=3,<4)", "pytest-mock (>=3,<4)", "pytz (==2022.1)", "snapshottest (>=0.6,<1)"]
+test = ["coveralls (>=3.3,<4)", "iso8601 (>=1,<2)", "mock (>=4,<5)", "promise (>=2.3,<3)", "pytest (>=6,<7)", "pytest-asyncio (>=0.16,<2)", "pytest-benchmark (>=3.4,<4)", "pytest-cov (>=3,<4)", "pytest-mock (>=3,<4)", "pytz (==2022.1)", "snapshottest (>=0.6,<1)"]
 
 [[package]]
 name = "graphene-django"
-version = "2.13.0"
+version = "3.0.0"
 description = "Graphene Django integration"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-Django = ">=1.11"
-graphene = ">=2.1.7,<3"
-graphql-core = ">=2.1.0,<3"
+Django = ">=3.2"
+graphene = ">=3.0,<4"
+graphql-core = ">=3.1.0,<4"
+graphql-relay = ">=3.1.1,<4"
 promise = ">=2.1"
-singledispatch = ">=3.4.0.3"
-six = ">=1.10.0"
-unidecode = ">=1.1.1,<2"
+text-unidecode = "*"
 
 [package.extras]
-dev = ["black (==19.10b0)", "coveralls", "django-filter (<2)", "django-filter (>=2)", "djangorestframework (>=3.6.3)", "flake8 (==3.7.9)", "flake8-black (==0.1.1)", "flake8-bugbear (==20.1.4)", "mock", "pytest (>=3.6.3)", "pytest-cov", "pytest-django (>=3.3.2)", "pytz"]
+dev = ["black (==22.8.0)", "coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", "flake8 (==5.0.4)", "flake8-black (==0.3.3)", "flake8-bugbear (==22.9.11)", "mock", "pytest (>=7.1.3)", "pytest-cov", "pytest-django (>=4.5.2)", "pytest-random-order", "pytz"]
 rest-framework = ["djangorestframework (>=3.6.3)"]
-test = ["coveralls", "django-filter (<2)", "django-filter (>=2)", "djangorestframework (>=3.6.3)", "mock", "pytest (>=3.6.3)", "pytest-cov", "pytest-django (>=3.3.2)", "pytz"]
+test = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", "mock", "pytest (>=7.1.3)", "pytest-cov", "pytest-django (>=4.5.2)", "pytest-random-order", "pytz"]
 
 [[package]]
 name = "graphql-core"
-version = "2.3.2"
-description = "GraphQL implementation for Python"
+version = "3.2.3"
+description = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
 category = "main"
 optional = false
-python-versions = "*"
-
-[package.dependencies]
-promise = ">=2.3,<3"
-rx = ">=1.6,<2"
-six = ">=1.10.0"
-
-[package.extras]
-gevent = ["gevent (>=1.1)"]
-test = ["coveralls (==1.11.1)", "cython (==0.29.17)", "gevent (==1.5.0)", "pyannotate (==1.2.0)", "pytest (==4.6.10)", "pytest-benchmark (==3.2.3)", "pytest-cov (==2.8.1)", "pytest-django (==3.9.0)", "pytest-mock (==2.0.0)", "six (==1.14.0)"]
+python-versions = ">=3.6,<4"
 
 [[package]]
 name = "graphql-relay"
-version = "2.0.1"
-description = "Relay implementation for Python"
+version = "3.2.0"
+description = "Relay library for graphql-core"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6,<4"
 
 [package.dependencies]
-graphql-core = ">=2.2,<3"
-promise = ">=2.2,<3"
-six = ">=1.12"
+graphql-core = ">=3.2,<3.3"
 
 [[package]]
 name = "gunicorn"
@@ -564,14 +541,6 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
-name = "rx"
-version = "1.6.1"
-description = "Reactive Extensions (Rx) for Python"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "selenium"
 version = "3.141.0"
 description = "Python bindings for Selenium"
@@ -624,21 +593,6 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
-name = "singledispatch"
-version = "3.7.0"
-description = "Backport functools.singledispatch from Python 3.4 to Python 2.6-3.3."
-category = "main"
-optional = false
-python-versions = ">=2.6"
-
-[package.dependencies]
-six = "*"
-
-[package.extras]
-docs = ["jaraco.packaging (>=8.2)", "rst.linker (>=1.9)", "sphinx"]
-testing = ["pytest (>=4.6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-flake8", "unittest2"]
-
-[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -661,6 +615,14 @@ description = "A non-validating SQL parser."
 category = "main"
 optional = false
 python-versions = ">=3.5"
+
+[[package]]
+name = "text-unidecode"
+version = "1.3"
+description = "The most basic Text::Unidecode port"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "tomli"
@@ -690,14 +652,6 @@ optional = false
 python-versions = ">=2"
 
 [[package]]
-name = "unidecode"
-version = "1.3.6"
-description = "ASCII transliterations of Unicode text"
-category = "main"
-optional = false
-python-versions = ">=3.5"
-
-[[package]]
 name = "urllib3"
 version = "1.26.12"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -724,12 +678,12 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10.0"
-content-hash = "3ed3b65ec7c0668dd84f89f58e720a1f4604af7ce608c7240f5568605a55241a"
+content-hash = "155bb8e3f1a504c3fa74e405155857faae7162e52945773f151692f72a1c094c"
 
 [metadata.files]
 aniso8601 = [
-    {file = "aniso8601-7.0.0-py2.py3-none-any.whl", hash = "sha256:d10a4bf949f619f719b227ef5386e31f49a2b6d453004b21f02661ccc8670c7b"},
-    {file = "aniso8601-7.0.0.tar.gz", hash = "sha256:513d2b6637b7853806ae79ffaca6f3e8754bdd547048f5ccc1420aec4b714f1e"},
+    {file = "aniso8601-9.0.1-py2.py3-none-any.whl", hash = "sha256:1d2b7ef82963909e93c4f24ce48d4de9e66009a21bf1c1e1c85bdd0812fe412f"},
+    {file = "aniso8601-9.0.1.tar.gz", hash = "sha256:72e3117667eedf66951bb2d93f4296a56b94b078a8a95905a052611fb3f1b973"},
 ]
 asgiref = [
     {file = "asgiref-3.5.2-py3-none-any.whl", hash = "sha256:1d2880b792ae8757289136f1db2b7b99100ce959b2aa57fd69dab783d05afac4"},
@@ -854,9 +808,6 @@ django-bootstrap5 = [
     {file = "django-bootstrap5-2.1.2.tar.gz", hash = "sha256:ac05ca69b990e62657c0bf40db14946c22fd64c7fb9dfe094a9f22ecc58f86c5"},
     {file = "django_bootstrap5-2.1.2-py3-none-any.whl", hash = "sha256:0021355df9212c511876e3f5336ba470416a6dd52f61bf5acec5bb783ab41ff5"},
 ]
-django-common-helpers = [
-    {file = "django-common-helpers-0.9.2.tar.gz", hash = "sha256:2d56be6fa261d829a6a224f189bf276267b9082a17d613fe5f015dd4d65c17b4"},
-]
 django-cors-headers = [
     {file = "django-cors-headers-3.5.0.tar.gz", hash = "sha256:db82b2840f667d47872ae3e4a4e0a0d72fbecb42779b8aa233fa8bb965f7836a"},
     {file = "django_cors_headers-3.5.0-py3-none-any.whl", hash = "sha256:9322255c296d5f75089571f29e520c83ff9693df17aa3cf9f6a4bea7c6740169"},
@@ -866,7 +817,8 @@ django-crispy-forms = [
     {file = "django_crispy_forms-1.9.2-py3-none-any.whl", hash = "sha256:888bb316db89b60050a42ec35080facb361d823eec38010ccb0702f45642d3b8"},
 ]
 django-cron = [
-    {file = "django-cron-0.5.1.tar.gz", hash = "sha256:08d22708c8b2ecab8cda989019a66c7e1e2424c59d822796fd45abf7731d261d"},
+    {file = "django-cron-0.6.0.tar.gz", hash = "sha256:dc3c0d3433a2e4e7012f77f6d8415ad90367ba068649db2674325bc36f935841"},
+    {file = "django_cron-0.6.0-py3-none-any.whl", hash = "sha256:016203554748512b7f19d7363b4fde8741c6ff63fe8a15051f3031f4a0506a41"},
 ]
 django-extensions = [
     {file = "django-extensions-3.0.5.tar.gz", hash = "sha256:6306175ae8c78c18ea7aff794f5fa3a47de7d128666e6668bd40596895da7f84"},
@@ -892,20 +844,20 @@ freezegun = [
     {file = "freezegun-1.0.0.tar.gz", hash = "sha256:1cf08e441f913ff5e59b19cc065a8faa9dd1ddc442eaf0375294f344581a0643"},
 ]
 graphene = [
-    {file = "graphene-2.1.9-py2.py3-none-any.whl", hash = "sha256:3d446eb1237c551052bc31155cf1a3a607053e4f58c9172b83a1b597beaa0868"},
-    {file = "graphene-2.1.9.tar.gz", hash = "sha256:b9f2850e064eebfee9a3ef4a1f8aa0742848d97652173ab44c82cc8a62b9ed93"},
+    {file = "graphene-3.1.1-py2.py3-none-any.whl", hash = "sha256:1c0d43560a86536b7816bb05e3685beebf140118e091a9c445cd10f55acb20fd"},
+    {file = "graphene-3.1.1.tar.gz", hash = "sha256:ff251dbc39a6409106c41de444358d93b2c5588d161dce2245bea7d74b445c86"},
 ]
 graphene-django = [
-    {file = "graphene-django-2.13.0.tar.gz", hash = "sha256:8a4efc7bf954ba0b5a28d3cdb090b36941aca6b83d211e3cd3ab29cf53ac6154"},
-    {file = "graphene_django-2.13.0-py2.py3-none-any.whl", hash = "sha256:0e33cdec0774284175c387c2af1e0ef4eb0f4e10a56a3a1b2d39bc3a74d9a538"},
+    {file = "graphene-django-3.0.0.tar.gz", hash = "sha256:018a8dc4736d99b5bb4a15d7fd0b46c98010e9201cb52a290f6d1f16ae6fefda"},
+    {file = "graphene_django-3.0.0-py2.py3-none-any.whl", hash = "sha256:9fa531d319d5c8f9e08274628f547574ee684e74dddd1c969abf38142bc32df2"},
 ]
 graphql-core = [
-    {file = "graphql-core-2.3.2.tar.gz", hash = "sha256:aac46a9ac524c9855910c14c48fc5d60474def7f99fd10245e76608eba7af746"},
-    {file = "graphql_core-2.3.2-py2.py3-none-any.whl", hash = "sha256:44c9bac4514e5e30c5a595fac8e3c76c1975cae14db215e8174c7fe995825bad"},
+    {file = "graphql-core-3.2.3.tar.gz", hash = "sha256:06d2aad0ac723e35b1cb47885d3e5c45e956a53bc1b209a9fc5369007fe46676"},
+    {file = "graphql_core-3.2.3-py3-none-any.whl", hash = "sha256:5766780452bd5ec8ba133f8bf287dc92713e3868ddd83aee4faab9fc3e303dc3"},
 ]
 graphql-relay = [
-    {file = "graphql-relay-2.0.1.tar.gz", hash = "sha256:870b6b5304123a38a0b215a79eace021acce5a466bf40cd39fa18cb8528afabb"},
-    {file = "graphql_relay-2.0.1-py3-none-any.whl", hash = "sha256:ac514cb86db9a43014d7e73511d521137ac12cf0101b2eaa5f0a3da2e10d913d"},
+    {file = "graphql-relay-3.2.0.tar.gz", hash = "sha256:1ff1c51298356e481a0be009ccdff249832ce53f30559c1338f22a0e0d17250c"},
+    {file = "graphql_relay-3.2.0-py3-none-any.whl", hash = "sha256:c9b22bd28b170ba1fe674c74384a8ff30a76c8e26f88ac3aa1584dd3179953e5"},
 ]
 gunicorn = [
     {file = "gunicorn-20.0.4-py2.py3-none-any.whl", hash = "sha256:cd4a810dd51bf497552cf3f863b575dabd73d6ad6a91075b65936b151cbf4f9c"},
@@ -985,10 +937,6 @@ requests = [
     {file = "requests-2.28.1-py3-none-any.whl", hash = "sha256:8fefa2a1a1365bf5520aac41836fbee479da67864514bdb821f31ce07ce65349"},
     {file = "requests-2.28.1.tar.gz", hash = "sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983"},
 ]
-rx = [
-    {file = "Rx-1.6.1-py2.py3-none-any.whl", hash = "sha256:7357592bc7e881a95e0c2013b73326f704953301ab551fbc8133a6fadab84105"},
-    {file = "Rx-1.6.1.tar.gz", hash = "sha256:13a1d8d9e252625c173dc795471e614eadfe1cf40ffc684e08b8fff0d9748c23"},
-]
 selenium = [
     {file = "selenium-3.141.0-py2.py3-none-any.whl", hash = "sha256:2d7131d7bc5a5b99a2d9b04aaf2612c411b03b8ca1b1ee8d3de5845a9be2cb3c"},
     {file = "selenium-3.141.0.tar.gz", hash = "sha256:deaf32b60ad91a4611b98d8002757f29e6f2c2d5fcaf202e1c9ad06d6772300d"},
@@ -1000,10 +948,6 @@ sentry-sdk = [
 setuptools = [
     {file = "setuptools-65.5.0-py3-none-any.whl", hash = "sha256:f62ea9da9ed6289bfe868cd6845968a2c854d1427f8548d52cae02a42b4f0356"},
     {file = "setuptools-65.5.0.tar.gz", hash = "sha256:512e5536220e38146176efb833d4a62aa726b7bbff82cfbc8ba9eaa3996e0b17"},
-]
-singledispatch = [
-    {file = "singledispatch-3.7.0-py2.py3-none-any.whl", hash = "sha256:bc77afa97c8a22596d6d4fc20f1b7bdd2b86edc2a65a4262bdd7cc3cc19aa989"},
-    {file = "singledispatch-3.7.0.tar.gz", hash = "sha256:c1a4d5c1da310c3fd8fccfb8d4e1cb7df076148fd5d858a819e37fffe44f3092"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
@@ -1017,6 +961,10 @@ sqlparse = [
     {file = "sqlparse-0.4.3-py3-none-any.whl", hash = "sha256:0323c0ec29cd52bceabc1b4d9d579e311f3e4961b98d174201d5622a23b85e34"},
     {file = "sqlparse-0.4.3.tar.gz", hash = "sha256:69ca804846bb114d2ec380e4360a8a340db83f0ccf3afceeb1404df028f57268"},
 ]
+text-unidecode = [
+    {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
+    {file = "text_unidecode-1.3-py2.py3-none-any.whl", hash = "sha256:1311f10e8b895935241623731c2ba64f4c455287888b18189350b67134a822e8"},
+]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
@@ -1028,10 +976,6 @@ tqdm = [
 tzdata = [
     {file = "tzdata-2022.5-py2.py3-none-any.whl", hash = "sha256:323161b22b7802fdc78f20ca5f6073639c64f1a7227c40cd3e19fd1d0ce6650a"},
     {file = "tzdata-2022.5.tar.gz", hash = "sha256:e15b2b3005e2546108af42a0eb4ccab4d9e225e2dfbf4f77aad50c70a4b1f3ab"},
-]
-unidecode = [
-    {file = "Unidecode-1.3.6-py3-none-any.whl", hash = "sha256:547d7c479e4f377b430dd91ac1275d593308dce0fc464fb2ab7d41f82ec653be"},
-    {file = "Unidecode-1.3.6.tar.gz", hash = "sha256:fed09cf0be8cf415b391642c2a5addfc72194407caee4f98719e40ec2a72b830"},
 ]
 urllib3 = [
     {file = "urllib3-1.26.12-py2.py3-none-any.whl", hash = "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997"},

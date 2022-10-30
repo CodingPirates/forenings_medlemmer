@@ -9,7 +9,7 @@ omit = ["*/tests/*", "members/migrations"]
 name = "forenings_medlemmer"
 version = "1.2"
 description = "Forenings system for Coding Pirates"
-authors = ["Benjamin Rotendahl <Benjamin@Rotendahl.dk>"]
+authors = ["Kristoffer Rath Hansen <kristoffer@codingpirates.dk>"]
 
 [tool.poetry.dependencies]
 python = "^3.10.0"
@@ -20,13 +20,13 @@ dj-email-url = "1.0.1"
 django = "4.1.2"
 django-cors-headers = "3.5.0"
 django-crispy-forms = "1.9.2"
-django-cron = "0.5.1"
+django-cron = "0.6.0"
 django-extensions = "3.0.5"
 environs = "8.0.0"
 factory-boy = "3.0.1"
 flake8 = "3.8.4"
 freezegun = "1.0.0"
-graphene_django = "2.13.0"
+graphene_django = "3.0.0"
 gunicorn = "20.0.4"
 psycopg2 = "2.9.3"
 quickpay-api-client = "2.0.1"
