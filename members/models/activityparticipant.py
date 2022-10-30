@@ -3,8 +3,11 @@
 from django.db import models
 import members.models.payment
 import members.models.member
+import members.models.family
+import members.models.person
 import members.models.waitinglist
 from django.utils import timezone
+from django.utils.html import format_html
 
 
 class ActivityParticipant(models.Model):
@@ -47,6 +50,49 @@ class ActivityParticipant(models.Model):
         return not members.models.payment.Payment.objects.filter(
             activityparticipant=self, accepted_dtm=None
         )
+
+    def payment_info(self, format_as_html: bool):
+        payment = members.models.payment.Payment.objects.get(activityparticipant=self)
+        if format_as_html:
+            html_error_pre = "<span style='color:red'><b>"
+            html_warn_pre = "<span style='color:blue'><b>"
+            html_good_pre = "<span style='color:green'><b>"
+            html_post = "</b></span>"
+        else:
+            html_error_pre = ""
+            html_good_pre = ""
+            html_warn_pre = ""
+            html_post = ""
+
+        result_string = "asdf"
+        if payment.refunded_dtm is not None:
+            result_string = f'{html_warn_pre}Refunderet{html_post}:{payment.refunded_dtm.strftime("%Y-%m-%d %H-%M")}. '
+            if payment.confirmed_dtm is not None:
+                result_string += (
+                    f'Betalt:{payment.confirmed_dtm.strftime("%Y-%m-%d %H-%M")}. '
+                )
+            else:
+                result_string += (
+                    f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+                )
+
+        elif payment.rejected_dtm is not None:
+            result_string = f'{html_error_pre}Afvist:{html_post}{payment.rejected_dtm.strftime("%Y-%m-%d %H-%M")}. '
+            result_string += f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+        elif payment.cancelled_dtm is not None:
+            result_string = f'{html_error_pre}Cancelled:{html_post}{payment.cancelled_dtm.strftime("%Y-%m-%d %H-%M")}. '
+            result_string += f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+        else:
+            if payment.confirmed_dtm is not None:
+                result_string = f'{html_good_pre}Betalt:{html_post}{payment.confirmed_dtm.strftime("%Y-%m-%d %H-%M")}. '
+            else:
+                result_string = f"{html_error_pre}IKKE BETALT.{html_post} "
+            result_string += f'(Oprettet:{payment.added.strftime("%Y-%m-%d %H-%M")})'
+
+        if format_as_html:
+            return format_html(result_string)
+        else:
+            return result_string
 
     def get_payment_link(self):
         payment = members.models.payment.Payment.objects.get(
