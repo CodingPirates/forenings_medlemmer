@@ -24,7 +24,7 @@ class ActivityAdmin(admin.ModelAdmin):
     def start_end(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
 
-    start_end.short_description = 'Periode'
+    start_end.short_description = "Periode"
 
     def age(self, obj):
         return str(obj.min_age) + " - " + str(obj.max_age)

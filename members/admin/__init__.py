@@ -361,14 +361,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             return "Pige"
         else:
             return "Andet"
-    
+
     person_gender.short_description = "Køn"
 
     def person_zipcode(self, item):
         return item.member.person.zipcode
 
     person_zipcode.short_description = "Postnummer"
-    
 
     # Only show participants to own departments
     def get_queryset(self, request):
