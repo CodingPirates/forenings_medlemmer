@@ -73,7 +73,9 @@
     <section id="current_activities">
         <h2>Igangværende aktiviteter</h2>
         {% if current_activities %}
-            <p>Denne liste indeholder åbne aktiviteter, hvor der er fri tilmelding</p>
+            <p>Denne liste indeholder igangværende aktiviteter. For aktiviteter med fri tilmelding, kan I tilmelde Jer direkte, og ellers
+                kan I opskrive Jer på venteliste til afdelingen.
+            </p>
             <table>
                 <thead>
                 <tr>
@@ -109,10 +111,20 @@
                                         venteliste til næste gang {{ activity.union.name }} opretter en ny aktivitet.
                                     </p>
                                 {% endif %}
-                                {% for person in activity.persons %}
-                                    <a class="button-success" href="{% url 'activity_signup' activity.id person.id %}">
-                                        Tilmeld {{ person.firstname }} aktivitet
-                                    </a>
+                                {% for child in children %}
+                                    {% if activity.open_invite %}
+                                        <a class="button-success" href="{% url 'activity_signup' activity.id child.person.id %}">
+                                            Tilmeld {{ child.person.firstname }}
+                                        </a>
+                                    {% else %}
+                                        {% if activity.department in child.departments_is_waiting %}
+                                            <div class="center">{{ child.person.firstname }} er opskrevet</div>
+                                        {% else %}
+                                            <a class="button-success" href="{% url 'waiting_list_subscription' child.person.id activity.department.id 'subscribe' %}">
+                                                Opskriv {{ child.person.firstname }} på venteliste
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
                                 {% if activity.open_invite %}

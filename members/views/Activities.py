@@ -5,7 +5,10 @@ from django.utils import timezone
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
-from members.models import Person
+from members.models import (
+    Person,
+    WaitingList,
+)
 from members.utils.user import user_to_person
 
 
@@ -19,8 +22,18 @@ def Activities(request):
     invites = None
     participating = None
     current_activities_with_persons = current_activities
+    children = []
+
     if request.user.is_authenticated:
         family = user_to_person(request.user).family
+        children = [
+            {"person": child, "waitinglists": WaitingList.get_by_child(child)}
+            for child in family.get_children()
+        ]
+        for child in children:
+            child["departments_is_waiting"] = [
+                department for (department, _place) in child["waitinglists"]
+            ]
         invites = ActivityInvite.objects.filter(
             person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None
         )
@@ -50,6 +63,8 @@ def Activities(request):
                         "open_invite": curActivity.open_invite,
                         "department": curActivity.department,
                         "persons": applicablePersons,
+                        "min_age": curActivity.min_age,
+                        "max_age": curActivity.max_age,
                     }
                 )
 
@@ -58,5 +73,6 @@ def Activities(request):
         "invites": invites,
         "participating": participating,
         "current_activities": current_activities_with_persons,
+        "children": children,
     }
     return render(request, "members/activities.html", context)
