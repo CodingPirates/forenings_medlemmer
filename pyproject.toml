@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 88
-target-version = ['py37', 'py38']
+target-version = ['py310', 'py311']
 
 [tool.coverage.run]
 omit = ["*/tests/*", "members/migrations"]
@@ -12,12 +12,12 @@ description = "Forenings system for Coding Pirates"
 authors = ["Benjamin Rotendahl <Benjamin@Rotendahl.dk>"]
 
 [tool.poetry.dependencies]
-python = "^3.8.0"
+python = "^3.10.0"
 black = "^22.3"
 codecov = "2.1.9"
 dj-database-url = "0.5.0"
 dj-email-url = "1.0.1"
-django = "3.2.15"
+django = "4.1.2"
 django-cors-headers = "3.5.0"
 django-crispy-forms = "1.9.2"
 django-cron = "0.5.1"
