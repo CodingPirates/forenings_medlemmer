@@ -1,5 +1,6 @@
 from selenium.webdriver.common.by import By
 
+
 def log_in(self, person):
     password = "rioguyp34098gy"
     person.user.set_password(password)

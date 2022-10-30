@@ -42,8 +42,8 @@ class VolunteerTest(StaticLiveServerTestCase):
         self.browser.get(f"{self.live_server_url}/volunteer")
         options_texts = [
             e.text
-            for e in self.browser.find_elements(By.XPATH,
-                "//*/select[@id='id_volunteer_department']/option"
+            for e in self.browser.find_elements(
+                By.XPATH, "//*/select[@id='id_volunteer_department']/option"
             )
         ]
         self.assertIn(

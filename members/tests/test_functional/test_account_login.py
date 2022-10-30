@@ -38,8 +38,8 @@ class AccountLoginTest(StaticLiveServerTestCase):
             "Log ind",
             [
                 e.text
-                for e in self.browser.find_elements(By.XPATH,
-                    "//body/descendant-or-self::*"
+                for e in self.browser.find_elements(
+                    By.XPATH, "//body/descendant-or-self::*"
                 )
             ],
         )
@@ -48,8 +48,8 @@ class AccountLoginTest(StaticLiveServerTestCase):
             "Opret bruger",
             [
                 e.text
-                for e in self.browser.find_elements(By.XPATH,
-                    "//body/descendant-or-self::*"
+                for e in self.browser.find_elements(
+                    By.XPATH, "//body/descendant-or-self::*"
                 )
             ],
         )

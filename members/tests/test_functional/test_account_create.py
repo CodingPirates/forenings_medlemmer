@@ -40,7 +40,11 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
 
         # Gender
-        field = Select(WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "child_gender"))))
+        field = Select(
+            WebDriverWait(self.browser, 10).until(
+                EC.presence_of_element_located((By.NAME, "child_gender"))
+            )
+        )
         field.select_by_value("MA")
 
         # Enter child details
@@ -87,13 +91,13 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
         # Check that redirect and get password
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
-        password = self.browser.find_elements(By.XPATH,
-            "//*[text()[contains(.,'Adgangskoden er')]]"
+        password = self.browser.find_elements(
+            By.XPATH, "//*[text()[contains(.,'Adgangskoden er')]]"
         )[0].text.split(" ")[-1]
 
         # Go to login page,
-        self.browser.find_elements(By.XPATH,
-            "//*[text()[contains(.,'Gå til log ind')]]"
+        self.browser.find_elements(
+            By.XPATH, "//*[text()[contains(.,'Gå til log ind')]]"
         )[0].click()
 
         # enter email and password

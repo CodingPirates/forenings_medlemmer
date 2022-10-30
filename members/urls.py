@@ -78,7 +78,9 @@ urlpatterns = [
     re_path(r"^admin_signup/$", AdminSignup, name="admin_signup"),
     re_path(r"^family/$", FamilyDetails, name="family_detail"),
     re_path(r"^family/Person/(?P<id>[\d]+)/$", PersonUpdate, name="person_update"),
-    re_path(r"^family/Person/(?P<membertype>[A-Z]{2})$", PersonCreate, name="person_add"),
+    re_path(
+        r"^family/Person/(?P<membertype>[A-Z]{2})$", PersonCreate, name="person_add"
+    ),
     re_path(
         r"^family/activity/(?P<activity_id>[\d]+)/person/(?P<person_id>[\d]+)/$",
         ActivitySignup,
@@ -110,7 +112,9 @@ urlpatterns = [
         WaitingListSetSubscription,
         name="waiting_list_subscription",
     ),
-    re_path(r"^activity/(?P<activity_id>[\d]+)/$", ActivitySignup, name="activity_view"),
+    re_path(
+        r"^activity/(?P<activity_id>[\d]+)/$", ActivitySignup, name="activity_view"
+    ),
     re_path(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     re_path(r"^department_signup$", DepartmentSignView, name="department_signup"),
     re_path(r"^departments$", departmentView, name="department_view"),

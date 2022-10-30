@@ -53,8 +53,8 @@ class SignUpTest(StaticLiveServerTestCase):
         # Check that we are logged in with welcome message in top right
         self.assertGreater(
             len(
-                self.browser.find_elements(By.XPATH,
-                    "//*[text()[contains(.,'Velkommen')]]"
+                self.browser.find_elements(
+                    By.XPATH, "//*[text()[contains(.,'Velkommen')]]"
                 )
             ),
             0,
