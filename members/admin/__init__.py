@@ -1,3 +1,4 @@
+from logging import exception
 from uuid import uuid4
 from django import forms
 from django.contrib import admin
@@ -531,20 +532,28 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_department_link.admin_order_field = "activity__department__name"
 
     def activity_payment_info_txt(self, item):
-        try:
-            return item.payment_info(False)
-        except Exception:
-            return "INGEN BETALINGSINFO"
+        if item.activity.price_in_dkk == 0.00:
+            return "Gratis"
+        else:
+            try:
+                return item.payment_info(False)
+            except Exception:
+                return "Andet er aftalt"
 
     activity_payment_info_txt.short_description = "Betalingsinfo"
 
     def activity_payment_info_html(self, item):
-        try:
-            return item.payment_info(True)
-        except Exception:
+        if item.activity.price_in_dkk == 0.00:
             return format_html(
-                "<span style='color:red'><b>INGEN BETALINGSINFO</b></span>"
-            )
+                    "<span style='color:green'><b>Gratis</b></span>"
+                ) 
+        else:
+            try:
+                return item.payment_info(True)
+            except Exception:
+                return format_html(
+                    "<span style='color:red'><b>Andet er aftalt</b></span>"
+                )
 
     activity_payment_info_html.short_description = "Betalingsinfo"
 
