@@ -81,7 +81,6 @@ class Union(models.Model):
     )
 
     def __str__(self):
-        # return "Foreningen for " + self.name
         return self.name
 
     def clean(self):
