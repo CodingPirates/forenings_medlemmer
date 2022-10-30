@@ -92,28 +92,26 @@
       {% crispy signupform %}
 
       {% else %}
-        {% if not person %}
+        {% if not family %}
         <hr>
         <a href="{% url 'person_login' %}">Log ind</a> eller <a href="{% url 'account_create' %}">tilmeld dit barn</a> for at tilmelde dig denne aktivitet.
         {% else %}
-          {% if participating %}
-
-          <hr/>
-
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">{{person.name}} er tilmeldt dette arrangement</h2>
-            </div>
-          </div>
-          {% endif %}
           {% if signup_closed and not participating %}
           <hr>
             <div class="alert alert-primary">
               <p>Arrangementet er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
             </div>
-          {% endif %}
-          {% if family %}
-          <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
+          {% else %}
+            <hr/>
+            {% for child in family.get_children %}
+              {% if child.id in family_participants %}
+                {{ child.firstname}} er tilmeldt
+              {% else %}
+                <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
+                  Tilmeld {{ child.firstname }}
+                </a>
+              {% endif %}
+            {% endfor %}
           {% endif %}
         {% endif %}
       {% endif %}

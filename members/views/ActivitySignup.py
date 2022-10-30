@@ -27,10 +27,21 @@ def ActivitySignup(request, activity_id, person_id=None):
     if request.resolver_match.url_name == "activity_view_person":
         view_only_mode = True
 
-    family = None
-    if person_id:
+    if request.user and not request.user.is_anonymous:
+        family = user_to_person(request.user).family
+    else:
+        family = None
+
+    family_participants = [] # participants from current family
+    if family:
+        family_participants = [
+            (act.member.person.id)
+            for act in ActivityParticipant.objects.filter(activity_id=activity.id, member__person__family=family)
+        ]
+
+    if family and person_id:
+
         try:
-            family = user_to_person(request.user).family
             person = family.person_set.get(pk=person_id)
 
             # Check not already signed up
@@ -207,6 +218,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         "signup_closed": signup_closed,
         "view_only_mode": view_only_mode,
         "participating": participating,
+        "family_participants": family_participants,
         "union": union,
     }
     return render(request, "members/activity_signup.html", context)
