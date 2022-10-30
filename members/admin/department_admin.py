@@ -18,7 +18,7 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
 class DepartmentAdmin(admin.ModelAdmin):
     list_filter = (UnionDepartmentFilter,)
-    raw_id_fields = ("union", )
+    raw_id_fields = ("union",)
     filter_horizontal = ["department_leaders"]
 
     def get_form(self, request, obj=None, **kwargs):
@@ -80,7 +80,6 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     department_union_name.short_description = "Forening"
 
-
     def department_union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.union_id])
         link = '<a href="%s">%s</a>' % (url, item.union.name)
@@ -94,6 +93,6 @@ class DepartmentAdmin(admin.ModelAdmin):
         url = reverse("admin:members_department_change", args=[item.id])
         link = '<a href="%s">%s</a>' % (url, item.name)
         return mark_safe(link)
-    
+
     department_link.short_description = "Afdeling"
     department_link.admin_order_field = "department_name"

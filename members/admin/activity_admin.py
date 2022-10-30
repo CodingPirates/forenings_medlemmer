@@ -45,9 +45,7 @@ class ActivityAdmin(admin.ModelAdmin):
     union_link.admin_order_field = "activity__union__name"
 
     def department_link(self, item):
-        url = reverse(
-            "admin:members_department_change", args=[item.department_id]
-        )
+        url = reverse("admin:members_department_change", args=[item.department_id])
         link = '<a href="%s">%s</a>' % (url, item.department.name)
         return mark_safe(link)
 
