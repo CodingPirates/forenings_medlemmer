@@ -1,3 +1,5 @@
+from selenium.webdriver.common.by import By
+
 def log_in(self, person):
     password = "rioguyp34098gy"
     person.user.set_password(password)
@@ -8,15 +10,15 @@ def log_in(self, person):
     self.browser.get(f"{self.live_server_url}/account/login/")
 
     # Enter username
-    field = self.browser.find_element_by_name("username")
+    field = self.browser.find_element(By.NAME, "username")
     field.send_keys(person.email)
 
     # Enter username
-    field = self.browser.find_element_by_name("password")
+    field = self.browser.find_element(By.NAME, "password")
     field.send_keys(password)
 
     # Click log ind button
-    self.browser.find_element_by_xpath("//input[@type='submit']").click()
+    self.browser.find_element(By.XPATH, "//input[@type='submit']").click()
 
 
 def get_text_contains(browser, text):

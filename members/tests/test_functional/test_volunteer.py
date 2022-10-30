@@ -4,6 +4,7 @@ import socket
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from factory import Faker
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from members.tests.factories import (
@@ -41,7 +42,7 @@ class VolunteerTest(StaticLiveServerTestCase):
         self.browser.get(f"{self.live_server_url}/volunteer")
         options_texts = [
             e.text
-            for e in self.browser.find_elements_by_xpath(
+            for e in self.browser.find_elements(By.XPATH,
                 "//*/select[@id='id_volunteer_department']/option"
             )
         ]
