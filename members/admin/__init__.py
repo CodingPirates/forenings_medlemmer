@@ -7,7 +7,6 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -32,14 +31,8 @@ from members.models import (
     Equipment,
     EquipmentLoan,
     EmailTemplate,
-    activity,
-    activityparticipant,
-    department,
-    union,
 )
 import urllib
-import members.models.payment
-
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
@@ -278,11 +271,11 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for activity in Activity.objects.filter(
+        for act in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year__lte=timezone.now().year - 2,
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(activity.pk), str(activity)))
+            activitys.append((str(act.pk), str(act)))
         return activitys
 
     def queryset(self, request, queryset):
@@ -308,11 +301,11 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
         activitys = [
             #    ("none", "Intet filter"),
         ]
-        for activity in Activity.objects.filter(
+        for act in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year=timezone.now().year,
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(activity.pk), str(activity)))
+            activitys.append((str(act.pk), str(act)))
         return activitys
 
     def queryset(self, request, queryset):
@@ -342,11 +335,11 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
         activitys = [
             # ("all", f'Alle aktiviteter i {str(timezone.now().year - 1)}')
         ]
-        for activity in Activity.objects.filter(
+        for act in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year=timezone.now().year - 1,
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(activity.pk), str(activity)))
+            activitys.append((str(act.pk), str(act)))
         return activitys
 
     def queryset(self, request, queryset):
@@ -531,7 +524,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     def activity_payment_info_txt(self, item):
         try:
             return item.payment_info(False)
-        except:
+        except Exception:
             return "INGEN BETALINGSINFO"
 
     activity_payment_info_txt.short_description = "Betalingsinfo"
@@ -539,7 +532,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     def activity_payment_info_html(self, item):
         try:
             return item.payment_info(True)
-        except:
+        except Exception:
             return format_html(
                 "<span style='color:red'><b>INGEN BETALINGSINFO</b></span>"
             )
