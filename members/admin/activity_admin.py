@@ -2,13 +2,14 @@ from django.contrib import admin
 from members.models import Department
 from members.models import ActivityParticipant
 
+
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
-    fields=("member",)
-    readonly_fields=fields
-    raw_id_fields=("member",)
-    
+    fields = ("member",)
+    readonly_fields = fields
+    raw_id_fields = ("member",)
+
     def get_queryset(self, request):
         return ActivityParticipant.objects.all()
 

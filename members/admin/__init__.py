@@ -352,29 +352,26 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display_links = ("member",)
     raw_id_fields = ("activity", "member")
     search_fields = ("member__person__name",)
-    Member.short_description = u'Navn'
+    Member.short_description = "Navn"
 
     def person_age_years(self, item):
         return item.member.person.age_years()
 
     person_age_years.short_description = "Alder"
     person_age_years.admin_order_field = "-member__person__birthday"
-    
-    
 
     def person_gender(self, item):
         if item.member.person.gender == "MA":
             return "Dreng"
         else:
             return "Pige"
-    
+
     person_gender.short_description = "Køn"
 
     def person_zipcode(self, item):
         return item.member.person.zipcode
 
     person_zipcode.short_description = "Postnummer"
-    
 
     # Only show participants to own departments
     def get_queryset(self, request):
@@ -516,39 +513,42 @@ admin.site.register(Equipment, EquipmentAdmin)
 User = get_user_model()
 admin.site.unregister(User)
 
+
 class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ("departments", "unions")
     can_delete = False
 
+
 class CustomUserAdmin(UserAdmin):
     inlines = [AdminUserInformationInline, PersonInline]
 
-    readonly_fields = ['date_joined','last_login', 'username']
+    readonly_fields = ["date_joined", "last_login", "username"]
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super(UserAdmin, self).get_fieldsets(request, obj)
         if not obj:
             return fieldsets
-        
-        if not request.user.is_superuser: # or request.user.pk == obj.pk:  #
+
+        if not request.user.is_superuser:  # or request.user.pk == obj.pk:  #
             fieldsets = deepcopy(fieldsets)
             for fieldset in fieldsets:
-                if 'is_superuser' in fieldset[1]['fields']:
-                    if type(fieldset[1]['fields'] == tuple):
-                        fieldset[1]["fields"] = list(fieldset[1]['fields'])
-                        fieldset[1]["fields"].remove('is_superuser')
-                        #break
-                if 'user_permissions' in fieldset[1]['fields']:
-                    if type(fieldset[1]['fields'] == tuple):
-                        fieldset[1]["fields"] = list(fieldset[1]['fields'])
-                        fieldset[1]["fields"].remove('user_permissions')
-                        #break
-                if 'username' in fieldset[1]['fields']:
-                    if type(fieldset[1]['fields'] == tuple):
-                        fieldset[1]["fields"] = list(fieldset[1]['fields'])
-                        fieldset[1]["fields"].remove('username')
-                        #break
+                if "is_superuser" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("is_superuser")
+                        # break
+                if "user_permissions" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("user_permissions")
+                        # break
+                if "username" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("username")
+                        # break
         return fieldsets
+
 
 admin.site.register(User, CustomUserAdmin)

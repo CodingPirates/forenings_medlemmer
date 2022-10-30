@@ -19,15 +19,15 @@ class PersonInline(admin.StackedInline):
 
 class UserAdmin(UserAdmin):
     inlines = (AdminUserInformationInline, PersonInline)
-    
+
     def get_queryset(self, request):
         qs = super(UserAdmin, self).get_queryset(request)
-        
-        #Following will hide superusers for normal admins !
-        #if not request.user.is_superuser:
+
+        # Following will hide superusers for normal admins !
+        # if not request.user.is_superuser:
         #    return qs.filter(is_superuser=False)
         return qs
-    
+
     def get_list_filter(self, request):
         if request.user.is_superuser:
             return ["is_staff", "is_superuser", "is_active", "groups__id"]

@@ -10,7 +10,9 @@ class AdminUserInformation(models.Model):
         return self.user.username + " admin data"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    departments = models.ManyToManyField(Department, blank=True, verbose_name="Afdelinger")
+    departments = models.ManyToManyField(
+        Department, blank=True, verbose_name="Afdelinger"
+    )
     unions = models.ManyToManyField(Union, blank=True, verbose_name="Foreninger")
 
     @staticmethod

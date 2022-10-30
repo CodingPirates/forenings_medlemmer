@@ -69,16 +69,24 @@ class ActivitySignupForm(forms.Form):
         )
 
     note = forms.CharField(
-        label="<span style='color:red'><b>Besked til arrangør</b></span> (Særlige hensyn, gener, allergi, medicin etc.)", widget=forms.Textarea, required=False
+        label="<span style='color:red'><b>Besked til arrangør</b></span> (Særlige hensyn, gener, allergi, medicin etc.)",
+        widget=forms.Textarea,
+        required=False,
     )
     photo_permission = forms.ChoiceField(
         label="Må Coding Pirates tage og bruge billeder og videoer af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)",
         initial="Choose",
         required=True,
         choices=(
-            ("Choose", "Vælg om Coding Pirates må tage billeder af mit barn til denne aktivitet"),
+            (
+                "Choose",
+                "Vælg om Coding Pirates må tage billeder af mit barn til denne aktivitet",
+            ),
             (ActivityParticipant.PHOTO_OK, "Ja, det er OK"),
-            (ActivityParticipant.PHOTO_NOTOK, "Nej, vi vil ikke have I fotograferer mit barn"),
+            (
+                ActivityParticipant.PHOTO_NOTOK,
+                "Nej, vi vil ikke have I fotograferer mit barn",
+            ),
         ),
     )
     read_conditions = forms.ChoiceField(

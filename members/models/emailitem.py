@@ -23,7 +23,7 @@ class EmailItem(models.Model):
     department = models.ForeignKey(
         "Department", blank=True, null=True, on_delete=models.DO_NOTHING
     )
-    
+
     created_dtm = models.DateTimeField("Oprettet", auto_now_add=True)
     subject = models.CharField("Emne", max_length=200, blank=True)
     body_html = models.TextField("HTML Indhold", blank=True)
