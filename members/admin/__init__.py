@@ -428,9 +428,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity__name",
     )
     actions = [
-        "export_csv_simple1",
-        "export_csv_simple2",
-        "export_csv_full1",
+#        "export_csv_simple1",
+#        "export_csv_simple2",
+#        "export_csv_full1",
         "export_csv_full2",
     ]
 
@@ -679,7 +679,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     )
 
     def export_csv_full2(self, request, queryset):
-        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"\n'
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"\n'
         gender = "andet"
         today = timezone.now().date()
         for p in queryset:
@@ -723,6 +723,8 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + gender
                 + ";"
+                + p.member.person.zipcode
+                + ";"
                 + self.activity_payment_info_txt(p)
                 + ";"
                 + parent_name
@@ -736,7 +738,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
-    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon)"
+    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Post-nr; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon)"
 
 
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)

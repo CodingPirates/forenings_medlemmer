@@ -20,6 +20,7 @@ class ActivityAdmin(admin.ModelAdmin):
     raw_id_fields = (
         "union",
         "department",
+    )
     list_filter = ("union", "department", "open_invite", "activitytype")
     save_as = True
 
