@@ -401,6 +401,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity_person_gender",
         "person_age_years",
         "activity_family_email_link",
+        "person_zipcode",
         "photo_permission",
         "note",
         "activity_payment_info_html",
@@ -450,6 +451,21 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     person_age_years.short_description = "Alder"
     person_age_years.admin_order_field = "-member__person__birthday"
+
+    def person_gender(self, item):
+        if item.member.person.gender == "MA":
+            return "Dreng"
+        elif item.member.person.gender == "FE":
+            return "Pige"
+        else:
+            return "Andet"
+
+    person_gender.short_description = "Køn"
+
+    def person_zipcode(self, item):
+        return item.member.person.zipcode
+
+    person_zipcode.short_description = "Postnummer"
 
     # Only show participants to own departments
     def get_queryset(self, request):
