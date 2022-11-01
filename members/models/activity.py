@@ -49,7 +49,9 @@ class Activity(models.Model):
     signup_closing = models.DateField("Tilmelding lukker", null=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
-    help_price = "Hvis det er en sæsonaktivitet fratrækkes der automatisk 100 kr. "
+    help_price = (
+        "Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr. "
+    )
     help_price += "til Coding Pirates Denmark pr. barn."
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=500, help_text=help_price
@@ -58,7 +60,7 @@ class Activity(models.Model):
     max_age = models.PositiveIntegerField("Maximum Alder", default=17)
     min_age = models.PositiveIntegerField("Minimum Alder", default=7)
     help_temp = "Bestemmer om personerne bliver til medlemmer i forhold til DUF."
-    help_temp += " De fleste aktiviteter er sæsoner og medlemsberettiget. Hvis "
+    help_temp += " De fleste aktiviteter er forløb/sæsoner og medlemsberettiget. Hvis "
     help_temp += "du er i tvivl, så spørg på Slack i #medlemsssystem-support."
     member_justified = models.BooleanField(
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp

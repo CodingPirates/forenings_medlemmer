@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 from members.models import Department
 from members.models import ActivityParticipant
 
@@ -17,17 +19,18 @@ class ActivityParticipantInline(admin.TabularInline):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "union",
-        "department",
+        "union_link",
+        "department_link",
         "activitytype",
         "start_end",
         "open_invite",
         "price_in_dkk",
         "max_participants",
         "age",
+        "description",
     )
     date_hierarchy = "start_date"
-    search_fields = ("name", "department__name")
+    search_fields = ("name", "union__name", "department__name", "description")
     list_per_page = 20
     raw_id_fields = (
         "union",
@@ -56,6 +59,22 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.min_age) + " - " + str(obj.max_age)
 
     age.short_description = "Alder"
+
+    def union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.union_id])
+        link = '<a href="%s">%s</a>' % (url, item.union.name)
+        return mark_safe(link)
+
+    union_link.short_description = "Forening"
+    union_link.admin_order_field = "union__name"
+
+    def department_link(self, item):
+        url = reverse("admin:members_department_change", args=[item.department_id])
+        link = '<a href="%s">%s</a>' % (url, item.department.name)
+        return mark_safe(link)
+
+    department_link.short_description = "Afdeling"
+    department_link.admin_order_field = "department__name"
 
     # Only view activities on own department
     def get_queryset(self, request):
@@ -113,7 +132,7 @@ class ActivityAdmin(admin.ModelAdmin):
         (
             "Tilmeldingsdetaljer",
             {
-                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-sæsoner i områder, hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
                 "fields": (
                     "instructions",
                     "open_invite",
