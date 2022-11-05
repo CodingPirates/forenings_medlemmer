@@ -18,6 +18,7 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "department_union_link",
         "department_link",
         "address",

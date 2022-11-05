@@ -26,17 +26,31 @@ class ActivityAdmin(admin.ModelAdmin):
         "open_invite",
         "price_in_dkk",
         "max_participants",
+        "participants",
+        "seats_left",
         "age",
         "description",
     )
+
     date_hierarchy = "start_date"
-    search_fields = ("name", "union__name", "department__name", "description")
+    search_fields = (
+        "name",
+        "department__union__name",
+        "department__name",
+        "description",
+    )
+    readonly_fields = ("seats_left", "participants")
     list_per_page = 20
     raw_id_fields = (
         "union",
         "department",
     )
-    list_filter = ("union__name", "department", "open_invite", "activitytype")
+    list_filter = (
+        "department__union__name",
+        "department__name",
+        "open_invite",
+        "activitytype",
+    )
     save_as = True
     inlines = [ActivityParticipantInline]
 
@@ -61,12 +75,12 @@ class ActivityAdmin(admin.ModelAdmin):
     age.short_description = "Alder"
 
     def union_link(self, item):
-        url = reverse("admin:members_union_change", args=[item.union_id])
-        link = '<a href="%s">%s</a>' % (url, item.union.name)
+        url = reverse("admin:members_union_change", args=[item.department.union_id])
+        link = '<a href="%s">%s</a>' % (url, item.department.union.name)
         return mark_safe(link)
 
     union_link.short_description = "Forening"
-    union_link.admin_order_field = "union__name"
+    union_link.admin_order_field = "department__union__name"
 
     def department_link(self, item):
         url = reverse("admin:members_department_change", args=[item.department_id])
@@ -94,20 +108,36 @@ class ActivityAdmin(admin.ModelAdmin):
             db_field, request, **kwargs
         )
 
-    fieldsets = (
-        ("Forening", {"fields": ("union",)}),
-        ("Afdeling", {"fields": ("department",)}),
+    fieldsets = [
+        (
+            "Afdeling",
+            {
+                "description": "<p>Du kan ændre afdeling for aktiviteten ved at skrive afdelings-id, eller tryk på søg-ikonet og i det nye vindue skal du finde afdelingen, for derefter at trykke på ID i første kolonne.</p>",
+                "fields": ("department",),
+            },
+        ),
+        (
+            "Forening",
+            {
+                "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.</p>",
+                "fields": ("union",),
+            },
+        ),
         (
             "Aktivitet",
             {
                 "description": "<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårssæson 2018</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>",
                 "fields": (
-                    "name",
-                    "activitytype",
+                    (
+                        "name",
+                        "activitytype",
+                    ),
                     "open_hours",
                     "description",
-                    "start_date",
-                    "end_date",
+                    (
+                        "start_date",
+                        "end_date",
+                    ),
                     "member_justified",
                 ),
             },
@@ -117,31 +147,45 @@ class ActivityAdmin(admin.ModelAdmin):
             {
                 "description": "<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer (f.eks. et gamejam der foregår et andet sted).</p>",
                 "fields": (
-                    "responsible_name",
-                    "responsible_contact",
-                    "streetname",
-                    "housenumber",
-                    "floor",
-                    "door",
-                    "zipcode",
-                    "city",
-                    "placename",
+                    (
+                        "responsible_name",
+                        "responsible_contact",
+                    ),
+                    (
+                        "streetname",
+                        "housenumber",
+                        "floor",
+                        "door",
+                    ),
+                    (
+                        "zipcode",
+                        "city",
+                        "placename",
+                    ),
                 ),
             },
         ),
         (
             "Tilmeldingsdetaljer",
             {
-                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. </p><p>Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
                 "fields": (
                     "instructions",
-                    "open_invite",
+                    (
+                        "signup_closing",
+                        "open_invite",
+                    ),
                     "price_in_dkk",
-                    "signup_closing",
-                    "max_participants",
-                    "min_age",
-                    "max_age",
+                    (
+                        "max_participants",
+                        "participants",
+                        "seats_left",
+                    ),
+                    (
+                        "min_age",
+                        "max_age",
+                    ),
                 ),
             },
         ),
-    )
+    ]

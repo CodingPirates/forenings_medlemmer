@@ -13,9 +13,10 @@ class Activity(models.Model):
     department = models.ForeignKey(
         "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
     )
+    # Please note: Activity.Union is used as a hack for the Foreningsmedlemskab / Støttemedlemskab
+    # It's not used for anything else
     union = models.ForeignKey(
         "Union",
-        blank=True,
         on_delete=models.CASCADE,
         default=1,
         verbose_name="Forening",
@@ -85,3 +86,10 @@ class Activity(models.Model):
 
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
+
+    seats_left.short_description = "Ledige pladser"
+
+    def participants(self):
+        return self.activityparticipant_set.count()
+
+    participants.short_description = "Deltagere"
