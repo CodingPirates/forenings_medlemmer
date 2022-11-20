@@ -30,14 +30,14 @@ class MemberInline(admin.TabularInline):
 
 class PaymentInline(admin.TabularInline):
     model = Payment
-    fields = ("added", "payment_type", "confirmed_dtm", "rejected_dtm", "amount_ore")
+    fields = ("added_at", "payment_type", "confirmed_at", "rejected_at", "amount_ore")
     readonly_fields = ("family",)
     extra = 0
 
 
 class VolunteerInline(admin.TabularInline):
     model = Volunteer
-    fields = ("department", "added", "confirmed", "removed")
+    fields = ("department", "added_at", "confirmed", "removed")
     extra = 0
 
 

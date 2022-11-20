@@ -18,14 +18,14 @@ def FamilyDetails(request):
     family.last_visit_dtm = timezone.now()
     family.save()
 
-    need_confirmation = family.confirmed_dtm is None or (
-        family.confirmed_dtm
+    need_confirmation = family.confirmed_at is None or (
+        family.confirmed_at
         < timezone.now()
         - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
     )
 
     invites = ActivityInvite.objects.filter(
-        person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None
+        person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
     )
 
     context = {

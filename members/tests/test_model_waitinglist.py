@@ -30,13 +30,16 @@ class TestModelWaitinglist(TestCase):
     def test_waiting_list_is_sorted_by_person_signup_date(self):
         department = DepartmentFactory()
         subscription0 = WaitingListFactory(
-            person__added=datetime(2017, 1, 1, tzinfo=TIMEZONE), department=department
+            person__added_at=datetime(2017, 1, 1, tzinfo=TIMEZONE),
+            department=department,
         )
         subscription1 = WaitingListFactory(
-            person__added=datetime(2015, 1, 1, tzinfo=TIMEZONE), department=department
+            person__added_at=datetime(2015, 1, 1, tzinfo=TIMEZONE),
+            department=department,
         )
         subscription2 = WaitingListFactory(
-            person__added=datetime(2019, 1, 1, tzinfo=TIMEZONE), department=department
+            person__added_at=datetime(2019, 1, 1, tzinfo=TIMEZONE),
+            department=department,
         )
 
         subscriptions = WaitingList.objects.all()
@@ -49,11 +52,13 @@ class TestModelWaitinglist(TestCase):
     def test_position_on_waitinglist_computed_correctly(self):
         department = DepartmentFactory()
         subscription0 = WaitingListFactory(
-            department=department, person__added=datetime(2017, 1, 1, tzinfo=TIMEZONE)
+            department=department,
+            person__added_at=datetime(2017, 1, 1, tzinfo=TIMEZONE),
         )
         self.assertEqual(1, subscription0.number_on_waiting_list())
         subscription1 = WaitingListFactory(
-            department=department, person__added=datetime(2015, 1, 1, tzinfo=TIMEZONE)
+            department=department,
+            person__added_at=datetime(2015, 1, 1, tzinfo=TIMEZONE),
         )
         self.assertEqual(2, subscription0.number_on_waiting_list())
         self.assertEqual(1, subscription1.number_on_waiting_list())
@@ -78,7 +83,7 @@ class TestModelWaitinglist(TestCase):
         n = 30
         for i in range(n):
             WaitingListFactory(
-                person__added=fake.date_time(tzinfo=TIMEZONE), department=department1
+                person__added_at=fake.date_time(tzinfo=TIMEZONE), department=department1
             )
 
         # Should not interfere with position on the first list
