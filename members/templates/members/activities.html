@@ -116,9 +116,11 @@
                                         {% if activity.id in child.participating_activities %}
                                             <div class="center">{{ child.person.firstname }} er tilmeldt</div>
                                         {% else %}
-                                            <a class="button-success" href="{% url 'activity_signup' activity.id child.person.id %}">
-                                                Tilmeld {{ child.person.firstname }}
-                                            </a>
+                                            {% if child.person in activity.persons %}
+                                                <a class="button-success" href="{% url 'activity_signup' activity.id child.person.id %}">
+                                                    Tilmeld {{ child.person.firstname }}
+                                                </a>
+                                            {% endif %}
                                         {% endif %}
                                     {% else %}
                                         {% if activity.department in child.departments_is_waiting %}
