@@ -66,4 +66,4 @@ class UnionAdmin(admin.ModelAdmin):
         ),
     ]
 
-    list_display = ("name", "address")
+    list_display = ("name", "address", "union_email")
