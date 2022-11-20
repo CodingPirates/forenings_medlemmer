@@ -103,15 +103,27 @@
             </div>
           {% else %}
             <hr/>
-            {% for child in family.get_children %}
-              {% if child.id in family_participants %}
-                {{ child.firstname}} er tilmeldt
-              {% else %}
-                <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
-                  Tilmeld {{ child.firstname }}
-                </a>
-              {% endif %}
-            {% endfor %}
+            {% if activity.open_invite %}
+              {% for child in family.get_children %}
+                {% if child.id in family_participants %}
+                  {{ child.firstname}} er tilmeldt
+                {% else %}
+                  <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
+                    Tilmeld {{ child.firstname }}
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              {% for child in family.get_children %}
+                {% if child.id in family_subscriptions %}
+                  {{ child.firstname }} er opskrevet&nbsp;&nbsp;
+                {% else %}
+                  <a class="button" href="{% url 'waiting_list_subscription' child.id activity.department.id 'subscribe' %}">
+                    Opskriv {{ child.firstname }} på venteliste
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
           {% endif %}
         {% endif %}
       {% endif %}

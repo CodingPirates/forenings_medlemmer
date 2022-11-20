@@ -11,6 +11,7 @@ from members.models.activityparticipant import ActivityParticipant
 from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
+from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
 
 
@@ -34,6 +35,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             family = user_to_person(request.user).family
 
     family_participants = []  # participants from current family
+    family_subscriptions = []  # waiting list subscriptions for current family
     if family:
         family_participants = [
             (act.member.person.id)
@@ -41,6 +43,11 @@ def ActivitySignup(request, activity_id, person_id=None):
                 activity_id=activity.id, member__person__family=family
             )
         ]
+
+        for child in family.get_children():
+            subscriptions = WaitingList.objects.filter(department=activity.department, person=child)
+            if len(subscriptions) > 0:
+                family_subscriptions.append(child.id)
 
     if family and person_id:
 
@@ -222,6 +229,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         "view_only_mode": view_only_mode,
         "participating": participating,
         "family_participants": family_participants,
+        "family_subscriptions": family_subscriptions,
         "union": union,
     }
     return render(request, "members/activity_signup.html", context)
