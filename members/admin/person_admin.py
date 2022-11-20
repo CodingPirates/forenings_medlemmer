@@ -45,7 +45,7 @@ class PersonAdmin(admin.ModelAdmin):
         "family_url",
         "age_years",
         "zipcode",
-        "added",
+        "added_at",
         "notes",
     )
     list_filter = (
@@ -263,7 +263,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "membertype",
                         "birthday",
                         "has_certificate",
-                        "added",
+                        "added_at",
                         "user",
                     ),
                 },
@@ -289,7 +289,7 @@ class PersonAdmin(admin.ModelAdmin):
                 "membertype",
                 "birthday",
                 "has_certificate",
-                "added",
+                "added_at",
             ]
         else:
             return []
@@ -335,7 +335,7 @@ class PersonAdmin(admin.ModelAdmin):
                 + ";"
                 + str(person.age_years())
                 + ";"
-                + str(person.added)
+                + str(person.added_at)
                 + ";"
                 + person.phone
                 + ";"

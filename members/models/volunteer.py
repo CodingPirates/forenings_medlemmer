@@ -17,7 +17,7 @@ class Volunteer(models.Model):
     def has_certificate(self):
         return self.person.has_certificate
 
-    added = models.DateTimeField("Start", default=timezone.now)
+    added_at = models.DateTimeField("Start", default=timezone.now)
     confirmed = models.DateTimeField("Bekræftet", blank=True, null=True, default=None)
     removed = models.DateTimeField("Slut", blank=True, null=True, default=None)
 

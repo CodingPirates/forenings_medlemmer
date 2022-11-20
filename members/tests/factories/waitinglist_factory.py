@@ -13,4 +13,4 @@ class WaitingListFactory(DjangoModelFactory):
     person = SubFactory(PersonFactory)
     department = SubFactory(DepartmentFactory)
     on_waiting_list_since = Faker("date_time", tzinfo=TIMEZONE)
-    added_dtm = Faker("date_time", tzinfo=TIMEZONE)
+    added_at = Faker("date_time", tzinfo=TIMEZONE)

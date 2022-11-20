@@ -24,8 +24,8 @@ class TestModelPerson(TestCase):
         PersonFactory()  # no error should be thrown
 
     def test_saving_and_retrieving_persons(self):
-        PersonFactory(name="Jane Doe", added=datetime(2018, 1, 1, tzinfo=TIMEZONE))
-        PersonFactory(name="John Doe", added=datetime(2017, 1, 1, tzinfo=TIMEZONE))
+        PersonFactory(name="Jane Doe", added_at=datetime(2018, 1, 1, tzinfo=TIMEZONE))
+        PersonFactory(name="John Doe", added_at=datetime(2017, 1, 1, tzinfo=TIMEZONE))
 
         saved_persons = Person.objects.all()
         self.assertEqual(saved_persons.count(), 2)

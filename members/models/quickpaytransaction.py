@@ -116,7 +116,7 @@ class QuickpayTransaction(models.Model):
             + " - QuickPay orderid: '"
             + str(self.order_id)
             + "' confirmed: '"
-            + str(self.payment.confirmed_dtm)
+            + str(self.payment.confirmed_at)
             + "'"
         )
 
@@ -131,5 +131,5 @@ class QuickpayTransaction(models.Model):
         )
 
         if status == 202:
-            self.payment.confirmed_dtm = timezone.now()
+            self.payment.confirmed_at = timezone.now()
             self.payment.save()
