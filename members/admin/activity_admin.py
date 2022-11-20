@@ -1,23 +1,61 @@
 from django.contrib import admin
 from members.models import Department
+from members.models import ActivityParticipant
+
+
+class ActivityParticipantInline(admin.TabularInline):
+    model = ActivityParticipant
+    extra = 0
+    fields = ("member",)
+    readonly_fields = fields
+    raw_id_fields = ("member",)
+
+    def get_queryset(self, request):
+        return ActivityParticipant.objects.all()
 
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "union",
         "department",
         "activitytype",
-        "start_date",
+        "start_end",
         "open_invite",
         "price_in_dkk",
         "max_participants",
+        "age",
     )
     date_hierarchy = "start_date"
     search_fields = ("name", "department__name")
     list_per_page = 20
-    raw_id_fields = ("department",)
-    list_filter = ("department", "open_invite", "activitytype")
+    raw_id_fields = (
+        "union",
+        "department",
+    )
+    list_filter = ("union__name", "department", "open_invite", "activitytype")
     save_as = True
+    inlines = [ActivityParticipantInline]
+
+    def startend(self, obj):
+        return str(obj.start_date) + " - " + str(obj.end_date)
+
+    startend.short_description = "Periode"
+
+    def age(self, obj):
+        return str(obj.min_age) + " - " + str(obj.max_age)
+
+    age.short_description = "Alder"
+
+    def start_end(self, obj):
+        return str(obj.start_date) + " - " + str(obj.end_date)
+
+    start_end.short_description = "Periode"
+
+    def age(self, obj):
+        return str(obj.min_age) + " - " + str(obj.max_age)
+
+    age.short_description = "Alder"
 
     # Only view activities on own department
     def get_queryset(self, request):
@@ -38,6 +76,7 @@ class ActivityAdmin(admin.ModelAdmin):
         )
 
     fieldsets = (
+        ("Forening", {"fields": ("union",)}),
         ("Afdeling", {"fields": ("department",)}),
         (
             "Aktivitet",

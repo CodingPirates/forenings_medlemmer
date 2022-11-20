@@ -13,7 +13,13 @@ class Activity(models.Model):
     department = models.ForeignKey(
         "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
     )
-    union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1)
+    union = models.ForeignKey(
+        "Union",
+        blank=True,
+        on_delete=models.CASCADE,
+        default=1,
+        verbose_name="Forening",
+    )
     name = models.CharField("Navn", max_length=200)
     activitytype = models.ForeignKey(
         "ActivityType",
@@ -43,8 +49,8 @@ class Activity(models.Model):
     signup_closing = models.DateField("Tilmelding lukker", null=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
-    help_price = "På prisen for aktiviteten fratrækker vi automatisk 100 kr."
-    help_price += " pr. barn hvis det er en sæsonaktivitet."
+    help_price = "Hvis det er en sæsonaktivitet fratrækkes der automatisk 100 kr. "
+    help_price += "til Coding Pirates Denmark pr. barn."
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=500, help_text=help_price
     )
@@ -65,6 +71,9 @@ class Activity(models.Model):
 
     def __str__(self):
         return self.department.name + ", " + self.name
+
+    def filterinfo(self):
+        return self.department.name + ": " + self.name
 
     def is_season(self):
         return (self.end_date - self.start_date).days > 30
