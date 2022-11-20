@@ -503,7 +503,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
         return mark_safe(link)
 
-    activity_union_link.short_description = "Forening"
+    activity_union_link.short_description = (
+        "Forening for Foreningsmedlemskab/Støttemedlemskab"
+    )
     activity_union_link.admin_order_field = "activity__union__name"
 
     def activity_department_link(self, item):
@@ -540,141 +542,8 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     activity_payment_info_html.short_description = "Betalingsinfo"
 
-    def export_csv_simple1(self, request, queryset):
-        result_string = '"Navn", "Alder, "Køn"\n'
-        gender = "andet"
-        today = timezone.now().date()
-        for p in queryset:
-            if p.member.person.gender == "MA":
-                gender = "Dreng"
-            elif p.member.person.gender == "FM":
-                gender = "Pige"
-            else:
-                gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
-
-            result_string = (
-                result_string
-                + p.member.person.name
-                + ";"
-                + str(age)
-                + ";"
-                + gender
-                + "\n"
-            )
-        response = HttpResponse(result_string, content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
-        return response
-
-    export_csv_simple1.short_description = "CSV Export (Navn; Alder; Køn)"
-
-    def export_csv_simple2(self, request, queryset):
-        result_string = (
-            '"Navn", "Alder, "Køn"; "forældre navn"; "forældre email"; "forældre tlf"\n'
-        )
-        gender = "andet"
-        today = timezone.now().date()
-        for p in queryset:
-            if p.member.person.gender == "MA":
-                gender = "Dreng"
-            elif p.member.person.gender == "FM":
-                gender = "Pige"
-            else:
-                gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
-
-            parent = p.member.person.family.get_first_parent()
-            if parent:
-                parent_name = parent.name
-                parent_phone = parent.phone
-                if not p.member.person.family.dont_send_mails:
-                    parent_email = parent.email
-                else:
-                    parent_email = ""
-            else:
-                parent_name = ""
-                parent_phone = ""
-                parent_email = ""
-
-            result_string = (
-                result_string
-                + p.member.person.name
-                + ";"
-                + str(age)
-                + ";"
-                + gender
-                + ";"
-                + parent_name
-                + ";"
-                + parent_email
-                + ";"
-                + parent_phone
-                + "\n"
-            )
-        response = HttpResponse(result_string, content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
-        return response
-
-    export_csv_simple2.short_description = (
-        "CSV Export (Navn; Alder; Køn; forældre-navn; forældre-email; forældre-telefon)"
-    )
-
-    def export_csv_full1(self, request, queryset):
-        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Betalingsinfo"\n'
-        gender = "andet"
-        today = timezone.now().date()
-        for p in queryset:
-            if p.member.person.gender == "MA":
-                gender = "Dreng"
-            elif p.member.person.gender == "FM":
-                gender = "Pige"
-            else:
-                gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
-
-            result_string = (
-                result_string
-                + p.activity.union.name
-                + ";"
-                + p.activity.department.name
-                + ";"
-                + p.activity.name
-                + ";"
-                + p.member.person.name
-                + ";"
-                + str(age)
-                + ";"
-                + gender
-                + ";"
-                + self.activity_payment_info_txt(p)
-                + "\n"
-            )
-        response = HttpResponse(result_string, content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
-        return response
-
-    export_csv_full1.short_description = (
-        "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Betalingsinfo)"
-    )
-
     def export_csv_full2(self, request, queryset):
-        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"\n'
-        gender = "andet"
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
         today = timezone.now().date()
         for p in queryset:
             if p.member.person.gender == "MA":
@@ -705,7 +574,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
             result_string = (
                 result_string
-                + p.activity.union.name
+                + p.activity.department.union.name
                 + ";"
                 + p.activity.department.name
                 + ";"
@@ -726,13 +595,15 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + parent_email
                 + ";"
                 + parent_phone
+                + ";"
+                + self.note
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
-    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Post-nr; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon)"
+    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Post-nr; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon; Note-til-arrangørerne)"
 
 
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)

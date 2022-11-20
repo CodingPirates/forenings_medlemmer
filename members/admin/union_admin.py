@@ -1,9 +1,12 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from members.models import Address
 
 
 class UnionAdmin(admin.ModelAdmin):
+    list_display = ("id", "union_link", "address", "union_email")
     list_filter = ("address__region",)
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
@@ -66,4 +69,10 @@ class UnionAdmin(admin.ModelAdmin):
         ),
     ]
 
-    list_display = ("name", "address", "union_email")
+    def union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.id])
+        link = '<a href="%s">%s</a>' % (url, item.name)
+        return mark_safe(link)
+
+    union_link.short_description = "Forening"
+    union_link.admin_order_field = "name"

@@ -28,10 +28,27 @@ class Department(models.Model):
         "Address", on_delete=models.PROTECT, verbose_name="Adresse"
     )
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
-    created = models.DateField("Oprettet", blank=False, default=timezone.now)
-    closed_dtm = models.DateField("Lukket", blank=True, null=True, default=None)
-    isVisible = models.BooleanField("Kan ses på afdelingssiden", default=True)
-    isOpening = models.BooleanField("Er afdelingen under opstart", default=False)
+    created = models.DateField(
+        "Oprettet",
+        blank=False,
+        default=timezone.now,
+        help_text="Dato for oprettelse af denne afdeling",
+    )
+    closed_dtm = models.DateField(
+        "Lukket",
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Dato for lukning af denne afdeling",
+    )
+    isVisible = models.BooleanField(
+        "På afdelingskort",
+        default=True,
+        help_text="Bliver denne afdeling vist på https://codingpirates.dk/afdelinger/ ?",
+    )
+    isOpening = models.BooleanField(
+        "Under opstart", default=False, help_text="Er denne afdeling under opstart ?"
+    )
     website = models.URLField("Hjemmeside", blank=True)
     union = models.ForeignKey(
         "Union",
