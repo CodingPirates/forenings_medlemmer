@@ -2,6 +2,7 @@ import socket
 import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from members.tests.factories import ActivityFactory
 from django.utils import timezone
@@ -35,7 +36,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/activities_list_1.png")
 
         # check that the test activity is present
-        activity_name = self.browser.find_element_by_xpath(
+        activity_name = self.browser.find_element(By.XPATH,
             "//section[@id='current_activities']/table/tbody/tr[1]/td[@data-label='Aktivitet']"
         ).get_attribute("textContent")
         self.assertEqual(activity_name, self.activity_1.name)
@@ -43,7 +44,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         # check there is only one activity present
         self.assertEqual(
             len(
-                self.browser.find_elements_by_xpath(
+                self.browser.find_elements(By.XPATH,
                     "//section[@id='current_activities']/table/tbody"
                 )
             ),
