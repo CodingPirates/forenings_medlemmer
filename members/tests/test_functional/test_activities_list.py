@@ -36,16 +36,17 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/activities_list_1.png")
 
         # check that the test activity is present
-        activity_name = self.browser.find_element(By.XPATH,
-            "//section[@id='current_activities']/table/tbody/tr[1]/td[@data-label='Aktivitet']"
+        activity_name = self.browser.find_element(
+            By.XPATH,
+            "//section[@id='current_activities']/table/tbody/tr[1]/td[@data-label='Aktivitet']",
         ).get_attribute("textContent")
         self.assertEqual(activity_name, self.activity_1.name)
 
         # check there is only one activity present
         self.assertEqual(
             len(
-                self.browser.find_elements(By.XPATH,
-                    "//section[@id='current_activities']/table/tbody"
+                self.browser.find_elements(
+                    By.XPATH, "//section[@id='current_activities']/table/tbody"
                 )
             ),
             1,

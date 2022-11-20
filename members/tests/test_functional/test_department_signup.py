@@ -38,22 +38,23 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/department_signup_1.png")
 
         # check that there's the "Hovedstaden" region tab
-        self.browser.find_element(By.XPATH,
-            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]"
+        self.browser.find_element(
+            By.XPATH,
+            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         ).click()
         self.browser.save_screenshot("test-screens/department_signup_2.png")
 
         # check that the department we made in the "Hovedstaden" region is present
-        department_name = self.browser.find_element(By.XPATH,
-            "//tbody[@id='department-tbody']/tr/td"
+        department_name = self.browser.find_element(
+            By.XPATH, "//tbody[@id='department-tbody']/tr/td"
         ).get_attribute("innerText")
         self.assertEqual(department_name, self.department_1.name)
 
         # check there is only one department preset
         self.assertEqual(
             len(
-                self.browser.find_elements(By.XPATH,
-                    "(//tbody[@id='department-tbody'])/tr"
+                self.browser.find_elements(
+                    By.XPATH, "(//tbody[@id='department-tbody'])/tr"
                 )
             ),
             1,

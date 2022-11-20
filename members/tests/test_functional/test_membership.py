@@ -27,7 +27,7 @@ class MembershipTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/membership_1.png")
 
         # for now, just check that the "Department signup" button exists
-        button_text = self.browser.find_element(By.XPATH,
-            "//a[@href='/department_signup']"
+        button_text = self.browser.find_element(
+            By.XPATH, "//a[@href='/department_signup']"
         ).get_attribute("text")
         self.assertNotEqual(button_text, None)
