@@ -41,7 +41,7 @@ def AdminSignup(request):
                 family = Family.objects.create(
                     email=admin_signup.cleaned_data["volunteer_email"]
                 )
-                family.confirmed_dtm = timezone.now()
+                family.confirmed_at = timezone.now()
                 family.save()
 
                 # create volunteer

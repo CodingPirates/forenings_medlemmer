@@ -11,7 +11,7 @@ class ActivityParticipantFactory(DjangoModelFactory):
     class Meta:
         model = ActivityParticipant
 
-    added_dtm = Faker("date_time", tzinfo=TIMEZONE)
+    added_at = Faker("date_time", tzinfo=TIMEZONE)
     activity = SubFactory(ActivityFactory)
     member = SubFactory(MemberFactory)
     note = Faker("text")

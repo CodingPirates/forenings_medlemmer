@@ -3,6 +3,7 @@ import socket
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from members.tests.factories import (
@@ -37,20 +38,20 @@ class AccountLoginTest(StaticLiveServerTestCase):
             "Log ind",
             [
                 e.text
-                for e in self.browser.find_elements_by_xpath(
-                    "//body/descendant-or-self::*"
+                for e in self.browser.find_elements(
+                    By.XPATH, "//body/descendant-or-self::*"
                 )
             ],
         )
-        self.browser.find_element_by_link_text("Log ind")
+        self.browser.find_elements(By.LINK_TEXT, "Log ind")
         self.assertIn(
             "Opret bruger",
             [
                 e.text
-                for e in self.browser.find_elements_by_xpath(
-                    "//body/descendant-or-self::*"
+                for e in self.browser.find_elements(
+                    By.XPATH, "//body/descendant-or-self::*"
                 )
             ],
         )
-        self.browser.find_element_by_link_text("Tilmeld barn")
-        self.browser.find_element_by_link_text("Bliv frivillig")
+        self.browser.find_elements(By.LINK_TEXT, "Tilmeldt barn")
+        self.browser.find_elements(By.LINK_TEXT, "Bliv frivillig")

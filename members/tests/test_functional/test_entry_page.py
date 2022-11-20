@@ -3,6 +3,7 @@ import socket
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from members.tests.factories import (
@@ -36,45 +37,44 @@ class EntryPageTest(StaticLiveServerTestCase):
         # Login
         log_in(self, self.member.person)
 
-        self.browser.find_element_by_link_text("Familie")
-        self.browser.find_element_by_link_text("Log ud")
+        self.browser.find_element(By.LINK_TEXT, "Familie")
+        self.browser.find_element(By.LINK_TEXT, "Log ud")
 
     def test_entry_page(self):
         self.browser.get(f"{self.live_server_url}")
 
-        self.browser.find_element_by_link_text("Log ind")
-        self.browser.find_element_by_link_text("Tilmeld barn")
-        self.browser.find_element_by_link_text("Bliv frivillig")
-
-        self.browser.find_element_by_link_text("Afdelinger")
-        self.browser.find_element_by_link_text("Arrangementer")
-        self.browser.find_element_by_link_text("Medlemskaber")
-        self.browser.find_element_by_link_text("Støttemedlemskaber")
+        self.browser.find_element(By.LINK_TEXT, "Log ind")
+        self.browser.find_element(By.LINK_TEXT, "Tilmeld barn")
+        self.browser.find_element(By.LINK_TEXT, "Bliv frivillig")
+        self.browser.find_element(By.LINK_TEXT, "Afdelinger")
+        self.browser.find_element(By.LINK_TEXT, "Arrangementer")
+        self.browser.find_element(By.LINK_TEXT, "Medlemskaber")
+        self.browser.find_element(By.LINK_TEXT, "Støttemedlemskaber")
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Arrangementer"),
+                self.browser.find_elements(By.LINK_TEXT, "Arrangementer"),
             )
         )
         self.assertEqual(links[0], links[1])
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Afdelinger"),
+                self.browser.find_elements(By.LINK_TEXT, "Afdelinger"),
             )
         )
         self.assertEqual(links[0], links[1])
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Medlemskaber"),
+                self.browser.find_elements(By.LINK_TEXT, "Medlemskaber"),
             )
         )
         self.assertEqual(links[0], links[1])
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Støttemedlemskaber"),
+                self.browser.find_elements(By.LINK_TEXT, "Støttemedlemskaber"),
             )
         )
         self.assertEqual(links[0], links[1])

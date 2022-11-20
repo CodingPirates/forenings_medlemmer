@@ -15,7 +15,7 @@ from members.utils.user import user_to_person, has_user
 def Activities(request):
     family = user_to_person(request.user).family
     invites = ActivityInvite.objects.filter(
-        person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None
+        person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
     )
     open_activities = Activity.objects.filter(
         open_invite=True,
