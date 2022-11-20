@@ -26,7 +26,7 @@ class SendActivitySignupConfirmationsCronJob(CronJobBase):
     def do(self):
         unannounced_signups = ActivityParticipant.objects.exclude(
             notification__isnull=False
-        ).filter(payment__accepted_dtm__isnull=False)
+        ).filter(payment__accepted_at__isnull=False)
 
         for announcement in unannounced_signups:
             context = {
@@ -106,10 +106,10 @@ class RequestConfirmationCronJob(CronJobBase):
             days=settings.REQUEST_FAMILY_VALIDATION_PERIOD
         )
         unconfirmed_families = Family.objects.filter(
-            Q(confirmed_dtm__lt=outdated_dtm) | Q(confirmed_dtm=None)
+            Q(confirmed_at__lt=outdated_dtm) | Q(confirmed_at=None)
         ).exclude(
-            Q(notification__update_info_dtm__gt=F("confirmed_dtm"))
-            | Q(~Q(notification__update_info_dtm=None), confirmed_dtm=None)
+            Q(notification__update_info_dtm__gt=F("confirmed_at"))
+            | Q(~Q(notification__update_info_dtm=None), confirmed_at=None)
         )[
             :10
         ]
@@ -139,15 +139,45 @@ class PollQuickpayPaymentsCronJob(CronJobBase):
             days=14
         )  # Timeout checking payments after 14 days
         payments = Payment.objects.filter(
-            rejected_dtm__isnull=True,
-            confirmed_dtm__isnull=True,
+            rejected_at__isnull=True,
+            confirmed_at__isnull=True,
             payment_type=Payment.CREDITCARD,
-            added__gt=outdated_dtm,
+            added_at__gt=outdated_dtm,
         )
 
         for payment in payments:
             payment.get_quickpaytransaction().update_status()
 
+
+# Send email to family if payment initiated but not accepted after 3 days
+"""
+class ReminderEmailPaymentCronJob(CronJobBase):
+    RUN_AT_TIMES = ["5:00"]
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+# Following was copied from previous schedule - has to be corrected ;-)
+    def do(self):
+        unannounced_signups = ActivityParticipant.objects.exclude(
+            notification__isnull=False
+        ).filter(payment__accepted_at__isnull=False)
+
+        for announcement in unannounced_signups:
+            context = {
+                "activity": announcement.activity,
+                "person": announcement.member.person,
+                "family": announcement.member.person.family,
+                "union": announcement.activity.department.union,
+            }
+            emails = EmailTemplate.objects.get(idname="ACT_CONFIRM").makeEmail(
+                [announcement.member.person, announcement.member.person.family], context
+            )
+            for email in emails:
+                notification = Notification(
+                    family=announcement.member.person.family,
+                    email=email,
+                    anounced_activity_participant=announcement,
+                )
+                notification.save()
+"""
 
 # TODO:Find created families/persons, which never clicked the link (spambots etc.)
 

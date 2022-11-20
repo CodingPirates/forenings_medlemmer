@@ -86,7 +86,7 @@ class PersonInline(admin.TabularInline):
     admin_link.short_description = "Navn"
 
     model = Person
-    fields = ("admin_link", "membertype", "zipcode", "added", "notes", "email")
+    fields = ("admin_link", "membertype", "zipcode", "added_at", "notes", "email")
     readonly_fields = fields
     can_delete = False
     extra = 0
@@ -94,14 +94,14 @@ class PersonInline(admin.TabularInline):
 
 class PaymentInline(admin.TabularInline):
     model = Payment
-    fields = ("added", "payment_type", "confirmed_dtm", "rejected_dtm", "amount_ore")
+    fields = ("added_at", "payment_type", "confirmed_at", "rejected_at", "amount_ore")
     readonly_fields = ("family",)
     extra = 0
 
 
 class VolunteerInline(admin.TabularInline):
     model = Volunteer
-    fields = ("department", "added", "confirmed", "removed")
+    fields = ("department", "added_at", "confirmed", "removed")
     extra = 0
 
 
@@ -165,8 +165,8 @@ class FamilyAdmin(admin.ModelAdmin):
     ]  # new UUID gets used accidentially
     # actions = ['resend_link_email']
 
-    fields = ("email", "dont_send_mails", "confirmed_dtm")
-    readonly_fields = ("confirmed_dtm",)
+    fields = ("email", "dont_send_mails", "confirmed_at")
+    readonly_fields = ("confirmed_at",)
     list_per_page = 20
 
     def create_new_uuid(self, request, queryset):
@@ -248,19 +248,19 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
             return queryset.filter(payment__isnull=True)
         elif self.value() == "ok":
             return queryset.filter(
-                payment__isnull=False, payment__accepted_dtm__isnull=False
+                payment__isnull=False, payment__accepted_at__isnull=False
             )
         elif self.value() == "confirmed":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=False
+                payment__isnull=False, payment__confirmed_at__isnull=False
             )
         elif self.value() == "pending":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=True
+                payment__isnull=False, payment__confirmed_at__isnull=True
             )
         elif self.value() == "rejected":
             return queryset.filter(
-                payment__isnull=False, payment__rejected_dtm__isnull=False
+                payment__isnull=False, payment__rejected_at__isnull=False
             )
 
 
@@ -391,7 +391,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity_union_link",
         "activity_department_link",
         "activity_link",
-        "added_dtm",
+        "added_at",
         "activity_person_link",
         "activity_person_gender",
         "person_age_years",
@@ -416,7 +416,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     # search_fields = ("member__person__name",)
     # Member.short_description = "Navn"
     list_display_links = (
-        "added_dtm",
+        "added_at",
         "photo_permission",
         "note",
     )
@@ -775,7 +775,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "invite_dtm",
         "person_age_years",
         "person_zipcode",
-        "rejected_dtm",
+        "rejected_at",
     )
     list_filter = (ActivivtyInviteActivityListFilter,)
     search_fields = ("person__name",)
@@ -800,7 +800,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                     "activity",
                     "invite_dtm",
                     "expire_dtm",
-                    "rejected_dtm",
+                    "rejected_at",
                 ),
             },
         ),

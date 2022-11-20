@@ -39,7 +39,7 @@ def AccountCreate(request):
                 family = Family.objects.create(
                     email=signup.cleaned_data["parent_email"]
                 )
-                family.confirmed_dtm = timezone.now()
+                family.confirmed_at = timezone.now()
                 family.save()
 
                 # create parent as user

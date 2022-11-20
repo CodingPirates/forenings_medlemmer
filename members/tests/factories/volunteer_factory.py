@@ -14,6 +14,6 @@ class VolunteerFactory(DjangoModelFactory):
     person = SubFactory(PersonFactory)
     department = SubFactory(DepartmentFactory)
 
-    added = Faker("date_time", tzinfo=TIMEZONE)
-    confirmed = LazyAttribute(lambda d: datetime_after(d.added))
-    removed = LazyAttribute(lambda d: datetime_after(d.added))
+    added_at = Faker("date_time", tzinfo=TIMEZONE)
+    confirmed = LazyAttribute(lambda d: datetime_after(d.added_at))
+    removed = LazyAttribute(lambda d: datetime_after(d.added_at))
