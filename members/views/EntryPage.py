@@ -16,7 +16,7 @@ def EntryPage(request):
         else:
             family = user.family
             invites = ActivityInvite.objects.filter(
-                person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None
+                person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
             )
 
             context = {

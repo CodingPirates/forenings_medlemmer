@@ -42,7 +42,7 @@ def volunteerSignup(request):
                 family = Family.objects.create(
                     email=vol_signup.cleaned_data["volunteer_email"]
                 )
-                family.confirmed_dtm = timezone.now()
+                family.confirmed_at = timezone.now()
                 family.save()
 
                 # create volunteer as user

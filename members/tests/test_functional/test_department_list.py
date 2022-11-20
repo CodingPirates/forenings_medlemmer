@@ -2,6 +2,7 @@ import socket
 import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from members.tests.factories import DepartmentFactory
 from django.utils import timezone
@@ -58,31 +59,33 @@ class DepartmentListTest(StaticLiveServerTestCase):
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/department_list_1.png")
 
-        self.assertEquals(0, len(self.browser.find_elements_by_tag_name("nav")))
+        self.assertEquals(0, len(self.browser.find_elements(By.TAG_NAME, "nav")))
         # check that there's the "Hovedstaden" region tab
-        self.browser.find_element_by_xpath(
-            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]"
+        self.browser.find_element(
+            By.XPATH,
+            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         ).click()
         self.browser.save_screenshot("test-screens/department_list_first_region.png")
 
         # check that the department we made in the "Hovedstaden" region is present
-        department_name = self.browser.find_element_by_xpath(
-            "//section[@id='department-container']/div/ul/li/a"
+        department_name = self.browser.find_element(
+            By.XPATH, "//section[@id='department-container']/div/ul/li/a"
         ).get_attribute("text")
         self.assertEqual(department_name, self.department_1.name)
 
         # check there is only one department preset
         self.assertEqual(
             len(
-                self.browser.find_elements_by_xpath(
-                    "(//section[@id='department-container'])[1]/div"
+                self.browser.find_elements(
+                    By.XPATH, "(//section[@id='department-container'])[1]/div"
                 )
             ),
             1,
         )
 
         # check that there's the "Syddanmark" region tab
-        self.browser.find_element_by_xpath(
-            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Syddanmark')]]"
+        self.browser.find_element(
+            By.XPATH,
+            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Syddanmark')]]",
         ).click()
         self.browser.save_screenshot("test-screens/department_list_second_region.png")

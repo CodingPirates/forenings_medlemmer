@@ -86,7 +86,7 @@ class PersonInline(admin.TabularInline):
     admin_link.short_description = "Navn"
 
     model = Person
-    fields = ("admin_link", "membertype", "zipcode", "added", "notes", "email")
+    fields = ("admin_link", "membertype", "zipcode", "added_at", "notes", "email")
     readonly_fields = fields
     can_delete = False
     extra = 0
@@ -94,14 +94,14 @@ class PersonInline(admin.TabularInline):
 
 class PaymentInline(admin.TabularInline):
     model = Payment
-    fields = ("added", "payment_type", "confirmed_dtm", "rejected_dtm", "amount_ore")
+    fields = ("added_at", "payment_type", "confirmed_at", "rejected_at", "amount_ore")
     readonly_fields = ("family",)
     extra = 0
 
 
 class VolunteerInline(admin.TabularInline):
     model = Volunteer
-    fields = ("department", "added", "confirmed", "removed")
+    fields = ("department", "added_at", "confirmed", "removed")
     extra = 0
 
 
@@ -165,8 +165,8 @@ class FamilyAdmin(admin.ModelAdmin):
     ]  # new UUID gets used accidentially
     # actions = ['resend_link_email']
 
-    fields = ("email", "dont_send_mails", "confirmed_dtm")
-    readonly_fields = ("confirmed_dtm",)
+    fields = ("email", "dont_send_mails", "confirmed_at")
+    readonly_fields = ("confirmed_at",)
     list_per_page = 20
 
     def create_new_uuid(self, request, queryset):
@@ -248,19 +248,19 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
             return queryset.filter(payment__isnull=True)
         elif self.value() == "ok":
             return queryset.filter(
-                payment__isnull=False, payment__accepted_dtm__isnull=False
+                payment__isnull=False, payment__accepted_at__isnull=False
             )
         elif self.value() == "confirmed":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=False
+                payment__isnull=False, payment__confirmed_at__isnull=False
             )
         elif self.value() == "pending":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=True
+                payment__isnull=False, payment__confirmed_at__isnull=True
             )
         elif self.value() == "rejected":
             return queryset.filter(
-                payment__isnull=False, payment__rejected_dtm__isnull=False
+                payment__isnull=False, payment__rejected_at__isnull=False
             )
 
 
@@ -391,7 +391,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity_union_link",
         "activity_department_link",
         "activity_link",
-        "added_dtm",
+        "added_at",
         "activity_person_link",
         "activity_person_gender",
         "person_age_years",
@@ -416,7 +416,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     # search_fields = ("member__person__name",)
     # Member.short_description = "Navn"
     list_display_links = (
-        "added_dtm",
+        "added_at",
         "photo_permission",
         "note",
     )
@@ -503,7 +503,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
         return mark_safe(link)
 
-    activity_union_link.short_description = "Forening"
+    activity_union_link.short_description = (
+        "Forening for Foreningsmedlemskab/Støttemedlemskab"
+    )
     activity_union_link.admin_order_field = "activity__union__name"
 
     def activity_department_link(self, item):
@@ -540,141 +542,8 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     activity_payment_info_html.short_description = "Betalingsinfo"
 
-    def export_csv_simple1(self, request, queryset):
-        result_string = '"Navn", "Alder, "Køn"\n'
-        gender = "andet"
-        today = timezone.now().date()
-        for p in queryset:
-            if p.member.person.gender == "MA":
-                gender = "Dreng"
-            elif p.member.person.gender == "FM":
-                gender = "Pige"
-            else:
-                gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
-
-            result_string = (
-                result_string
-                + p.member.person.name
-                + ";"
-                + str(age)
-                + ";"
-                + gender
-                + "\n"
-            )
-        response = HttpResponse(result_string, content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
-        return response
-
-    export_csv_simple1.short_description = "CSV Export (Navn; Alder; Køn)"
-
-    def export_csv_simple2(self, request, queryset):
-        result_string = (
-            '"Navn", "Alder, "Køn"; "forældre navn"; "forældre email"; "forældre tlf"\n'
-        )
-        gender = "andet"
-        today = timezone.now().date()
-        for p in queryset:
-            if p.member.person.gender == "MA":
-                gender = "Dreng"
-            elif p.member.person.gender == "FM":
-                gender = "Pige"
-            else:
-                gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
-
-            parent = p.member.person.family.get_first_parent()
-            if parent:
-                parent_name = parent.name
-                parent_phone = parent.phone
-                if not p.member.person.family.dont_send_mails:
-                    parent_email = parent.email
-                else:
-                    parent_email = ""
-            else:
-                parent_name = ""
-                parent_phone = ""
-                parent_email = ""
-
-            result_string = (
-                result_string
-                + p.member.person.name
-                + ";"
-                + str(age)
-                + ";"
-                + gender
-                + ";"
-                + parent_name
-                + ";"
-                + parent_email
-                + ";"
-                + parent_phone
-                + "\n"
-            )
-        response = HttpResponse(result_string, content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
-        return response
-
-    export_csv_simple2.short_description = (
-        "CSV Export (Navn; Alder; Køn; forældre-navn; forældre-email; forældre-telefon)"
-    )
-
-    def export_csv_full1(self, request, queryset):
-        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Betalingsinfo"\n'
-        gender = "andet"
-        today = timezone.now().date()
-        for p in queryset:
-            if p.member.person.gender == "MA":
-                gender = "Dreng"
-            elif p.member.person.gender == "FM":
-                gender = "Pige"
-            else:
-                gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
-
-            result_string = (
-                result_string
-                + p.activity.union.name
-                + ";"
-                + p.activity.department.name
-                + ";"
-                + p.activity.name
-                + ";"
-                + p.member.person.name
-                + ";"
-                + str(age)
-                + ";"
-                + gender
-                + ";"
-                + self.activity_payment_info_txt(p)
-                + "\n"
-            )
-        response = HttpResponse(result_string, content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
-        return response
-
-    export_csv_full1.short_description = (
-        "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Betalingsinfo)"
-    )
-
     def export_csv_full2(self, request, queryset):
-        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"\n'
-        gender = "andet"
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
         today = timezone.now().date()
         for p in queryset:
             if p.member.person.gender == "MA":
@@ -705,7 +574,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
             result_string = (
                 result_string
-                + p.activity.union.name
+                + p.activity.department.union.name
                 + ";"
                 + p.activity.department.name
                 + ";"
@@ -726,13 +595,15 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + parent_email
                 + ";"
                 + parent_phone
+                + ";"
+                + self.note
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
-    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Post-nr; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon)"
+    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Post-nr; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon; Note-til-arrangørerne)"
 
 
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
@@ -775,7 +646,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "invite_dtm",
         "person_age_years",
         "person_zipcode",
-        "rejected_dtm",
+        "rejected_at",
     )
     list_filter = (ActivivtyInviteActivityListFilter,)
     search_fields = ("person__name",)
@@ -800,7 +671,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                     "activity",
                     "invite_dtm",
                     "expire_dtm",
-                    "rejected_dtm",
+                    "rejected_at",
                 ),
             },
         ),

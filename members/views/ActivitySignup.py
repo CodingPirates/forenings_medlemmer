@@ -206,7 +206,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                 )
                 for invite in invites:
                     if invite.activity.is_season():
-                        invite.rejected_dtm = timezone.now()
+                        invite.rejected_at = timezone.now()
                         invite.save()
 
             return HttpResponseRedirect(return_link_url)

@@ -44,7 +44,7 @@ def Activities(request):
                     )
                 ]
             invites = ActivityInvite.objects.filter(
-                person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None
+                person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
             )
             participating = ActivityParticipant.objects.filter(
                 member__person__family=family,
