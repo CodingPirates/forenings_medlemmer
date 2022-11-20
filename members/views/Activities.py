@@ -39,7 +39,9 @@ def Activities(request):
                 ]
                 child["participating_activities"] = [
                     (act.activity.id)
-                    for act in ActivityParticipant.objects.filter(member__person=child["person"].id)
+                    for act in ActivityParticipant.objects.filter(
+                        member__person=child["person"].id
+                    )
                 ]
             invites = ActivityInvite.objects.filter(
                 person__family=family, expire_dtm__gte=timezone.now(), rejected_dtm=None

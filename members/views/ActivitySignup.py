@@ -33,11 +33,13 @@ def ActivitySignup(request, activity_id, person_id=None):
         if person:
             family = user_to_person(request.user).family
 
-    family_participants = [] # participants from current family
+    family_participants = []  # participants from current family
     if family:
         family_participants = [
             (act.member.person.id)
-            for act in ActivityParticipant.objects.filter(activity_id=activity.id, member__person__family=family)
+            for act in ActivityParticipant.objects.filter(
+                activity_id=activity.id, member__person__family=family
+            )
         ]
 
     if family and person_id:
