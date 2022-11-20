@@ -108,9 +108,11 @@
                 {% if child.id in family_participants %}
                   {{ child.firstname}} er tilmeldt
                 {% else %}
-                  <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
-                    Tilmeld {{ child.firstname }}
-                  </a>
+                  {% if activity.min_age <= child.age_years and child.age_years <= activity.max_age %}
+                    <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
+                      Tilmeld {{ child.firstname }}
+                    </a>
+                  {% endif %}
                 {% endif %}
               {% endfor %}
             {% else %}
