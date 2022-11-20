@@ -101,8 +101,8 @@ class DepartmentStatistics(models.Model):
 
         self.payments = Payment.objects.filter(
             activity__department=self.department,
-            refunded_dtm=None,
-            confirmed_dtm__isnull=False,
+            refunded_at=None,
+            confirmed_at__isnull=False,
         ).aggregate(sum=Coalesce(Sum("amount_ore"), 0))["sum"]
 
         super(DepartmentStatistics, self).save(*args, **kwargs)

@@ -40,34 +40,38 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
 
         # Gender
-        field = Select(self.browser.find_element_by_name("child_gender"))
+        field = Select(
+            WebDriverWait(self.browser, 10).until(
+                EC.presence_of_element_located((By.NAME, "child_gender"))
+            )
+        )
         field.select_by_value("MA")
 
         # Enter child details
-        field = self.browser.find_element_by_name("child_name")
+        field = self.browser.find_element(By.NAME, "child_name")
         field.send_keys("Torben Test")
 
-        field = self.browser.find_element_by_name("child_birthday")
+        field = self.browser.find_element(By.NAME, "child_birthday")
         field.send_keys("05-03-2010")
 
         # Enter parent details
-        field = Select(self.browser.find_element_by_name("parent_gender"))
+        field = Select(self.browser.find_element(By.NAME, "parent_gender"))
         field.select_by_value("MA")
 
-        field = self.browser.find_element_by_name("parent_name")
+        field = self.browser.find_element(By.NAME, "parent_name")
         field.send_keys("Anders Afprøvning")
 
-        field = self.browser.find_element_by_name("parent_birthday")
+        field = self.browser.find_element(By.NAME, "parent_birthday")
         field.send_keys("05-03-1980")
 
-        field = self.browser.find_element_by_name("parent_email")
+        field = self.browser.find_element(By.NAME, "parent_email")
         field.send_keys(self.email)
 
-        field = self.browser.find_element_by_name("parent_phone")
+        field = self.browser.find_element(By.NAME, "parent_phone")
         field.send_keys("12345678")
 
         # Use addresse Autocomplete
-        field = self.browser.find_element_by_name("search_address")
+        field = self.browser.find_element(By.NAME, "search_address")
         field.click()
         field.send_keys("Kochsgade 31D, 5000")
         try:
@@ -90,23 +94,23 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
         # Check that redirect and get password
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
-        password = self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'Adgangskoden er')]]"
+        password = self.browser.find_elements(
+            By.XPATH, "//*[text()[contains(.,'Adgangskoden er')]]"
         )[0].text.split(" ")[-1]
 
         # Go to login page,
-        self.browser.find_elements_by_xpath(
-            "//*[text()[contains(.,'Gå til log ind')]]"
+        self.browser.find_elements(
+            By.XPATH, "//*[text()[contains(.,'Gå til log ind')]]"
         )[0].click()
 
         # enter email and password
-        field = self.browser.find_element_by_name("username")
+        field = self.browser.find_element(By.NAME, "username")
         field.send_keys(self.email)
 
-        field = self.browser.find_element_by_name("password")
+        field = self.browser.find_element(By.NAME, "password")
         field.send_keys(password)
 
-        self.browser.find_element_by_xpath("//input[@type='submit']").click()
+        self.browser.find_element(By.XPATH, "//input[@type='submit']").click()
 
         # Check that we were redirectet to front page
         self.assertEqual(f"{self.live_server_url}/", self.browser.current_url)

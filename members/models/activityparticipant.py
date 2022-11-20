@@ -16,7 +16,7 @@ class ActivityParticipant(models.Model):
         verbose_name_plural = "Deltagere"
         unique_together = ("activity", "member")
 
-    added_dtm = models.DateField("Tilmeldt", default=timezone.now)
+    added_at = models.DateField("Tilmeldt", default=timezone.now)
     activity = models.ForeignKey(
         "Activity", on_delete=models.PROTECT, verbose_name="Aktivitet"
     )
@@ -41,14 +41,13 @@ class ActivityParticipant(models.Model):
     )
 
     def __str__(self):
-        return self.member.__str__()
-        # + ", " + self.activity.name
+        return self.member.__str__() + ", " + self.activity.name
         # No reason to show an activity here - looks like it's the first activity for the given user
 
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
         return not members.models.payment.Payment.objects.filter(
-            activityparticipant=self, accepted_dtm=None
+            activityparticipant=self, accepted_at=None
         )
 
     def payment_info(self, format_as_html: bool):
@@ -66,28 +65,28 @@ class ActivityParticipant(models.Model):
             html_post = ""
 
         result_string = "asdf"
-        if payment.refunded_dtm is not None:
-            result_string = f"{html_warn_pre}Refunderet{html_post}:{payment.refunded_dtm.strftime(ymdhm)}. "
-            if payment.confirmed_dtm is not None:
-                result_string += f"Betalt:{payment.confirmed_dtm.strftime(ymdhm)}. "
+        if payment.refunded_at is not None:
+            result_string = f"{html_warn_pre}Refunderet{html_post}:{payment.refunded_at.strftime(ymdhm)}. "
+            if payment.confirmed_at is not None:
+                result_string += f"Betalt:{payment.confirmed_at.strftime(ymdhm)}. "
             else:
-                result_string += f"(Oprettet:{payment.added.strftime(ymdhm)})"
+                result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
 
-        elif payment.rejected_dtm is not None:
-            result_string = f"{html_error_pre}Afvist:{html_post}{payment.rejected_dtm.strftime(ymdhm)}. "
-            result_string += f"(Oprettet:{payment.added.strftime(ymdhm)})"
-        elif payment.cancelled_dtm is not None:
-            result_string = f"{html_error_pre}Cancelled:{html_post}{payment.cancelled_dtm.strftime(ymdhm)}. "
-            result_string += f"(Oprettet:{payment.added.strftime(ymdhm)})"
+        elif payment.rejected_at is not None:
+            result_string = f"{html_error_pre}Afvist:{html_post}{payment.rejected_at.strftime(ymdhm)}. "
+            result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
+        elif payment.cancelled_at is not None:
+            result_string = f"{html_error_pre}Cancelled:{html_post}{payment.cancelled_at.strftime(ymdhm)}. "
+            result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
         else:
-            if payment.confirmed_dtm is not None:
-                result_string = f"{html_good_pre}Betalt:{html_post}{payment.confirmed_dtm.strftime(ymdhm)}. "
+            if payment.confirmed_at is not None:
+                result_string = f"{html_good_pre}Betalt:{html_post}{payment.confirmed_at.strftime(ymdhm)}. "
             else:
                 if payment.activity.price_in_dkk == 0:
                     result_string = f"{html_good_pre}Gratis.{html_post} "
                 else:
                     result_string = f"{html_error_pre}Andet er aftalt.{html_post} "
-            result_string += f"(Oprettet:{payment.added.strftime(ymdhm)})"
+            result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
 
         if format_as_html:
             return format_html(result_string)
@@ -96,7 +95,7 @@ class ActivityParticipant(models.Model):
 
     def get_payment_link(self):
         payment = members.models.payment.Payment.objects.get(
-            activityparticipant=self, confirmed_dtm=None
+            activityparticipant=self, confirmed_at=None
         )
         if payment.payment_type == members.models.payment.Payment.CREDITCARD:
             return payment.get_quickpaytransaction().get_link_url()

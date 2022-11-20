@@ -17,7 +17,7 @@ class WaitingList(models.Model):
     on_waiting_list_since = models.DateTimeField(
         "Venteliste position", blank=False, null=False
     )
-    added_dtm = models.DateTimeField(
+    added_at = models.DateTimeField(
         "Tilføjet", blank=False, null=False, default=timezone.now
     )
 
@@ -35,7 +35,7 @@ class WaitingList(models.Model):
     def save(self, *args, **kwargs):
         """On creation set on_waiting_list"""
         if not self.id:
-            self.on_waiting_list_since = self.person.added
+            self.on_waiting_list_since = self.person.added_at
         return super(WaitingList, self).save(*args, **kwargs)
 
     @staticmethod

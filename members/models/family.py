@@ -21,7 +21,7 @@ class Family(models.Model):
     email = models.EmailField(unique=True)
     dont_send_mails = models.BooleanField("Vil ikke kontaktes", default=False)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
-    confirmed_dtm = models.DateTimeField("Bekræftet", null=True, blank=True)
+    confirmed_at = models.DateTimeField("Bekræftet", null=True, blank=True)
     last_visit_dtm = models.DateTimeField("Sidst besøgt", null=True, blank=True)
     deleted_dtm = models.DateTimeField("Slettet", null=True, blank=True)
 

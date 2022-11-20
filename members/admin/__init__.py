@@ -8,10 +8,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
-# from django.contrib.auth.admin import UserAdmin
 from django.db.models.functions import Lower
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -37,7 +35,6 @@ from members.models import (
     EquipmentLoan,
     EmailTemplate,
 )
-import urllib
 
 from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
@@ -90,7 +87,7 @@ class PersonInline(admin.TabularInline):
     admin_link.short_description = "Navn"
 
     model = Person
-    fields = ("admin_link", "membertype", "zipcode", "added", "notes", "email")
+    fields = ("admin_link", "membertype", "zipcode", "added_at", "notes", "email")
     readonly_fields = fields
     can_delete = False
     extra = 0
@@ -98,14 +95,14 @@ class PersonInline(admin.TabularInline):
 
 class PaymentInline(admin.TabularInline):
     model = Payment
-    fields = ("added", "payment_type", "confirmed_dtm", "rejected_dtm", "amount_ore")
+    fields = ("added_at", "payment_type", "confirmed_at", "rejected_at", "amount_ore")
     readonly_fields = ("family",)
     extra = 0
 
 
 class VolunteerInline(admin.TabularInline):
     model = Volunteer
-    fields = ("department", "added", "confirmed", "removed")
+    fields = ("department", "added_at", "confirmed", "removed")
     extra = 0
 
 
@@ -169,8 +166,8 @@ class FamilyAdmin(admin.ModelAdmin):
     ]  # new UUID gets used accidentially
     # actions = ['resend_link_email']
 
-    fields = ("email", "dont_send_mails", "confirmed_dtm")
-    readonly_fields = ("confirmed_dtm",)
+    fields = ("email", "dont_send_mails", "confirmed_at")
+    readonly_fields = ("confirmed_at",)
     list_per_page = 20
 
     def create_new_uuid(self, request, queryset):
@@ -252,19 +249,19 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
             return queryset.filter(payment__isnull=True)
         elif self.value() == "ok":
             return queryset.filter(
-                payment__isnull=False, payment__accepted_dtm__isnull=False
+                payment__isnull=False, payment__accepted_at__isnull=False
             )
         elif self.value() == "confirmed":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=False
+                payment__isnull=False, payment__confirmed_at__isnull=False
             )
         elif self.value() == "pending":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=True
+                payment__isnull=False, payment__confirmed_at__isnull=True
             )
         elif self.value() == "rejected":
             return queryset.filter(
-                payment__isnull=False, payment__rejected_dtm__isnull=False
+                payment__isnull=False, payment__rejected_at__isnull=False
             )
 
 
@@ -364,7 +361,7 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     parameter_name = "union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union)) for union in Union.objects.all()]
+        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -395,7 +392,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity_union_link",
         "activity_department_link",
         "activity_link",
-        "added_dtm",
+        "added_at",
         "activity_person_link",
         "activity_person_gender",
         "person_age_years",
@@ -420,7 +417,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     # search_fields = ("member__person__name",)
     # Member.short_description = "Navn"
     list_display_links = (
-        "added_dtm",
+        "added_at",
         "photo_permission",
         "note",
     )
@@ -430,24 +427,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "member__person__name",
         "activity__name",
     )
+
     actions = [
         #        "export_csv_simple1",
         #        "export_csv_simple2",
         #        "export_csv_full1",
         "export_csv_full2",
     ]
-
-    def changelist_view(self, request, extra_context=None):
-        if request.GET:
-            return super().changelist_view(request, extra_context=extra_context)
-        date = timezone.now().date()
-        # params = ['day', 'month', 'year']
-        params = ["year"]
-        field_keys = ["{}__{}".format(self.date_hierarchy, i) for i in params]
-        field_values = [getattr(date, i) for i in params]
-        query_params = dict(zip(field_keys, field_values))
-        url = "{}?{}".format(request.path, urllib.parse.urlencode(query_params))
-        return redirect(url)
 
     def person_age_years(self, item):
         return item.member.person.age_years()
@@ -790,7 +776,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "invite_dtm",
         "person_age_years",
         "person_zipcode",
-        "rejected_dtm",
+        "rejected_at",
     )
     list_filter = (ActivivtyInviteActivityListFilter,)
     search_fields = ("person__name",)
@@ -815,7 +801,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                     "activity",
                     "invite_dtm",
                     "expire_dtm",
-                    "rejected_dtm",
+                    "rejected_at",
                 ),
             },
         ),

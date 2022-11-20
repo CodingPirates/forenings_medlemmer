@@ -44,7 +44,7 @@ class PersonFactory(DjangoModelFactory):
     # has_certificate = Faker("date")
     family = SubFactory(FamilyFactory, email=email)
     notes = Faker("text")
-    # added = Faker("date_time", tzinfo=TIMEZONE)
+    # added_at = Faker("date_time", tzinfo=TIMEZONE)
     # deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
     user = SubFactory(
         UserFactory, username=SelfAttribute("..email"), email=SelfAttribute("..email")
