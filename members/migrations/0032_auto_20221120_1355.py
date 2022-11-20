@@ -6,67 +6,78 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0031_auto_20221120_1215'),
+        ("members", "0031_auto_20221120_1215"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='person',
-            options={'ordering': ['added_at'], 'permissions': (('view_full_address', 'Can view persons full address + phonenumber + email'), ('view_all_persons', 'Can view persons not related to department')), 'verbose_name': 'Person', 'verbose_name_plural': 'Personer'},
+            name="person",
+            options={
+                "ordering": ["added_at"],
+                "permissions": (
+                    (
+                        "view_full_address",
+                        "Can view persons full address + phonenumber + email",
+                    ),
+                    ("view_all_persons", "Can view persons not related to department"),
+                ),
+                "verbose_name": "Person",
+                "verbose_name_plural": "Personer",
+            },
         ),
         migrations.RenameField(
-            model_name='activityinvite',
-            old_name='rejected_dtm',
-            new_name='rejected_at',
+            model_name="activityinvite",
+            old_name="rejected_dtm",
+            new_name="rejected_at",
         ),
         migrations.RenameField(
-            model_name='activityparticipant',
-            old_name='added_dtm',
-            new_name='added_at',
+            model_name="activityparticipant",
+            old_name="added_dtm",
+            new_name="added_at",
         ),
         migrations.RenameField(
-            model_name='family',
-            old_name='confirmed_dtm',
-            new_name='confirmed_at',
+            model_name="family",
+            old_name="confirmed_dtm",
+            new_name="confirmed_at",
         ),
         migrations.RenameField(
-            model_name='payment',
-            old_name='accepted_dtm',
-            new_name='accepted_at',
+            model_name="payment",
+            old_name="accepted_dtm",
+            new_name="accepted_at",
         ),
         migrations.RenameField(
-            model_name='payment',
-            old_name='added',
-            new_name='added_at',
+            model_name="payment",
+            old_name="added",
+            new_name="added_at",
         ),
         migrations.RenameField(
-            model_name='payment',
-            old_name='cancelled_dtm',
-            new_name='cancelled_at',
+            model_name="payment",
+            old_name="cancelled_dtm",
+            new_name="cancelled_at",
         ),
         migrations.RenameField(
-            model_name='payment',
-            old_name='confirmed_dtm',
-            new_name='confirmed_at',
+            model_name="payment",
+            old_name="confirmed_dtm",
+            new_name="confirmed_at",
         ),
         migrations.RenameField(
-            model_name='payment',
-            old_name='rejected_dtm',
-            new_name='rejected_at',
+            model_name="payment",
+            old_name="rejected_dtm",
+            new_name="rejected_at",
         ),
         migrations.RenameField(
-            model_name='person',
-            old_name='added',
-            new_name='added_at',
+            model_name="person",
+            old_name="added",
+            new_name="added_at",
         ),
         migrations.RenameField(
-            model_name='volunteer',
-            old_name='added',
-            new_name='added_at',
+            model_name="volunteer",
+            old_name="added",
+            new_name="added_at",
         ),
         migrations.RenameField(
-            model_name='waitinglist',
-            old_name='added_dtm',
-            new_name='added_at',
+            model_name="waitinglist",
+            old_name="added_dtm",
+            new_name="added_at",
         ),
     ]
