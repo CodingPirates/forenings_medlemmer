@@ -31,7 +31,7 @@
           <p>
           <strong>Ansvarlig:</strong><br>
           {{ activity.responsible_name}}<br>
-          <a href="mailto:{{activity.responsible_contact}}">{{activity.responsible_contact}}</a>
+          {% if person %}<a href="mailto:{{activity.responsible_contact}}">{{activity.responsible_contact}}</a>{% endif %}
           </p>
         </div>
         <div class="col-lg-6">
@@ -51,7 +51,7 @@
         <div class="col-lg-6">
           <p>
           <strong>Periode:</strong><br>
-            {{ activity.start_date|date:"j. F"}} - {{ activity.end_date|date:"j. F"}}
+            {{ activity.start_date }} - {{ activity.end_date }}
           </p>
         </div>
       </div>
@@ -80,30 +80,53 @@
             {{ union.name }}
           </p>
         </div>
+        <div class="col-lg-6">
+          <p>
+            <strong>Aldersbegrænsning:</strong><br>
+            {{ activity.min_age }} - {{ activity.max_age }} år.
+          </p>
+        </div>
       </div>
       {% if not view_only_mode %}
       <hr>
       {% crispy signupform %}
 
       {% else %}
-        {% if participating %}
-
-          <hr/>
-
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">{{person.name}} er tilmeldt dette arrangement</h2>
-            </div>
-          </div>
-        {% endif %}
-        {% if signup_closed and not participating %}
+        {% if not family %}
+        <hr>
+        <a href="{% url 'person_login' %}">Log ind</a> eller <a href="{% url 'account_create' %}">tilmeld dit barn</a> for at tilmelde dig denne aktivitet.
+        {% else %}
+          {% if signup_closed and not participating %}
           <hr>
             <div class="alert alert-primary">
               <p>Arrangementet er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
             </div>
-        {% endif %}
-        {% if family %}
-          <a class="btn btn-primary" href="{% url 'family_detail' %}">Tilbage</a>
+          {% else %}
+            <hr/>
+            {% if activity.open_invite %}
+              {% for child in family.get_children %}
+                {% if child.id in family_participants %}
+                  {{ child.firstname}} er tilmeldt
+                {% else %}
+                  {% if activity.min_age <= child.age_years and child.age_years <= activity.max_age %}
+                    <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
+                      Tilmeld {{ child.firstname }}
+                    </a>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              {% for child in family.get_children %}
+                {% if child.id in family_subscriptions %}
+                  {{ child.firstname }} er opskrevet&nbsp;&nbsp;
+                {% else %}
+                  <a class="button" href="{% url 'waiting_list_subscription' child.id activity.department.id 'subscribe' %}">
+                    Opskriv {{ child.firstname }} på venteliste
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endif %}
         {% endif %}
       {% endif %}
     </div>

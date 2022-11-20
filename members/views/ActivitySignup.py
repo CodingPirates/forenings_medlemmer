@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, user_passes_test
 
 from members.forms import ActivitySignupForm
 from members.models.activity import Activity
@@ -12,15 +11,12 @@ from members.models.activityparticipant import ActivityParticipant
 from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
-from members.utils.user import user_to_person, has_user
+from members.models.waitinglist import WaitingList
+from members.utils.user import user_to_person
 
 
-@login_required
-@user_passes_test(has_user, "/admin_signup/")
 def ActivitySignup(request, activity_id, person_id=None):
-    # TODO: is should be possible to view an activity without loggin in
     if person_id is None:
-        # View only mode
         view_only_mode = True
     else:
         view_only_mode = False
@@ -32,9 +28,31 @@ def ActivitySignup(request, activity_id, person_id=None):
     if request.resolver_match.url_name == "activity_view_person":
         view_only_mode = True
 
-    family = user_to_person(request.user).family
+    family = None
+    if request.user and not request.user.is_anonymous:
+        person = user_to_person(request.user)
+        if person:
+            family = user_to_person(request.user).family
 
-    if person_id:
+    family_participants = []  # participants from current family
+    family_subscriptions = []  # waiting list subscriptions for current family
+    if family:
+        family_participants = [
+            (act.member.person.id)
+            for act in ActivityParticipant.objects.filter(
+                activity_id=activity.id, member__person__family=family
+            )
+        ]
+
+        for child in family.get_children():
+            subscriptions = WaitingList.objects.filter(
+                department=activity.department, person=child
+            )
+            if len(subscriptions) > 0:
+                family_subscriptions.append(child.id)
+
+    if family and person_id:
+
         try:
             person = family.person_set.get(pk=person_id)
 
@@ -212,6 +230,8 @@ def ActivitySignup(request, activity_id, person_id=None):
         "signup_closed": signup_closed,
         "view_only_mode": view_only_mode,
         "participating": participating,
+        "family_participants": family_participants,
+        "family_subscriptions": family_subscriptions,
         "union": union,
     }
     return render(request, "members/activity_signup.html", context)
