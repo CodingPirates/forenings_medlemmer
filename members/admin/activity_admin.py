@@ -71,6 +71,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def age(self, obj):
         return str(obj.min_age) + " - " + str(obj.max_age)
+
     age.short_description = "Alder"
 
     def union_link(self, item):
@@ -94,18 +95,22 @@ class ActivityAdmin(admin.ModelAdmin):
             return obj.description
         else:
             return obj.description[:100] + "[..]"
-    activityDescShort.short_description = 'Beskrivelse'
+
+    activityDescShort.short_description = "Beskrivelse"
 
     def seatsTotal(self, obj):
         return str(obj.max_participants)
+
     seatsTotal.short_description = "Total"
 
     def seatsUsed(self, obj):
         return str(obj.activityparticipant_set.count())
+
     seatsUsed.short_description = "Besat"
 
     def seatsFree(self, obj):
         return str(obj.max_participants - obj.activityparticipant_set.count())
+
     seatsFree.short_description = "Ubesat"
 
     # Only view activities on own department
