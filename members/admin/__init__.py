@@ -603,7 +603,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
-    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Post-nr; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon; Note-til-arrangørerne)"
+    export_csv_full2.short_description = "CSV Export"
 
 
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
