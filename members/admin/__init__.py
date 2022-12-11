@@ -596,7 +596,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + parent_phone
                 + ";"
-                + self.note
+                + p.note
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
