@@ -388,7 +388,6 @@ class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = [
-        "activity_union_link",
         "activity_department_link",
         "activity_link",
         "added_at",
@@ -400,6 +399,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
+        "activity_union_link",
     ]
     date_hierarchy = "activity__start_date"
 

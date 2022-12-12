@@ -29,7 +29,7 @@ class ActivityAdmin(admin.ModelAdmin):
         "seatsUsed",
         "seatsFree",
         "age",
-        "activityDescShort",
+        #"activityDescShort",
     )
 
     date_hierarchy = "start_date"
