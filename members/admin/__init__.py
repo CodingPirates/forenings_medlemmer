@@ -388,7 +388,6 @@ class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = [
-        "activity_union_link",
         "activity_department_link",
         "activity_link",
         "added_at",
@@ -400,6 +399,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
+        "activity_union_link",
     ]
     date_hierarchy = "activity__start_date"
 
@@ -596,14 +596,14 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + parent_phone
                 + ";"
-                + self.note
+                + p.note
                 + "\n"
             )
         response = HttpResponse(result_string, content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
-    export_csv_full2.short_description = "CSV Export (Forening; Afdeling; Aktivitet; Navn; Alder; Køn; Post-nr; Betalingsinfo; forældre-navn; forældre-email; forældre-telefon; Note-til-arrangørerne)"
+    export_csv_full2.short_description = "CSV Export"
 
 
 admin.site.register(ActivityParticipant, ActivityParticipantAdmin)
