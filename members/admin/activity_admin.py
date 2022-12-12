@@ -29,7 +29,6 @@ class ActivityAdmin(admin.ModelAdmin):
         "seatsUsed",
         "seatsFree",
         "age",
-        #"activityDescShort",
     )
 
     date_hierarchy = "start_date"
@@ -89,14 +88,6 @@ class ActivityAdmin(admin.ModelAdmin):
 
     department_link.short_description = "Afdeling"
     department_link.admin_order_field = "department__name"
-
-    def activityDescShort(self, obj):
-        if len(obj.description) < 100:
-            return obj.description
-        else:
-            return obj.description[:100] + "[..]"
-
-    activityDescShort.short_description = "Beskrivelse"
 
     def seatsTotal(self, obj):
         return str(obj.max_participants)
