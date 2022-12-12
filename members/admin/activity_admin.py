@@ -25,9 +25,9 @@ class ActivityAdmin(admin.ModelAdmin):
         "start_end",
         "open_invite",
         "price_in_dkk",
-        "seatsTotal",
-        "seatsUsed",
-        "seatsFree",
+        "seats_total",
+        "seats_used",
+        "seats_free",
         "age",
     )
 
@@ -89,20 +89,20 @@ class ActivityAdmin(admin.ModelAdmin):
     department_link.short_description = "Afdeling"
     department_link.admin_order_field = "department__name"
 
-    def seatsTotal(self, obj):
+    def seats_total(self, obj):
         return str(obj.max_participants)
 
-    seatsTotal.short_description = "Total"
+    seats_total.short_description = "Total"
 
-    def seatsUsed(self, obj):
+    def seats_used(self, obj):
         return str(obj.activityparticipant_set.count())
 
-    seatsUsed.short_description = "Besat"
+    seats_used.short_description = "Besat"
 
-    def seatsFree(self, obj):
+    def seats_free(self, obj):
         return str(obj.max_participants - obj.activityparticipant_set.count())
 
-    seatsFree.short_description = "Ubesat"
+    seats_free.short_description = "Ubesat"
 
     # Only view activities on own department
     def get_queryset(self, request):
