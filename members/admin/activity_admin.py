@@ -17,6 +17,9 @@ class ActivityParticipantInline(admin.TabularInline):
 
 
 class ActivityAdmin(admin.ModelAdmin):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}
+
     list_display = (
         "name",
         "union_link",
