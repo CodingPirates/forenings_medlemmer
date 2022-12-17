@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from members.models import Union, Address
+from members.models import Union, Address, AdminUserInformation
 
 
 class UnionDepartmentFilter(admin.SimpleListFilter):
@@ -14,6 +14,17 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         return queryset if self.value() is None else queryset.filter(union=self.value())
+
+class DepartmentAdminInline(admin.TabularInline):
+    model = AdminUserInformation.departments
+    extra = 0
+    fields = ("user",)
+    readonly_fields = fields
+    raw_id_fields = ("user",)
+
+    def get_queryset(self, request):
+        return AdminUserInformation.get_admins_for_department(id)
+        return ActivityParticipant.objects.all()
 
 
 class DepartmentAdmin(admin.ModelAdmin):
@@ -47,6 +58,8 @@ class DepartmentAdmin(admin.ModelAdmin):
         "description",
     )
     filter_horizontal = ["department_leaders"]
+
+    inlines = [DepartmentAdminInline]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(DepartmentAdmin, self).get_form(request, obj, **kwargs)

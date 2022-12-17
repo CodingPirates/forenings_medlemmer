@@ -5,6 +5,7 @@ from .union import Union
 from .department import Department
 
 
+
 class AdminUserInformation(models.Model):
     def __str__(self):
         return self.user.username + " admin data"
@@ -21,3 +22,7 @@ class AdminUserInformation(models.Model):
             return Department.objects.all()
         else:
             return Department.objects.filter(adminuserinformation__user=user)
+
+    @staticmethod
+    def get_admins_for_department(department):
+        return user.objects.filter(AdminUserInformation__department=department)
