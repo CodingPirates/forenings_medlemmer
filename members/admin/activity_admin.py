@@ -6,17 +6,42 @@ from members.models import ActivityParticipant
 
 
 class ActivityParticipantInline(admin.TabularInline):
+    # se også https://stackoverflow.com/questions/41376406/remove-title-from-tabularinline-in-admin
     model = ActivityParticipant
     extra = 0
-    fields = ("member",)
+
+    fields = (
+        "member",
+        "persongender",
+        "personage",
+        "note",
+    )
     readonly_fields = fields
     raw_id_fields = ("member",)
 
     def get_queryset(self, request):
         return ActivityParticipant.objects.all()
 
+    def persongender(self, request):
+        if request.member.person.gender == "MA":
+            return "Dreng"
+        elif request.member.person.gender == "FM":
+            return "Pige"
+        else:
+            return "andet"
+
+    persongender.short_description = "Køn"
+
+    def personage(self, request):
+        return str(request.member.person.age_years())
+
+    personage.short_description = "Alder"
+
 
 class ActivityAdmin(admin.ModelAdmin):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}
+
     list_display = (
         "name",
         "union_link",
