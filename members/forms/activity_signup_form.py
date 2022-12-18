@@ -53,7 +53,7 @@ class ActivitySignupForm(forms.Form):
                         "Betaling",
                         Field("payment_option", aria_describedby="paymentHelp"),
                         HTML(
-                            '<span class="paymentHelp"><p>Vælg <b>ikke</b> "andet er aftalt", med mindre der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen.{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
+                            '<span class="paymentHelp"><p>Vælg kun <i>"andet er aftalt"</i>, <u>hvis</u> der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen.{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
                         ),
                         FormActions(
                             Submit(
@@ -69,16 +69,24 @@ class ActivitySignupForm(forms.Form):
         )
 
     note = forms.CharField(
-        label="Besked til arrangør", widget=forms.Textarea, required=False
+        label="<span style='color:red'><b>Besked til arrangør</b></span> (Særlige hensyn, gener, allergi, medicin etc.)",
+        widget=forms.Textarea,
+        required=False,
     )
     photo_permission = forms.ChoiceField(
         label="Må Coding Pirates tage og bruge billeder og videoer af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)",
         initial="Choose",
         required=True,
         choices=(
-            ("Choose", "Vælg om vi må tage billeder"),
+            (
+                "Choose",
+                "Vælg om Coding Pirates må tage billeder af mit barn til denne aktivitet",
+            ),
             (ActivityParticipant.PHOTO_OK, "Ja, det er OK"),
-            (ActivityParticipant.PHOTO_NOTOK, "Nej, vi vil ikke have i fotograferer"),
+            (
+                ActivityParticipant.PHOTO_NOTOK,
+                "Nej, vi vil ikke have I fotograferer mit barn",
+            ),
         ),
     )
     read_conditions = forms.ChoiceField(

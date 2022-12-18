@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from members.models import Union, Address
 
@@ -8,15 +10,42 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
     parameter_name = "Union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union)) for union in Union.objects.all()]
+        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
 
     def queryset(self, request, queryset):
         return queryset if self.value() is None else queryset.filter(union=self.value())
 
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_filter = (UnionDepartmentFilter,)
+    list_display = (
+        "id",
+        "department_union_link",
+        "department_link",
+        "address",
+        "isVisible",
+        "isOpening",
+        "created",
+        "closed_dtm",
+        "description",
+    )
+    list_filter = (
+        UnionDepartmentFilter,
+        "isVisible",
+        "isOpening",
+        "created",
+        "closed_dtm",
+    )
     raw_id_fields = ("union",)
+    search_fields = (
+        "name",
+        "union__name",
+        "address__streetname",
+        "address__housenumber",
+        "address__placename",
+        "address__zipcode",
+        "address__city",
+        "description",
+    )
     filter_horizontal = ["department_leaders"]
 
     def get_form(self, request, obj=None, **kwargs):
@@ -62,13 +91,19 @@ class DepartmentAdmin(admin.ModelAdmin):
             },
         ),
     ]
-    list_display = (
-        "union",
-        "name",
-        "address",
-        "description",
-        "isVisible",
-        "isOpening",
-        "created",
-        "closed_dtm",
-    )
+
+    def department_union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.union_id])
+        link = '<a href="%s">%s</a>' % (url, item.union.name)
+        return mark_safe(link)
+
+    department_union_link.short_description = "Forening"
+    department_union_link.admin_order_field = "union__name"
+
+    def department_link(self, item):
+        url = reverse("admin:members_department_change", args=[item.id])
+        link = '<a href="%s">%s</a>' % (url, item.name)
+        return mark_safe(link)
+
+    department_link.short_description = "Afdeling"
+    department_link.admin_order_field = "name"

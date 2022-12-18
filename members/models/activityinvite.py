@@ -27,7 +27,7 @@ class ActivityInvite(models.Model):
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
     invite_dtm = models.DateField("Inviteret", default=timezone.now)
     expire_dtm = models.DateField("Udløber", default=_defaultInviteExpiretime)
-    rejected_dtm = models.DateField("Afslået", blank=True, null=True)
+    rejected_at = models.DateField("Afslået", blank=True, null=True)
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit

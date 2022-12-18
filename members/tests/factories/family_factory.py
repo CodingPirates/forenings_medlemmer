@@ -16,6 +16,6 @@ class FamilyFactory(DjangoModelFactory):
     )  # Faker("email")
     # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
-    confirmed_dtm = Faker("date_time", tzinfo=TIMEZONE)
+    confirmed_at = Faker("date_time", tzinfo=TIMEZONE)
     last_visit_dtm = Faker("date_time", tzinfo=TIMEZONE)
     deleted_dtm = Faker("date_time", tzinfo=TIMEZONE)
