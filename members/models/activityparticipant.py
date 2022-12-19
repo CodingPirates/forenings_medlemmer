@@ -42,7 +42,13 @@ class ActivityParticipant(models.Model):
     )
 
     def __str__(self):
-        return self.member.__str__() + ", " + self.activity.department.name + ", " + self.activity.name
+        return (
+            self.member.__str__()
+            + ", "
+            + self.activity.department.name
+            + ", "
+            + self.activity.name
+        )
 
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
