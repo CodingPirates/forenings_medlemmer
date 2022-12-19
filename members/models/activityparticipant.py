@@ -72,7 +72,6 @@ class ActivityParticipant(models.Model):
                 result_string += f"Betalt:{payment.confirmed_at.strftime(ymdhm)}. "
             else:
                 result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
-
         elif payment.rejected_at is not None:
             result_string = f"{html_error_pre}Afvist:{html_post}{payment.rejected_at.strftime(ymdhm)}. "
             result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
@@ -86,8 +85,10 @@ class ActivityParticipant(models.Model):
                 if payment.activity.price_in_dkk == 0:
                     result_string = f"{html_good_pre}Gratis.{html_post} "
                 else:
-
-                    if self.activity.start_date.year > timezone.now().year:
+                    if (
+                        payment.accepted_at is not None
+                        and self.activity.start_date.year > timezone.now().year
+                    ):
                         result_string = f"{html_warn_pre}Betalingsdato:{str(self.activity.start_date.year)}-01-01{html_post} "
                     else:
                         result_string = (
