@@ -8,7 +8,7 @@ from members.models import ActivityParticipant
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
-    fields = ("member",)
+    fields = ("member",  )
     readonly_fields = fields
     raw_id_fields = ("member",)
 

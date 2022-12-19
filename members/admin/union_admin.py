@@ -3,13 +3,38 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from members.models import Address
+from members.models import Department
+from members.models import AdminUserInformation
 
+class UnionDepartmentInline(admin.TabularInline):
+    model = Department
+    extra = 0
+    fields = ("name", "created", "closed_dtm", "isOpening", "isVisible", )
+    readonly_fields = fields
+
+    def get_queryset(self, request):
+        return Department.objects.all()
+
+class unionsAdminUserInformationInline(admin.TabularInline):
+    model = AdminUserInformation.Union
+    extra = 0
+    fields = ("id",)
+    readonly_fields = fields
+
+    def get_queryset(self, request):
+        return AdminUserInformation.Union.objects.all()
+        
 
 class UnionAdmin(admin.ModelAdmin):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}
+    
     list_display = ("id", "union_link", "address", "union_email")
     list_filter = ("address__region",)
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
+
+    inlines = [UnionDepartmentInline, unionsAdminUserInformationInline]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(UnionAdmin, self).get_form(request, obj, **kwargs)
@@ -47,14 +72,22 @@ class UnionAdmin(admin.ModelAdmin):
             "Bestyrelsen gamle felter",
             {
                 "fields": (
-                    "chairman_old",
-                    "chairman_email_old",
-                    "second_chair_old",
-                    "second_chair_email_old",
-                    "cashier_old",
-                    "cashier_email_old",
-                    "secretary_old",
-                    "secretary_email_old",
+                    (
+                        "chairman_old",
+                        "chairman_email_old",
+                    ),
+                    (
+                        "second_chair_old",
+                        "second_chair_email_old",
+                    ),
+                    (
+                        "cashier_old",
+                        "cashier_email_old",
+                    ),
+                    (
+                        "secretary_old",
+                        "secretary_email_old",
+                    ),
                     "board_members_old",
                 )
             },
