@@ -1,10 +1,18 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.http import HttpResponse
+from django.db import connection
+from collections import namedtuple
 
 from members.models import Address
 from members.models import Department
 from members.models import AdminUserInformation
+
+def namedtuplefetchall(cursor):
+    desc = cursor.description
+    res = namedtuple('Result', [col[0] for col in desc])
+    return [res(*row) for row in cursor.fetchall()]
 
 class UnionDepartmentInline(admin.TabularInline):
     model = Department
@@ -15,6 +23,7 @@ class UnionDepartmentInline(admin.TabularInline):
     def get_queryset(self, request):
         return Department.objects.all()
 
+'''
 class unionsAdminUserInformationInline(admin.TabularInline):
     model = AdminUserInformation.Union
     extra = 0
@@ -24,6 +33,7 @@ class unionsAdminUserInformationInline(admin.TabularInline):
     def get_queryset(self, request):
         return AdminUserInformation.Union.objects.all()
         
+'''
 
 class UnionAdmin(admin.ModelAdmin):
     class Media:
@@ -34,7 +44,11 @@ class UnionAdmin(admin.ModelAdmin):
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
-    inlines = [UnionDepartmentInline, unionsAdminUserInformationInline]
+    inlines = [UnionDepartmentInline, ]# unionsAdminUserInformationInline]
+
+    actions = [
+        "export_union_stat1_current_year",
+    ]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(UnionAdmin, self).get_form(request, obj, **kwargs)
@@ -101,6 +115,36 @@ class UnionAdmin(admin.ModelAdmin):
             },
         ),
     ]
+
+
+    def export_union_stat1_current_year(self, request, queryset):
+        # This function is only made as an example of how  to get additional data for unions
+        result_string = '"Forening","id","email"\n'
+
+        for p in queryset:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    " SELECT name, id, union_email " +
+                    " FROM members_union " +
+                    " WHERE id = " + 
+                    str(p.id)
+                )
+                results = namedtuplefetchall(cursor)
+                for r in results:
+                    result_string = (
+                        result_string
+                        + r.name
+                        + ","
+                        + str(r.id)
+                        + ","
+                        + r.union_email
+                        + "\n"
+                    )
+        response = HttpResponse(result_string, content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="forenings.stat1.csv"'
+        return response
+
+
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
