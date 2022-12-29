@@ -124,6 +124,7 @@ class PersonInline(admin.TabularInline):
     model = Person
     fields = ("admin_link", "membertype", "zipcode", "added_at", "notes")
     readonly_fields = fields
+    can_delete = False
     extra = 0
 
 

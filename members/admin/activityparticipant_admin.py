@@ -1,24 +1,45 @@
 from django.contrib import admin
+from django.utils import timezone
 
 from members.models import (
     Activity,
     AdminUserInformation,
+    Department,
+    Union,
 )
 
 
-class ActivityParticipantListFilter(admin.SimpleListFilter):
-    # Title shown in filter view
-    title = "Efter aktivitet"
+class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
+    title = "Afdeling"
+    parameter_name = "department"
+
+    def lookups(self, request, model_admin):
+        return [
+            (str(department.pk), str(department))
+            for department in Department.objects.all()
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(activity__department__pk=self.value())
+
+
+class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
+    # Title shown in filter view. \u2265 : ≥ (større end eller lig med)
+    title = "Efter aktivitet (\u2265 år " + str(timezone.now().year) + ")"
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
         activitys = []
-        for activity in Activity.objects.filter(
-            department__in=AdminUserInformation.get_departments_admin(request.user)
+        for act in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            start_date__year__gte=timezone.now().year,
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(activity.pk), str(activity)))
+            activitys.append((str(act.pk), str(act)))
         return activitys
 
     def queryset(self, request, queryset):
@@ -26,6 +47,66 @@ class ActivityParticipantListFilter(admin.SimpleListFilter):
             return queryset
         else:
             return queryset.filter(activity=self.value())
+
+
+class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
+    # Title shown in filter view
+    title = "Efter aktivitet (= år " + str(timezone.now().year - 1) + ")"
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = "activity"
+
+    def lookups(self, request, model_admin):
+        activitys = []
+        for act in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            start_date__year=timezone.now().year - 1,
+        ).order_by("department__name", "-start_date"):
+            activitys.append((str(act.pk), str(act)))
+        return activitys
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(activity=self.value())
+
+
+class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
+    # Title shown in filter view. \u2264 : ≤ (mindre end eller lig med)
+    title = "Efter aktivitet (\u2264 år " + str(timezone.now().year - 2) + ")"
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = "activity"
+
+    def lookups(self, request, model_admin):
+        activitys = []
+        for act in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            start_date__year__lte=timezone.now().year - 2,
+        ).order_by("department__name", "-start_date"):
+            activitys.append((str(act.pk), str(act)))
+        return activitys
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(activity=self.value())
+
+
+class ActivityParticipantUnionFilter(admin.SimpleListFilter):
+    title = "Lokalforening"
+    parameter_name = "union"
+
+    def lookups(self, request, model_admin):
+        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(activity__union__pk=self.value())
 
 
 class ParticipantPaymentListFilter(admin.SimpleListFilter):
@@ -91,7 +172,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity",
         "note",
     ]
-    list_filter = (ActivityParticipantListFilter, ParticipantPaymentListFilter)
+    list_filter = (ActivityParticipantUnionFilter, ActivityParticipantDepartmentFilter, ActivityParticipantListCurrentYearFilter, ActivityParticipantListLastYearFilter, ActivityParticipantListOldYearsFilter, ParticipantPaymentListFilter)
     list_display_links = ("member",)
     raw_id_fields = ("activity", "member")
     search_fields = ("member__person__name",)
