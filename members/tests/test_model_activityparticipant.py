@@ -65,8 +65,8 @@ class TestModelActivityParticipant(TestCase):
     def test_utc_to_local_ymdhm(self):
         # test of : Get local current timestamp (t1_local) and convert to utc (t1_utc)
         # then call the utc_to_local_ymdhm(t1_utc) and check it's as expected local time
-        # ymdhm = "%Y-%m-%d %H:%M"
+        ymdhm = "%Y-%m-%d %H:%M"
         time_input_utc = timezone.now()
-        time_expected_local = timezone.localtime(time_input_utc)  # .strftime(ymdhm)
+        time_expected_local = timezone.localtime(time_input_utc).strftime(ymdhm)
         time_result_local = self.ap.utc_to_local_ymdhm(time_input_utc)
-        self.assertNotEqual(time_result_local, time_expected_local)
+        self.assertEqual(time_result_local, time_expected_local)
