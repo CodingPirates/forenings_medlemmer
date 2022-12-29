@@ -8,6 +8,7 @@ from members.models.waitinglist import WaitingList
 from members.models.activityparticipant import ActivityParticipant
 from django.utils import timezone
 
+from .factories import UnionFactory
 from .factories import DepartmentFactory
 from .factories import ActivityParticipantFactory
 
@@ -15,7 +16,8 @@ from .factories import ActivityParticipantFactory
 class TestModelActivityParticipant(TestCase):
     # ToDo: Maybe test payment
     def setUp(self):
-        self.department = DepartmentFactory()
+        self.union = UnionFactory()
+        self.department = DepartmentFactory(union=self.union)
 
         self.activity = Activity(
             start_date=datetime.now(),
@@ -45,8 +47,7 @@ class TestModelActivityParticipant(TestCase):
         waitinglist.save()
         self.waitinglist_id = waitinglist.id
 
-        self.ap = ActivityParticipantFactory()
-
+        self.ap = ActivityParticipantFactory(department=self.department)
 
     def test_save_waiting_list(self):
         self.participant = ActivityParticipant(
@@ -58,10 +59,8 @@ class TestModelActivityParticipant(TestCase):
     def test_utc_to_local_ymdhm(self):
         # test of : Get local current timestamp (t1_local) and convert to utc (t1_utc)
         # then call the utc_to_local_ymdhm(t1_utc) and check it's as expected local time
-        ymdhm = "%Y-%m-%d %H:%M"
+        # ymdhm = "%Y-%m-%d %H:%M"
         time_input_utc = timezone.now()
-        time_expected_local = timezone.localtime(time_input_utc) # .strftime(ymdhm)
-        time_result_local = self.ap.utc_to_local_ymdhm(
-            time_input_utc
-        )
+        time_expected_local = timezone.localtime(time_input_utc)  # .strftime(ymdhm)
+        time_result_local = self.ap.utc_to_local_ymdhm(time_input_utc)
         self.assertNotEqual(time_result_local, time_expected_local)
