@@ -2,6 +2,8 @@ import requests
 
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 from .department import Department
 from .union import Union
@@ -44,6 +46,10 @@ class Address(models.Model):
         "Overskriv DAWA", default=False, help_text=help_temp
     )
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
+    created_at = models.DateTimeField(
+        "Oprettet", auto_now=False, auto_now_add=True, auto_created=True
+    )
+    created_by = models.PositiveIntegerField("Oprettet af", default=0)
 
     def __str__(self):
         address = f"{self.streetname} {self.housenumber}"
@@ -53,6 +59,10 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
+        #if self.pk is None: # this is only True for new Address not saved yet
+            #self.user = kwargs.pop('user', None)
+            #self.created_by = self.user
+
         if settings.USE_DAWA_ON_SAVE and not self.dawa_overwrite:
             self.get_dawa_data()
         super().save(*args, **kwargs)
