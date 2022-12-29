@@ -23,6 +23,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.email = "parent@example.com"
+        self.password = "ois8Ieli7bah"
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
@@ -35,6 +36,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
     def test_account_create(self):
         # Loads the front page
+        self.browser.maximize_window()
         self.browser.get(f"{self.live_server_url}/account/create")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
@@ -70,6 +72,19 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field = self.browser.find_element(By.NAME, "parent_phone")
         field.send_keys("12345678")
 
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.browser.save_screenshot("test-screens/sign_up_screen_1a.png")
+
+        # Set password
+        field = self.browser.find_element(By.NAME, "password1")
+        field.click()
+        field.send_keys(self.password)
+
+        # Set "Gentag password"
+        field = self.browser.find_element(By.NAME, "password2")
+        field.click()
+        field.send_keys(f"{self.password}l")
+
         # Use addresse Autocomplete
         field = self.browser.find_element(By.NAME, "search_address")
         field.click()
@@ -92,11 +107,28 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys(Keys.TAB)
         field.send_keys(Keys.ENTER)
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
-        # Check that redirect and get password
+        # Check that it dosnt redirect since passwords arent matching
+        self.assertEqual(self.browser.current_url.split("/")[-2], "create")
+
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.browser.save_screenshot("test-screens/sign_up_screen_3a.png")
+
+        # Set password
+        field = self.browser.find_element(By.NAME, "password1")
+        field.click()
+        field.send_keys(self.password)
+
+        # Set "Gentag password"
+        field = self.browser.find_element(By.NAME, "password2")
+        field.click()
+        field.send_keys(self.password)
+
+        field.send_keys(Keys.TAB)
+        field.send_keys(Keys.TAB)
+        field.send_keys(Keys.ENTER)
+        self.browser.save_screenshot("test-screens/sign_up_screen_4.png")
+        # Check that redirect
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
-        password = self.browser.find_elements(
-            By.XPATH, "//*[text()[contains(.,'Adgangskoden er')]]"
-        )[0].text.split(" ")[-1]
 
         # Go to login page,
         self.browser.find_elements(
@@ -108,7 +140,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys(self.email)
 
         field = self.browser.find_element(By.NAME, "password")
-        field.send_keys(password)
+        field.send_keys(self.password)
 
         self.browser.find_element(By.XPATH, "//input[@type='submit']").click()
 
