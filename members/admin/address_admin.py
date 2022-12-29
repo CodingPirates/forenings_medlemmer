@@ -39,7 +39,7 @@ class AddressAdmin(admin.ModelAdmin):
             "Yderlige data",
             {
                 "fields": ("created_at", "created_by"),
-                "description": "HVornår er denne adresse oprettet og af hvem ?",
+                "description": "Hvornår er denne adresse oprettet og af hvem ?",
                 "classes": ("collapse",),
             },
         ),
