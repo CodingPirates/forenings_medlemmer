@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
             self.stdout.write("foreningen %s " % (curUnion.name))
             department = mainDepartment
-            name = "Foreningsmedlemsskab 2021: %s" % (curUnion.name)
+            name = "Foreningsmedlemsskab 2023: %s" % (curUnion.name)
             open_hours = "-"
             dawa_id = ""
 
@@ -29,6 +29,12 @@ class Command(BaseCommand):
                     "name", flat=True
                 ),
             )
+
+            try:
+                department = Department.objects.get(name=localDepartments)
+            except:
+                print("Using backup main department at %s" % (curUnion.name))
+                pass
 
             description = """Denne aktivitet er en særlig aktivitet oprettet for, at frivillige i Coding Pirates kan melde sig ind i vores forening og dermed få stemmeret i foreningen Coding Pirates %s samt Coding Pirates Denmark.
 
@@ -48,9 +54,9 @@ class Command(BaseCommand):
                 localDepartments,
             )
             instructions = ""
-            start_date = datetime.date(year=2021, month=1, day=1)
-            end_date = datetime.date(year=2021, month=12, day=31)
-            signup_closing = datetime.date(year=2021, month=4, day=30)
+            start_date = datetime.date(year=2023, month=1, day=1)
+            end_date = datetime.date(year=2023, month=12, day=31)
+            signup_closing = datetime.date(year=2023, month=4, day=30)
             open_invite = True
             price_in_dkk = 75
             max_participants = 9999
