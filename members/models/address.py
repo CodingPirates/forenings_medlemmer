@@ -119,5 +119,17 @@ class Address(models.Model):
             union.address.id
             for union in Union.objects.filter(adminuserinformation__user=user)
         ]
-        address_ids = set(department_address_id + union_address_id)
+
+        # Find all addresses not used by Union nor Department
+        address_id_all = [address.id for address in Address.objects.all()]
+        department_address_id_all = [
+            department.address.id for department in Department.objects.all()
+        ]
+        union_address_id_all = [union.address.id for union in Union.objects.all()]
+        address_unused_ids = list(
+            set(address_id_all)
+            - set(department_address_id_all)
+            - set(union_address_id_all)
+        )
+        address_ids = address_unused_ids + department_address_id + union_address_id
         return Address.objects.filter(pk__in=address_ids)
