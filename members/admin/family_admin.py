@@ -26,7 +26,7 @@ class FamilyAdmin(admin.ModelAdmin):
     ]  # new UUID gets used accidentially
     # actions = ['resend_link_email']
 
-    fields = ("email", "dont_send_mails", "confirmed_dtm")
+    fields = ("email", "dont_send_mails", "confirmed_at")
     readonly_fields = ("confirmed_at",)
     list_per_page = 20
 
