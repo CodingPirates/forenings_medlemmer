@@ -6,6 +6,7 @@ import members.models.member
 import members.models.family
 import members.models.person
 import members.models.waitinglist
+import members.models.activity
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -41,9 +42,13 @@ class ActivityParticipant(models.Model):
     )
 
     def __str__(self):
-        return self.member.__str__()
-        # + ", " + self.activity.name
-        # No reason to show an activity here - looks like it's the first activity for the given user
+        return (
+            self.member.__str__()
+            + ", "
+            + self.activity.department.name
+            + ", "
+            + self.activity.name
+        )
 
     def paid(self):
         # not paid if unconfirmed payments on this activity participation
@@ -54,6 +59,7 @@ class ActivityParticipant(models.Model):
     def payment_info(self, format_as_html: bool):
         ymdhm = "%Y-%m-%d %H:%M"
         payment = members.models.payment.Payment.objects.get(activityparticipant=self)
+
         if format_as_html:
             html_error_pre = "<span style='color:red'><b>"
             html_warn_pre = "<span style='color:blue'><b>"
@@ -65,14 +71,13 @@ class ActivityParticipant(models.Model):
             html_warn_pre = ""
             html_post = ""
 
-        result_string = "asdf"
+        result_string = ""
         if payment.refunded_at is not None:
             result_string = f"{html_warn_pre}Refunderet{html_post}:{payment.refunded_at.strftime(ymdhm)}. "
             if payment.confirmed_at is not None:
                 result_string += f"Betalt:{payment.confirmed_at.strftime(ymdhm)}. "
             else:
                 result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
-
         elif payment.rejected_at is not None:
             result_string = f"{html_error_pre}Afvist:{html_post}{payment.rejected_at.strftime(ymdhm)}. "
             result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
@@ -86,7 +91,16 @@ class ActivityParticipant(models.Model):
                 if payment.activity.price_in_dkk == 0:
                     result_string = f"{html_good_pre}Gratis.{html_post} "
                 else:
-                    result_string = f"{html_error_pre}Andet er aftalt.{html_post} "
+                    if (
+                        payment.accepted_at is not None
+                        and self.activity.start_date.year > timezone.now().year
+                    ):
+                        result_string = f"{html_warn_pre}Betalingsdato:{str(self.activity.start_date.year)}-01-01{html_post} "
+                    else:
+                        result_string = (
+                            f"{html_error_pre}Betaling er ikke gennemført{html_post} "
+                        )
+
             result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
 
         if format_as_html:
