@@ -6,6 +6,7 @@ from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 from members.models.department import Department
 from members.models.person import Person
 
+from django.contrib.auth.password_validation import validate_password
 
 class vol_signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -33,6 +34,14 @@ class vol_signupForm(forms.Form):
                     Div(Field("volunteer_department"), css_class="col-md-3"),
                     css_class="row",
                 ),
+            ),
+            Fieldset(
+                "Adgangskode",
+                Div(
+                    Div(Field("password1"), css_class="col"),
+                    Div(Field("password2"), css_class="col"),
+                    css_class="row",
+                )
             ),
             Fieldset(
                 "Adresse oplysninger",
@@ -101,6 +110,20 @@ class vol_signupForm(forms.Form):
         required=True,
         label="Afdeling",
         empty_label="-",
+    )
+
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Password",
+        required=True,
+        max_length=20,
+        validators=[validate_password]
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Gentag Password",
+        required=True,
+        max_length=20,
     )
 
     search_address = forms.CharField(

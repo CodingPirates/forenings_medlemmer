@@ -20,6 +20,17 @@ def volunteerSignup(request):
             # signup has been filled
             vol_signup = vol_signupForm(request.POST)
             if vol_signup.is_valid():
+
+                # check if passwords match
+                if (vol_signup.cleaned_data["password1"] != vol_signup.cleaned_data["password2"]):
+                    # Passwords dosent match throw an error
+                    vol_signup.add_error("password2", "Passwords er ikke ens")
+                    return render(
+                        request,
+                        "members/volunteer_signup.html",
+                        {"vol_signupform": vol_signup},
+                    )
+
                 # check if family already exists
                 try:
                     family = Family.objects.get(
@@ -50,7 +61,7 @@ def volunteerSignup(request):
                     username=vol_signup.cleaned_data["volunteer_email"],
                     email=vol_signup.cleaned_data["volunteer_email"],
                 )
-                password = User.objects.make_random_password()
+                password = vol_signup.cleaned_data["password2"]
                 user.set_password(password)
                 user.save()
 
