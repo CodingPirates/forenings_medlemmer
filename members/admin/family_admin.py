@@ -27,7 +27,7 @@ class FamilyAdmin(admin.ModelAdmin):
     # actions = ['resend_link_email']
 
     fields = ("email", "dont_send_mails", "confirmed_dtm")
-    readonly_fields = ("confirmed_dtm",)
+    readonly_fields = ("confirmed_at",)
     list_per_page = 20
 
     def create_new_uuid(self, request, queryset):

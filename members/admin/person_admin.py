@@ -20,6 +20,9 @@ from members.models import (
 
 from .person_admin_filters import (
     PersonInvitedListFilter,
+    PersonParticipantActiveListFilter,
+    PersonParticipantCurrentYearListFilter,
+    PersonParticipantLastYearListFilter,
     PersonParticipantListFilter,
     PersonWaitinglistListFilter,
     VolunteerListFilter,

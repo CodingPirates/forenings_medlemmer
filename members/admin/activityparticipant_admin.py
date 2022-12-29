@@ -66,25 +66,25 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
             return queryset.filter(payment__isnull=True)
         elif self.value() == "ok":
             return queryset.filter(
-                payment__isnull=False, payment__accepted_dtm__isnull=False
+                payment__isnull=False, payment__accepted_at__isnull=False
             )
         elif self.value() == "confirmed":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=False
+                payment__isnull=False, payment__confirmed_at__isnull=False
             )
         elif self.value() == "pending":
             return queryset.filter(
-                payment__isnull=False, payment__confirmed_dtm__isnull=True
+                payment__isnull=False, payment__confirmed_at__isnull=True
             )
         elif self.value() == "rejected":
             return queryset.filter(
-                payment__isnull=False, payment__rejected_dtm__isnull=False
+                payment__isnull=False, payment__rejected_at__isnull=False
             )
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = [
-        "added_dtm",
+        "added_at",
         "member",
         "person_age_years",
         "photo_permission",

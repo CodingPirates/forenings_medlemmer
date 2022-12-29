@@ -49,7 +49,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "invite_dtm",
         "person_age_years",
         "person_zipcode",
-        "rejected_dtm",
+        "rejected_at",
     )
     list_filter = (ActivivtyInviteActivityListFilter,)
     search_fields = ("person__name",)
@@ -73,7 +73,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                     "activity",
                     "invite_dtm",
                     "expire_dtm",
-                    "rejected_dtm",
+                    "rejected_at",
                 ),
             },
         ),

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 
 from members.models import Activity, AdminUserInformation
 
