@@ -76,7 +76,6 @@ class SignUpTest(StaticLiveServerTestCase):
         except Exception:
             self.fail("Could not reach person admin site")
 
-
         self.assertEqual(
             self.browser.find_element(By.NAME, "email").get_attribute("value"),
             self.person.email,
