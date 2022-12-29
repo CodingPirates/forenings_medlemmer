@@ -24,6 +24,7 @@ class TestModelActivityParticipant(TestCase):
             end_date=datetime.now()
             + timedelta(days=365),  # Has to be long enough to be a season
             department=self.department,
+            union=self.union,
         )
         self.activity.save()
         self.assertTrue(self.activity.is_season())  # If this fail increase the end_date
@@ -35,7 +36,9 @@ class TestModelActivityParticipant(TestCase):
         self.person.save()
 
         self.member = Member(
-            department=self.department, person=self.person, is_active=True
+            department=self.department,
+            person=self.person,
+            is_active=True,
         )
         self.member.save()
 
