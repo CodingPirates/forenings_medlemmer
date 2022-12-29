@@ -56,7 +56,7 @@ class Command(BaseCommand):
             instructions = ""
             start_date = datetime.date(year=2023, month=1, day=1)
             end_date = datetime.date(year=2023, month=12, day=31)
-            signup_closing = datetime.date(year=2023, month=4, day=30)
+            signup_closing = datetime.date(year=2023, month=12, day=31)
             open_invite = True
             price_in_dkk = 75
             max_participants = 9999
