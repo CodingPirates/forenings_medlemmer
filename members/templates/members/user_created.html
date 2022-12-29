@@ -5,8 +5,7 @@
       <div class="bg-light border p-5 rounded-3">
         <h1>Brugeren er oprettet!</h1>
         <p>Vi har oprettet en bruger til dig. Du logger ind ved hjælp af din e-mail-adresse samt adgangskode.</p>
-        <p><i>Adgangskoden er {{ password }}</i></p>
-        <p>Hvis du klikker væk fra denne side, kan du kun få koden igen ved nulstilning.</p>
+        <p>Hvis du har glemt din adgangskode kan du få den tilbage med <a href="/account/forgot/">Password nulstilling</a></p>
         <a class="btn btn-primary" href="{% url 'person_login' %}">Gå til log ind →</a>
       </div>
 {% endblock %}

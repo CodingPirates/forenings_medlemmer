@@ -69,8 +69,8 @@ class SignUpTest(StaticLiveServerTestCase):
             self.fail("Could not reach person admin site")
 
         # GO to person change page
-        elment = self.browser.find_element(By.LINK_TEXT, str(self.person))
-        self.browser.get(elment.get_attribute("href"))
+        element = self.browser.find_element(By.LINK_TEXT, str(self.person))
+        self.browser.get(element.get_attribute("href"))
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("change"))
         except Exception:

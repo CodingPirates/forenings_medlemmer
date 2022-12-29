@@ -17,6 +17,17 @@ def AccountCreate(request):
             # signup has been filled
             signup = signupForm(request.POST)
             if signup.is_valid():
+
+                # check if passwords match
+                if signup.cleaned_data["password1"] != signup.cleaned_data["password2"]:
+                    # Passwords dosent match throw an error
+                    signup.add_error("password2", "Adgangskoder er ikke ens")
+                    return render(
+                        request,
+                        "members/volunteer_signup.html",
+                        {"vol_signupform": signup},
+                    )
+
                 # check if family already exists
                 # TODO: rewrite this! >>>>
                 try:
@@ -47,7 +58,7 @@ def AccountCreate(request):
                     username=signup.cleaned_data["parent_email"],
                     email=signup.cleaned_data["parent_email"],
                 )
-                password = User.objects.make_random_password()
+                password = signup.cleaned_data["password2"]
                 user.set_password(password)
                 user.save()
 
