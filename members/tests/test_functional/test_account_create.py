@@ -36,6 +36,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
     def test_account_create(self):
         # Loads the front page
+        self.browser.maximize_window()
         self.browser.get(f"{self.live_server_url}/account/create")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
@@ -70,6 +71,9 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
         field = self.browser.find_element(By.NAME, "parent_phone")
         field.send_keys("12345678")
+
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.browser.save_screenshot("test-screens/sign_up_screen_1a.png")
 
         # Set password
         field = self.browser.find_element(By.NAME, "password1")
