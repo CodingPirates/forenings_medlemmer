@@ -107,8 +107,11 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys(Keys.TAB)
         field.send_keys(Keys.ENTER)
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
-        # Check that redirect
-        self.assertEqual(self.browser.current_url.split("/")[-2], "account/create/")
+        # Check that it dosnt redirect since passwords arent matching
+        self.assertEqual(self.browser.current_url.split("/")[-2], "create")
+
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.browser.save_screenshot("test-screens/sign_up_screen_3a.png")
 
         # Set password
         field = self.browser.find_element(By.NAME, "password1")
