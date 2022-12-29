@@ -83,7 +83,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         # Set "Gentag password"
         field = self.browser.find_element(By.NAME, "password2")
         field.click()
-        field.send_keys(self.password)
+        field.send_keys(f"{self.password}l")
 
         # Use addresse Autocomplete
         field = self.browser.find_element(By.NAME, "search_address")
@@ -107,7 +107,24 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys(Keys.TAB)
         field.send_keys(Keys.ENTER)
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
-        # Check that redirect and get password
+        # Check that redirect
+        self.assertEqual(self.browser.current_url.split("/")[-2], "account/create/")
+
+        # Set password
+        field = self.browser.find_element(By.NAME, "password1")
+        field.click()
+        field.send_keys(self.password)
+
+        # Set "Gentag password"
+        field = self.browser.find_element(By.NAME, "password2")
+        field.click()
+        field.send_keys(self.password)
+
+        field.send_keys(Keys.TAB)
+        field.send_keys(Keys.TAB)
+        field.send_keys(Keys.ENTER)
+        self.browser.save_screenshot("test-screens/sign_up_screen_4.png")
+        # Check that redirect
         self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
 
         # Go to login page,
