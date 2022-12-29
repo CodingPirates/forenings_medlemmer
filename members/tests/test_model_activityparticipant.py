@@ -9,6 +9,7 @@ from members.models.activityparticipant import ActivityParticipant
 from django.utils import timezone
 
 from .factories import DepartmentFactory
+from .factories import ActivityParticipantFactory
 
 
 class TestModelActivityParticipant(TestCase):
@@ -44,6 +45,9 @@ class TestModelActivityParticipant(TestCase):
         waitinglist.save()
         self.waitinglist_id = waitinglist.id
 
+        self.ap = ActivityParticipantFactory()
+
+
     def test_save_waiting_list(self):
         self.participant = ActivityParticipant(
             activity=self.activity, member=self.member
@@ -57,7 +61,7 @@ class TestModelActivityParticipant(TestCase):
         ymdhm = "%Y-%m-%d %H:%M"
         time_input_utc = timezone.now()
         time_expected_local = timezone.localtime(time_input_utc) # .strftime(ymdhm)
-        time_result_local = ActivityParticipant.utc_to_local_ymdhm(
+        time_result_local = self.ap.utc_to_local_ymdhm(
             time_input_utc
         )
         self.assertNotEqual(time_result_local, time_expected_local)
