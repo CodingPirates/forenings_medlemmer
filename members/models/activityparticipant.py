@@ -7,6 +7,7 @@ import members.models.family
 import members.models.person
 import members.models.waitinglist
 import members.models.activity
+import pytz
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -57,7 +58,6 @@ class ActivityParticipant(models.Model):
         )
 
     def payment_info(self, format_as_html: bool):
-        ymdhm = "%Y-%m-%d %H:%M"
         payment = members.models.payment.Payment.objects.get(activityparticipant=self)
 
         if format_as_html:
@@ -73,20 +73,24 @@ class ActivityParticipant(models.Model):
 
         result_string = ""
         if payment.refunded_at is not None:
-            result_string = f"{html_warn_pre}Refunderet{html_post}:{payment.refunded_at.strftime(ymdhm)}. "
+            result_string = f"{html_warn_pre}Refunderet{html_post}:{self.utc_to_local_ymdhm(payment.refunded_at)}. "
             if payment.confirmed_at is not None:
-                result_string += f"Betalt:{payment.confirmed_at.strftime(ymdhm)}. "
+                result_string += (
+                    f"Betalt:{self.utc_to_local_ymdhm(payment.confirmed_at)}. "
+                )
             else:
-                result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
+                result_string += (
+                    f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
+                )
         elif payment.rejected_at is not None:
-            result_string = f"{html_error_pre}Afvist:{html_post}{payment.rejected_at.strftime(ymdhm)}. "
-            result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
+            result_string = f"{html_error_pre}Afvist:{html_post}{self.utc_to_local_ymdhm(payment.rejected_at)}. "
+            result_string += f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
         elif payment.cancelled_at is not None:
-            result_string = f"{html_error_pre}Cancelled:{html_post}{payment.cancelled_at.strftime(ymdhm)}. "
-            result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
+            result_string = f"{html_error_pre}Cancelled:{html_post}{self.utc_to_local_ymdhm(payment.cancelled_at)}. "
+            result_string += f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
         else:
             if payment.confirmed_at is not None:
-                result_string = f"{html_good_pre}Betalt:{html_post}{payment.confirmed_at.strftime(ymdhm)}. "
+                result_string = f"{html_good_pre}Betalt:{html_post}{self.utc_to_local_ymdhm(payment.confirmed_at)}. "
             else:
                 if payment.activity.price_in_dkk == 0:
                     result_string = f"{html_good_pre}Gratis.{html_post} "
@@ -101,8 +105,7 @@ class ActivityParticipant(models.Model):
                             f"{html_error_pre}Betaling er ikke gennemført{html_post} "
                         )
 
-            result_string += f"(Oprettet:{payment.added_at.strftime(ymdhm)})"
-
+            result_string += f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
         if format_as_html:
             return format_html(result_string)
         else:
@@ -126,3 +129,10 @@ class ActivityParticipant(models.Model):
                     person=self.member.person
                 ).delete()
         return super(ActivityParticipant, self).save(*args, **kwargs)
+
+    @staticmethod
+    def utc_to_local_ymdhm(timestamp_utc):
+        ymdhm = "%Y-%m-%d %H:%M"
+        utc = timestamp_utc.replace(tzinfo=pytz.UTC)
+        local_time = utc.astimezone(timezone.get_current_timezone())
+        return local_time.strftime(ymdhm)

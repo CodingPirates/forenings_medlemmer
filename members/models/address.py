@@ -44,6 +44,10 @@ class Address(models.Model):
         "Overskriv DAWA", default=False, help_text=help_temp
     )
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
+    created_at = models.DateTimeField(
+        "Oprettet", auto_now=False, auto_now_add=True, auto_created=True
+    )
+    created_by = models.PositiveIntegerField("Oprettet af", default=0)
 
     def __str__(self):
         address = f"{self.streetname} {self.housenumber}"
@@ -119,5 +123,17 @@ class Address(models.Model):
             union.address.id
             for union in Union.objects.filter(adminuserinformation__user=user)
         ]
-        address_ids = set(department_address_id + union_address_id)
+
+        # Find all addresses not used by Union nor Department
+        address_id_all = [address.id for address in Address.objects.all()]
+        department_address_id_all = [
+            department.address.id for department in Department.objects.all()
+        ]
+        union_address_id_all = [union.address.id for union in Union.objects.all()]
+        address_unused_ids = list(
+            set(address_id_all)
+            - set(department_address_id_all)
+            - set(union_address_id_all)
+        )
+        address_ids = address_unused_ids + department_address_id + union_address_id
         return Address.objects.filter(pk__in=address_ids)
