@@ -172,7 +172,14 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity",
         "note",
     ]
-    list_filter = (ActivityParticipantUnionFilter, ActivityParticipantDepartmentFilter, ActivityParticipantListCurrentYearFilter, ActivityParticipantListLastYearFilter, ActivityParticipantListOldYearsFilter, ParticipantPaymentListFilter)
+    list_filter = (
+        ActivityParticipantUnionFilter,
+        ActivityParticipantDepartmentFilter,
+        ActivityParticipantListCurrentYearFilter,
+        ActivityParticipantListLastYearFilter,
+        ActivityParticipantListOldYearsFilter,
+        ParticipantPaymentListFilter,
+    )
     list_display_links = ("member",)
     raw_id_fields = ("activity", "member")
     search_fields = ("member__person__name",)
