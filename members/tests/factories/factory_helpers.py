@@ -1,4 +1,4 @@
-import pytz
+import zoneinfo
 import random
 from datetime import timedelta
 
@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 LOCALE = "dk_DK"
-TIMEZONE = pytz.timezone(settings.TIME_ZONE)
+TIMEZONE = zoneinfo.ZoneInfo(settings.TIME_ZONE)
 # Setting default locale (this is not documented or intended by factory_boy)
 # Faker._DEFAULT_LOCALE = LOCALE
 

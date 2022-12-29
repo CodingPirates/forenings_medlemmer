@@ -42,7 +42,7 @@ class PersonAdmin(admin.ModelAdmin):
         "family_url",
         "age_years",
         "zipcode",
-        "added",
+        "added_at",
         "notes",
     )
     list_filter = (
@@ -52,6 +52,9 @@ class PersonAdmin(admin.ModelAdmin):
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
         PersonParticipantListFilter,
+        PersonParticipantActiveListFilter,
+        PersonParticipantCurrentYearListFilter,
+        PersonParticipantLastYearListFilter,
     )
     search_fields = ("name", "family__email", "notes")
     actions = ["invite_many_to_activity_action", "export_emaillist", "export_csv"]
@@ -257,7 +260,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "membertype",
                         "birthday",
                         "has_certificate",
-                        "added",
+                        "added_at",
                         "user",
                     ),
                 },
@@ -283,7 +286,7 @@ class PersonAdmin(admin.ModelAdmin):
                 "membertype",
                 "birthday",
                 "has_certificate",
-                "added",
+                "added_at",
             ]
         else:
             return []
@@ -329,7 +332,7 @@ class PersonAdmin(admin.ModelAdmin):
                 + ";"
                 + str(person.age_years())
                 + ";"
-                + str(person.added)
+                + str(person.added_at)
                 + ";"
                 + person.phone
                 + ";"

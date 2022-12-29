@@ -21,17 +21,18 @@ class ActivityInvite(models.Model):
         verbose_name_plural = "Invitationer"
         unique_together = ("activity", "person")
 
-    activity = models.ForeignKey("Activity", on_delete=models.CASCADE)
+    activity = models.ForeignKey(
+        "Activity", on_delete=models.CASCADE, verbose_name="Aktivitet"
+    )
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
     invite_dtm = models.DateField("Inviteret", default=timezone.now)
     expire_dtm = models.DateField("Udløber", default=_defaultInviteExpiretime)
-    rejected_dtm = models.DateField("Afslået", blank=True, null=True)
+    rejected_at = models.DateField("Afslået", blank=True, null=True)
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
-        if (
-            self.person.age_years() < self.activity.min_age
-            or self.person.age_years() > self.activity.max_age
+        if not (
+            self.activity.min_age <= self.person.age_years() <= self.activity.max_age
         ):
             raise ValidationError(
                 "Aktiviteten er kun for personer mellem "

@@ -47,8 +47,5 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Union, UnionAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-
-# class AdminUserInformationAdmin(admin.ModelAdmin):
-#    raw_id_fields = ("person",)
-
+admin.site.register(Equipment, EquipmentAdmin)
 # admin.site.register(AdminUserInformation, AdminUserInformationAdmin)

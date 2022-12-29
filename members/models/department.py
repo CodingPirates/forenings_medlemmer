@@ -19,14 +19,36 @@ class Department(models.Model):
     responsible_name = models.CharField("Afdelingsleder", max_length=200, blank=True)
     department_email = models.EmailField("E-mail", blank=True)
     department_leaders = models.ManyToManyField(
-        "Person", limit_choices_to={"user__is_staff": True}, blank=True
+        "Person",
+        limit_choices_to={"user__is_staff": True},
+        blank=True,
+        verbose_name="Afdelingsledere",
     )
-    address = models.ForeignKey("Address", on_delete=models.PROTECT)
+    address = models.ForeignKey(
+        "Address", on_delete=models.PROTECT, verbose_name="Adresse"
+    )
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
-    created = models.DateField("Oprettet", blank=False, default=timezone.now)
-    closed_dtm = models.DateField("Lukket", blank=True, null=True, default=None)
-    isVisible = models.BooleanField("Kan ses på afdelingssiden", default=True)
-    isOpening = models.BooleanField("Er afdelingen under opstart", default=False)
+    created = models.DateField(
+        "Oprettet",
+        blank=False,
+        default=timezone.now,
+        help_text="Dato for oprettelse af denne afdeling",
+    )
+    closed_dtm = models.DateField(
+        "Lukket",
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Dato for lukning af denne afdeling",
+    )
+    isVisible = models.BooleanField(
+        "På afdelingskort",
+        default=True,
+        help_text="Bliver denne afdeling vist på https://codingpirates.dk/afdelinger/ ?",
+    )
+    isOpening = models.BooleanField(
+        "Under opstart", default=False, help_text="Er denne afdeling under opstart ?"
+    )
     website = models.URLField("Hjemmeside", blank=True)
     union = models.ForeignKey(
         "Union",

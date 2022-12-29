@@ -10,7 +10,9 @@ class Member(models.Model):
         verbose_name_plural = "Medlemmer"
         ordering = ["is_active", "member_since"]
 
-    department = models.ForeignKey("Department", on_delete=models.PROTECT)
+    department = models.ForeignKey(
+        "Department", on_delete=models.PROTECT, verbose_name="Afdeling"
+    )
     person = models.OneToOneField("Person", on_delete=models.PROTECT)
     is_active = models.BooleanField("Aktiv", default=True)
     member_since = models.DateField("Indmeldt", blank=False, default=timezone.now)
@@ -22,4 +24,4 @@ class Member(models.Model):
     name.short_description = "Navn"
 
     def __str__(self):
-        return "{}, {}".format(self.person, self.department)
+        return "{}".format(self.person)

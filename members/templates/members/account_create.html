@@ -1,0 +1,13 @@
+{% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
+{% block content %}
+
+  <h1>Tilmelding til Coding Pirates</h1>
+  <p>
+    Indtast her barnets og forældre informationer, for at blive opskrevet i medlemssystemet.<br>
+    <b>Når I har oprettet jer, husk derefter at logge ind i medlemssystemet</b> for at skrive barnet op på nærliggende afdelingers venteliste eller for at tilmelde barnet en aktivitet.<br>
+    Det er også herinde I kan tilføje flere børn, forældre eller værger tilknyttet jeres familie.
+  </p>
+  <div id="signup-form">
+      {% crispy signupform %}
+  </div>
+{% endblock %}

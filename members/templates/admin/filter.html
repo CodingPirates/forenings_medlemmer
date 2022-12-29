@@ -2,7 +2,11 @@
 <script type="text/javascript">var go_from_select = function(opt) { window.location = window.location.pathname + opt };</script>
 <h3>{{ title }}</h3>
 <ul class="admin-filter-{{ title|cut:' ' }}">
-{% if choices|slice:"4:" %}
+{% comment %}
+slice:"0:" alle elementer er i dropdown box
+slice:"4:" hvis der er op til 4 elementer vises de som en liste, ellers i en dropdown box
+{% endcomment %}
+{% if choices|slice:"0:" %}
     <li>
     <select style="width: 95%;"
         onchange="go_from_select(this.options[this.selectedIndex].value)">

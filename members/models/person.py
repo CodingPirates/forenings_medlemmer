@@ -14,7 +14,7 @@ class Person(models.Model):
     class Meta:
         verbose_name = "Person"
         verbose_name_plural = "Personer"
-        ordering = ["added"]
+        ordering = ["added_at"]
         permissions = (
             (
                 "view_full_address",
@@ -35,8 +35,17 @@ class Person(models.Model):
     )
     MALE = "MA"
     FEMALE = "FM"
-    MEMBER_GENDER_CHOICES = ((MALE, "Dreng"), (FEMALE, "Pige"))
-    MEMBER_ADULT_GENDER_CHOICES = ((MALE, "Mand"), (FEMALE, "Kvinde"))
+    SELECT_GENDER_TEXT = "(Vælg køn)"
+    MEMBER_GENDER_CHOICES = (
+        ("", SELECT_GENDER_TEXT),
+        (MALE, "Dreng"),
+        (FEMALE, "Pige"),
+    )
+    MEMBER_ADULT_GENDER_CHOICES = (
+        ("", SELECT_GENDER_TEXT),
+        (MALE, "Mand"),
+        (FEMALE, "Kvinde"),
+    )
     membertype = models.CharField(
         "Type", max_length=2, choices=MEMBER_TYPE_CHOICES, default=PARENT
     )
@@ -66,7 +75,7 @@ class Person(models.Model):
     has_certificate = models.DateField("Børneattest", blank=True, null=True)
     family = models.ForeignKey("Family", on_delete=models.CASCADE)
     notes = models.TextField("Noter", blank=True, null=False, default="")
-    added = models.DateTimeField("Tilføjet", default=timezone.now, blank=False)
+    added_at = models.DateTimeField("Tilføjet", default=timezone.now, blank=False)
     deleted_dtm = models.DateTimeField("Slettet", null=True, blank=True)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,

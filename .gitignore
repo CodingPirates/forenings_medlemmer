@@ -4,8 +4,11 @@ __pycache__
 staticfiles
 test-results
 .coverage
-members/static/members/css
 .sass-cache/
+.vscode/
 public_data.zip
 test-screens
 /node_modules
+members.db
+*.bak
+.vs/

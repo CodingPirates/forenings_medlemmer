@@ -30,4 +30,4 @@ class TestModelUnion(TestCase):
 
     def test_string_representation(self):
         union = UnionFactory()
-        self.assertEqual("Foreningen for " + union.name, str(union))
+        self.assertEqual(union.name, str(union))

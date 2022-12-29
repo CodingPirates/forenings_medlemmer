@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, user_passes_test
 
+from members.models.activityinvite import ActivityInvite
 from members.models.person import Person
 from members.utils.user import user_to_person, has_user
 
@@ -17,10 +18,14 @@ def FamilyDetails(request):
     family.last_visit_dtm = timezone.now()
     family.save()
 
-    need_confirmation = family.confirmed_dtm is None or (
-        family.confirmed_dtm
+    need_confirmation = family.confirmed_at is None or (
+        family.confirmed_at
         < timezone.now()
         - datetime.timedelta(days=settings.REQUEST_FAMILY_VALIDATION_PERIOD)
+    )
+
+    invites = ActivityInvite.objects.filter(
+        person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
     )
 
     context = {
@@ -30,5 +35,6 @@ def FamilyDetails(request):
         "request_parents": family.person_set.exclude(membertype=Person.CHILD).count()
         < 1,
         "ordered_persons": family.person_set.order_by("membertype").all(),
+        "invites": invites,
     }
     return render(request, "members/family_details.html", context)
