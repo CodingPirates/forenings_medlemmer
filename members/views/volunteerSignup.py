@@ -27,7 +27,7 @@ def volunteerSignup(request):
                     != vol_signup.cleaned_data["password2"]
                 ):
                     # Passwords dosent match throw an error
-                    vol_signup.add_error("password2", "Passwords er ikke ens")
+                    vol_signup.add_error("password2", "Adgangskoder er ikke ens")
                     return render(
                         request,
                         "members/volunteer_signup.html",

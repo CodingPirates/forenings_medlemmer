@@ -137,14 +137,14 @@ class signupForm(forms.Form):
 
     password1 = forms.CharField(
         widget=forms.PasswordInput(),
-        label="Password",
+        label="Adgangskode",
         required=True,
         max_length=20,
         validators=[validate_password],
     )
     password2 = forms.CharField(
         widget=forms.PasswordInput(),
-        label="Gentag Password",
+        label="Gentag adgangskode",
         required=True,
         max_length=20,
     )
