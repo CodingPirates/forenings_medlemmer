@@ -51,7 +51,6 @@ class TestModelActivityParticipant(TestCase):
         self.waitinglist_id = waitinglist.id
 
         self.ap = ActivityParticipantFactory(
-            department=self.department,
             member_id=self.member,
         )
         self.ap.save()
