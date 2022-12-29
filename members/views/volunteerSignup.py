@@ -22,7 +22,10 @@ def volunteerSignup(request):
             if vol_signup.is_valid():
 
                 # check if passwords match
-                if (vol_signup.cleaned_data["password1"] != vol_signup.cleaned_data["password2"]):
+                if (
+                    vol_signup.cleaned_data["password1"]
+                    != vol_signup.cleaned_data["password2"]
+                ):
                     # Passwords dosent match throw an error
                     vol_signup.add_error("password2", "Passwords er ikke ens")
                     return render(

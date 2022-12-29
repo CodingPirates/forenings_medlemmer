@@ -7,6 +7,7 @@ from members.models.person import Person
 
 from django.contrib.auth.password_validation import validate_password
 
+
 class signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(signupForm, self).__init__(*args, **kwargs)
@@ -54,7 +55,7 @@ class signupForm(forms.Form):
                     Div(Field("password1"), css_class="col"),
                     Div(Field("password2"), css_class="col"),
                     css_class="row",
-                )
+                ),
             ),
             Fieldset(
                 "Adresse oplysninger",
@@ -139,7 +140,7 @@ class signupForm(forms.Form):
         label="Password",
         required=True,
         max_length=20,
-        validators=[validate_password]
+        validators=[validate_password],
     )
     password2 = forms.CharField(
         widget=forms.PasswordInput(),

@@ -19,7 +19,7 @@ def AccountCreate(request):
             if signup.is_valid():
 
                 # check if passwords match
-                if (signup.cleaned_data["password1"] != signup.cleaned_data["password2"]):
+                if signup.cleaned_data["password1"] != signup.cleaned_data["password2"]:
                     # Passwords dosent match throw an error
                     signup.add_error("password2", "Passwords er ikke ens")
                     return render(
