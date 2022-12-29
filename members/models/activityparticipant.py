@@ -132,3 +132,12 @@ class ActivityParticipant(models.Model):
                     person=self.member.person
                 ).delete()
         return super(ActivityParticipant, self).save(*args, **kwargs)
+
+    @staticmethod
+    def utc_to_local_ymdhm2(self, timestamp_utc):
+        return utc_to_local_ymdhm(timestamp_utc)
+
+        ymdhm = "%Y-%m-%d %H:%M"
+        utc = timestamp_utc.replace(tzinfo=pytz.UTC)
+        local_time = utc.astimezone(timezone.get_current_timezone())
+        return local_time.strftime(ymdhm)
