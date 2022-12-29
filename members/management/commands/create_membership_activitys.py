@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
             try:
                 department = Department.objects.get(name=localDepartments)
-            except:
+            except Exception:
                 print("Using backup main department at %s" % (curUnion.name))
                 pass
 
