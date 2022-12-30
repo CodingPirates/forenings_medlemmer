@@ -4,7 +4,7 @@ from members.models import (
     Department,
 )
 
-from members.utils.user import has_family, user_to_family
+from members.utils.user import user_to_family
 from django.contrib.auth.decorators import user_passes_test
 from members.utils.user import is_not_logged_in_and_has_person
 
