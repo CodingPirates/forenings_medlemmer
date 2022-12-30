@@ -5,14 +5,13 @@ from django.utils import timezone
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
 from members.models import Person
-from members.utils.user import user_to_person
+from members.utils.user import user_to_family
 
-from django.contrib.auth.decorators import login_required, user_passes_test
-from members.utils.user import has_user
+from django.contrib.auth.decorators import user_passes_test
+from members.utils.user import is_not_logged_in_and_has_person
 
 
-@login_required
-@user_passes_test(has_user, "/admin_signup/")
+@user_passes_test(is_not_logged_in_and_has_person, "/admin_signup/")
 def SupportMembership(request):
     current_activities = Activity.objects.filter(
         signup_closing__gte=timezone.now(),
@@ -23,7 +22,7 @@ def SupportMembership(request):
     participating = None
     activities_with_persons = current_activities
     if request.user.is_authenticated:
-        family = user_to_person(request.user).family
+        family = user_to_family(request.user)
 
         participating = ActivityParticipant.objects.filter(
             member__person__family=family,
