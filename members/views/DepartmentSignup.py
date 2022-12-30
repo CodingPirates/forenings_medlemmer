@@ -8,6 +8,7 @@ from members.utils.user import user_to_person
 from django.contrib.auth.decorators import login_required, user_passes_test
 from members.utils.user import has_user
 
+
 @login_required
 @user_passes_test(has_user, "/admin_signup/")
 def DepartmentSignup(request):
