@@ -70,11 +70,15 @@
                     {% for child in children %}
                       <div>
                         {% if department in child.departments_is_waiting %}
-                          {{ child.person.firstname }} er opskrevet
+                          {% for waitinglist_department, waitinglist_place in child.waitinglists %}
+                            {% if waitinglist_department == department %}
+                              {{ child.person.firstname }} er opskrevet (Nr {{ waitinglist_place }} på ventelisten)
+                            {% endif %}
+                          {% endfor %}
                         {% else %}
                           <a
-                              class="button"
-                              href="{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
+                            class="button"
+                            href="{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
                           >
                             Opskriv: {{ child.person.firstname }}
                           </a>
