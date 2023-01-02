@@ -53,6 +53,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department_link",
         "person_link",
         "person_age_years",
+        "person_gender",
         "UserCreated",
         "UserAddedWaitingList",
     )
@@ -91,6 +92,17 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     person_age_years.short_description = "Alder"
     person_age_years.admin_order_field = "-person__birthday"
+
+    def person_gender(self, item):
+        if item.person.gender == "MA":
+            return "Dreng"
+        elif item.person.gender == "FM":
+            return "Pige"
+        else:
+            return "Andet"
+
+    person_gender.short_description = "Køn"
+
 
     def UserCreated(self, item):
         return item.on_waiting_list_since
