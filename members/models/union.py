@@ -55,7 +55,14 @@ class Union(models.Model):
     secretary_email_old = models.EmailField("Sekretærens email", blank=True)
     union_email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
-    founded = models.DateField("Stiftet", blank=True, null=True)
+    founded_at = models.DateField("Stiftet", blank=True, null=True)
+    closed_at = models.DateField(
+        "Lukket",
+        blank=True,
+        null=True,
+        default=None,
+        help_text="Dato for lukning af denne forening",
+    )
     address = models.ForeignKey(
         "Address", on_delete=models.PROTECT, verbose_name="Adresse"
     )
