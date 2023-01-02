@@ -47,25 +47,103 @@ class WaitingListAdmin(admin.ModelAdmin):
     class Meta:
         verbose_name = "Venteliste"
         verbose_name_plural = "Ventelister"
+    
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super().get_form(request, obj=obj, change=change, **kwargs)
+        form.base_fields["image"].help_text = "og noget hjælpetext"
+        return form
 
     list_display = (
         "id",
         "department_link",
         "person_link",
         "person_age_years",
-        "person_gender",
+        "person_gender_text",
         "UserCreated",
         "UserAddedWaitingList",
     )
 
+
+
     list_filter = (
         WaitingListDepartmentFilter,
+        #"person__gender",
     )
 
-    actions = ["invite_many_to_activity_action", ]
+    actions = [
+        "invite_many_to_activity_action", 
+        "delete_many_from_department_waitinglist"]
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
     def invite_many_to_activity_action(self, request, queryset):
         return PersonAdmin.invite_many_to_activity_action(self, request, queryset)
+    invite_many_to_activity_action.short_description = "Inviter alle valgte til en aktivitet"
+
+    def delete_many_from_department_waitinglist(self, request, queryset):
+        # User has selected one or more records from the overview
+        # Confirm by select one department
+        # and enter a text line to be included in standard email
+        # And also select the right option 
+        # This means: All families / persons will get an email
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_persons"
+        ):
+            department_list_query = Department.objects.all()
+        else:
+            department_list_query = Department.objects.filter(
+                adminuserinformation__user=request.user
+            )
+        department_list = [("-","-")]
+        for department in department_list_query:
+            department_list.append((department.id, department.name))
+
+        confirm_list = [("-", "-")]
+        confirm_list.append((1, "Ja - fjern person(er) fra venteliste for den valgte afdeling og send email til dem med info"))
+        confirm_list.append((2, "Nej - fjern ikke personer(er) fra venteliste for den valgte afdeling"))
+
+        # Form used to confirm department, confirm action and write additional message to be in email
+        class MassConfirmForm(forms.Form):
+            department = forms.ChoiceField(label="Afdeling", choices=department_list)
+            email_text = forms.CharField(label="Email ekstra info", widget=forms.Textarea)
+        #   email_text = forms.TextInput(label="Email ekstra info")
+            confirmation = forms.ChoiceField(label="Bekræft", choices=confirm_list)
+            
+        persons = queryset
+
+        context = admin.site.each_context(request)
+        context["persons"] = persons
+        context["queryset"] = queryset
+
+        if request.method == "POST" and "confirmation" in request.POST:
+            # Post request with data
+            mass_confirmation_form = MassConfirmForm(request.POST)
+            context["mass_confirmation_form"] = mass_confirmation_form
+
+            if (
+                mass_confirmation_form.is_valid()
+                and mass_confirmation_form.cleaned_data["department"] != "-"
+                and mass_confirmation_form.cleaned_data["confirmation"] == 1
+            ):
+                messages.error(
+                    request, 
+                    "Så vidt så godt"
+                )
+            else:
+                messages.error(
+                    request,
+                    "ikke godkenddt"
+                )
+        else:
+            context["mass_confirmation_form"] = MassConfirmForm()
+
+        return render(request, "admin/delete_many_from_waitinglist.html", context)
+
+    delete_many_from_department_waitinglist.short_description = "Fjern fra venteliste" 
 
     def get_queryset(self, request):
         return super().get_queryset(request)
@@ -93,7 +171,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     person_age_years.short_description = "Alder"
     person_age_years.admin_order_field = "-person__birthday"
 
-    def person_gender(self, item):
+    def person_gender_text(self, item):
         if item.person.gender == "MA":
             return "Dreng"
         elif item.person.gender == "FM":
@@ -101,13 +179,16 @@ class WaitingListAdmin(admin.ModelAdmin):
         else:
             return "Andet"
 
-    person_gender.short_description = "Køn"
+    person_gender_text.short_description = "Køn"
+    person_gender_text.admin_order_field = "persongendertext"
 
 
     def UserCreated(self, item):
         return item.on_waiting_list_since
     UserCreated.short_description = "Person oprettet"
+    UserCreated.admin_order_field = "on_waiting_list_since"
 
     def UserAddedWaitingList(self, item):
         return item.added_at
     UserAddedWaitingList.short_description = "Tilføjet til venteliste"
+    UserAddedWaitingList.admin_order_field = "added_at"
