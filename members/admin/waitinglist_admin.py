@@ -59,11 +59,11 @@ class WaitingListAdmin(admin.ModelAdmin):
         "person_link",
         "person_age_years",
         "person_gender_text",
-        "UserCreated",
-        "UserAddedWaitingList",
+        "user_created",
+        "user_added_waiting_list",
     )
 
-
+# GEM knappen skal ændres til "Slet fra venteliste og send email" ??
 
     list_filter = (
         WaitingListDepartmentFilter,
@@ -110,7 +110,6 @@ class WaitingListAdmin(admin.ModelAdmin):
         class MassConfirmForm(forms.Form):
             department = forms.ChoiceField(label="Afdeling", choices=department_list)
             email_text = forms.CharField(label="Email ekstra info", widget=forms.Textarea)
-        #   email_text = forms.TextInput(label="Email ekstra info")
             confirmation = forms.ChoiceField(label="Bekræft", choices=confirm_list)
             
         persons = queryset
@@ -183,12 +182,12 @@ class WaitingListAdmin(admin.ModelAdmin):
     person_gender_text.admin_order_field = "persongendertext"
 
 
-    def UserCreated(self, item):
+    def user_created(self, item):
         return item.on_waiting_list_since
-    UserCreated.short_description = "Person oprettet"
-    UserCreated.admin_order_field = "on_waiting_list_since"
+    user_created.short_description = "Person oprettet"
+    user_created.admin_order_field = "on_waiting_list_since"
 
-    def UserAddedWaitingList(self, item):
+    def user_added_waiting_list(self, item):
         return item.added_at
-    UserAddedWaitingList.short_description = "Tilføjet til venteliste"
-    UserAddedWaitingList.admin_order_field = "added_at"
+    user_added_waiting_list.short_description = "Tilføjet til venteliste"
+    user_added_waiting_list.admin_order_field = "added_at"
