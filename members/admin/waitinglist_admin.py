@@ -19,6 +19,8 @@ from members.models import (
     ActivityInvite,
     Department,
     Person,
+    AdminUserInformation,
+    WaitingList
 )
 
 from .person_admin import (
@@ -26,21 +28,31 @@ from .person_admin import (
 )
 
 
-class WaitingListDepartmentFilter(admin.SimpleListFilter):
-    title = "Afdeling"
-    parameter_name = "department"
+class PersonWaitinglistListFilter(admin.SimpleListFilter):
+    title = "Venteliste"
+    parameter_name = "waiting_list"
 
     def lookups(self, request, model_admin):
-        return [
-            (str(department.pk), str(department))
-            for department in Department.objects.all()
+        departments = [
+            ("any", "Alle opskrevne samlet"),
+            ("none", "Ikke opskrevet på venteliste"),
         ]
+        for department in AdminUserInformation.get_departments_admin(
+            request.user
+        ).order_by("name"):
+            departments.append((str(department.pk), department.name))
+        
+        return departments
     
     def queryset(self, request, queryset):
-        if self.value() is None:
+        if self.value() == "any":
+            return queryset.exclude(department__isnull=True)
+        elif self.value() == "none":
+            return queryset.filter(department__isnull=True)
+        elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(department__pk=self.value())
+            return queryset.filter(department__id=self.value())
         
 
 class WaitingListAdmin(admin.ModelAdmin):
@@ -66,7 +78,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 # GEM knappen skal ændres til "Slet fra venteliste og send email" ??
 
     list_filter = (
-        WaitingListDepartmentFilter,
+        PersonWaitinglistListFilter,
         #"person__gender",
     )
 
@@ -145,7 +157,31 @@ class WaitingListAdmin(admin.ModelAdmin):
     delete_many_from_department_waitinglist.short_description = "Fjern fra venteliste" 
 
     def get_queryset(self, request):
-        return super().get_queryset(request)
+        qs = super().get_queryset(request)
+    #    qs = super(PersonAdmin, self).get_queryset(request)
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_persons"
+        ):
+            return qs
+        else:
+            departments = Department.objects.filter(
+                adminuserinformation__user=request.user
+            ).values("id")
+            return qs.filter(
+                Q(
+                    department__in=departments
+                ),
+                '''
+                Q(
+
+                    family__person__member__activityparticipant__activity__department__in=departments
+                )
+                | Q(family__person__waitinglist__department__in=departments)
+                | Q(
+                    family__person__activityinvite__activity__department__in=departments
+                )
+                '''
+            ).distinct()
 
     def department_link(self, item):
         url = reverse("admin:members_department_change", args=[item.department_id])
