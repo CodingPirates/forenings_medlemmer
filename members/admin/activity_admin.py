@@ -29,6 +29,7 @@ class ActivityAdmin(admin.ModelAdmin):
         "seats_used",
         "seats_free",
         "age",
+        "activity_membership_union_link",
     )
 
     date_hierarchy = "start_date"
@@ -104,6 +105,18 @@ class ActivityAdmin(admin.ModelAdmin):
 
     seats_free.short_description = "Ubesat"
 
+    def activity_membership_union_link(self, obj):
+        if obj.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
+            url = reverse("admin:members_union_change", args=[obj.union_id])
+            link = '<a href="%s">%s</a>' % (url, obj.union.name)
+            return mark_safe(link)
+
+        #            return obj.union
+        else:
+            return ""
+
+    activity_membership_union_link.short_description = "Forening for medlemskab"
+
     # Only view activities on own department
     def get_queryset(self, request):
         qs = super(ActivityAdmin, self).get_queryset(request)
@@ -133,7 +146,8 @@ class ActivityAdmin(admin.ModelAdmin):
         (
             "Forening",
             {
-                "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.</p>",
+                "classes": ("collapse",),
+                "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.<br>Forening er normalt fra den afdeling som aktiviteten er lavet under, og kan ikke rettes her</p>",
                 "fields": ("union",),
             },
         ),
