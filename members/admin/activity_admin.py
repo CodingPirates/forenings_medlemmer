@@ -17,6 +17,44 @@ class ActivityParticipantInline(admin.TabularInline):
 
 
 class ActivityAdmin(admin.ModelAdmin):
+
+    def get_form(self, request, obj=None, **kwargs):
+        current_user = request.user
+        if request.user.is_super:
+            self.list_display = (
+                "name",
+                "union_link",
+                "department_link",
+                "activitytype",
+                "start_end",
+                "open_invite",
+                "price_in_dkk",
+                "seats_total",
+                "seats_used",
+                "seats_free",
+                "age",
+#                "activity_membership_union_link",
+            )
+        else:
+            self.list_display = (
+                "union_link",
+                "department_link",
+                "activitytype",
+                "start_end",
+                "open_invite",
+                "price_in_dkk",
+                "seats_total",
+                "seats_used",
+                "seats_free",
+                "age",
+                "activity_membership_union_link",
+            )
+        form = super(ActivityAdmin, self).get_form(request, obj, **kwargs)
+        form.current_user = current_user
+        return form
+
+
+    '''
     list_display = (
         "name",
         "union_link",
@@ -31,7 +69,7 @@ class ActivityAdmin(admin.ModelAdmin):
         "age",
         "activity_membership_union_link",
     )
-
+    '''
     date_hierarchy = "start_date"
     search_fields = (
         "name",
@@ -54,25 +92,17 @@ class ActivityAdmin(admin.ModelAdmin):
     save_as = True
     inlines = [ActivityParticipantInline]
 
-    def startend(self, obj):
-        return str(obj.start_date) + " - " + str(obj.end_date)
-
-    startend.short_description = "Periode"
-
-    def age(self, obj):
-        return str(obj.min_age) + " - " + str(obj.max_age)
-
-    age.short_description = "Alder"
-
     def start_end(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
 
     start_end.short_description = "Periode"
+    start_end.admin_order_field = "start_date"
 
     def age(self, obj):
         return str(obj.min_age) + " - " + str(obj.max_age)
 
     age.short_description = "Alder"
+    age.admin_order_field = "min_age"
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.department.union_id])
@@ -94,6 +124,7 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.max_participants)
 
     seats_total.short_description = "Total"
+    seats_total.admin_order_field = "max_participants"
 
     def seats_used(self, obj):
         return str(obj.activityparticipant_set.count())
@@ -117,7 +148,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     activity_membership_union_link.short_description = "Forening for medlemskab"
 
-    # Only view activities on own department
+     # Only view activities on own department
     def get_queryset(self, request):
         qs = super(ActivityAdmin, self).get_queryset(request)
         if request.user.is_superuser:
