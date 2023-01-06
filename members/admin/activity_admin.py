@@ -18,43 +18,6 @@ class ActivityParticipantInline(admin.TabularInline):
 
 class ActivityAdmin(admin.ModelAdmin):
 
-    def get_form(self, request, obj=None, **kwargs):
-        current_user = request.user
-        if request.user.is_super:
-            self.list_display = (
-                "name",
-                "union_link",
-                "department_link",
-                "activitytype",
-                "start_end",
-                "open_invite",
-                "price_in_dkk",
-                "seats_total",
-                "seats_used",
-                "seats_free",
-                "age",
-#                "activity_membership_union_link",
-            )
-        else:
-            self.list_display = (
-                "union_link",
-                "department_link",
-                "activitytype",
-                "start_end",
-                "open_invite",
-                "price_in_dkk",
-                "seats_total",
-                "seats_used",
-                "seats_free",
-                "age",
-                "activity_membership_union_link",
-            )
-        form = super(ActivityAdmin, self).get_form(request, obj, **kwargs)
-        form.current_user = current_user
-        return form
-
-
-    '''
     list_display = (
         "name",
         "union_link",
@@ -67,9 +30,14 @@ class ActivityAdmin(admin.ModelAdmin):
         "seats_used",
         "seats_free",
         "age",
-        "activity_membership_union_link",
     )
-    '''
+
+    def changelist_view(self, request, extra_context=None):
+        # This is to show the membership_union_link for super admins only
+        if  request.user.is_superuser:
+            self.list_display += ("activity_membership_union_link",)
+        return super(ActivityAdmin, self).changelist_view(request, extra_context=extra_context)
+
     date_hierarchy = "start_date"
     search_fields = (
         "name",
@@ -166,20 +134,13 @@ class ActivityAdmin(admin.ModelAdmin):
             db_field, request, **kwargs
         )
 
+ 
     fieldsets = [
         (
             "Afdeling",
             {
                 "description": "<p>Du kan ændre afdeling for aktiviteten ved at skrive afdelings-id, eller tryk på søg-ikonet og i det nye vindue skal du finde afdelingen, for derefter at trykke på ID i første kolonne.</p>",
                 "fields": ("department",),
-            },
-        ),
-        (
-            "Forening",
-            {
-                "classes": ("collapse",),
-                "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.<br>Forening er normalt fra den afdeling som aktiviteten er lavet under, og kan ikke rettes her</p>",
-                "fields": ("union",),
             },
         ),
         (
@@ -248,3 +209,20 @@ class ActivityAdmin(admin.ModelAdmin):
             },
         ),
     ]
+
+    def get_fieldsets(self, request, obj=None):
+        # This setup ensures the membership department is visible for super admins only
+        if request.user.is_superuser:
+            return [
+                (
+                    "Forening",
+                    {
+                        "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.<br>Forening er normalt fra den afdeling som aktiviteten er lavet under, og kan ikke rettes her</p>",
+                        "fields": ("union",),
+                    },
+                ),
+            ] + self.fieldsets
+        else:
+            return self.fieldsets
+        
+

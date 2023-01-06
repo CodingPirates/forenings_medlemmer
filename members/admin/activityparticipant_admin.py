@@ -180,7 +180,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
-        "activity_membership_union_link",
     ]
 
     list_filter = (
@@ -304,16 +303,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 )
 
     activity_payment_info_html.short_description = "Betalingsinfo"
-
-    def activity_membership_union_link(self, obj):
-        if obj.activity.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
-            url = reverse("admin:members_union_change", args=[obj.activity.union_id])
-            link = '<a href="%s">%s</a>' % (url, obj.activity.union.name)
-            return mark_safe(link)
-        else:
-            return ""
-
-    activity_membership_union_link.short_description = "Forening for medlemskab"
 
     def export_csv_full(self, request, queryset):
         result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
