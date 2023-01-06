@@ -34,9 +34,11 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         # This is to show the membership_union_link for super admins only
-        if  request.user.is_superuser:
+        if request.user.is_superuser:
             self.list_display += ("activity_membership_union_link",)
-        return super(ActivityAdmin, self).changelist_view(request, extra_context=extra_context)
+        return super(ActivityAdmin, self).changelist_view(
+            request, extra_context=extra_context
+        )
 
     date_hierarchy = "start_date"
     search_fields = (
@@ -116,7 +118,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     activity_membership_union_link.short_description = "Forening for medlemskab"
 
-     # Only view activities on own department
+    # Only view activities on own department
     def get_queryset(self, request):
         qs = super(ActivityAdmin, self).get_queryset(request)
         if request.user.is_superuser:
@@ -134,7 +136,6 @@ class ActivityAdmin(admin.ModelAdmin):
             db_field, request, **kwargs
         )
 
- 
     fieldsets = [
         (
             "Afdeling",
@@ -224,5 +225,3 @@ class ActivityAdmin(admin.ModelAdmin):
             ] + self.fieldsets
         else:
             return self.fieldsets
-        
-
