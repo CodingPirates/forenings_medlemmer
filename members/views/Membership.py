@@ -73,6 +73,8 @@ def Membership(request):
                         "zipcode": curActivity.zipcode,
                         "city": curActivity.city,
                         "price": curActivity.price_in_dkk,
+                        "start_date": curActivity.start_date,
+                        "end_date": curActivity.end_date,
                     }
 
                     if curActivity.union.address.region == user_region:

@@ -67,6 +67,7 @@
                   <th>Adresse</th>
                   <th>Aktivitet</th>
                   <th>Pris</th>
+                  <th>Dato</th>
                   <th>Info</th>
                   <th>Handling</th>
                 </tr>
@@ -98,6 +99,13 @@
                     <td>{{ activity.name }}</td>
                     <td>{{ activity.price }} kr</td>
                     <td>
+                      {% if activity.start_date == activity.end_date %}
+                        {{ activity.start_date }}
+                      {% else %}
+                        {{ activity.start_date }} <br> - {{ activity.end_date }}
+                      {% endif %}
+                    </td>
+                        <td>
                       <a
                           class="button"
                           href="{% url 'activity_view_family' activity.id %}"
@@ -146,8 +154,7 @@
               <th>Navn</th>
               <th>Aktivitet</th>
               <th>Forening</th>
-              <th>Start</th>
-              <th>Slut</th>
+              <th>Dato</th>
             </tr>
             </thead>
             <tbody>
@@ -164,9 +171,14 @@
                     </a>
                   {% endif %}
                 </td>
-                <td>{{ participation.activity.union.name }}</td>
-                <td>{{ participation.activity.start_date }}</td>
-                <td>{{ participation.activity.end_date }}</td>
+                <td>Coding Pirates {{ participation.activity.union.name }}</td>
+                <td>
+                  {% if participation.activity.start_date == participation.activity.end_date %}
+                    {{ participation.activity.start_date }}
+                  {% else %}
+                    {{ participation.activity.start_date }} <br> - {{ participation.activity.end_date }}
+                  {% endif %}
+                </td>
               </tr>
             {% endfor %}
             </tbody>
