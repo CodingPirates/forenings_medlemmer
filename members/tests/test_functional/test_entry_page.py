@@ -47,13 +47,13 @@ class EntryPageTest(StaticLiveServerTestCase):
         self.browser.find_element(By.LINK_TEXT, "Tilmeld barn")
         self.browser.find_element(By.LINK_TEXT, "Bliv frivillig")
         self.browser.find_element(By.LINK_TEXT, "Afdelinger")
-        self.browser.find_element(By.LINK_TEXT, "Arrangementer")
+        self.browser.find_element(By.LINK_TEXT, "Aktiviteter")
         self.browser.find_element(By.LINK_TEXT, "Medlemskaber")
         self.browser.find_element(By.LINK_TEXT, "Støttemedlemskaber")
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements(By.LINK_TEXT, "Arrangementer"),
+                self.browser.find_elements(By.LINK_TEXT, "Aktiviteter"),
             )
         )
         self.assertEqual(links[0], links[1])
