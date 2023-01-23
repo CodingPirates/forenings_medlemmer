@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="container-fluid">
-          <h1>{{activity.department.name}} <small>{{activity.name}}</small></h1>
+          <h1>{{activity.department.name}}: <small>{{activity.name}}</small></h1>
           <p>
             {{ activity.description|linebreaksbr }}
           </p>
@@ -58,12 +58,6 @@
       <div class="row">
         <div class="col-lg-6">
           <p>
-          <strong>Pladser:</strong><br>
-            {{ seats_left }} af {{ activity.max_participants}} pladser ledige.
-          </p>
-        </div>
-        <div class="col-lg-6">
-          <p>
           <strong>Venteliste:</strong><br>
             {% if activity.open_invite %}
               Nej. Åben invitation uden venteliste
@@ -93,16 +87,20 @@
 
       {% else %}
         {% if not family %}
-        <hr>
-        <a href="{% url 'person_login' %}">Log ind</a> eller <a href="{% url 'account_create' %}">tilmeld dit barn</a> for at tilmelde dig denne aktivitet.
-        {% else %}
-          {% if signup_closed and not participating %}
           <hr>
-            <div class="alert alert-primary">
-              <p>Arrangementet er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
-            </div>
-          {% else %}
+          <a href="{% url 'person_login' %}">Log ind</a>
+          eller 
+          <a href="{% url 'account_create' %}">tilmeld dit barn</a>
+          for at tilmelde dig denne aktivitet.
+        {% else %}
+          {% if signup_closed %}
+          <!--and not participating % -->
+            <hr>
+              <div class="alert alert-primary">
+                <p>Aktiviteten er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
+              </div>
             <hr/>
+          {% else %}
             {% if activity.open_invite %}
               {% for child in family.get_children %}
                 {% if child.id in family_participants %}
