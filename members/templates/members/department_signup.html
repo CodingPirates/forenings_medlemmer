@@ -54,7 +54,7 @@
       <li>Tilmeldte ventelister</li>
       <li>Kort over afdelinger</li>
     </ul>
-    <section>
+    <section id="alle-ventelister">
       {% regroup departments by address.region as departments_region %}
       <h2>Opskrivning på venteliste</h2>
       <p>
@@ -136,7 +136,7 @@
         {% endfor %}
       </div>
     </section>
-    <section>
+    <section id="tilmeldte-ventelister">
       {% for child in children %}
         <section>
           <h4>Venteliste oversigt for <em>{{ child.person.name }}</em></h4>
@@ -175,7 +175,7 @@
         <br>
         {% endfor %}
     </section>
-    <section>
+    <section id="kort-over-afdelinger">
       <iframe 
         loading="lazy"
         src="/departments"
