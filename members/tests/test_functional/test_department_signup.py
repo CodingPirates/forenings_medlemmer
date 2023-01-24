@@ -40,7 +40,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         # check that there's the "Hovedstaden" region tab
         self.browser.find_element(
             By.XPATH,
-            "//div[@class='tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
+            "//div[@class='tabs']//div[@class='tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         ).click()
         self.browser.save_screenshot("test-screens/department_signup_2.png")
 
