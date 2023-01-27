@@ -39,7 +39,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
 
         self.browser.find_element(
             By.XPATH, 
-            "//div[@id='menu-tabs']/ul/li[text()[contains(., 'Alle ventelister')]]",
+            "//div[@id='menu-tabs']/ul/li[text()[contains(.,'Alle ventelister')]]",
         ).click()
         self.browser.save_screenshot("test-screens/department_signup_2.png")
 
