@@ -111,7 +111,7 @@
       {% endif %}
     </section>
 
-    <section id="current_activities">
+    <section id="current-activities">
       {% if current_activities %}
         <h2>Nuværende og kommende aktiviteter</h2>
         {% regroup current_activities by department.address.region as departments_region %}
@@ -129,7 +129,7 @@
             )" 
           placeholder="Søg efter..."
         >
-        <div class="region-tabs">
+        <div class="tabs" id="region-tabs">
           <ul>
             {% for region in departments_region %}
               <li>{{ region.grouper }}</li>

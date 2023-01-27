@@ -46,7 +46,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         # check that the test activity is present
         activity_name = self.browser.find_element(
             By.XPATH,
-            "//div[@class='tabs']/section[@id='current_activities']/div[@class='region-tabs']/section[@class='activity-per-region']/table/tbody/tr[1]/td[@data-label='Aktivitet']",
+            "//div[@class='tabs']/section[@id='current-activities']/div[@id='region-tabs']/section[@class='activity-per-region']/table/tbody/tr[1]/td[@data-label='Aktivitet']",
         ).get_attribute("textContent")
         self.assertEqual(activity_name, self.activity_1.name)
 
