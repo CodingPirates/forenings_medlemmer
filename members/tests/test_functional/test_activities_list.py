@@ -39,7 +39,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         # /html/body/main/div/ul/li[2]
         self.browser.find_element(
             By.XPATH,
-            "//div[@class='tabs']/ul/li[text()[contains(.'Nuværende og kommende aktiviteter')]]",
+            "//div[@class='tabs']/ul/li[text()[contains(.,'Nuværende og kommende aktiviteter')]]",
         ).click()
         self.browser.save_screenshot("test-screens/activities_list_2.png")
 
