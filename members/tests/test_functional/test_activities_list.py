@@ -35,6 +35,14 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/activities_list_1.png")
 
+        # click on the right button for "Nuværende og kommende aktiviteter"
+        # /html/body/main/div/ul/li[2]
+        self.browser.find_element(
+            By.XPATH,
+            "//div[@class='tabs']/ul/li[text()[contains(.'Nuværende og kommende aktiviteter')]]",
+        ).click()
+        self.browser.save_screenshot("test-screens/activities_list_2.png")
+
         # check that the test activity is present
         activity_name = self.browser.find_element(
             By.XPATH,
