@@ -42,7 +42,8 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/department_signup_1.png")
         try:
             region_tab = WebDriverWait(self.browser, 10).until(
-                EC.presence_of_element_located(
+                #EC.presence_of_element_located(
+                EC.located_to_be_selected(
                     (
                         By.XPATH,
                         "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
