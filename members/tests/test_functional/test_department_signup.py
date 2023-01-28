@@ -42,7 +42,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/department_signup_1.png")
         try:
             WebDriverWait(self.browser, 10).until(
-                region_data = EC.presence_of_element_located(
+                EC.presence_of_element_located(
                 #EC.located_to_be_selected(
                     (
                         By.XPATH,
@@ -65,6 +65,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         # check that there's the "Hovedstaden" region tab
         # div[@id='menu-tabs']/section[@id='alle-ventelister']/
         self.browser.execute_script("arguments[0].scrollIntoView();", region_data)
+        self.browser.save_screenshot("test-screens/department_signup_3.png")
         # self.browser.find_element(
         #      By.XPATH,
         #      "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
@@ -76,7 +77,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         #region_tab.click()
         region_data.click()
 
-        self.browser.save_screenshot("test-screens/department_signup_3.png")
+        self.browser.save_screenshot("test-screens/department_signup_4.png")
 
         # check that the department we made in the "Hovedstaden" region is present
         department_name = self.browser.find_element(
