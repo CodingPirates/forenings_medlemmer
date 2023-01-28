@@ -42,10 +42,9 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
 
         region_tab = WebDriverWait(self.browser, 5).until(
             EC.presence_of_element_located(
-                (By.XPATH, "//div[@id='menu-tabs']/section[@id='alle-ventelister']/div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",)
+                (By.XPATH, "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",)
             )
         )
-        region_tab.click()
         '''
         self.browser.find_element(
             By.XPATH, 
@@ -55,12 +54,12 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         '''
 
         # check that there's the "Hovedstaden" region tab
-        '''
+        # div[@id='menu-tabs']/section[@id='alle-ventelister']/
         self.browser.find_element(
             By.XPATH,
-            "//div[@id='menu-tabs']/section[@id='alle-ventelister']/div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
+            "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         ).click()
-        '''
+        
         self.browser.save_screenshot("test-screens/department_signup_3.png")
 
         # check that the department we made in the "Hovedstaden" region is present
