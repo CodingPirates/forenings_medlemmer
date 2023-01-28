@@ -41,9 +41,9 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/department_signup_1.png")
         try:
-            region_tab = WebDriverWait(self.browser, 10).until(
-                #EC.presence_of_element_located(
-                EC.located_to_be_selected(
+            WebDriverWait(self.browser, 10).until(
+                EC.presence_of_element_located(
+                #EC.located_to_be_selected(
                     (
                         By.XPATH,
                         "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
@@ -53,25 +53,25 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         except:
             self.browser.save_screenshot("test-screens/department_signup_1_except.png")
 
-        """
-        self.browser.find_element(
-            By.XPATH, 
-            "//div[@id='menu-tabs']/ul/li[text()[contains(.,'Alle ventelister')]]",
-        ).click()
-        self.browser.save_screenshot("test-screens/department_signup_2.png")
-        """
+        
+        # self.browser.find_element(
+        #     By.XPATH, 
+        #     "//div[@id='menu-tabs']/ul/li[text()[contains(.,'Alle ventelister')]]",
+        # ).click()
+        # self.browser.save_screenshot("test-screens/department_signup_2.png")
+        
 
         # check that there's the "Hovedstaden" region tab
         # div[@id='menu-tabs']/section[@id='alle-ventelister']/
-        # self.browser.find_element(
-        #     By.XPATH,
-        #     "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
-        # ).click()
+        self.browser.find_element(
+             By.XPATH,
+             "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
+         ).click()
 
         # actions = ActionChains(self.browser)
         # actions.move_to_element(region_tab).perform()
 
-        region_tab.click()
+        #region_tab.click()
 
         self.browser.save_screenshot("test-screens/department_signup_3.png")
 
