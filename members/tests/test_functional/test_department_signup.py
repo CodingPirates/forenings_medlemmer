@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class DepartmentSignupTest(StaticLiveServerTestCase):
@@ -39,12 +40,16 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.browser.maximize_window()
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/department_signup_1.png")
-
-        region_tab = WebDriverWait(self.browser, 5).until(
-            EC.presence_of_element_located(
-                (By.XPATH, "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]")
+        try:
+            region_tab = WebDriverWait(self.browser, 5).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]")
+                )
             )
-        )
+        except:
+            self.browser.save_screenshot("test-screens/department_signup_1_except.png")
+        
+            
         '''
         self.browser.find_element(
             By.XPATH, 
@@ -59,6 +64,10 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         #     By.XPATH,
         #     "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         # ).click()
+
+        actions = ActionChains(self.browser)
+        actions.move_to_element(region_tab).perform()
+        
         region_tab.click()
 
         self.browser.save_screenshot("test-screens/department_signup_3.png")
