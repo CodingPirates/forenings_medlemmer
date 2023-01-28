@@ -94,7 +94,7 @@
                   <th>Opskriv på venteliste</th>
                 </tr>
               </thead>
-              <tbody class="department-tbody">
+              <tbody class="department-tbody" id="table-body-{{region.grouper|slugify}}">
               {% for department in region.list %}
                 <tr>
                   <td>

@@ -30,6 +30,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         self.browser.quit()
 
     def test_activities_list(self):
+        self.browser.maximize_window()
         # Loads the activities list
         self.browser.get(f"{self.live_server_url}/activities")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
@@ -39,7 +40,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         # /html/body/main/div/ul/li[2]
         self.browser.find_element(
             By.XPATH,
-            "//div[@class='tabs']/ul/li[text()[contains(.,'Nuværende og kommende aktiviteter')]]",
+            "//div[@id='tab-menu']/ul/li[text()[contains(.,'Nuværende og kommende aktiviteter')]]",
         ).click()
         self.browser.save_screenshot("test-screens/activities_list_2.png")
 

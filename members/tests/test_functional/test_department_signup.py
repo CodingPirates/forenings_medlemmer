@@ -81,7 +81,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
 
         # check that the department we made in the "Hovedstaden" region is present
         department_name = self.browser.find_element(
-            By.XPATH, "//tbody[@id='department-tbody']/tr/td"
+            By.XPATH, "//tbody[@id='table-body-region-hovedstaden']/tr/td"
         ).get_attribute("innerText")
         self.assertEqual(department_name, self.department_1.name)
 
