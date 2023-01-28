@@ -7,6 +7,8 @@ from members.tests.factories import DepartmentFactory
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class DepartmentSignupTest(StaticLiveServerTestCase):
@@ -34,21 +36,31 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
 
     def test_department_signup(self):
         self.browser.get(f"{self.live_server_url}/department_signup")
+        self.browser.maximize_window()
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/department_signup_1.png")
 
+        region_tab = WebDriverWait(self.browser, 5).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//div[@id='menu-tabs']/section[@id='alle-ventelister']/div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",)
+            )
+        )
+        region_tab.click()
+        '''
         self.browser.find_element(
             By.XPATH, 
             "//div[@id='menu-tabs']/ul/li[text()[contains(.,'Alle ventelister')]]",
         ).click()
         self.browser.save_screenshot("test-screens/department_signup_2.png")
-
+        '''
 
         # check that there's the "Hovedstaden" region tab
+        '''
         self.browser.find_element(
             By.XPATH,
             "//div[@id='menu-tabs']/section[@id='alle-ventelister']/div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         ).click()
+        '''
         self.browser.save_screenshot("test-screens/department_signup_3.png")
 
         # check that the department we made in the "Hovedstaden" region is present
