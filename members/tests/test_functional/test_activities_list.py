@@ -54,7 +54,8 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         self.assertEqual(
             len(
                 self.browser.find_elements(
-                    By.XPATH, "//div[@class='tabs']/section[@id='current_activities']/div[@class='tabs']/section[@id='activity-per-region']/table/tbody"
+                    By.XPATH,
+                    "//div[@class='tabs']/section[@id='current_activities']/div[@class='tabs']/section[@id='activity-per-region']/table/tbody",
                 )
             ),
             1,

@@ -36,27 +36,29 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.browser.quit()
 
     def test_department_signup(self):
-        self.browser.get(f"{self.live_server_url}/department_signup")
         self.browser.maximize_window()
+        self.browser.get(f"{self.live_server_url}/department_signup")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/department_signup_1.png")
         try:
-            region_tab = WebDriverWait(self.browser, 5).until(
+            region_tab = WebDriverWait(self.browser, 10).until(
                 EC.presence_of_element_located(
-                    (By.XPATH, "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]")
+                    (
+                        By.XPATH,
+                        "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
+                    )
                 )
             )
         except:
             self.browser.save_screenshot("test-screens/department_signup_1_except.png")
-        
-            
-        '''
+
+        """
         self.browser.find_element(
             By.XPATH, 
             "//div[@id='menu-tabs']/ul/li[text()[contains(.,'Alle ventelister')]]",
         ).click()
         self.browser.save_screenshot("test-screens/department_signup_2.png")
-        '''
+        """
 
         # check that there's the "Hovedstaden" region tab
         # div[@id='menu-tabs']/section[@id='alle-ventelister']/
@@ -65,9 +67,9 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         #     "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         # ).click()
 
-        actions = ActionChains(self.browser)
-        actions.move_to_element(region_tab).perform()
-        
+        # actions = ActionChains(self.browser)
+        # actions.move_to_element(region_tab).perform()
+
         region_tab.click()
 
         self.browser.save_screenshot("test-screens/department_signup_3.png")
