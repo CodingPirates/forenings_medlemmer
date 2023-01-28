@@ -64,7 +64,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
 
         # check that there's the "Hovedstaden" region tab
         # div[@id='menu-tabs']/section[@id='alle-ventelister']/
-        self.browser.execute_script("arguments[0].scrollIntoView();", region_data)
+        self.browser.execute_script("return arguments[0].scrollIntoView(true);", region_data)
         self.browser.save_screenshot("test-screens/department_signup_3.png")
         # self.browser.find_element(
         #      By.XPATH,
