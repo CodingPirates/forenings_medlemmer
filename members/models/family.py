@@ -50,7 +50,7 @@ class Family(models.Model):
 
     def get_children(self):
         return Person.objects.filter(family=self, membertype=Person.CHILD)
-    
+
     def get_persons(self):
         return Person.objects.filter(family=self)
 
