@@ -104,13 +104,13 @@
           {% else %}
             <hr/>
             {% if activity.open_invite %}
-              {% for child in family.get_children %}
-                {% if child.id in family_participants %}
-                  {{ child.firstname}} er tilmeldt
+              {% for person in family.get_persons %}
+                {% if person.id in family_participants %}
+                  {{ person.firstname}} er tilmeldt
                 {% else %}
-                  {% if activity.min_age <= child.age_years and child.age_years <= activity.max_age %}
-                    <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
-                      Tilmeld {{ child.firstname }}
+                  {% if activity.min_age <= person.age_years and person.age_years <= activity.max_age %}
+                    <a class="button" href="{% url 'activity_signup' activity.id person.id %}">
+                      Tilmeld {{ person.firstname }}
                     </a>
                   {% endif %}
                 {% endif %}
