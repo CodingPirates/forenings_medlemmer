@@ -28,90 +28,90 @@
     
     {% if family %}
       <section>
-          <h2>Invitationer</h2>
-          <p>
-            Denne liste indeholder invitationer til aktiviteter, hvor der 
-            enten er fri tilmelding (først til mølle) eller invitationer til
-            aktiviteter I har stået på venteliste til.<br>
-            I vil modtage en e-mail på <em>{{ family.email }}</em> 
-            når der er aktiviteter, som I kan tilmelde jer.
-          </p>
-          {% if invites %}
-            <p><i>Vær opmærksom på, at du tilmelder dig den rigtige afdeling!</i></p>
-            <table>
-              <thead>
+        <h2>Invitationer</h2>
+        <p>
+          Denne liste indeholder invitationer til aktiviteter, hvor der 
+          enten er fri tilmelding (først til mølle) eller invitationer til
+          aktiviteter I har stået på venteliste til.<br>
+          I vil modtage en e-mail på <em>{{ family.email }}</em> 
+          når der er aktiviteter, som I kan tilmelde jer.
+        </p>
+        {% if invites %}
+          <p><i>Vær opmærksom på, at du tilmelder dig den rigtige afdeling!</i></p>
+          <table>
+            <thead>
+              <tr>
+                <!-- <th>Navn</th> -->
+                <th>Afdeling</th>
+                <th>Aktivitet</th>
+                <th>Adresse</th>
+                <th>Alder</th>
+                <th>Info</th>
+                <th>Handling</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for invite in invites %}
                 <tr>
-                  <!-- <th>Navn</th> -->
-                  <th>Afdeling</th>
-                  <th>Aktivitet</th>
-                  <th>Adresse</th>
-                  <th>Alder</th>
-                  <th>Info</th>
-                  <th>Handling</th>
+                  <!-- <td>{{ invite.person.name }}</td> -->
+                  <td>
+                    Coding Pirates<br>
+                    {{ invite.activity.department.name }}
+                  </td>
+                  <td>
+                    <a href="{% url 'activity_signup' invite.activity.id invite.person.id %}">
+                      {{ invite.activity.name }}
+                    </a>
+                  </td>
+                  <td>
+                    {% if invite.activity.placename %}
+                      {{ invite.activity.placename }}<br>
+                    {% endif %}
+                    {{ invite.activity.streetname }}
+                    {{ invite.activity.housenumber }}
+                    {% if invite.activity.floor %}
+                      {{ invite.activity.floor }}
+                    {% endif %}
+                    {% if invite.activity.door %}
+                      {{ invite.activity.door }}
+                    {% endif %}
+                    <br>
+                    {{ invite.activity.zipcode }}
+                    {{ invite.activity.city }}
+                  </td>
+                  <td>
+                    {{ invite.activity.min_age }} - {{ invite.activity.max_age }}
+                  </td>
+                  <td>
+                    <a
+                      class="button"
+                      href="{% url 'activity_view_family' invite.activity.id %}"
+                    >
+                      Læs mere
+                    </a>
+                  </td>
+                  <td>
+                    
+                    <a class="button-success"
+                      href="{% url 'activity_signup' invite.activity.id invite.person.id %}">
+                      Tilmeld {{ invite.person.name }}
+                    </a>
+                    <a class="button-danger"
+                      href="{% url 'invitation_decline' family.unique invite.id %}">
+                      Afslå invitation
+                    </a>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for invite in invites %}
-                  <tr>
-                    <!-- <td>{{ invite.person.name }}</td> -->
-                    <td>
-                      Coding Pirates<br>
-                      {{ invite.activity.department.name }}
-                    </td>
-                    <td>
-                      <a href="{% url 'activity_signup' invite.activity.id invite.person.id %}">
-                        {{ invite.activity.name }}
-                      </a>
-                    </td>
-                    <td>
-                      {% if invite.activity.placename %}
-                        {{ invite.activity.placename }}<br>
-                      {% endif %}
-                      {{ invite.activity.streetname }}
-                      {{ invite.activity.housenumber }}
-                      {% if invite.activity.floor %}
-                        {{ invite.activity.floor }}
-                      {% endif %}
-                      {% if invite.activity.door %}
-                        {{ invite.activity.door }}
-                      {% endif %}
-                      <br>
-                      {{ invite.activity.zipcode }}
-                      {{ invite.activity.city }}
-                    </td>
-                    <td>
-                      {{ invite.activity.min_age }} - {{ invite.activity.max_age }}
-                    </td>
-                    <td>
-                      <a
-                        class="button"
-                        href="{% url 'activity_view_family' invite.activity.id %}"
-                      >
-                        Læs mere
-                      </a>
-                    </td>
-                    <td>
-                      
-                      <a class="button-success"
-                        href="{% url 'activity_signup' invite.activity.id invite.person.id %}">
-                        Tilmeld {{ invite.person.name }}
-                      </a>
-                      <a class="button-danger"
-                        href="{% url 'invitation_decline' family.unique invite.id %}">
-                        Afslå invitation
-                      </a>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <div class="info-box">
-              Der er endnu ikke åbnet for tilmelding til aktiviteter.<br>
-              Vi sender en e-mail til <em>{{ family.email }}</em> når vi er klar til at 
-              modtage tilmeldinger.
-            </div>
-          {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="info-box">
+            Der er endnu ikke åbnet for tilmelding til aktiviteter.<br>
+            Vi sender en e-mail til <em>{{ family.email }}</em> når vi er klar til at 
+            modtage tilmeldinger.
+          </div>
+        {% endif %}
       </section>
     {% endif %}
 
