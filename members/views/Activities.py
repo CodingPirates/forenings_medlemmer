@@ -43,6 +43,20 @@ def Activities(request):
                         member__person=child["person"].id
                     )
                 ]
+            persons = [
+                {"person": person, "waitinglists": WaitingList.get_by_person(person)}
+                for person in family.get_persons()
+            ]
+            for person in persons:
+                person["departments_is_waiting"] = [
+                    department for (department, _place) in person["waitinglists"]
+                ]
+                person["participating_activities"] = [
+                    (act.activity.id)
+                    for act in ActivityParticipant.objects.filter(
+                        member__person=child["person"].id
+                    )
+                ]
             invites = ActivityInvite.objects.filter(
                 person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
             )
@@ -83,5 +97,6 @@ def Activities(request):
         "participating": participating,
         "current_activities": current_activities_with_persons,
         "children": children,
+        "persons": persons,
     }
     return render(request, "members/activities.html", context)
