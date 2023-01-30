@@ -126,7 +126,7 @@
                                         {% if activity.department in person.departments_is_waiting %}
                                             <div class="center">{{ person.person.firstname }} er opskrevet</div>
                                         {% else %}
-                                            {% if person.age <= activity.maxage %}
+                                            {% if person.person.age_years <= activity.max_age %}
                                                 <a class="button-success" href="{% url 'waiting_list_subscription' person.person.id activity.department.id 'subscribe' %}">
                                                     Opskriv {{ person.person.firstname }} på venteliste
                                                 </a>

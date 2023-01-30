@@ -23,6 +23,7 @@ def Activities(request):
     participating = None
     current_activities_with_persons = current_activities
     children = []
+    persons = []
 
     if request.user.is_authenticated:
         person = user_to_person(request.user)
