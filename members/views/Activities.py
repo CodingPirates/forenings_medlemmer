@@ -55,7 +55,7 @@ def Activities(request):
                 person["participating_activities"] = [
                     (act.activity.id)
                     for act in ActivityParticipant.objects.filter(
-                        member__person=child["person"].id
+                        member__person=person["person"].id
                     )
                 ]
             invites = ActivityInvite.objects.filter(
