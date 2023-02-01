@@ -307,12 +307,11 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_payment_info_html.short_description = "Betalingsinfo"
 
     def export_csv_full(self, request, queryset):
-        
+
         # csv_content_utf8.write(codecs.BOM_UTF8)
-        result_string = 'Forening;Afdeling;Aktivitet;Navn;Alder;'
-        result_string += 'Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;'
-        result_string += 'Forældre tlf;Note til arrangørerne\n'
-        today = timezone.now().date()
+        result_string = "Forening;Afdeling;Aktivitet;Navn;Alder;"
+        result_string += "Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;"
+        result_string += "Forældre tlf;Note til arrangørerne\n"
         for p in queryset:
             if p.member.person.gender == "MA":
                 gender = "Dreng"
@@ -358,10 +357,15 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + parent_phone
                 + ";"
-                + '"' + p.note + '"'
+                + '"'
+                + p.note
+                + '"'
                 + "\n"
             )
-        response = HttpResponse(f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}', content_type="text/csv; charset=utf-8")
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
