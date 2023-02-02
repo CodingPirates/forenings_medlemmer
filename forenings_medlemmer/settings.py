@@ -67,7 +67,7 @@ SECRET_KEY = env.str("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG")
 if DEBUG:
-    logger.warning("RUNNING IN DEBUG MODE")
+    logger.warning("RUNNING IN DEBUG MODEX")
 else:
     logger.info("RUNNING IN PRODUCTION")
 

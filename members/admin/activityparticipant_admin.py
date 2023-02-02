@@ -10,8 +10,13 @@ from members.models import (
     AdminUserInformation,
     Department,
     Union,
+    Member,
+    Person,
 )
 
+from .person_admin import(
+    PersonAdmin
+)
 
 class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     title = "Afdeling"
@@ -110,7 +115,7 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         else:
-            return queryset.filter(activity__union__pk=self.value())
+            return queryset.filter(activity__department__union__pk=self.value())
 
 
 class ParticipantPaymentListFilter(admin.SimpleListFilter):
@@ -186,18 +191,25 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     list_filter = (
         ActivityParticipantUnionFilter,
         ActivityParticipantDepartmentFilter,
+        "member__person__gender",
         ActivityParticipantListCurrentYearFilter,
         ActivityParticipantListLastYearFilter,
         ActivityParticipantListOldYearsFilter,
         ParticipantPaymentListFilter,
+        "activity__activitytype_id",
+
     )
+
     list_display_links = (
         "added_at",
         "photo_permission",
         "note",
     )
+
     date_hierarchy = "activity__start_date"
+
     raw_id_fields = ("activity",)
+
     search_fields = (
         "member__person__name",
         "activity__name",
@@ -205,7 +217,29 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     actions = [
         "export_csv_full",
+        "invite_many_to_activity_action",
     ]
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    def invite_many_to_activity_action(self, request, queryset):
+        ## STILL SOME ISSUES; NOT CORRET VALUES FOUND ##
+        members = queryset.select_related('member').all()
+        persons = [
+            m.person_id for m in Member.objects.filter(pk__in=members).values()
+        ]
+
+        return PersonAdmin.invite_many_to_activity_action(
+            self, 
+            request, 
+            Person.objects.filter(pk__in = persons).values()
+        )
+
+    invite_many_to_activity_action.short_description = "Inviter alle valgte til en aktivitet"
 
     def person_age_years(self, item):
         return item.member.person.age_years()
@@ -217,6 +251,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return item.member.person.zipcode
 
     person_zipcode.short_description = "Postnummer"
+    person_zipcode.admin_order_field = "member__person__zipcode"
 
     # Only show participants to own departments
     def get_queryset(self, request):
@@ -232,8 +267,8 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
             return "Pige"
         else:
             return "Andet"
-
     activity_person_gender.short_description = "Køn"
+    activity_person_gender.admin_order_field = "member__person__gender"
 
     def activity_person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.member.person_id])
