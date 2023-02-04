@@ -20,6 +20,7 @@ class LoadWhenNoFamilyTest(TestCase):
         self.person.user.email = "person@example.com"
         self.person.user.username = "person"
         self.person.user.set_password(self.password)
+        self.person.user.save()
         self.person.save()
 
         # self.user = UserFactory.Create(username="user", email="user@example.com", password=self.password)
@@ -40,9 +41,7 @@ class LoadWhenNoFamilyTest(TestCase):
 
         # Log into user with person
         self.client.logout()
-        logged_in = self.client.login(
-            username="person", email="person@example.com", password=self.password
-        )
+        logged_in = self.client.login(username="person", password=self.password)
         self.assertTrue(logged_in)
 
         # Check for no redirect
