@@ -87,7 +87,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for activity in current_activities %}
+                {% for activity in current_activities|dictsort:"name"|dictsort:"department.name" %}
                     <tr>
                         <td>
                             Coding Pirates {{ activity.department.name }}
