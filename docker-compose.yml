@@ -61,7 +61,7 @@ services:
     networks:
       - webnet
     ports:
-      - 4444
+      - "4444:4444"
 
 volumes:
   database:

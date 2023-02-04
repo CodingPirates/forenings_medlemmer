@@ -1,5 +1,9 @@
 from django.contrib import admin
+from django.http import HttpResponse
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from members.models import (
     Activity,
@@ -165,13 +169,20 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = [
+        "activity_department_link",
+        "activity_link",
         "added_at",
-        "member",
+        "activity_person_link",
+        "activity_person_gender",
         "person_age_years",
+        "activity_family_email_link",
+        "person_zipcode",
         "photo_permission",
-        "activity",
         "note",
+        "activity_payment_info_html",
+        "activity_union_link",
     ]
+
     list_filter = (
         ActivityParticipantUnionFilter,
         ActivityParticipantDepartmentFilter,
@@ -180,9 +191,21 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         ActivityParticipantListOldYearsFilter,
         ParticipantPaymentListFilter,
     )
-    list_display_links = ("member",)
-    raw_id_fields = ("activity", "member")
-    search_fields = ("member__person__name",)
+    list_display_links = (
+        "added_at",
+        "photo_permission",
+        "note",
+    )
+    date_hierarchy = "activity__start_date"
+    raw_id_fields = ("activity",)
+    search_fields = (
+        "member__person__name",
+        "activity__name",
+    )
+
+    actions = [
+        "export_csv_full",
+    ]
 
     def person_age_years(self, item):
         return item.member.person.age_years()
@@ -190,9 +213,157 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     person_age_years.short_description = "Alder"
     person_age_years.admin_order_field = "-member__person__birthday"
 
+    def person_zipcode(self, item):
+        return item.member.person.zipcode
+
+    person_zipcode.short_description = "Postnummer"
+
     # Only show participants to own departments
     def get_queryset(self, request):
         qs = super(ActivityParticipantAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         return qs.filter(activity__department__adminuserinformation__user=request.user)
+
+    def activity_person_gender(self, item):
+        if item.member.person.gender == "MA":
+            return "Dreng"
+        elif item.member.person.gender == "FM":
+            return "Pige"
+        else:
+            return "Andet"
+
+    activity_person_gender.short_description = "Køn"
+
+    def activity_person_link(self, item):
+        url = reverse("admin:members_person_change", args=[item.member.person_id])
+        link = '<a href="%s">%s</a>' % (url, item.member.person.name)
+        return mark_safe(link)
+
+    activity_person_link.short_description = "Deltager"
+    activity_person_link.admin_order_field = "member__person__name"
+
+    def activity_family_email_link(self, item):
+        url = reverse(
+            "admin:members_family_change", args=[item.member.person.family_id]
+        )
+        link = '<a href="%s">%s</a>' % (url, item.member.person.family.email)
+        return mark_safe(link)
+
+    activity_family_email_link.short_description = "Familie"
+    activity_family_email_link.admin_order_field = "member__person__family__email"
+
+    def activity_link(self, item):
+        url = reverse("admin:members_activity_change", args=[item.activity.id])
+        link = '<a href="%s">%s</a>' % (url, item.activity.name)
+        return mark_safe(link)
+
+    activity_link.short_description = "Aktivitet"
+    activity_link.admin_order_field = "activity__name"
+
+    def activity_union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.activity.union_id])
+        link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
+        return mark_safe(link)
+
+    activity_union_link.short_description = (
+        "Forening for Foreningsmedlemskab/Støttemedlemskab"
+    )
+    activity_union_link.admin_order_field = "activity__union__name"
+
+    def activity_department_link(self, item):
+        url = reverse(
+            "admin:members_department_change", args=[item.activity.department_id]
+        )
+        link = '<a href="%s">%s</a>' % (url, item.activity.department.name)
+        return mark_safe(link)
+
+    activity_department_link.short_description = "Afdeling"
+    activity_department_link.admin_order_field = "activity__department__name"
+
+    def activity_payment_info_txt(self, item):
+        if item.activity.price_in_dkk == 0.00:
+            return "Gratis"
+        else:
+            try:
+                return item.payment_info(False)
+            except Exception:
+                return "Andet er aftalt"
+
+    activity_payment_info_txt.short_description = "Betalingsinfo"
+
+    def activity_payment_info_html(self, item):
+        if item.activity.price_in_dkk == 0.00:
+            return format_html("<span style='color:green'><b>Gratis</b></span>")
+        else:
+            try:
+                return item.payment_info(True)
+            except Exception:
+                return format_html(
+                    "<span style='color:red'><b>Andet er aftalt</b></span>"
+                )
+
+    activity_payment_info_html.short_description = "Betalingsinfo"
+
+    def export_csv_full(self, request, queryset):
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
+        today = timezone.now().date()
+        for p in queryset:
+            if p.member.person.gender == "MA":
+                gender = "Dreng"
+            elif p.member.person.gender == "FM":
+                gender = "Pige"
+            else:
+                gender = p.member.person.gender
+            birthday = p.member.person.birthday
+            age = (
+                today.year
+                - birthday.year
+                - ((today.month, today.day) < (birthday.month, birthday.day))
+            )
+
+            parent = p.member.person.family.get_first_parent()
+            if parent:
+                parent_name = parent.name
+                parent_phone = parent.phone
+                if not p.member.person.family.dont_send_mails:
+                    parent_email = parent.email
+                else:
+                    parent_email = ""
+            else:
+                parent_name = ""
+                parent_phone = ""
+                parent_email = ""
+
+            result_string = (
+                result_string
+                + p.activity.department.union.name
+                + ";"
+                + p.activity.department.name
+                + ";"
+                + p.activity.name
+                + ";"
+                + p.member.person.name
+                + ";"
+                + str(age)
+                + ";"
+                + gender
+                + ";"
+                + p.member.person.zipcode
+                + ";"
+                + self.activity_payment_info_txt(p)
+                + ";"
+                + parent_name
+                + ";"
+                + parent_email
+                + ";"
+                + parent_phone
+                + ";"
+                + p.note
+                + "\n"
+            )
+        response = HttpResponse(result_string, content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
+        return response
+
+    export_csv_full.short_description = "CSV Export"
