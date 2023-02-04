@@ -76,7 +76,7 @@
       "value": "gunicorn forenings_medlemmer.wsgi:application --bind"
     }
   },
-  "addons": ["heroku-postgresql:hobby-dev"],
+  "addons": ["heroku-postgresql:essential-mini"],
   "environments": {
     "test": {
       "env": {

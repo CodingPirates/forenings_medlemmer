@@ -6,8 +6,19 @@ from members.models import Address
 
 
 class UnionAdmin(admin.ModelAdmin):
-    list_display = ("id", "union_link", "address", "union_email")
-    list_filter = ("address__region",)
+    list_display = (
+        "id",
+        "union_link",
+        "address",
+        "union_email",
+        "founded_at",
+        "closed_at",
+    )
+    list_filter = (
+        "address__region",
+        "founded_at",
+        "closed_at",
+    )
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
@@ -62,7 +73,13 @@ class UnionAdmin(admin.ModelAdmin):
         (
             "Info",
             {
-                "fields": ("bank_main_org", "bank_account", "statues", "founded"),
+                "fields": (
+                    "bank_main_org",
+                    "bank_account",
+                    "statues",
+                    "founded_at",
+                    "closed_at",
+                ),
                 "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
                 generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
             },
