@@ -2,7 +2,13 @@ from members.tests.factories import PersonFactory
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import Client
-from members.utils.user import *
+from members.utils.user import (
+    is_not_logged_in_and_has_person,
+    has_family,
+    user_to_family,
+    user_to_person,
+    has_user,
+)
 
 """
     This checks if user decorators work
