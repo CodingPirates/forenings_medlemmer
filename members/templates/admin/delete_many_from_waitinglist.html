@@ -51,14 +51,20 @@
 
         <h2>Bekræft deltagere</h2>
         <div class="description">
-          <p>Følgene ({{persons.count}}) personer inviteres:</p>
+          <p>Følgene ({{persons.count}}) personer fjernes fra venteliste:</p>
           <p>
             <ul>
-              {% for person in persons %}
-              <li>{{person.name}}</li>
+              {% for item in persons %}
+              <li>{{item.person.name}} ({{item.person.email}})</li>
               {% endfor %}
             </ul>
           </p>
+          <p> følgende afdelinger er valgt:</p>
+            <ul>
+              {% for item in departments %}
+              <li>{{item}}</li>
+              {% endfor %}
+            </ul>
         </div>
 
         <div class="submit-row">

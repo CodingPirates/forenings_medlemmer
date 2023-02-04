@@ -124,7 +124,6 @@ class PersonAdmin(admin.ModelAdmin):
         context["persons"] = persons
         context["queryset"] = queryset
 
-        #if request.method == "POST" and "department" in request.POST:
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
             mass_invitation_form = MassInvitationForm(request.POST)
