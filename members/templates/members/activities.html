@@ -111,24 +111,26 @@
                                         venteliste til næste gang {{ activity.union.name }} opretter en ny aktivitet.
                                     </p>
                                 {% endif %}
-                                {% for child in children %}
+                                {% for person in persons %}
                                     {% if activity.open_invite %}
-                                        {% if activity.id in child.participating_activities %}
-                                            <div class="center">{{ child.person.firstname }} er tilmeldt</div>
+                                        {% if activity.id in persons.participating_activities %}
+                                            <div class="center">{{ person.person.firstname }} er tilmeldt</div>
                                         {% else %}
-                                            {% if child.person in activity.persons %}
-                                                <a class="button-success" href="{% url 'activity_signup' activity.id child.person.id %}">
-                                                    Tilmeld {{ child.person.firstname }}
+                                            {% if person.person in activity.persons %}
+                                                <a class="button-success" href="{% url 'activity_signup' activity.id person.person.id %}">
+                                                    Tilmeld {{ person.person.firstname }}
                                                 </a>
                                             {% endif %}
                                         {% endif %}
                                     {% else %}
-                                        {% if activity.department in child.departments_is_waiting %}
-                                            <div class="center">{{ child.person.firstname }} er opskrevet</div>
+                                        {% if activity.department in person.departments_is_waiting %}
+                                            <div class="center">{{ person.person.firstname }} er opskrevet</div>
                                         {% else %}
-                                            <a class="button-success" href="{% url 'waiting_list_subscription' child.person.id activity.department.id 'subscribe' %}">
-                                                Opskriv {{ child.person.firstname }} på venteliste
-                                            </a>
+                                            {% if person.person.age_years <= activity.max_age %}
+                                                <a class="button-success" href="{% url 'waiting_list_subscription' person.person.id activity.department.id 'subscribe' %}">
+                                                    Opskriv {{ person.person.firstname }} på venteliste
+                                                </a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
                                 {% endfor %}
