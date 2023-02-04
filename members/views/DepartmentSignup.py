@@ -4,9 +4,12 @@ from members.models import (
     Department,
 )
 
-from members.utils.user import user_to_person
+from members.utils.user import user_to_family
+from django.contrib.auth.decorators import user_passes_test
+from members.utils.user import is_not_logged_in_and_has_person
 
 
+@user_passes_test(is_not_logged_in_and_has_person, "/admin_signup/")
 def DepartmentSignup(request):
     departments = Department.get_open_departments()
     departments = [
@@ -14,7 +17,7 @@ def DepartmentSignup(request):
     ]
     children = []
     if request.user.is_authenticated:
-        family = user_to_person(request.user).family
+        family = user_to_family(request.user)
         children = [
             {"person": child, "waitinglists": WaitingList.get_by_child(child)}
             for child in family.get_children()
