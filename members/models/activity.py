@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class Activity(models.Model):
@@ -93,3 +95,19 @@ class Activity(models.Model):
         return self.activityparticipant_set.count()
 
     participants.short_description = "Deltagere"
+
+    def clean(self):
+        errors = {}
+        min_amount = 0
+
+        if self.activitytype.id == 'FORENINGSMEDLEMSKAB':
+            min_amount = 75
+
+        if self.activitytype.id == 'FORLØB':
+            min_amount = 100
+
+        if self.price_in_dkk < min_amount:
+            errors['price_in_dkk'] = 'Prisen er for lav. Denne type aktivitet skal mindst koste ' + str(min_amount) + ' kr. For foreningsmedlemsskaber gælder det, at DUF har sat et mindstebeløb. For forløb er mindstebeløbet sat til det beløb Coding Pirates Denmark trækker fra hver sæson.'
+
+        if errors:
+            raise ValidationError(errors)
