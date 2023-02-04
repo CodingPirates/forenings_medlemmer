@@ -28,3 +28,5 @@ class LoadWhenNoFamilyTest(StaticLiveServerTestCase):
         self.browser.get(f"{self.live_server_url}/")
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/load_no_family_start.png")
+
+        
