@@ -81,7 +81,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     )
 
     actions = [
-        "delete_many_from_department_waitinglist",
+        "delete_many_from_department_waitinglist_action",
     ]
 
     def get_actions(self, request):
@@ -90,8 +90,8 @@ class WaitingListAdmin(admin.ModelAdmin):
             del actions["delete_selected"]
         return actions
 
-    def delete_many_from_department_waitinglist(self, request, queryset):
-        # User has selected one or more records from the waitinglist overview 
+    def delete_many_from_department_waitinglist_action(self, request, queryset):
+        # User has selected one or more records from the waitinglist overview
         # First validation: Only handle from one department - did user select from multiple departments ?
         # Confirm by select one department
         # and enter a text line to be included in standard email
@@ -112,7 +112,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         for item in queryset:
             if not waitinglist_departments.count(item.department):
                 waitinglist_departments.append(item.department)
-        
+
         department_list = [("-", "-")]
         for department in department_list_query:
             department_list.append((department.id, department.name))
@@ -168,7 +168,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
         return render(request, "admin/delete_many_from_waitinglist.html", context)
 
-    delete_many_from_department_waitinglist.short_description = "Fjern fra venteliste"
+    delete_many_from_department_waitinglist_action.short_description = "Fjern fra venteliste"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
