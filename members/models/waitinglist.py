@@ -48,3 +48,13 @@ class WaitingList(models.Model):
         ]
         waitlists.sort(key=lambda tup: tup[1])
         return waitlists
+
+    @staticmethod
+    def get_by_person(person):
+        """Returns a list of (department, waitinglist_tuple) tuples"""
+        waitlists = [
+            (waitinglist.department, waitinglist.number_on_waiting_list())
+            for waitinglist in WaitingList.objects.filter(person=person)
+        ]
+        waitlists.sort(key=lambda tup: tup[1])
+        return waitlists

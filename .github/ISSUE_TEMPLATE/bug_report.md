@@ -6,25 +6,29 @@ labels: bug
 assignees: ''
 ---
 
-**Beskriv fejlen overordnet**
+## Beskriv fejlen overordnet
+
 En beskrivelse af fejlen
 
-**Genskab fejlen**
+## Genskab fejlen
+
 Disse trin førte til fejlen:
 
-1.  Loggede ind '...'
-2.  Clicked på '....'
-3.  ...
-4.  Lortet gav fejl 401
+1. Loggede ind '...'
+2. Clicked på '...'
+3. ...
+4. Siden fejlede med fejlkode '...'
 
-**Hvad skulle der være sket**
+## Hvad skulle der være sket
+
 Hvad prøvede du på
 
-**Screenshots**
+## Screenshots
+
 Giv endelig dine screenshorts hvis det give mening
 
-**Enheder:**
+## Enheder
 
--   OS:
--   Browser:
--   Smartphone/desktop:
+- OS:
+- Browser:
+- Smartphone/desktop:

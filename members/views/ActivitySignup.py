@@ -51,6 +51,13 @@ def ActivitySignup(request, activity_id, person_id=None):
             if len(subscriptions) > 0:
                 family_subscriptions.append(child.id)
 
+        for person in family.get_persons():
+            subscriptions = WaitingList.objects.filter(
+                department=activity.department, person=person
+            )
+            if len(subscriptions) > 0:
+                family_subscriptions.append(person.id)
+
     if family and person_id:
 
         try:
