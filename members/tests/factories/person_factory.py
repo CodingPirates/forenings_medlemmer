@@ -7,14 +7,10 @@ from factory.fuzzy import FuzzyChoice
 from members.models import Person
 from django.contrib.auth import get_user_model
 from members.tests.factories.family_factory import FamilyFactory
+from members.tests.factories.user_factory import UserFactory
 
 Faker.add_provider(DanishProvider, locale=LOCALE)
 Faker._DEFAULT_LOCALE = "dk_DK"
-
-
-class UserFactory(DjangoModelFactory):
-    class Meta:
-        model = get_user_model()
 
 
 class PersonFactory(DjangoModelFactory):
