@@ -15,3 +15,4 @@ members.db
 
 # MacOS temp file
 .DS_Store
+live_data_dump
