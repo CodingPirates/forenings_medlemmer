@@ -352,6 +352,17 @@ label[for=id_password] {
   text-align: left;
 }
 
+#input-search-text {
+  background-image: url("/static/searchicon.png");
+  background-position: 10px 12px;
+  background-repeat: no-repeat;
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 3px solid #ddd;
+  margin-bottom: 12px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -464,49 +475,5 @@ table tr {
   color: #ff9900;
   cursor: pointer;
 }
-
-.readmore-text {
-  height: 64px;
-  overflow: hidden;
-}
-
-.readmore-container {
-  position: relative;
-}
-
-.readmore-label {
-  position: absolute;
-  top: 100%
-}
-
-.readmore-input {
-  display: none;
-}
-
-.readmore-label:after {
-  color: red;
-  content: "Klik her for at se mere...";
-}
-
-.readmore-input:checked + .readmore-label:after  {
-  color: green;
-  content: "Klik her for at vise mindre...";
-}
-
-.readmore-input:checked ~ div {
-  height: 100%;
-}
-
-#input-search-text {
-  background-image: url("/static/searchicon.png");
-  background-position: 10px 12px;
-  background-repeat: no-repeat;
-  width: 100%;
-  font-size: 16px;
-  padding: 12px 20px 12px 40px;
-  border: 3px solid #ddd;
-  margin-bottom: 12px;
-}
-
 
 /*# sourceMappingURL=main.css.map */

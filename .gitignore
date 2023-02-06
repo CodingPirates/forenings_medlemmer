@@ -12,3 +12,4 @@ test-screens
 members.db
 *.bak
 .vs/
+live_data_dump

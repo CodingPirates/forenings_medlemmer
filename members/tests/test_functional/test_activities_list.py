@@ -1,6 +1,8 @@
 import socket
 import os
+import codecs
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -33,21 +35,26 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         self.browser.maximize_window()
         # Loads the activities list
         self.browser.get(f"{self.live_server_url}/activities")
+        # Save HTML file
+        filename = os.path.join("test-screens", "activities.html")
+        filestream = codecs.open(filename, "w", "utf-8")
+        filehandle = self.browser.page_source
+        filestream.write(filehandle)
+
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/activities_list_1.png")
 
         # click on the right button for "Nuværende og kommende aktiviteter"
-        # /html/body/main/div/ul/li[2]
         self.browser.find_element(
             By.XPATH,
-            "//div[@id='tab-menu']/ul/li[text()[contains(.,'Nuværende og kommende aktiviteter')]]",
+            "//div[@id='tab-menu']/ul/li[@id='tab-aktiviteter']",
         ).click()
         self.browser.save_screenshot("test-screens/activities_list_2.png")
 
         # check that the test activity is present
         activity_name = self.browser.find_element(
             By.XPATH,
-            "//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/section[@id='region-hovedstaden']/table/tbody/tr[1]/td[@data-label='Aktivitet']",
+            f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/section[@id='{slugify(self.activity_1.department.address.region)}']/table/tbody/tr[1]/td[@data-label='Aktivitet']",
         ).get_attribute("textContent")
         self.assertEqual(activity_name, self.activity_1.name)
 
@@ -56,7 +63,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
             len(
                 self.browser.find_elements(
                     By.XPATH,
-                    "//div[@class='tabs']/section[@id='current_activities']/div[@class='tabs']/section[@id='activity-per-region']/table/tbody",
+                    f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/ul/section[@id='{slugify(self.activity_1.department.address.region)}']/table/tbody",
                 )
             ),
             1,

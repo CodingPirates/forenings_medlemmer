@@ -54,3 +54,6 @@ class Family(models.Model):
     def save(self, *args, **kwargs):
         self.email = self.email.lower()
         return super(Family, self).save(*args, **kwargs)
+
+    def get_persons(self):
+        return Person.objects.filter(family=self)

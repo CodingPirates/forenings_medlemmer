@@ -1,71 +1,51 @@
 {% extends 'members/base.html' %}
 {% block content %}
-  <h2>Opskrivninger i Coding Pirates</h2>
+  <h2>Opskrivninger på ventelister i Coding Pirates</h2>
   <p>
-    De fleste afdelinger starter nye hold to gange om året. Som regel i februar og
-    september.<br>
-    Du kan skrive dit barn op til en eller flere afdelinger her. Næste
-    gang afdelingen åbner op for nye tilmeldinger vil I modtage en mail med en
-    invitation.<br>
-    Under menupunktet <b>Aktiviteter</b> kan I se afdelinger der har åbent
-    for tilmeldinger allerede nu og se invitationer sendt til jer.
+    De fleste afdelinger starter nye hold to gange om året. Som regel i februar og september.<br>
+    Du kan skrive dit barn op til en eller flere afdelinger her. <br>
+    I vil modtage en invitation til en sæson, så snart I står højt nok på ventelisten til en afdeling.<br>
+    Under menupunktet <b>Aktiviteter</b> kan I se afdelinger der har åbent for tilmeldinger allerede nu og også se om der er sendt invitationer til jer, hvis afdelingens aktivitet inviterer gennem ventelisten.<br>
     <a class="button" href="{% url "activities" %}">Gå til Aktiviteter</a>
   </p>
 
   <h2>Vigtig information om Ventelister</h2>
-  <!--
-  <div class="readmore-container">
-      <input class="readmore-input" id="ch" type="checkbox">
-      <label class="readmore-label" for="ch"></label>
-      <div class="readmore-text">
-        Dit barns plads på ventelisten bliver beregnet ud fra, hvornår barnet er 
-        oprettet i systemet.<br>
-        Det er altså barnets anciennitet, der bestemmer pladsen på ventelisten til samtlige afdelinger, barnet er skrevet op på.<br>
-        Jo højere anciennitet, des bedre plads på ventelisten(erne).<br>
-        Bemærk at jeres position på ventelisten afgøres ud fra barnets 
-        oprettelsestidspunkt i systemet - ikke tidspunktet I melder jer
-        på ventelisterne nedenfor!<br>
-        I kan derfor frit tilmelde og framelde jer ventelisterne uden at miste
-        en position på listen.<br>
-        Når en afdeling sender invitationer ud <u>kan</u> afdelingen vælge at prioritere
-        <ul>
-          <li>børn længere nede på listen for at få den bedst mulige fordeling af
-            børn på holdet.</li>
-          <li>børn fra nærområdet / kommunen</li>
-          <li>frivilliges børn</li>
-          <li>eller efter andre kriterier, der efter afdelingens vurdering er den
-            måde de ønsker at gøre det på. </li>
-        </ul>
-        <u>Hvordan bliver man fjernet fra venteliste(r)</u><br>
-        Der er forskellige måder hvorpå man bliver fjernet fra en venteliste.<br>
-        Husk: man kan altid melde sig til igen med samme anciennitet som før.
-        <ul>
-          <li>Når man modtager en invitation til en aktivitet i en afdeling, så bliver man samtidig fjernet fra venteliste til den afdeling</li>
-          <li>Når man acceptere en invitation til en aktivitet bliver man fjernet fra alle ventelister</li>
-          <li>Man kan selv fjerne sig fra en venteliste under hovedmenu Aktiviteter, klik derefter på "Tilmeldte Aktiviteter", og så på røde "Afmeld" knap (husk at checke at det er den rigtige afdeling og det rigtige barn</li>
-          <li>Der kan ske en oprydning af personer på venteliste(r), og der kommer så en email med information om at man er fjernet</li>
-        </ul>
-    </div>
-  </div>
+    Dit barns plads på ventelisten bliver beregnet ud fra, hvornår barnet er oprettet i systemet.<br>
+    Det er altså hvornår barnet er skrevet op på i medlemssystemet der tæller og ikke tidspunktet I melder jer på ventelisterne nedenfor!<br>
+    Jo højere anciennitet, des bedre plads på ventelisten(erne).<br>
+    I kan derfor frit tilmelde og framelde jer ventelisterne uden at miste
+    en position på listen.<br>
+    Når en afdeling sender invitationer ud <u>kan</u> afdelingen vælge at prioritere
+    <ul>
+      <li>børn længere nede på listen for at få den bedst mulige fordeling af
+        børn på holdet.</li>
+      <li>børn fra nærområdet / kommunen</li>
+      <li>frivilliges børn</li>
+      <li>eller efter andre kriterier, der efter afdelingens vurdering er den
+        måde de ønsker at gøre det på. </li>
+    </ul>
+    <u>Hvordan bliver man fjernet fra venteliste(r)</u><br>
+    Der er forskellige måder hvorpå man bliver fjernet fra en venteliste.<br>
+    <b>Husk:</b> man kan altid melde sig til igen med samme anciennitet som før.
+    <ul>
+      <li>Når man modtager en invitation til en aktivitet i en afdeling, så bliver man samtidig fjernet fra venteliste til den afdeling</li>
+      <li>Når man acceptere en invitation til en aktivitet bliver man fjernet fra <b>alle</b> ventelister</li>
+      <li>Man kan selv fjerne sig fra en venteliste under hovedmenu <b>Aktiviteter</b>, klik derefter på <b>Tilmeldte ventelister</b>, og så på røde <b>Afmeld</b> knap (husk at checke at det er den rigtige afdeling og det rigtige barn</li>
+      <li>Der kan ske en oprydning af personer på venteliste(r), og der kommer så en email med information om at man er fjernet</li>
+    </ul>
   <br>
-  -->  
   <br>
   <div class="tabs" id="menu-tabs">
     <ul>
-      <li>Alle ventelister</li>
-      <li>Tilmeldte ventelister</li>
-      <li>Kort over afdelinger</li>
+      <li id="menu-alle-ventelister">Alle ventelister</li>
+      <li id="menu-timeldte-ventelister">Tilmeldte ventelister</li>
+      <li id="menu-kort-over-afdelinger">Kort over afdelinger</li>
     </ul>
     <section id="alle-ventelister">
       {% regroup departments by address.region as departments_region %}
       <h2>Opskrivning på venteliste</h2>
       <p>
-        Opskriv jer kun de afdelinger, der har interesse for jer. Det er en god
-        ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye
-        afdelinger efterhånden som vi får bekræftet de åbner og børnene får kun
-        tilbud om at komme med på de afdelinger de har skrevet sig op til. Se
-        jeres nuværende ventelistestatus under "<em>Se Pladser</em>"
-      </p>
+        Opskriv jer kun de afdelinger, der har interesse for jer. Det er en god ide at kigge forbi hyppigt op til sæsonstart, da vi tilføjer nye afdelinger efterhånden som vi får bekræftet de åbner. Afdelinger med aktiviteter der inviterer gennem ventelisten, sender invitation med tilbud om at komme med til sæsonen de har skrevet sig op til. Se jeres nuværende ventelistestatus under <b>Tilmeldte ventelister</b><br><br>
       <input 
         type="text" 
         id="input-search-text"
@@ -76,10 +56,11 @@
           )" 
         placeholder="Søg efter..."
       >
+      <br> <br>
       <div class="tabs" id="region-tabs">
         <ul>
           {% for region in departments_region %}
-            <li>{{ region.grouper }}</li>
+            <li id="tab-{{region.grouper|slugify}}">{{ region.grouper }}</li>
           {% endfor %}
         </ul>
         {% for region in departments_region %}

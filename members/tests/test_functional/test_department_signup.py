@@ -1,5 +1,6 @@
 import socket
 import os
+import codecs
 from datetime import timedelta
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.utils import timezone
@@ -9,7 +10,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 
 
 class DepartmentSignupTest(StaticLiveServerTestCase):
@@ -38,44 +38,36 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
     def test_department_signup(self):
         self.browser.maximize_window()
         self.browser.get(f"{self.live_server_url}/department_signup")
+
+        filename = os.path.join("test-screens", "department_signup.html")
+        filestream = codecs.open(filename, "w", "utf-8")
+        filehandle = self.browser.page_source
+        filestream.write(filehandle)
+
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/department_signup_1.png")
-        try:
-            WebDriverWait(self.browser, 10).until(
-                EC.presence_of_element_located(
-                #EC.located_to_be_selected(
-                    (
-                        By.XPATH,
-                        "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
-                    )
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    "//div[@id='menu-tabs']/section[@id='alle-ventelister']/div[@id='region-tabs']/ul/li[@id='tab-region-hovedstaden']",
                 )
             )
-        except:
-            self.browser.save_screenshot("test-screens/department_signup_1_except.png")
-
-        
-        region_data = self.browser.find_element(
-             By.XPATH, 
-             "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
         )
-        #.click()
+
         self.browser.save_screenshot("test-screens/department_signup_2.png")
-        
 
-        # check that there's the "Hovedstaden" region tab
-        # div[@id='menu-tabs']/section[@id='alle-ventelister']/
-        self.browser.execute_script("return arguments[0].scrollIntoView(true);", region_data)
+        region_tab = self.browser.find_element(
+            By.XPATH,
+            "//div[@id='menu-tabs']/section[@id='alle-ventelister']/div[@id='region-tabs']/ul/li[@id='tab-region-hovedstaden']",
+        )
+
+        self.browser.execute_script(
+            "return arguments[0].scrollIntoView(true);", region_tab
+        )
+
         self.browser.save_screenshot("test-screens/department_signup_3.png")
-        # self.browser.find_element(
-        #      By.XPATH,
-        #      "//div[@id='region-tabs']/ul/li[text()[contains(.,'Region Hovedstaden')]]",
-        #  ).click()
-
-        # actions = ActionChains(self.browser)
-        # actions.move_to_element(region_tab).perform()
-
-        #region_tab.click()
-        region_data.click()
+        region_tab.click()
 
         self.browser.save_screenshot("test-screens/department_signup_4.png")
 

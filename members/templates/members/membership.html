@@ -65,7 +65,7 @@
                 <tr>
                   <th>Forening</th>
                   <th>Adresse</th>
-                  <th>Aktivitet</th>
+                  <th>Medlemskab</th>
                   <th>Pris</th>
                   <th>Dato</th>
                   <th>Info</th>
@@ -77,7 +77,7 @@
                   <tr>
                     <td>
                       Coding Pirates<br>
-                      {{ activity.union.name }}
+                      {{ activity.department.union.name }}
                     </td>
                     <td>
                       {% if activity.placename %}
@@ -152,7 +152,7 @@
             <thead>
             <tr>
               <th>Navn</th>
-              <th>Aktivitet</th>
+              <th>Medlemskab</th>
               <th>Forening</th>
               <th>Dato</th>
             </tr>
@@ -171,7 +171,7 @@
                     </a>
                   {% endif %}
                 </td>
-                <td>Coding Pirates {{ participation.activity.union.name }}</td>
+                <td>Coding Pirates {{ participation.activity.department.union.name }}</td>
                 <td>
                   {% if participation.activity.start_date == participation.activity.end_date %}
                     {{ participation.activity.start_date }}

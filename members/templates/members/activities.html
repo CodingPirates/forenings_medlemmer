@@ -2,7 +2,7 @@
 {% block content %}
   <h2>Aktiviteter i Coding Pirates</h2>
   <p>
-    Her kan du tilmelde dit barn en aktivitet i en Coding Pirates afdeling.<br>
+    Her kan I tilmelde Jer en aktivitet i en Coding Pirates afdeling.<br>
     Det kan enten være en åben aktivitet der ikke kræver invitation, eller
     hvis I har modtaget en invitation vil den kunne ses her.<br>
     De aktiviteter som I allerede er tilmeldt vil også fremgå på denne side.
@@ -18,16 +18,16 @@
   <div class="tabs" id="tab-menu">
     <ul>
       {% if family %}
-        <li>Invitationer</li>
+        <li id="tab-invitationer">Invitationer</li>
       {% endif %}        
-      <li>Nuværende og kommende aktiviteter</li>
+      <li id="tab-aktiviteter">Nuværende og kommende aktiviteter</li>
       {% if family %}
-        <li>Tilmeldte aktiviteter</li>
+        <li id="tab-tilmeldte-aktiviteter">Tilmeldte aktiviteter</li>
       {% endif %}        
       </ul>
     
     {% if family %}
-      <section>
+      <section id="invitationer">
         <h2>Invitationer</h2>
         <p>
           Denne liste indeholder invitationer til aktiviteter, hvor der 
@@ -37,7 +37,7 @@
           når der er aktiviteter, som I kan tilmelde jer.
         </p>
         {% if invites %}
-          <p><i>Vær opmærksom på, at du tilmelder dig den rigtige afdeling!</i></p>
+          <p><i>Vær opmærksom på, at I tilmelder Jer den rigtige afdeling!</i></p>
           <table>
             <thead>
               <tr>
@@ -94,7 +94,7 @@
                     
                     <a class="button-success"
                       href="{% url 'activity_signup' invite.activity.id invite.person.id %}">
-                      Tilmeld {{ invite.person.name }}
+                      Tilmeld {{ invite.person.firstname }}
                     </a>
                     <a class="button-danger"
                       href="{% url 'invitation_decline' family.unique invite.id %}">
@@ -123,6 +123,7 @@
           For aktiviteter med fri tilmelding, kan I tilmelde Jer direkte, og ellers
           kan I opskrive Jer på venteliste til afdelingen.
         </p>
+        <br>
         <input 
           type="text" 
           id="input-search-text"
@@ -133,10 +134,11 @@
             )" 
           placeholder="Søg efter..."
         >
+        <br><br>
         <div class="tabs" id="region-tabs">
           <ul>
             {% for region in departments_region %}
-              <li>{{ region.grouper }}</li>
+              <li id="tab-{{region.grouper|slugify}}">{{ region.grouper }}</li>
             {% endfor %}
           </ul>
 
@@ -155,7 +157,7 @@
                   </tr>
                 </thead>
                 <tbody class="activity-data">
-                  {% for activity in region.list %}
+                  {% for activity in region.list|dictsort:"name"|dictsort:"department.name" %}
                     <tr>
                       <td>Coding Pirates<br>
                         {{ activity.department.name }}
@@ -205,33 +207,33 @@
                               {{ activity.department.name }} opretter en ny aktivitet.
                             </p>
                           {% endif %}
-                          {% for child in children %}
+                          {% for person in persons %}
                             {% if activity.open_invite %}
-                              {% if activity.id in child.participating_activities %}
+                              {% if activity.id in person.participating_activities %}
                                 <div class="center">
-                                  {{ child.person.firstname }} er tilmeldt
+                                  {{ person.person.firstname }} er tilmeldt
                                 </div>
                               {% else %}
-                                  {% if child.person in activity.persons %}
+                                  {% if person.person in activity.persons %}
                                     <a 
                                       class="button-success" 
-                                      href="{% url 'activity_signup' activity.id child.person.id %}"
+                                      href="{% url 'activity_signup' activity.id person.person.id %}"
                                     >
-                                      Tilmeld {{ child.person.firstname }}
+                                      Tilmeld {{ person.person.firstname }}
                                     </a>
                                   {% endif %}
                               {% endif %}
                             {% else %}
-                              {% if activity.department in child.departments_is_waiting %}
+                              {% if activity.department in person.departments_is_waiting %}
                                 <div class="center">
-                                  {{ child.person.firstname }} er opskrevet
+                                  {{ person.person.firstname }} er opskrevet
                                 </div>
                               {% else %}
                                 <a 
                                   class="button-success" 
-                                  href="{% url 'waiting_list_subscription' child.person.id activity.department.id 'subscribe' %}"
+                                  href="{% url 'waiting_list_subscription' person.person.id activity.department.id 'subscribe' %}"
                                 >
-                                  Opskriv {{ child.person.firstname }} på venteliste
+                                  Opskriv {{ person.person.firstname }} på venteliste
                                 </a>
                               {% endif %}
                             {% endif %}
