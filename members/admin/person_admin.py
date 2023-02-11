@@ -355,7 +355,7 @@ class PersonAdmin(admin.ModelAdmin):
             )
             response = HttpResponse(
                 f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
-                content_type="text/csv",
+                content_type="text/csv; charset=utf-8",
             )
             response["Content-Disposition"] = 'attachment; filename="personer.csv"'
         return response
