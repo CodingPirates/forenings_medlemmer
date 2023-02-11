@@ -31,9 +31,13 @@ class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for activity in Activity.objects.filter(
-            department__in=AdminUserInformation.get_departments_admin(request.user)
-        ).order_by("department__name"):
+        for activity in (
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user)
+            )
+            .order_by("department__name")
+            .distinct()
+        ):
             activitys.append((str(activity.pk), activity))
 
         return activitys
@@ -50,7 +54,19 @@ class ActivityInviteUnionListFilter(admin.SimpleListFilter):
     parameter_name = "activity__department__union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
+        unions = []
+        for union1 in (
+            Union.objects.filter(
+                activity__department__union__in=AdminUserInformation.get_unions_admin(
+                    request.user
+                )
+            )
+            .order_by("activity__department__union__name")
+            .distinct()
+        ):
+            unions.append((str(union1.pk), str(union1.name)))
+        # remove duplicates:
+        return list(set([u for u in unions]))
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -64,10 +80,18 @@ class ActivityInviteDepartmentListFilter(admin.SimpleListFilter):
     parameter_name = "activity__department"
 
     def lookups(self, request, model_admin):
-        return [
-            (str(department.pk), str(department.name))
-            for department in Department.objects.all()
-        ]
+        departments = []
+        for department1 in (
+            Department.objects.filter(
+                activity__department__in=AdminUserInformation.get_departments_admin(
+                    request.user
+                )
+            )
+            .order_by("activity__department__name")
+            .distinct()
+        ):
+            departments.append((str(department1.pk), str(department1)))
+        return departments
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -84,10 +108,14 @@ class ActivitInviteListCurrentFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for act in Activity.objects.filter(
-            department__in=AdminUserInformation.get_departments_admin(request.user),
-            end_date__gte=timezone.now(),
-        ).order_by("department__name", "-start_date"):
+        for act in (
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user),
+                end_date__gte=timezone.now(),
+            )
+            .order_by("department__name", "-start_date")
+            .distinct()
+        ):
             activitys.append((str(act.pk), str(act)))
         return activitys
 
@@ -106,10 +134,14 @@ class ActivitInviteListFinishedFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activitys = []
-        for act in Activity.objects.filter(
-            department__in=AdminUserInformation.get_departments_admin(request.user),
-            end_date__lte=timezone.now(),
-        ).order_by("department__name", "-start_date"):
+        for act in (
+            Activity.objects.filter(
+                department__in=AdminUserInformation.get_departments_admin(request.user),
+                end_date__lte=timezone.now(),
+            )
+            .order_by("department__name", "-start_date")
+            .distinct()
+        ):
             activitys.append((str(act.pk), str(act)))
         return activitys
 
@@ -126,7 +158,6 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "activity_department_link",
         "activity_link",
         "person_link",
-        # "activity",
         "invite_dtm",
         "expire_dtm",
         "person_age_years",
@@ -136,7 +167,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     list_filter = (
         ActivityInviteUnionListFilter,
         ActivityInviteDepartmentListFilter,
-        ActivivtyInviteActivityListFilter,
+        # ActivivtyInviteActivityListFilter,
         ActivitInviteListCurrentFilter,
         ActivitInviteListFinishedFilter,
     )
