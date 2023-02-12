@@ -21,3 +21,10 @@ class AdminUserInformation(models.Model):
             return Department.objects.all()
         else:
             return Department.objects.filter(adminuserinformation__user=user)
+
+    @staticmethod
+    def get_unions_admin(user):
+        if user.is_superuser:
+            return Union.objects.all()
+        else:
+            return Union.objects.filter(adminuserinformation__user=user)
