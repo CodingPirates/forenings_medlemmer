@@ -19,7 +19,7 @@ def Activities(request):
         signup_closing__gte=timezone.now(),
         end_date__gte=timezone.now(),
         activitytype__in=["FORLØB", "ARRANGEMENT"],
-    ).order_by("-department__address__region", "-name", "start_date")
+    ).order_by("department__address__region", "-name", "start_date")
 
     family = None
     invites = None

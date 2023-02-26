@@ -4,11 +4,9 @@ from django.utils import timezone
 
 from members.models.activity import Activity
 
-# from members.models.union import Union
-
-# from members.models.address import Address
 from members.models.activityparticipant import ActivityParticipant
-from members.models import Person  # , Union, Address
+from members.models import Person
+from members.utils.user import user_to_person
 from members.utils.user import user_to_family
 
 from django.contrib.auth.decorators import user_passes_test
