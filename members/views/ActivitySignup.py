@@ -59,7 +59,6 @@ def ActivitySignup(request, activity_id, person_id=None):
                 family_subscriptions.append(person.id)
 
     if family and person_id:
-
         try:
             person = family.person_set.get(pk=person_id)
 
@@ -221,7 +220,6 @@ def ActivitySignup(request, activity_id, person_id=None):
             return HttpResponseRedirect(return_link_url)
         # fall through else
     else:
-
         signup_form = ActivitySignupForm()
 
     union = activity.department.union
