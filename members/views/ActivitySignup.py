@@ -155,7 +155,10 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Make ActivityParticipant
             # Note: The members field is now deprecated and is expected to be removed in a future release
             participant = ActivityParticipant(
-                member=member, person=person, activity=activity, note=signup_form.cleaned_data["note"]
+                member=member,
+                person=person,
+                activity=activity,
+                note=signup_form.cleaned_data["note"],
             )
 
             # If conditions not accepted, make error
