@@ -32,18 +32,19 @@ class ActivityUnionListFilter(admin.SimpleListFilter):
                     request.user
                 )
             )
-            .order_by("department__union__name")
+            .order_by("name")
             .distinct()
         ):
             unions.append((str(union1.pk), str(union1.name)))
         # remove duplicates:
-        return list(set([u for u in unions]))
+        # return list(set([u for u in unions]))
+        return unions
 
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
         else:
-            return queryset.filter(activity__department__union__pk=self.value())
+            return queryset.filter(department__union__pk=self.value())
 
 
 class ActivityDepartmentListFilter(admin.SimpleListFilter):
@@ -62,13 +63,14 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
             .distinct()
         ):
             departments.append((str(department1.pk), str(department1)))
+        # return list(set([d for d in departments]))
         return departments
 
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
         else:
-            return queryset.filter(activity__department__pk=self.value())
+            return queryset.filter(department__pk=self.value())
 
 
 class ActivityAdmin(admin.ModelAdmin):
