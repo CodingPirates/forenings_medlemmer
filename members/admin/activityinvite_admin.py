@@ -55,21 +55,17 @@ class ActivityInviteUnionListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         unions = []
-        for union1 in (
-            Union.objects.filter(
-                activity__department__union__in=AdminUserInformation.get_unions_admin(
-                    request.user
-                )
-            )
-            .order_by("activity__department__union__name")
-            .distinct()
+        for union in AdminUserInformation.get_unions_admin(request.user).order_by(
+            "name"
         ):
-            unions.append((str(union1.pk), str(union1.name)))
-        # remove duplicates:
-        return list(set([u for u in unions]))
+            unions.append((str(union.pk), union.name))
+
+        return unions
 
     def queryset(self, request, queryset):
-        if self.value() is None:
+        if self.value() == "any":
+            return queryset.exclude(activity__department__union__isnull=True)
+        elif self.value() is None:
             return queryset
         else:
             return queryset.filter(activity__department__union__pk=self.value())
@@ -81,16 +77,10 @@ class ActivityInviteDepartmentListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         departments = []
-        for department1 in (
-            Department.objects.filter(
-                activity__department__in=AdminUserInformation.get_departments_admin(
-                    request.user
-                )
-            )
-            .order_by("activity__department__name")
-            .distinct()
+        for department in AdminUserInformation.get_departments_admin(request.user).order_by(
+            "name"
         ):
-            departments.append((str(department1.pk), str(department1)))
+            departments.append((str(department.pk), department.name))
         return departments
 
     def queryset(self, request, queryset):
