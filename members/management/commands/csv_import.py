@@ -55,7 +55,6 @@ class Command(BaseCommand):
     args = "csvfile"
 
     def handle(self, *args, **options):
-
         if len(args) != 1:
             self.stdout.write("Invalid number of arguments")
             exit()
@@ -91,7 +90,6 @@ class Command(BaseCommand):
         datetimeobject = datetime.datetime.today()
 
         for entry in entries:
-
             email = entry[options["email_column"]].lower()
             name = entry[options["name_column"]].title().strip()
 
