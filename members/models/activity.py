@@ -106,11 +106,9 @@ class Activity(models.Model):
             min_amount = 100
 
         if self.price_in_dkk < min_amount:
-            errors["price_in_dkk"] = (
-                "Prisen er for lav. Denne type aktivitet skal mindst koste "
-                + str(min_amount)
-                + " kr."
-            )
+            errors[
+                "price_in_dkk"
+            ] = f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
 
         if errors:
             raise ValidationError(errors)
