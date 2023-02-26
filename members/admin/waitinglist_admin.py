@@ -10,8 +10,10 @@ from django.utils.safestring import mark_safe
 
 
 from members.models import (
+    Union,
     Department,
     AdminUserInformation,
+    WaitingList,
 )
 
 import members.models.emailtemplate
@@ -23,8 +25,6 @@ class person_waitinglist_union_filter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         unions = [
-            ("any", "(Alle opskrevne samlet)"),
-            ("none", "(Ikke opskrevet på venteliste)"),
         ]
         for union in AdminUserInformation.get_unions_admin(request.user).order_by(
             "name"
@@ -50,8 +50,6 @@ class person_waitinglist_department_filter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         departments = [
-            ("any", "(Alle opskrevne samlet)"),
-            ("none", "(Ikke opskrevet på venteliste)"),
         ]
         for department in AdminUserInformation.get_departments_admin(
             request.user
@@ -264,28 +262,26 @@ class WaitingListAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs = super(WaitingListAdmin, self).get_queryset(request)
+        #qs = super().get_queryset(request)
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
             return qs
-        else:
-            departments = Department.objects.filter(
-                adminuserinformation__user=request.user
-            ).values("id")
-            return qs.filter(
-                Q(department__in=departments),
-                """
-                Q(
+        departments = Department.objects.filter(
+            adminuserinformation__user=request.user
+            #adminuserinformation__user=request.user
+            #department__in=AdminUserInformation.get_departments_admin(request.user),
+        )
+        unions = Union.objects.filter(
+            adminuserinformation__user=request.user
+        )
 
-                    family__person__member__activityparticipant__activity__department__in=departments
-                )
-                | Q(family__person__waitinglist__department__in=departments)
-                | Q(
-                    family__person__activityinvite__activity__department__in=departments
-                )
-                """,
-            ).distinct()
+        return qs.filter(
+            Q(department__in=departments)
+            |
+            Q(department__union__in=unions)
+        ).distinct()
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
