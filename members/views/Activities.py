@@ -28,6 +28,7 @@ def Activities(request):
     children = []
     persons = []
     user_region = ""
+    persons = []
 
     if request.user.is_authenticated:
         person = user_to_person(request.user)
@@ -57,6 +58,20 @@ def Activities(request):
                     (act.activity.id)
                     for act in ActivityParticipant.objects.filter(
                         member__person=child["person"].id
+                    )
+                ]
+            persons = [
+                {"person": person, "waitinglists": WaitingList.get_by_person(person)}
+                for person in family.get_persons()
+            ]
+            for person in persons:
+                person["departments_is_waiting"] = [
+                    department for (department, _place) in person["waitinglists"]
+                ]
+                person["participating_activities"] = [
+                    (act.activity.id)
+                    for act in ActivityParticipant.objects.filter(
+                        member__person=person["person"].id
                     )
                 ]
             persons = [
@@ -132,6 +147,7 @@ def Activities(request):
         "participating": participating,
         "current_activities": current_activities_with_persons,
         "children": children,
+        "persons": persons,
         "persons": persons,
     }
     return render(request, "members/activities.html", context)

@@ -1,3 +1,4 @@
+import codecs
 from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import reverse
@@ -306,8 +307,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_payment_info_html.short_description = "Betalingsinfo"
 
     def export_csv_full(self, request, queryset):
-        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
-        today = timezone.now().date()
+        result_string = "Forening;Afdeling;Aktivitet;Navn;Alder;"
+        result_string += "Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;"
+        result_string += "Forældre tlf;Note til arrangørerne\n"
         for p in queryset:
             if p.member.person.gender == "MA":
                 gender = "Dreng"
@@ -315,12 +317,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 gender = "Pige"
             else:
                 gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
 
             parent = p.member.person.family.get_first_parent()
             if parent:
@@ -345,7 +341,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + p.member.person.name
                 + ";"
-                + str(age)
+                + str(p.member.person.age_years())
                 + ";"
                 + gender
                 + ";"
@@ -359,10 +355,15 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + parent_phone
                 + ";"
-                + p.note
+                + '"'
+                + p.note.replace('"', '""')
+                + '"'
                 + "\n"
             )
-        response = HttpResponse(result_string, content_type="text/csv")
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 

@@ -38,6 +38,20 @@ You are more than welcome to contribute to the system. This guide documents how 
     `pgadmin/servers.json` file, you just need to provide password to database when asked (can be found
     in your `.env` file)
 
+- To enable auto formatting with black on Linux: 
+    copy the pre-commit file into the .git/hooks directory
+    ```bash
+    cp pre-commit .git/hooks
+    ```
+    and then give it executeable permissions
+    ```bash
+    chmod +x .git/hooks/pre-commit
+    ```
+    Note: This only works on Unix. (MacOS or Linux) And only if you have black installed on python3 with
+    ```bash
+    python3 -m pip install black
+    ```
+
 > **_NOTE:_** If using linux with SELINUX you may need to add/change the following to your docker-compose.yml
 >
 > ``` yml
@@ -84,6 +98,15 @@ You are more than welcome to contribute to the system. This guide documents how 
     ```
 
     where the name of your tests replaces the last part.
+
+- [Unit tests][unittest]: runs the unittests. You run the unit tests the same way as the selenium tests. To run a specific test run
+
+    ```bash
+        docker-compose run web ./manage.py test members.tests.test_dump_data
+    ```
+
+    where the name of your tests replaces the last part.
+
 
 - [Quickpay][quickpay]: We use QuickPay for payments, `.env.example`
     contains a test api key. Quickpay has a series of cards that can be used
@@ -180,6 +203,8 @@ See [DEPLOYING.md](DEPLOYING.md) for instructions on deploying to test, staging 
 [black]: https://black.readthedocs.io/en/stable/
 
 [selenium]: https://www.selenium.dev
+
+[unittest]: https://docs.djangoproject.com/en/4.1/topics/testing/
 
 [main.scss]: https://github.com/CodingPirates/forenings_medlemmer/blob/master/members/static/members/sass/main.scss
 

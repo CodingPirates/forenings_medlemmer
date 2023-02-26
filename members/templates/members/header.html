@@ -10,6 +10,9 @@
     <a href="{% url "support_membership" %}">Støttemedlemskaber</a>
     <div class="account-sep"></div>
     {% if user.is_authenticated %}
+        {% if user.is_staff %}
+            <a href="{% url "admin:index" %}">ADMIN</a>
+        {% endif %}
         <a href="{% url "family_detail" %}">Familie</a>
         <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
     {% else %}

@@ -9,12 +9,16 @@ from members.models.activity import Activity
 # from members.models.address import Address
 from members.models.activityparticipant import ActivityParticipant
 from members.models import Person  # , Union, Address
-from members.utils.user import user_to_person
+from members.utils.user import user_to_family
+
+from django.contrib.auth.decorators import user_passes_test
+from members.utils.user import is_not_logged_in_and_has_person
 
 import requests
 import json
 
 
+@user_passes_test(is_not_logged_in_and_has_person, "/admin_signup/")
 def Membership(request):
     current_activities = Activity.objects.filter(
         signup_closing__gte=timezone.now(),
@@ -38,7 +42,7 @@ def Membership(request):
                 user_region = ""
                 # and we simply skip the region, and sorting will be as default
 
-            family = user_to_person(request.user).family
+            family = user_to_family(request.user)
             participating = ActivityParticipant.objects.filter(
                 member__person__family=family,
                 activity__activitytype__in=["FORENINGSMEDLEMSKAB"],

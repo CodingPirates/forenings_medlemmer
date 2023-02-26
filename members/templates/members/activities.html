@@ -19,21 +19,21 @@
     <ul>
       {% if family %}
         <li id="tab-invitationer">Invitationer</li>
-      {% endif %}        
+      {% endif %}
       <li id="tab-aktiviteter">Nuværende og kommende aktiviteter</li>
       {% if family %}
         <li id="tab-tilmeldte-aktiviteter">Tilmeldte aktiviteter</li>
-      {% endif %}        
+      {% endif %}
       </ul>
-    
+
     {% if family %}
       <section id="invitationer">
         <h2>Invitationer</h2>
         <p>
-          Denne liste indeholder invitationer til aktiviteter, hvor der 
+          Denne liste indeholder invitationer til aktiviteter, hvor der
           enten er fri tilmelding (først til mølle) eller invitationer til
           aktiviteter I har stået på venteliste til.<br>
-          I vil modtage en e-mail på <em>{{ family.email }}</em> 
+          I vil modtage en e-mail på <em>{{ family.email }}</em>
           når der er aktiviteter, som I kan tilmelde jer.
         </p>
         {% if invites %}
@@ -91,7 +91,7 @@
                     </a>
                   </td>
                   <td>
-                    
+
                     <a class="button-success"
                       href="{% url 'activity_signup' invite.activity.id invite.person.id %}">
                       Tilmeld {{ invite.person.firstname }}
@@ -108,7 +108,7 @@
         {% else %}
           <div class="info-box">
             Der er endnu ikke åbnet for tilmelding til aktiviteter.<br>
-            Vi sender en e-mail til <em>{{ family.email }}</em> når vi er klar til at 
+            Vi sender en e-mail til <em>{{ family.email }}</em> når vi er klar til at
             modtage tilmeldinger.
           </div>
         {% endif %}
@@ -124,14 +124,14 @@
           kan I opskrive Jer på venteliste til afdelingen.
         </p>
         <br>
-        <input 
-          type="text" 
+        <input
+          type="text"
           id="input-search-text"
           onkeyup="filter_rows_in_table(
-            'input-search-text', 
+            'input-search-text',
             'activity-per-region',
             'activity-data'
-            )" 
+            )"
           placeholder="Søg efter..."
         >
         <br><br>
@@ -203,7 +203,7 @@
                                 <a href="{% url 'department_signup' activity.id person.id %}">
                                   her
                                 </a>
-                              for at opskrive på venteliste til næste gang 
+                              for at opskrive på venteliste til næste gang
                               {{ activity.department.name }} opretter en ny aktivitet.
                             </p>
                           {% endif %}
@@ -215,8 +215,8 @@
                                 </div>
                               {% else %}
                                   {% if person.person in activity.persons %}
-                                    <a 
-                                      class="button-success" 
+                                    <a
+                                      class="button-success"
                                       href="{% url 'activity_signup' activity.id person.person.id %}"
                                     >
                                       Tilmeld {{ person.person.firstname }}
@@ -229,8 +229,8 @@
                                   {{ person.person.firstname }} er opskrevet
                                 </div>
                               {% else %}
-                                <a 
-                                  class="button-success" 
+                                <a
+                                  class="button-success"
                                   href="{% url 'waiting_list_subscription' person.person.id activity.department.id 'subscribe' %}"
                                 >
                                   Opskriv {{ person.person.firstname }} på venteliste
@@ -240,15 +240,15 @@
                           {% endfor %}
                         {% else %}
                           {% if activity.open_invite %}
-                            <a 
-                              class="button-success" 
+                            <a
+                              class="button-success"
                               href="{% url 'person_login' %}"
                             >
                               Tilmeld
                             </a>
                           {% else %}
-                            <a 
-                              class="button-success" 
+                            <a
+                              class="button-success"
                               href="{% url 'person_login' %}"
                             >
                               Opskriv på venteliste
@@ -275,14 +275,14 @@
       {% if family %}
         <h2>Tilmeldte aktiviteter</h2>
         <p>
-          Dette er de aktiviteter jeres børn er tilmeldt. 
-          I kan klikke på navnet for hver aktivitet, for at se flere 
+          Dette er de aktiviteter jeres børn er tilmeldt.
+          I kan klikke på navnet for hver aktivitet, for at se flere
           detaljer om hvor og hvornår det foregår.<b
         </p>
         {% if participating %}
           <p>
-            Hvis en aktivitet har en rød <kbd>betal</kbd>-knap, er 
-            betalingen ikke registreret. 
+            Hvis en aktivitet har en rød <kbd>betal</kbd>-knap, er
+            betalingen ikke registreret.
             Tryk på knappen for at betale.
           </p>
           <table>
@@ -295,19 +295,19 @@
               </tr>
             </thead>
             <tbody>
-              
+
                 {% for participation in participating %}
                   <tr>
                     <td>{{ participation.member.person.name }}</td>
                     <td>
-                      <a 
+                      <a
                         href="{% url 'activity_view_person' participation.activity.id participation.member.person.id %}"
                       >
                         {{ participation.activity.name }}
                       </a>
                       {% if not participation.paid %}
-                        <a 
-                          class="button-danger" 
+                        <a
+                          class="button-danger"
                           href="{{ participation.get_payment_link }}"
                         >
                           Betal
