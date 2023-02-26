@@ -20,7 +20,6 @@ def volunteerSignup(request):
             # signup has been filled
             vol_signup = vol_signupForm(request.POST)
             if vol_signup.is_valid():
-
                 # check if passwords match
                 if (
                     vol_signup.cleaned_data["password1"]

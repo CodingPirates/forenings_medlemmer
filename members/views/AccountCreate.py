@@ -17,7 +17,6 @@ def AccountCreate(request):
             # signup has been filled
             signup = signupForm(request.POST)
             if signup.is_valid():
-
                 # check if passwords match
                 if signup.cleaned_data["password1"] != signup.cleaned_data["password2"]:
                     # Passwords dosent match throw an error
