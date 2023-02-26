@@ -212,7 +212,9 @@ class WaitingListAdmin(admin.ModelAdmin):
                                     ):
                                         # If person got own email then also send to that
                                         template.makeEmail(
-                                            [wl.person, wl.person.family], mail_context, True
+                                            [wl.person, wl.person.family],
+                                            mail_context,
+                                            True,
                                         )
                                     else:
                                         template.makeEmail(
@@ -249,7 +251,7 @@ class WaitingListAdmin(admin.ModelAdmin):
             else:
                 messages.error(
                     request,
-                    f"Du må kun fjerne personer fra en afdeling ad gangen, og vælge mellem 1 og 50 personer",
+                    "Du må kun fjerne personer fra en afdeling ad gangen, og vælge mellem 1 og 50 personer",
                 )
                 return
         else:
