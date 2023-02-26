@@ -32,7 +32,6 @@
         <h2>Vælg aktivitet</h2>
         <div class="description">
           <p>Gennemgå listen og vælg den korrekte aktivitet der skal fjernes personer fra.</p>
-          <p>Alle personer fjernes og der sendes en email øjeblikkeligt med en beskrivelse af xxxx xxxx xxxx!<p>
         </div>
 
         {% csrf_token %}
@@ -49,9 +48,22 @@
           </div>
         {% endfor %}
 
+        <h2>Email template</h2>
+        <div class="description">
+          <p>Alle personer fjernes og der sendes en email udfra følgende mail template:</p><br>
+          <b>ID: </b>
+          <text readonly><pre>{{ emailtemplate.idname }}</pre></text><br>
+          <b>Subject: </b>
+          <text readonly><pre>{{ emailtemplate.subject }}</pre></text><br>
+          <b>HTML: </b>
+          <text readonly><pre>{{ emailtemplate.body_html }}</pre></text>
+          <b>Text: </b>
+          <text readonly><pre>{{ emailtemplate.body_text }}</pre></text>
+        </div>
+
         <h2>Bekræft deltagere</h2>
         <div class="description">
-          <p>Følgene ({{persons.count}}) personer fjernes fra venteliste:</p>
+          <p>Følgende ({{persons.count}}) personer fjernes fra venteliste:</p>
           <p>
             <ul>
               {% for item in persons %}
@@ -60,16 +72,18 @@
             </ul>
           </p>
           <p> følgende afdelinger er valgt:</p>
+          <p>
             <ul>
               {% for item in departments %}
               <li>{{item}}</li>
               {% endfor %}
             </ul>
+          </p>
         </div>
-
+        <br>
         <div class="submit-row">
           <p class="deletelink-box"><a href="../" class="deletelink">Fortryd</a></p>
-          <input class="default" name="" type="submit" value="Fjern fra venteliste og send email for alle valgte">
+          <input class="default" name="" type="submit" value="Fjern fra venteliste og send email for alle valgte personer/familier">
         </div>
       </fieldset>
     </div>
