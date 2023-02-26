@@ -40,7 +40,7 @@ class EmailTemplate(models.Model):
 
     # recievers is expected to be a list of Person, Family or strings (email adresses)
 
-    def makeEmail(self, recievers, context):
+    def makeEmail(self, recievers, context, allow_multiple_emails=False):
 
         if type(recievers) is not list:
             recievers = [recievers]
@@ -135,7 +135,8 @@ class EmailTemplate(models.Model):
             text_content = text_template.render(context)
             subject_content = subject_template.render(context)
             if (
-                members.models.emailitem.EmailItem.objects.filter(
+                allow_multiple_emails
+                or members.models.emailitem.EmailItem.objects.filter(
                     person=person,
                     reciever=destination_address,
                     activity=activity,
