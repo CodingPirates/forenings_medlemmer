@@ -38,6 +38,20 @@ You are more than welcome to contribute to the system. This guide documents how 
     `pgadmin/servers.json` file, you just need to provide password to database when asked (can be found
     in your `.env` file)
 
+- To enable auto formatting with black on Linux: 
+    copy the pre-commit file into the .git/hooks directory
+    ```bash
+    cp pre-commit .git/hooks
+    ```
+    and then give it executeable permissions
+    ```bash
+    chmod +x .git/hooks/pre-commit
+    ```
+    Note: This only works on Unix. (MacOS or Linux) And only if you have black installed on python3 with
+    ```bash
+    python3 -m pip install black
+    ```
+
 > **_NOTE:_** If using linux with SELINUX you may need to add/change the following to your docker-compose.yml
 >
 > ``` yml
