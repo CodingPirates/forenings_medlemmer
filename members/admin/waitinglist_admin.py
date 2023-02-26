@@ -212,11 +212,11 @@ class WaitingListAdmin(admin.ModelAdmin):
                                     ):
                                         # If person got own email then also send to that
                                         template.makeEmail(
-                                            [wl.person, wl.person.family], mail_context
+                                            [wl.person, wl.person.family], mail_context, True
                                         )
                                     else:
                                         template.makeEmail(
-                                            wl.person.family, mail_context
+                                            wl.person.family, mail_context, True
                                         )
                                     wl.delete()
                                     persons_deleted_from_wl += 1
