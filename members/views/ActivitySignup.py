@@ -111,11 +111,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
         if not (activity.min_age <= person.age_years() <= activity.max_age):
             return HttpResponse(
-                "Barnet skal være mellem "
-                + str(activity.min_age)
-                + " og "
-                + str(activity.max_age)
-                + " år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+                f"Barnet skal være mellem {activity.min_age} og {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
             )
 
         if (
@@ -157,8 +153,9 @@ def ActivitySignup(request, activity_id, person_id=None):
             member.save()
 
             # Make ActivityParticipant
+            # Note: The members field is now deprecated and is expected to be removed in a future release
             participant = ActivityParticipant(
-                member=member, activity=activity, note=signup_form.cleaned_data["note"]
+                member=member, person=person, activity=activity, note=signup_form.cleaned_data["note"]
             )
 
             # If conditions not accepted, make error
@@ -178,7 +175,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
 
             # Make payment if activity costs
-            if activity.price_in_dkk is not None and activity.price_in_dkk != 0:
+            if activity.price_in_dkk is not None and activity.price_in_dkk > 0:
                 # using creditcard ?
                 if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
                     payment = Payment(
