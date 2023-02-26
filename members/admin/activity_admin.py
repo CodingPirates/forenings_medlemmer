@@ -102,8 +102,6 @@ class ActivityAdmin(admin.ModelAdmin):
     list_filter = (
         ActivityUnionListFilter,
         ActivityDepartmentListFilter,
-        # "department__union__name",
-        # "department__name",
         "open_invite",
         "activitytype",
     )
