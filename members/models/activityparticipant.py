@@ -25,6 +25,9 @@ class ActivityParticipant(models.Model):
     member = models.ForeignKey(
         "Member", on_delete=models.CASCADE, verbose_name="Medlem"
     )
+    person = models.ForeignKey(
+        "Person", on_delete=models.CASCADE, verbose_name="Person", null=True
+    )
     note = models.TextField("Besked / Note til arrangement", blank=True)
     PHOTO_OK = "OK"
     PHOTO_NOTOK = "NO"
