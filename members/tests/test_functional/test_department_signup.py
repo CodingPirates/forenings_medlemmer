@@ -1,6 +1,7 @@
 import socket
 import os
 import codecs
+import time
 from datetime import timedelta
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.utils import timezone
@@ -62,9 +63,8 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
             "//div[@id='menu-tabs']/section[@id='alle-ventelister']/div[@id='region-tabs']/ul/li[@id='tab-region-hovedstaden']",
         )
 
-        self.browser.execute_script(
-            "return arguments[0].scrollIntoView(true);", region_tab
-        )
+        self.browser.execute_script("arguments[0].scrollIntoView(true);", region_tab)
+        time.sleep(0.2)
 
         self.browser.save_screenshot("test-screens/department_signup_3.png")
         region_tab.click()
