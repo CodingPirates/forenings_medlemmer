@@ -21,7 +21,7 @@ def Membership(request):
     current_activities = Activity.objects.filter(
         signup_closing__gte=timezone.now(),
         activitytype__in=["FORENINGSMEDLEMSKAB"],
-    ).order_by("start_date")
+    ).order_by("department__address__region", "-name", "start_date")
 
     family = None
     participating = None
