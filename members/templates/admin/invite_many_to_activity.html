@@ -51,7 +51,7 @@
 
         <h2>Bekræft deltagere</h2>
         <div class="description">
-          <p>Følgene ({{persons.count}}) personer inviteres:</p>
+          <p>Følgende ({{persons.count}}) personer inviteres:</p>
           <p>
             <ul>
               {% for person in persons %}
@@ -59,6 +59,8 @@
               {% endfor %}
             </ul>
           </p>
+          DEBUG:[{{queryset}}]. Count:[{{queryset.count}}].
+          X:[{{debuginfo}}]
         </div>
 
         <div class="submit-row">

@@ -38,6 +38,7 @@ from .inlines import (
 
 
 class PersonAdmin(admin.ModelAdmin):
+
     list_display = (
         "name",
         "membertype",
@@ -79,6 +80,7 @@ class PersonAdmin(admin.ModelAdmin):
     family_url.allow_tags = True
     family_url.short_description = "Familie"
     list_per_page = 20
+
 
     def invite_many_to_activity_action(self, request, queryset):
         # Get list of available departments
@@ -123,6 +125,12 @@ class PersonAdmin(admin.ModelAdmin):
         context = admin.site.each_context(request)
         context["persons"] = persons
         context["queryset"] = queryset
+
+        debuginfo = ""
+        for obj in persons:
+            for attr, value in obj.__dict__.items():
+                debuginfo += f"{attr}:{value}. "
+        context["debuginfo"] = debuginfo
 
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
