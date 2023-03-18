@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from members.tests.factories import (
-    MemberFactory,
+    PersonFactory,
 )
 from members.tests.test_functional.functional_helpers import log_in
 
@@ -22,7 +22,7 @@ class EntryPageTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        self.member = MemberFactory.create()
+        self.person = PersonFactory.create()
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
@@ -33,9 +33,9 @@ class EntryPageTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/activities_list_final.png")
         self.browser.quit()
 
-    def test_entry_page_as_member(self):
+    def test_entry_page_as_person(self):
         # Login
-        log_in(self, self.member.person)
+        log_in(self, self.person)
 
         self.browser.find_element(By.LINK_TEXT, "Familie")
         self.browser.find_element(By.LINK_TEXT, "Log ud")

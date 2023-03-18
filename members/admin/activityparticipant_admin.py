@@ -245,9 +245,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_person_link.admin_order_field = "person__name"
 
     def activity_family_email_link(self, item):
-        url = reverse(
-            "admin:members_family_change", args=[item.person.family_id]
-        )
+        url = reverse("admin:members_family_change", args=[item.person.family_id])
         link = '<a href="%s">%s</a>' % (url, item.person.family.email)
         return mark_safe(link)
 

@@ -125,7 +125,7 @@ class ActivityParticipant(models.Model):
             if self.activity.is_season():
                 # remove from all waiting lists
                 members.models.waitinglist.WaitingList.objects.filter(
-                    person=self.member.person
+                    person=self.person
                 ).delete()
         return super(ActivityParticipant, self).save(*args, **kwargs)
 
