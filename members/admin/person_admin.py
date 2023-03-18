@@ -30,7 +30,6 @@ from .person_admin_filters import (
 
 from .inlines import (
     ActivityInviteInline,
-    MemberInline,
     PaymentInline,
     VolunteerInline,
     WaitingListInline,
@@ -67,7 +66,6 @@ class PersonAdmin(admin.ModelAdmin):
         PaymentInline,
         VolunteerInline,
         ActivityInviteInline,
-        MemberInline,
         WaitingListInline,
     ]
 

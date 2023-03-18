@@ -41,7 +41,7 @@ def Activities(request):
                 child["participating_activities"] = [
                     (act.activity.id)
                     for act in ActivityParticipant.objects.filter(
-                        member__person=child["person"].id
+                        person=child["person"].id
                     )
                 ]
             persons = [
@@ -55,14 +55,14 @@ def Activities(request):
                 person["participating_activities"] = [
                     (act.activity.id)
                     for act in ActivityParticipant.objects.filter(
-                        member__person=person["person"].id
+                        person=person["person"].id
                     )
                 ]
             invites = ActivityInvite.objects.filter(
                 person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
             )
             participating = ActivityParticipant.objects.filter(
-                member__person__family=family,
+                person__family=family,
                 activity__activitytype__in=["FORLØB", "ARRANGEMENT"],
             ).order_by("-activity__start_date")
 
@@ -76,7 +76,7 @@ def Activities(request):
                     birthday__gt=curActivity.start_date
                     - relativedelta(years=curActivity.max_age + 1),  # not too old
                 ).exclude(
-                    member__activityparticipant__activity=curActivity
+                    activityparticipant__activity=curActivity
                 )  # not already participating
 
                 if applicablePersons.exists():

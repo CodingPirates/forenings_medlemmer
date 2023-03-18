@@ -8,9 +8,9 @@ from members.models import ActivityParticipant
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
-    fields = ("member",)
+    fields = ("person",)
     readonly_fields = fields
-    raw_id_fields = ("member",)
+    raw_id_fields = ("person",)
 
     def get_queryset(self, request):
         return ActivityParticipant.objects.all()

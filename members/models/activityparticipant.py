@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 import members.models.payment
-import members.models.member
 import members.models.family
 import members.models.person
 import members.models.waitinglist
@@ -16,14 +15,11 @@ class ActivityParticipant(models.Model):
     class Meta:
         verbose_name = "Deltager"
         verbose_name_plural = "Deltagere"
-        unique_together = ("activity", "member")
+        unique_together = ("activity", "person")
 
     added_at = models.DateField("Tilmeldt", default=timezone.now)
     activity = models.ForeignKey(
         "Activity", on_delete=models.PROTECT, verbose_name="Aktivitet"
-    )
-    member = models.ForeignKey(
-        "Member", on_delete=models.CASCADE, verbose_name="Medlem"
     )
     person = models.ForeignKey(
         "Person", on_delete=models.CASCADE, verbose_name="Person", null=True
@@ -47,7 +43,7 @@ class ActivityParticipant(models.Model):
 
     def __str__(self):
         return (
-            self.member.__str__()
+            self.person.__str__()
             + ", "
             + self.activity.department.name
             + ", "

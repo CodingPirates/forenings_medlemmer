@@ -36,7 +36,7 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
     title = "Efter aktivitet (\u2265 år " + str(timezone.now().year) + ")"
 
     # Parameter for the filter that will be used in the URL query.
-    parameter_name = "activity"
+    parameter_name = "activity_current_year"
 
     def lookups(self, request, model_admin):
         activitys = []
@@ -59,7 +59,7 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     title = "Efter aktivitet (= år " + str(timezone.now().year - 1) + ")"
 
     # Parameter for the filter that will be used in the URL query.
-    parameter_name = "activity"
+    parameter_name = "activity_last_year"
 
     def lookups(self, request, model_admin):
         activitys = []
@@ -82,7 +82,7 @@ class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
     title = "Efter aktivitet (\u2264 år " + str(timezone.now().year - 2) + ")"
 
     # Parameter for the filter that will be used in the URL query.
-    parameter_name = "activity"
+    parameter_name = "activity_old_years"
 
     def lookups(self, request, model_admin):
         activitys = []
@@ -200,7 +200,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     date_hierarchy = "activity__start_date"
     raw_id_fields = ("activity",)
     search_fields = (
-        "member__person__name",
+        "person__name",
         "activity__name",
     )
 
@@ -209,13 +209,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     ]
 
     def person_age_years(self, item):
-        return item.member.person.age_years()
+        return item.person.age_years()
 
     person_age_years.short_description = "Alder"
-    person_age_years.admin_order_field = "-member__person__birthday"
+    person_age_years.admin_order_field = "-person__birthday"
 
     def person_zipcode(self, item):
-        return item.member.person.zipcode
+        return item.person.zipcode
 
     person_zipcode.short_description = "Postnummer"
 
@@ -227,9 +227,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return qs.filter(activity__department__adminuserinformation__user=request.user)
 
     def activity_person_gender(self, item):
-        if item.member.person.gender == "MA":
+        if item.person.gender == "MA":
             return "Dreng"
-        elif item.member.person.gender == "FM":
+        elif item.person.gender == "FM":
             return "Pige"
         else:
             return "Andet"
@@ -237,22 +237,22 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_person_gender.short_description = "Køn"
 
     def activity_person_link(self, item):
-        url = reverse("admin:members_person_change", args=[item.member.person_id])
-        link = '<a href="%s">%s</a>' % (url, item.member.person.name)
+        url = reverse("admin:members_person_change", args=[item.person_id])
+        link = '<a href="%s">%s</a>' % (url, item.person.name)
         return mark_safe(link)
 
     activity_person_link.short_description = "Deltager"
-    activity_person_link.admin_order_field = "member__person__name"
+    activity_person_link.admin_order_field = "person__name"
 
     def activity_family_email_link(self, item):
         url = reverse(
-            "admin:members_family_change", args=[item.member.person.family_id]
+            "admin:members_family_change", args=[item.person.family_id]
         )
-        link = '<a href="%s">%s</a>' % (url, item.member.person.family.email)
+        link = '<a href="%s">%s</a>' % (url, item.person.family.email)
         return mark_safe(link)
 
     activity_family_email_link.short_description = "Familie"
-    activity_family_email_link.admin_order_field = "member__person__family__email"
+    activity_family_email_link.admin_order_field = "person__family__email"
 
     def activity_link(self, item):
         url = reverse("admin:members_activity_change", args=[item.activity.id])
@@ -311,18 +311,18 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         result_string += "Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;"
         result_string += "Forældre tlf;Note til arrangørerne\n"
         for p in queryset:
-            if p.member.person.gender == "MA":
+            if p.person.gender == "MA":
                 gender = "Dreng"
-            elif p.member.person.gender == "FM":
+            elif p.person.gender == "FM":
                 gender = "Pige"
             else:
-                gender = p.member.person.gender
+                gender = p.person.gender
 
-            parent = p.member.person.family.get_first_parent()
+            parent = p.person.family.get_first_parent()
             if parent:
                 parent_name = parent.name
                 parent_phone = parent.phone
-                if not p.member.person.family.dont_send_mails:
+                if not p.person.family.dont_send_mails:
                     parent_email = parent.email
                 else:
                     parent_email = ""
@@ -339,13 +339,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + p.activity.name
                 + ";"
-                + p.member.person.name
+                + p.person.name
                 + ";"
-                + str(p.member.person.age_years())
+                + str(p.person.age_years())
                 + ";"
                 + gender
                 + ";"
-                + p.member.person.zipcode
+                + p.person.zipcode
                 + ";"
                 + self.activity_payment_info_txt(p)
                 + ";"

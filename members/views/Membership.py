@@ -24,7 +24,7 @@ def Membership(request):
     if request.user.is_authenticated:
         family = user_to_family(request.user)
         participating = ActivityParticipant.objects.filter(
-            member__person__family=family,
+            person__family=family,
             activity__activitytype__in=["FORENINGSMEDLEMSKAB"],
         ).order_by("-activity__start_date")
 
@@ -38,7 +38,7 @@ def Membership(request):
                 birthday__gt=curActivity.start_date
                 - relativedelta(years=curActivity.max_age + 1),  # not too old
             ).exclude(
-                member__activityparticipant__activity=curActivity
+                activityparticipant__activity=curActivity
             )  # not already participating
 
             if applicablePersons.exists():
