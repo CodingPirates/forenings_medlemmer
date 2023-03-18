@@ -112,7 +112,6 @@ def Activities(request):
                 )  # not already participating
 
                 if applicablePersons.exists():
-
                     a = {
                         "id": curActivity.id,
                         "name": curActivity.name,

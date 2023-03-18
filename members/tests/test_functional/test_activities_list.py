@@ -6,9 +6,11 @@ from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from members.tests.factories import ActivityFactory
 from django.utils import timezone
 from datetime import timedelta
+
+from members.tests.factories import ActivityFactory, AddressFactory, DepartmentFactory
+from members.models import Address
 
 
 class ActivitiesListTest(StaticLiveServerTestCase):
@@ -16,11 +18,29 @@ class ActivitiesListTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
+        test_address = AddressFactory.create(
+            region=Address.REGION_CHOICES[0][0],
+        )
+        test_address.save()
+
+        test_department = DepartmentFactory.create(
+            name="Test Afdeling",
+            created=(timezone.now() - timedelta(days=5)).date(),
+            closed_dtm=None,
+            address=test_address,
+        )
+        test_department.save()
+
         self.activity_1 = ActivityFactory.create(
             name="Test Aktivitet",
+            max_participants=10,
+            start_date=(timezone.now() - timedelta(days=5)).date(),
+            end_date=(timezone.now() + timedelta(days=5)).date(),
             signup_closing=(timezone.now() + timedelta(days=5)).date(),
+            department=test_department,
         )
         self.activity_1.save()
+
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
         )
@@ -63,7 +83,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
             len(
                 self.browser.find_elements(
                     By.XPATH,
-                    f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/ul/section[@id='{slugify(self.activity_1.department.address.region)}']/table/tbody",
+                    f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/section[@id='{slugify(self.activity_1.department.address.region)}']/table/tbody",
                 )
             ),
             1,
