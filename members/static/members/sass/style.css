@@ -8,3 +8,14 @@
     min-width: 200px;
     text-align: left;
 }
+
+#input-search-text {
+    background-image: url("/static/searchicon.png");
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 3px solid #ddd;
+    margin-bottom: 12px;
+  }
