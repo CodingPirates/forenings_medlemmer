@@ -5,23 +5,11 @@
     Her kan du melde dig eller dit barn ind i en forening i Coding Pirates.
   </p>
   <p>
-    <em>Bemærk at medlemskab <u>ikke</u> betyder at dit barn kan gå til aktiviteter.</em><br>
-    Deltagelse i sæsonaktiviteter vil automatisk være medlemmer af lokalforeningen.<br>
+    <u>Bemærk:</u> Medlemskab af en forening giver ikke ret til at deltage i en aktivitet, men er man med i sæsonaktivitet bliver man automatisk medlem af foreningen i det år hvor aktiviteten foregår.<br>
     Som medlem støtter du din lokalforening og har mulighed for at stemme til generalforsamlinger i både lokalforeningen og hos Coding Pirates Denmark.
-  <!--</p>
-  <p> -->
-    <br>
-    Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye events kan du gøre det på afdelingssiden:
-    <a class="button" href="{% url "department_signup" %}">
-      Gå til Afdelings opskrivninger
-    </a>
-  <!--</p>
-  <p>-->
-    <br>
-    Se også listen over åbne aktiviteter her:
-    <a class="button" href="{% url "activities" %}">
-      Gå til aktiviteter
-    </a>
+  </p>
+  <p>
+    Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye events kan du gøre det under <b><a href="{% url "department_signup" %}">Afdelinger</a></b>. Se også listen over åbne <b><a href="{% url "activities" %}">Aktiviteter</a></b>.
   </p>
 
   <div class="tabs">
@@ -34,17 +22,17 @@
 
     <section id="current_activities">
       <h2>Tilmeld som medlem her</h2>
-      Her kan du finde alle de aktive foreninger i Coding Pirates, som du kan blive medlem af.<br>
-      <u>Bemærk:</u> Medlemskab af en forening giver ikke ret til at deltage i en aktivitet, men er man med i sæsonaktivitet bliver man automatisk medlem af foreningen i det år hvor aktiviteten foregår.<br>
-      <br>
-      <input 
-        type="text" 
+      <p>
+        Her kan du finde alle de aktive foreninger i Coding Pirates, som du kan blive medlem af.
+      </p>
+      <input
+        type="text"
         id="input-search-text"
         onkeyup="filter_rows_in_table(
-          'input-search-text', 
+          'input-search-text',
           'region-data',
           'union-membership-tablebody'
-          )" 
+          )"
         placeholder="Søg efter..."
       >
       <br>
@@ -56,7 +44,7 @@
               <li>{{ region.grouper }}</li>
             {% endfor %}
           </ul>
-  
+
           <!--<p>Liste over lokalforeninger du kan tilmelde dig:</p> -->
           {% for region in departments_region %}
             <section class="region-data" >
@@ -95,7 +83,7 @@
                       {{ activity.zipcode }}
                       {{ activity.city }}
                     </td>
-  
+
                     <td>{{ activity.name }}</td>
                     <td>{{ activity.price }} kr</td>
                     <td>
@@ -145,7 +133,7 @@
         </p>
         {% if participating %}
           <p>
-            Hvis en aktivitet har en rød <kbd>betal</kbd>-knap, er betalingen ikke
+            Hvis en aktivitet har en <kbd style="background-color:red">Betal</kbd>-knap, er betalingen ikke
             registreret. Tryk på knappen for at betale.
           </p>
           <table>

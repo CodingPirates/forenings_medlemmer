@@ -8,11 +8,8 @@
     De aktiviteter som I allerede er tilmeldt vil også fremgå på denne side.
   </p>
   <p>
-    Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye
-    events kan du gøre det på afdelingssiden.<br>
-    <a class="button" href="{% url "department_signup" %}">
-      Gå til Afdelings opskrivninger
-    </a>
+    Hvis du vil skrive dig op på venteliste til en afdeling og få sendt invitationer ved nye
+    events kan du gøre det under <b><a href="{% url "department_signup" %}">Afdelinger</a></b>.
   </p>
 
   <div class="tabs" id="tab-menu">
@@ -281,7 +278,7 @@
         </p>
         {% if participating %}
           <p>
-            Hvis en aktivitet har en rød <kbd>betal</kbd>-knap, er
+            Hvis en aktivitet har en <kbd style="background-color:red">Betal</kbd>-knap, er
             betalingen ikke registreret.
             Tryk på knappen for at betale.
           </p>
