@@ -74,7 +74,7 @@ def Membership(request):
                         "door": curActivity.door,
                         "zipcode": curActivity.zipcode,
                         "city": curActivity.city,
-                        "price": curActivity.price_in_dkk,
+                        "price_in_dkk": curActivity.price_in_dkk,
                         "start_date": curActivity.start_date,
                         "end_date": curActivity.end_date,
                     }
