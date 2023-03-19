@@ -148,9 +148,9 @@
             <tbody>
             {% for participation in participating %}
               <tr>
-                <td>{{ participation.member.person.name }}</td>
+                <td>{{ participation.person.name }}</td>
                 <td>
-                  <a href="{% url 'activity_view_person' participation.activity.id participation.member.person.id %}">
+                  <a href="{% url 'activity_view_person' participation.activity.id participation.person.id %}">
                     {{ participation.activity.name }}
                   </a>
                   {% if not participation.paid %}
