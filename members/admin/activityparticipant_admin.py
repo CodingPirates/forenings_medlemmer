@@ -309,13 +309,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         result_string += "Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;"
         result_string += "Forældre tlf;Note til arrangørerne\n"
         for p in queryset:
-            if p.member.person.gender is not None:
-                if p.member.person.gender == "MA":
+            if p.person.gender is not None:
+                if p.person.gender == "MA":
                     gender = "Dreng"
-                elif p.member.person.gender == "FM":
+                elif p.person.gender == "FM":
                     gender = "Pige"
                 else:
-                    gender = p.member.person.gender
+                    gender = p.person.gender
             else:
                 gender = "andet"
 

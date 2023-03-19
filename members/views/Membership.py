@@ -42,12 +42,12 @@ def Membership(request):
 
             family = user_to_family(request.user)
             participating = ActivityParticipant.objects.filter(
-                member__person__family=family,
+                person__family=family,
                 activity__activitytype__in=["FORENINGSMEDLEMSKAB"],
             ).order_by("-activity__start_date")
 
             membership_activities_with_persons = []
-            membershiP_activities_for_region_of_user = []
+            membership_activities_for_region_of_user = []
             membership_activities_for_other_regions = []
             # augment open invites with the persons who could join it in the family
             for curActivity in current_activities:
@@ -58,7 +58,7 @@ def Membership(request):
                     birthday__gt=curActivity.start_date
                     - relativedelta(years=curActivity.max_age + 1),  # not too old
                 ).exclude(
-                    member__activityparticipant__activity=curActivity
+                    activityparticipant__activity=curActivity
                 )  # not already participating
 
                 if applicablePersons.exists():
@@ -80,11 +80,11 @@ def Membership(request):
                     }
 
                     if curActivity.union.address.region == user_region:
-                        membershiP_activities_for_region_of_user.append(a)
+                        membership_activities_for_region_of_user.append(a)
                     else:
                         membership_activities_for_other_regions.append(a)
                 membership_activities_with_persons = (
-                    membershiP_activities_for_region_of_user
+                    membership_activities_for_region_of_user
                     + membership_activities_for_other_regions
                 )
 
