@@ -265,6 +265,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "has_certificate",
                         "added_at",
                         "user",
+                        "gender",
                     ),
                 },
             ),
