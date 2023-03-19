@@ -49,7 +49,7 @@ def SupportMembership(request):
                         "name": curActivity.name,
                         "union": curActivity.union,
                         "persons": applicablePersons,
-                        "price": curActivity.price_in_dkk,
+                        "price_in_dkk": curActivity.price_in_dkk,
                     }
                 )
 

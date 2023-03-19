@@ -309,12 +309,15 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         result_string += "Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;"
         result_string += "Forældre tlf;Note til arrangørerne\n"
         for p in queryset:
-            if p.person.gender == "MA":
-                gender = "Dreng"
-            elif p.person.gender == "FM":
-                gender = "Pige"
+            if p.member.person.gender is not None:
+                if p.member.person.gender == "MA":
+                    gender = "Dreng"
+                elif p.member.person.gender == "FM":
+                    gender = "Pige"
+                else:
+                    gender = p.member.person.gender
             else:
-                gender = p.person.gender
+                gender = "andet"
 
             parent = p.person.family.get_first_parent()
             if parent:
