@@ -374,7 +374,7 @@ class PersonAdmin(admin.ModelAdmin):
             ).values("id")
             return qs.filter(
                 Q(
-                    family__person__member__activityparticipant__activity__department__in=departments
+                    family__person__activityparticipant__activity__department__in=departments
                 )
                 | Q(family__person__waitinglist__department__in=departments)
                 | Q(
