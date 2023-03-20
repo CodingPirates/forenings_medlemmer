@@ -44,7 +44,8 @@ class DepartmentListTest(StaticLiveServerTestCase):
         self.department_2.address.region = "Region Syddanmark"
         self.department_2.address.save()
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor='http://selenium:4444/wd/hub',
+            options=webdriver.ChromeOptions()
         )
 
     def tearDown(self):

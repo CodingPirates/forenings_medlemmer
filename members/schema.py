@@ -16,38 +16,43 @@ from members.models.statistics import DepartmentStatistics as DepStatModel
 class StatisticsGeneral(DjangoObjectType):
     class Meta:
         model = DailyStatisticsGeneral
+        fields = __ALL__
 
 
 class DepartmentStatistics(DjangoObjectType):
     class Meta:
         model = DepStatModel
+        fields = __ALL__
 
 
 class StatisticsRegion(DjangoObjectType):
     class Meta:
         model = DailyStatisticsRegion
+        fields = __ALL__
 
 
 class StatisticsUnion(DjangoObjectType):
     class Meta:
         model = DailyStatisticsUnion
+        fields = __ALL__
 
 
 class UnionType(DjangoObjectType):
     class Meta:
         model = Union
-        exclude_fields = ("bank_main_org", "bank_account")
+        exclude = ("bank_main_org", "bank_account")
 
 
 class DepartmentType(DjangoObjectType):
     class Meta:
         model = Department
+        fields = __ALL__
 
 
 class AddressType(DjangoObjectType):
     class Meta:
         model = Address
-        exclude_fields = ("region",)
+        exclude = ("region",)
 
 
 class Query(graphene.ObjectType):
