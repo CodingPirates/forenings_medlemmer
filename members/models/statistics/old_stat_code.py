@@ -70,22 +70,22 @@ def old_stat_code(timestamp):
     ).count()
     dailyStatisticsGeneral.current_activity_participants = (
         Person.objects.filter(
-            member__activityparticipant__activity__end_date__gte=timestamp,
-            member__activityparticipant__activity__start_date__lte=timestamp,
+            activityparticipant__activity__end_date__gte=timestamp,
+            activityparticipant__activity__start_date__lte=timestamp,
         )
         .distinct()
         .count()
     )
     dailyStatisticsGeneral.activity_participants_male = (
         Person.objects.filter(
-            member__activityparticipant__activity__isnull=False, gender=Person.MALE
+            activityparticipant__activity__isnull=False, gender=Person.MALE
         )
         .distinct()
         .count()
     )
     dailyStatisticsGeneral.activity_participants_female = (
         Person.objects.filter(
-            member__activityparticipant__activity__isnull=False,
+            activityparticipant__activity__isnull=False,
             gender=Person.FEMALE,
         )
         .distinct()
@@ -123,9 +123,9 @@ def old_stat_code(timestamp):
         ).count()
         dailyStatisticsUnion.current_activity_participants = (
             Person.objects.filter(
-                member__activityparticipant__activity__start_date__lte=timestamp,
-                member__activityparticipant__activity__end_date__gte=timestamp,
-                member__activityparticipant__activity__department__union=union,
+                activityparticipant__activity__start_date__lte=timestamp,
+                activityparticipant__activity__end_date__gte=timestamp,
+                activityparticipant__activity__department__union=union,
             )
             .distinct()
             .count()
@@ -192,9 +192,9 @@ def old_stat_code(timestamp):
         ).count()
         dailyStatisticsRegion.current_activity_participants = (
             Person.objects.filter(
-                member__activityparticipant__activity__start_date__lte=timestamp,
-                member__activityparticipant__activity__end_date__gte=timestamp,
-                member__activityparticipant__activity__department__address__zipcode__in=zipsInRegion,
+                activityparticipant__activity__start_date__lte=timestamp,
+                activityparticipant__activity__end_date__gte=timestamp,
+                activityparticipant__activity__department__address__zipcode__in=zipsInRegion,
             )
             .distinct()
             .count()

@@ -36,13 +36,18 @@ def Activities(request):
         if person:
             # Wonder if we can have the data for the region of the user home location is the first ones ?
             # we have to check for region for the logged on user
-            dawa_req = f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
-            try:
-                dawa_reply = json.loads(requests.get(dawa_req).text)
-                user_region = dawa_reply["properties"]["regionsnavn"]
-            except Exception:
+            if person.dawa_id == "":
                 user_region = ""
-                # and we simply skip the region, and sorting will be as default
+            else:
+                dawa_req = (
+                    f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
+                )
+                try:
+                    dawa_reply = json.loads(requests.get(dawa_req).text)
+                    user_region = dawa_reply["properties"]["regionsnavn"]
+                except Exception:
+                    user_region = ""
+                    # and we simply skip the region, and sorting will be as default
 
             family = person.family
 
@@ -57,7 +62,7 @@ def Activities(request):
                 child["participating_activities"] = [
                     (act.activity.id)
                     for act in ActivityParticipant.objects.filter(
-                        member__person=child["person"].id
+                        person=child["person"].id
                     )
                 ]
             persons = [
@@ -71,7 +76,7 @@ def Activities(request):
                 person["participating_activities"] = [
                     (act.activity.id)
                     for act in ActivityParticipant.objects.filter(
-                        member__person=person["person"].id
+                        person=person["person"].id
                     )
                 ]
             persons = [
@@ -85,14 +90,14 @@ def Activities(request):
                 person["participating_activities"] = [
                     (act.activity.id)
                     for act in ActivityParticipant.objects.filter(
-                        member__person=person["person"].id
+                        person=person["person"].id
                     )
                 ]
             invites = ActivityInvite.objects.filter(
                 person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
             )
             participating = ActivityParticipant.objects.filter(
-                member__person__family=family,
+                person__family=family,
                 activity__activitytype__in=["FORLØB", "ARRANGEMENT"],
             ).order_by("-activity__start_date")
 
@@ -108,7 +113,7 @@ def Activities(request):
                     birthday__gt=curActivity.start_date
                     - relativedelta(years=curActivity.max_age + 1),  # not too old
                 ).exclude(
-                    member__activityparticipant__activity=curActivity
+                    activityparticipant__activity=curActivity
                 )  # not already participating
 
                 if applicablePersons.exists():
