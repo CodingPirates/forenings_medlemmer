@@ -36,13 +36,18 @@ def Activities(request):
         if person:
             # Wonder if we can have the data for the region of the user home location is the first ones ?
             # we have to check for region for the logged on user
-            dawa_req = f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
-            try:
-                dawa_reply = json.loads(requests.get(dawa_req).text)
-                user_region = dawa_reply["properties"]["regionsnavn"]
-            except Exception:
+            if person.dawa_id == "":
                 user_region = ""
-                # and we simply skip the region, and sorting will be as default
+            else:
+                dawa_req = (
+                    f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
+                )
+                try:
+                    dawa_reply = json.loads(requests.get(dawa_req).text)
+                    user_region = dawa_reply["properties"]["regionsnavn"]
+                except Exception:
+                    user_region = ""
+                    # and we simply skip the region, and sorting will be as default
 
             family = person.family
 
