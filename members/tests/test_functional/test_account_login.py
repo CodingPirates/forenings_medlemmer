@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from members.tests.factories import (
-    MemberFactory,
+    PersonFactory,
 )
 
 """
@@ -20,7 +20,7 @@ class AccountLoginTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        self.member = MemberFactory.create()
+        self.person = PersonFactory.create()
 
         self.browser = webdriver.Remote(
             "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME

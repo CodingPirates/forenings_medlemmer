@@ -62,7 +62,7 @@ class FamilyAdmin(admin.ModelAdmin):
             adminuserinformation__user=request.user
         ).values("id")
         return qs.filter(
-            Q(person__member__activityparticipant__activity__department__in=departments)
+            Q(person__activityparticipant__activity__department__in=departments)
             | Q(person__waitinglist__department__in=departments)
             | Q(person__activityinvite__activity__department__in=departments)
         ).distinct()

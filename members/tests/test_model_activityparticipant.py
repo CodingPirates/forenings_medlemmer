@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from members.models.activity import Activity
 from members.models.person import Person
 from members.models.family import Family
-from members.models.member import Member
 from members.models.waitinglist import WaitingList
 from members.models.activityparticipant import ActivityParticipant
 from django.utils import timezone
@@ -35,13 +34,6 @@ class TestModelActivityParticipant(TestCase):
         self.person = Person(family=self.family)
         self.person.save()
 
-        self.member = Member(
-            department=self.department,
-            person=self.person,
-            is_active=True,
-        )
-        self.member.save()
-
         waitinglist = WaitingList(
             person=self.person,
             department=self.department,
@@ -51,13 +43,13 @@ class TestModelActivityParticipant(TestCase):
         self.waitinglist_id = waitinglist.id
 
         self.ap = ActivityParticipantFactory(
-            member=self.member,
+            person=self.person,
         )
         self.ap.save()
 
     def test_save_waiting_list(self):
         self.participant = ActivityParticipant(
-            activity=self.activity, member=self.member
+            activity=self.activity, person=self.person
         )
         self.participant.save()
         self.assertFalse(WaitingList.objects.filter(pk=self.waitinglist_id).exists())
