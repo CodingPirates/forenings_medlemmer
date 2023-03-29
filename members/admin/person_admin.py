@@ -79,7 +79,6 @@ class PersonAdmin(admin.ModelAdmin):
     family_url.short_description = "Familie"
     list_per_page = 20
 
-
     def invite_many_to_activity_action(self, request, queryset):
         # Get list of available departments
         if request.user.is_superuser or request.user.has_perm(

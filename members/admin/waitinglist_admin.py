@@ -16,9 +16,7 @@ from members.models import (
     Person,
 )
 
-from .person_admin import (
-    PersonAdmin
-)
+from .person_admin import PersonAdmin
 
 
 import members.models.emailtemplate
@@ -107,7 +105,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     actions = [
         "delete_many_from_department_waitinglist_action",
-        "invite_to_activity_action",
+        "invite_many_to_activity_action",
     ]
 
     def get_actions(self, request):
@@ -265,41 +263,15 @@ class WaitingListAdmin(admin.ModelAdmin):
         "Fjern fra venteliste"
     )
 
-    def invite_to_activity_action(self, request, queryset):
-        q = []
+    def invite_many_to_activity_action(self, request, queryset):
         q = [wl.person.pk for wl in queryset]
         persons = Person.objects.filter(pk__in=q)
-
         pa = PersonAdmin(self.model, self.admin_site)
-        #pa = PersonAdmin(admin.ModelAdmin, admin.site)
+        return pa.invite_many_to_activity_action(request, persons)
 
-        return pa.invite_many_to_activity_action(
-            self,
-            request,
-            persons,
-        )
-        # Debug skal være a'la: DEBUG:[<QuerySet [<Person: test barn>, <Person: dreng2>]>]. Count:[2]
-        # men ovenstående giver: DEBUG:[[<Person: Dreng1 10år Hewel>]]. Count:[]
-        # DEBUG:[[<Person: Dreng1 10år Hewel>]]. Count:[]
-
-        '''
-        Fra Invitationer:
-
-        Følgende (1) personer inviteres:
-        Dreng1 10år Hewel
-        DEBUG:[<QuerySet [<Person: Dreng1 10år Hewel>]>]. Count:[1]. X:[_state:<django.db.models.base.ModelState object at 0x000001AD8F52D9F0>. id:7. membertype:CH. name:Dreng1 10år Hewel. zipcode:8543. city:Hornslet. streetname:Teglvangsvej. housenumber:64. floor:. door:. dawa_id:0a3f50c1-6866-32b8-e044-0003ba298018. municipality:København. longitude:12.473242. latitude:55.695696. updated_dtm:2023-01-30 15:09:05.108731+00:00. placename:. email:test@hewel.dk. phone:. gender:MA. birthday:2010-01-01. has_certificate:None. family_id:3. notes:. added_at:2022-12-17 10:20:44.391277+00:00. deleted_dtm:None. user_id:None. address_invalid:False. ]
-
-        Fra Personer:
-        Følgende (1) personer inviteres:
-
-        Dreng1 10år Hewel
-        DEBUG:[<QuerySet [<Person: Dreng1 10år Hewel>]>]. Count:[1]. X:[_state:<django.db.models.base.ModelState object at 0x000001AD8F4DF910>. id:7. membertype:CH. name:Dreng1 10år Hewel. zipcode:8543. city:Hornslet. streetname:Teglvangsvej. housenumber:64. floor:. door:. dawa_id:0a3f50c1-6866-32b8-e044-0003ba298018. municipality:København. longitude:12.473242. latitude:55.695696. updated_dtm:2023-01-30 15:09:05.108731+00:00. placename:. email:test@hewel.dk. phone:. gender:MA. birthday:2010-01-01. has_certificate:None. family_id:3. notes:. added_at:2022-12-17 10:20:44.391277+00:00. deleted_dtm:None. user_id:None. address_invalid:False. ]
-
-
-        '''
-
-    invite_to_activity_action.short_description = "Inviter alle valgte til en aktivitet"
-
+    invite_many_to_activity_action.short_description = (
+        "Inviter alle valgte til en aktivitet"
+    )
 
     def get_queryset(self, request):
         qs = super(WaitingListAdmin, self).get_queryset(request)
