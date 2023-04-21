@@ -21,6 +21,8 @@ from .person_admin import PersonAdmin
 
 import members.models.emailtemplate
 
+#import members.admin.admin_actions
+from members.admin.admin_actions import AdminActions
 
 class person_waitinglist_union_filter(admin.SimpleListFilter):
     title = "Forening"
@@ -105,7 +107,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     actions = [
         "delete_many_from_department_waitinglist_action",
-        "invite_many_to_activity_action",
+        AdminActions.invite_many_to_activity_common_action,
     ]
 
     def get_actions(self, request):
@@ -261,16 +263,6 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     delete_many_from_department_waitinglist_action.short_description = (
         "Fjern fra venteliste"
-    )
-
-    def invite_many_to_activity_action(self, request, queryset):
-        q = [wl.person.pk for wl in queryset]
-        persons = Person.objects.filter(pk__in=q)
-        pa = PersonAdmin(self.model, self.admin_site)
-        return pa.invite_many_to_activity_action(request, persons)
-
-    invite_many_to_activity_action.short_description = (
-        "Inviter alle valgte til en aktivitet"
     )
 
     def get_queryset(self, request):
