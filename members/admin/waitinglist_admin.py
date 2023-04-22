@@ -8,21 +8,17 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-
 from members.models import (
     Union,
     Department,
     AdminUserInformation,
-    Person,
 )
-
-from .person_admin import PersonAdmin
-
 
 import members.models.emailtemplate
 
-#import members.admin.admin_actions
+# import members.admin.admin_actions
 from members.admin.admin_actions import AdminActions
+
 
 class person_waitinglist_union_filter(admin.SimpleListFilter):
     title = "Forening"

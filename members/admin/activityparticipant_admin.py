@@ -15,6 +15,7 @@ from members.models import (
 
 from members.admin.admin_actions import AdminActions
 
+
 class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     title = "Afdeling"
     parameter_name = "department"

@@ -11,7 +11,6 @@ from django.utils.safestring import mark_safe
 from django.utils.html import escape
 from django.shortcuts import render
 
-
 from members.models import (
     Activity,
     ActivityInvite,
@@ -23,9 +22,7 @@ from members.models import (
 
 
 class AdminActions(admin.ModelAdmin):
-
     def invite_many_to_activity_common_action(modelAdmin, request, queryset):
-
         # Get list of available departments
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
@@ -80,11 +77,8 @@ class AdminActions(admin.ModelAdmin):
             persons = Person.objects.filter(pk__in=q)
             # queryset = persons
 
-        debuginfo = ""
-        for obj in persons:
-            for attr, value in obj.__dict__.items():
-                debuginfo += f"{attr}:{value}. "
-        context["debuginfo"] = debuginfo
+        context["persons"] = persons
+        context["queryset"] = queryset
 
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
@@ -110,11 +104,11 @@ class AdminActions(admin.ModelAdmin):
                         mass_invitation_form.cleaned_data["department"]
                     ):
                         invited_counter = 0
-                        persons_too_young = []            # List of persons who are too young
-                        persons_too_old = []              # List of persons who are too old
-                        persons_already_invited = []      # List of persons already invited
-                        persons_already_participant = []  # List of persons already participating
-                        persons_invited = []              # List of persons that are invited now
+                        persons_too_young = []
+                        persons_too_old = []
+                        persons_already_invited = []
+                        persons_already_participant = []
+                        persons_invited = []
 
                         # get list of already created invitations on selected persons
                         already_invited = Person.objects.filter(
@@ -211,19 +205,12 @@ class AdminActions(admin.ModelAdmin):
 
                         # Message about persons that are already participating in activity:
                         already_participating_text = ""
-                        if already_participant_ids.count():
+                        if len(persons_already_participant) > 0:
                             already_participating_text = (
                                 "<br><u>"
-                                + str(already_participant_ids.count())
+                                + str(len(persons_already_participant))
                                 + " deltager allerede:</u><br> "
-                                + escape(
-                                    str.join(
-                                        ", ",
-                                        already_participant.values_list(
-                                            "name", flat=True
-                                        ),
-                                    )
-                                )
+                                + escape(", ".join(persons_already_participant))
                             )
 
                         # Message about persons that are already invited (and not found as participant)
@@ -293,4 +280,3 @@ class AdminActions(admin.ModelAdmin):
     invite_many_to_activity_common_action.short_description = (
         "Inviter valgte personer til en aktivitet"
     )
-
