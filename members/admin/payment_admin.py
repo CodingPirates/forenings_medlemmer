@@ -3,6 +3,7 @@ from django.utils.html import format_html
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.urls import reverse
+from django.utils.html import escape
 
 
 from members.models import Activity, AdminUserInformation, Department
@@ -130,7 +131,7 @@ class PaymentAdmin(admin.ModelAdmin):
 
     def payment_person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.person_id])
-        link = '<a href="%s">%s</a>' % (url, item.person.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.name))
         return mark_safe(link)
 
     payment_person_link.short_description = "Deltager"
@@ -140,7 +141,7 @@ class PaymentAdmin(admin.ModelAdmin):
         url = reverse(
             "admin:members_department_change", args=[item.activity.department.id]
         )
-        link = '<a href="%s">%s</a>' % (url, item.activity.department.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.activity.department.name))
         return mark_safe(link)
 
     department_link.short_description = "Afdeling"
@@ -148,7 +149,7 @@ class PaymentAdmin(admin.ModelAdmin):
 
     def activity_link(self, item):
         url = reverse("admin:members_activity_change", args=[item.activity.id])
-        link = '<a href="%s">%s</a>' % (url, item.activity.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.activity.name))
         return mark_safe(link)
 
     activity_link.short_description = "Aktivitet"
