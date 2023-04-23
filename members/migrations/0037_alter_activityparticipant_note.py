@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("members", "0036_rename_founded_union_founded_at_union_closed_at"),
     ]

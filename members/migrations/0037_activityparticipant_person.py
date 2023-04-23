@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("members", "0036_rename_founded_union_founded_at_union_closed_at"),
     ]

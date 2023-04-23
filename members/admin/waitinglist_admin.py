@@ -183,7 +183,6 @@ class WaitingListAdmin(admin.ModelAdmin):
                     and mass_confirmation_form.cleaned_data["department"] != "-"
                     and mass_confirmation_form.cleaned_data["confirmation"] == "1"
                 ):
-
                     department_confirmed = mass_confirmation_form.cleaned_data[
                         "department"
                     ]
