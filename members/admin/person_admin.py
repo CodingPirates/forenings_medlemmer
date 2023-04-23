@@ -30,7 +30,6 @@ from members.admin.admin_actions import AdminActions
 
 
 class PersonAdmin(admin.ModelAdmin):
-
     list_display = (
         "name",
         "membertype",
