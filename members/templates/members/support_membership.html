@@ -1,125 +1,158 @@
 {% extends 'members/base.html' %}
 {% block content %}
-  <h2>Bliv støttemedlem af en Coding Pirates lokalforening</h2>
+  <h2>Bliv støttemedlem i Coding Pirates</h2>
   <p>
-    Her kan du melde dig som støttemedlem til en lokalforening.
+    Her kan du melde dig som støttemedlem til Coding Pirates' landsorganisation eller en af Coding Pirates mange lokalforeninger.<br>
+    Bemærk at et støttemedlemsskab ikke betyder, at dit barn kan gå til aktiviteter. Det betyder heller ikke, at du kan stemme til de årlige generalforsamlinger. Til gengæld støtter du Coding Pirates.
   </p>
   <p>
-    Bemærk at et støttemedlemsskab ikke betyder at dit barn kan gå til aktiviteter.
-    Til gengæld støtter du din lokalforening, men du har ikke mulighed for at stemme
-    til den årlige generalforsamling. Du kan også overveje et stemmeberettiget medlemskab
-    som du finder <a href="{% url 'support_membership' %}">her</a>.
-    Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye
-    events kan du gøre det på afdelingssiden.
-    <a class="button" href="{% url "department_signup" %}">
-      Gå til Afdelings opskrivninger
-    </a>
-  </p>
-  <p>
-    Se også listen over åben arrangementer her.
-    <a class="button" href="{% url "activities" %}">
-      Gå til arrangementer
-    </a>
-  </p>
+    Du kan også overveje et stemmeberettiget medlemskab på siden <b><a href="{% url 'membership' %}">Medlemskaber</a></b>.
+    Hvis du vil skrive dig op til en afdeling og få sendt invitationer ved nye events kan du gøre det siden for <b><a href="{% url "department_signup" %}">Afdelinger</a></b>.
+    Se også listen over åbne <b><a href="{% url "activities" %}">Aktiviteter</a></b>.
+</p>
 
-  {% if family %}
-    <section id="participation">
-      <h2>Nuværende og tidligere støttemedlemsskaber</h2>
-      <p>
-        Se her hvor du eller dit barn er medlem.
-      </p>
-      {% if participating %}
-        <p>
-          Hvis et arrangement har en rød <kbd>betal</kbd>-knap, er betalingen ikke
-          registreret. Tryk på knappen for at betale.
-        </p>
-        <table>
-          <thead>
-          <tr>
-            <th>Navn</th>
-            <th>Aktivitet</th>
-            <th>Forening</th>
-            <th>Start</th>
-            <th>Slut</th>
-          </tr>
-          </thead>
-          <tbody>
-          {% for participation in participating %}
+  <div class="tabs">
+    <ul>
+      <li>Tilmeld som støttemedlem</li>
+      {% if family%}
+        <li>Nuværende og tidligere støttemedlemskaber</li>
+      {% endif %}
+    </ul>
+    <section id="current_activities">
+      <h2>Tilmeld som støttemedlem her</h2>
+      Her kan du finde alle de aktive foreninger i Coding Pirates, som du kan blive støttemedlem af.<br>
+      <u>Bemærk:</u> Støttemedlemskab gør dig ikke til medlem af foreningen, og giver dig ikke ret til at deltage i en aktivitet i foreningen eller dens afdeling(er).
+      <br>
+      <br>
+      <input
+        type="text"
+        id="input-search-text"
+        onkeyup="filter_rows_in_table(
+          'input-search-text',
+          'region-data',
+          'union-membership-tablebody'
+          )"
+        placeholder="Søg efter..."
+      >
+
+      {% if current_activities %}
+        <section class="region-data">
+          <p>Liste over lokalforeninger du kan tilmelde dig:</p>
+          <table class="union-table">
+            <thead>
             <tr>
-              <td>{{ participation.member.person.name }}</td>
-              <td>
-                <a href="{% url 'activity_view_person' participation.activity.id participation.member.person.id %}">
-                  {{ participation.activity.name }}
-                </a>
-                {% if not participation.paid %}
-                  <a class="button-danger" href="{{ participation.get_payment_link }}">
-                    Betal
-                  </a>
-                {% endif %}
-              </td>
-              <td>{{ participation.activity.union.name }}</td>
-              <td>{{ participation.activity.start_date }}</td>
-              <td>{{ participation.activity.end_date }}</td>
+              <th>Forening</th>
+              <th>Adresse</th>
+              <th>Aktivitet</th>
+              <th>Pris</th>
+              <th>Info</th>
+              <th>Handling</th>
             </tr>
-          {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody class="union-membership-tablebody">
+            {% for activity in current_activities %}
+              <tr>
+                <td>
+                  {{ activity.union.name }}
+                </td>
+                <td>
+                  {% if activity.union.address.placename %}
+                    {{ activity.union.address.placename }}<br>
+                  {% endif %}
+                  {{ activity.union.address.streetname }}
+                  {{ activity.union.address.housenumber }}
+                  {% if activity.union.address.floor %}
+                    {{ activity.union.address.floor }}
+                  {% endif %}
+                  {% if activity.union.address.door %}
+                    {{ activity.union.address.door }}
+                  {% endif %}
+                  <br>
+                  {{ activity.union.address.zipcode }}
+                  {{ activity.union.address.city }}
+                </td>
 
+                <td>{{ activity.name }}</td>
+                <td>{{ activity.price_in_dkk }} kr</td>
+                <td>
+                  <a
+                      class="button"
+                      href="{% url 'activity_view_family' activity.id %}"
+                      target="_blank"
+                  >
+                    Læs mere
+                  </a>
+                </td>
+                <td>
+                  {% for person in activity.persons %}
+                    <a
+                        class="button-success"
+                        href="{% url 'activity_signup' activity.id person.id %}"
+                    >
+                      Tilmeld {{ person.firstname }}
+                    </a>
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </section>
       {% else %}
         <div class="info-box">
-          Ingen støttemedlemsskaber.
+          Der er ikke åbent for indmeldelse i nogen foreninger. Kom tilbage senere.
         </div>
       {% endif %}
     </section>
-  {% endif %}
+    {% if family %}
+      <section id="participation">
+        <h2>Nuværende og tidligere støttemedlemsskaber</h2>
+        <p>
+          Se her hvor du eller dit barn er medlem.
+        </p>
+        {% if participating %}
+          <p>
+            Hvis en aktivitet har en <kbd style="background-color:red">Betal</kbd>-knap, er betalingen ikke
+            registreret. Tryk på knappen for at betale.
+          </p>
+          <table>
+            <thead>
+            <tr>
+              <th>Navn</th>
+              <th>Aktivitet</th>
+              <th>Forening</th>
+              <th>Start</th>
+              <th>Slut</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for participation in participating %}
+              <tr>
+                <td>{{ participation.person.name }}</td>
+                <td>
+                  <a href="{% url 'activity_view_person' participation.activity.id participation.person.id %}">
+                    {{ participation.activity.name }}
+                  </a>
+                  {% if not participation.paid %}
+                    <a class="button-danger" href="{{ participation.get_payment_link }}">
+                      Betal
+                    </a>
+                  {% endif %}
+                </td>
+                <td>{{ participation.activity.union.name }}</td>
+                <td>{{ participation.activity.start_date }}</td>
+                <td>{{ participation.activity.end_date }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
 
-  <section id="current_activities">
-    <h2>Tilmeld som støttemedlem her</h2>
-    {% if current_activities %}
-      <p>Liste over lokalforeninger du kan tilmelde dig:</p>
-      <table>
-        <thead>
-        <tr>
-          <th>Forening</th>
-          <th>Aktivitet</th>
-          <th>Beskrivelse</th>
-          <th>Handling</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for activity in current_activities %}
-          <tr>
-            <td>
-              {{ activity.union.name }}
-            </td>
-            <td>{{ activity.name }}</td>
-            <td>
-              <a
-                  class="button"
-                  href="{% url 'activity_view_family' activity.id %}"
-                  target="_blank"
-              >
-                Læs mere
-              </a>
-            </td>
-            <td>
-              {% for person in activity.persons %}
-                <a
-                    class="button-success"
-                    href="{% url 'activity_signup' activity.id person.id %}"
-                >
-                  Tilmeld {{ person.firstname }} aktivitet
-                </a>
-              {% endfor %}
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <div class="info-box">
-        Der er ikke åbent for indmeldelse i nogen foreninger. Kom tilbage senere.
-      </div>
+        {% else %}
+          <div class="info-box">
+            Ingen støttemedlemsskaber.
+          </div>
+        {% endif %}
+      </section>
     {% endif %}
-  </section>
+  </div>
 {% endblock %}
