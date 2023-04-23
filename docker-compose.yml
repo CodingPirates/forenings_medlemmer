@@ -31,7 +31,7 @@ services:
       - USE_SQLITE=False
 
   database:
-    image: postgres:11.2-alpine
+    image: postgres:15.2-alpine
     networks:
       - webnet
     volumes:

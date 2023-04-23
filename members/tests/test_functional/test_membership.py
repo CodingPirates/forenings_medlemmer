@@ -3,7 +3,6 @@ import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 class MembershipTest(StaticLiveServerTestCase):
@@ -12,7 +11,8 @@ class MembershipTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=webdriver.ChromeOptions(),
         )
 
     def tearDown(self):

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("members", "0037_activityparticipant_person"),
         ("members", "0037_alter_waitinglist_options"),
