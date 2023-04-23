@@ -42,8 +42,8 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         self.activity_1.save()
 
         self.browser = webdriver.Remote(
-            command_executor='http://selenium:4444/wd/hub',
-            options=webdriver.ChromeOptions()
+            command_executor="http://selenium:4444/wd/hub",
+            options=webdriver.ChromeOptions(),
         )
 
     def tearDown(self):
