@@ -1,3 +1,4 @@
+import codecs
 from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import reverse
@@ -35,7 +36,7 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
     title = "Efter aktivitet (\u2265 år " + str(timezone.now().year) + ")"
 
     # Parameter for the filter that will be used in the URL query.
-    parameter_name = "activity"
+    parameter_name = "activity_current_year"
 
     def lookups(self, request, model_admin):
         activitys = []
@@ -58,7 +59,7 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     title = "Efter aktivitet (= år " + str(timezone.now().year - 1) + ")"
 
     # Parameter for the filter that will be used in the URL query.
-    parameter_name = "activity"
+    parameter_name = "activity_last_year"
 
     def lookups(self, request, model_admin):
         activitys = []
@@ -81,7 +82,7 @@ class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
     title = "Efter aktivitet (\u2264 år " + str(timezone.now().year - 2) + ")"
 
     # Parameter for the filter that will be used in the URL query.
-    parameter_name = "activity"
+    parameter_name = "activity_old_years"
 
     def lookups(self, request, model_admin):
         activitys = []
@@ -180,7 +181,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
-    ]
+     ]
 
     list_filter = (
         ActivityParticipantUnionFilter,
@@ -198,7 +199,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     date_hierarchy = "activity__start_date"
     raw_id_fields = ("activity",)
     search_fields = (
-        "member__person__name",
+        "person__name",
         "activity__name",
     )
 
@@ -207,13 +208,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     ]
 
     def person_age_years(self, item):
-        return item.member.person.age_years()
+        return item.person.age_years()
 
     person_age_years.short_description = "Alder"
-    person_age_years.admin_order_field = "-member__person__birthday"
+    person_age_years.admin_order_field = "-person__birthday"
 
     def person_zipcode(self, item):
-        return item.member.person.zipcode
+        return item.person.zipcode
 
     person_zipcode.short_description = "Postnummer"
 
@@ -225,32 +226,33 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return qs.filter(activity__department__adminuserinformation__user=request.user)
 
     def activity_person_gender(self, item):
-        if item.member.person.gender == "MA":
-            return "Dreng"
-        elif item.member.person.gender == "FM":
-            return "Pige"
+        if item.person.gender is not None:
+            if item.person.gender == "MA":
+                return "Dreng"
+            elif item.person.gender == "FM":
+                return "Pige"
+            else:
+                return item.person.gender
         else:
             return "Andet"
 
     activity_person_gender.short_description = "Køn"
 
     def activity_person_link(self, item):
-        url = reverse("admin:members_person_change", args=[item.member.person_id])
-        link = '<a href="%s">%s</a>' % (url, item.member.person.name)
+        url = reverse("admin:members_person_change", args=[item.person_id])
+        link = '<a href="%s">%s</a>' % (url, item.person.name)
         return mark_safe(link)
 
     activity_person_link.short_description = "Deltager"
-    activity_person_link.admin_order_field = "member__person__name"
+    activity_person_link.admin_order_field = "person__name"
 
     def activity_family_email_link(self, item):
-        url = reverse(
-            "admin:members_family_change", args=[item.member.person.family_id]
-        )
-        link = '<a href="%s">%s</a>' % (url, item.member.person.family.email)
+        url = reverse("admin:members_family_change", args=[item.person.family_id])
+        link = '<a href="%s">%s</a>' % (url, item.person.family.email)
         return mark_safe(link)
 
     activity_family_email_link.short_description = "Familie"
-    activity_family_email_link.admin_order_field = "member__person__family__email"
+    activity_family_email_link.admin_order_field = "person__family__email"
 
     def activity_link(self, item):
         url = reverse("admin:members_activity_change", args=[item.activity.id])
@@ -306,26 +308,22 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     def export_csv_full(self, request, queryset):
         result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
-        today = timezone.now().date()
         for p in queryset:
-            if p.member.person.gender == "MA":
-                gender = "Dreng"
-            elif p.member.person.gender == "FM":
-                gender = "Pige"
+            if p.person.gender is not None:
+                if p.person.gender == "MA":
+                    gender = "Dreng"
+                elif p.person.gender == "FM":
+                    gender = "Pige"
+                else:
+                    gender = p.person.gender
             else:
-                gender = p.member.person.gender
-            birthday = p.member.person.birthday
-            age = (
-                today.year
-                - birthday.year
-                - ((today.month, today.day) < (birthday.month, birthday.day))
-            )
+                gender = "andet"
 
-            parent = p.member.person.family.get_first_parent()
+            parent = p.person.family.get_first_parent()
             if parent:
                 parent_name = parent.name
                 parent_phone = parent.phone
-                if not p.member.person.family.dont_send_mails:
+                if not p.person.family.dont_send_mails:
                     parent_email = parent.email
                 else:
                     parent_email = ""
@@ -342,13 +340,13 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + p.activity.name
                 + ";"
-                + p.member.person.name
+                + p.person.name
                 + ";"
-                + str(age)
+                + str(p.person.age_years())
                 + ";"
                 + gender
                 + ";"
-                + p.member.person.zipcode
+                + p.person.zipcode
                 + ";"
                 + self.activity_payment_info_txt(p)
                 + ";"
@@ -358,11 +356,17 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
                 + ";"
                 + parent_phone
                 + ";"
-                + p.note
+                + '"'
+                + p.note.replace('"', '""')
+                + '"'
                 + "\n"
             )
-        response = HttpResponse(result_string, content_type="text/csv")
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
         response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
         return response
 
     export_csv_full.short_description = "CSV Export"
+

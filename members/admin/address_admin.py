@@ -3,7 +3,6 @@ from members.models import Address
 
 
 class AddressAdmin(admin.ModelAdmin):
-
     readonly_fields = (
         "created_at",
         "created_by",

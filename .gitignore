@@ -12,3 +12,7 @@ test-screens
 members.db
 *.bak
 .vs/
+
+# MacOS temp file
+.DS_Store
+live_data_dump

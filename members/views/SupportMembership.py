@@ -5,9 +5,13 @@ from django.utils import timezone
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
 from members.models import Person
-from members.utils.user import user_to_person
+from members.utils.user import user_to_family
+
+from django.contrib.auth.decorators import user_passes_test
+from members.utils.user import is_not_logged_in_and_has_person
 
 
+@user_passes_test(is_not_logged_in_and_has_person, "/admin_signup/")
 def SupportMembership(request):
     current_activities = Activity.objects.filter(
         signup_closing__gte=timezone.now(),
@@ -18,10 +22,10 @@ def SupportMembership(request):
     participating = None
     activities_with_persons = current_activities
     if request.user.is_authenticated:
-        family = user_to_person(request.user).family
+        family = user_to_family(request.user)
 
         participating = ActivityParticipant.objects.filter(
-            member__person__family=family,
+            person__family=family,
             activity__activitytype__in=["STØTTEMEDLEMSKAB"],
         ).order_by("-activity__start_date")
 
@@ -35,7 +39,7 @@ def SupportMembership(request):
                 birthday__gt=curActivity.start_date
                 - relativedelta(years=curActivity.max_age + 1),  # not too old
             ).exclude(
-                member__activityparticipant__activity=curActivity
+                activityparticipant__activity=curActivity
             )  # not already participating
 
             if applicablePersons.exists():
@@ -45,6 +49,7 @@ def SupportMembership(request):
                         "name": curActivity.name,
                         "union": curActivity.union,
                         "persons": applicablePersons,
+                        "price_in_dkk": curActivity.price_in_dkk,
                     }
                 )
 
