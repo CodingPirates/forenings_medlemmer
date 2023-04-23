@@ -38,7 +38,7 @@
         </div>
 
         {% csrf_token %}
-        <input type="hidden" name="action" value="invite_many_to_activity_common_action">
+        <input type="hidden" name="action" value="invite_many_to_activity_action">
         <input type="hidden" name="select_across" value="0">
         <input type="hidden" name="index" value="0">
         {% for obj in queryset %}

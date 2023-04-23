@@ -53,7 +53,7 @@ class PersonAdmin(admin.ModelAdmin):
     )
     search_fields = ("name", "family__email", "notes")
     actions = [
-        AdminActions.invite_many_to_activity_common_action,
+        AdminActions.invite_many_to_activity_action,
         "export_emaillist",
         "export_csv",
     ]

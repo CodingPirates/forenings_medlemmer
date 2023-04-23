@@ -22,7 +22,7 @@ from members.models import (
 
 
 class AdminActions(admin.ModelAdmin):
-    def invite_many_to_activity_common_action(modelAdmin, request, queryset):
+    def invite_many_to_activity_action(modelAdmin, request, queryset):
         # Get list of available departments
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
@@ -50,7 +50,7 @@ class AdminActions(admin.ModelAdmin):
             )
 
         # Form used to select department and activity - redundant department is for double check
-        class MassInvitationForm2(forms.Form):
+        class MassInvitationForm(forms.Form):
             department = forms.ChoiceField(label="Afdeling", choices=deparment_list)
             activity = forms.ChoiceField(label="Aktivitet", choices=activity_list)
             expire = forms.DateField(
@@ -82,7 +82,7 @@ class AdminActions(admin.ModelAdmin):
 
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
-            mass_invitation_form = MassInvitationForm2(request.POST)
+            mass_invitation_form = MassInvitationForm(request.POST)
             context["mass_invitation_form"] = mass_invitation_form
 
             if (
@@ -246,7 +246,7 @@ class AdminActions(admin.ModelAdmin):
                                 + " er over maximumsalder for aktiviteten "
                                 + "("
                                 + str(activity.max_age)
-                                + " år)"
+                                + " år) "
                                 + ":</u><br> "
                                 + escape(", ".join(persons_too_old))
                             )
@@ -273,10 +273,10 @@ class AdminActions(admin.ModelAdmin):
                     messages.error(request, "Du kan kun invitere til egne afdelinger")
                     return
         else:
-            context["mass_invitation_form"] = MassInvitationForm2()
+            context["mass_invitation_form"] = MassInvitationForm()
 
         return render(request, "admin/invite_many_to_activity.html", context)
 
-    invite_many_to_activity_common_action.short_description = (
+    invite_many_to_activity_action.short_description = (
         "Inviter valgte personer til en aktivitet"
     )

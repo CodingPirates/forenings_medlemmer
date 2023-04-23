@@ -207,7 +207,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     )
 
     actions = [
-        AdminActions.invite_many_to_activity_common_action,
+        AdminActions.invite_many_to_activity_action,
         "export_csv_full",
     ]
 

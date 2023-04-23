@@ -103,7 +103,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     actions = [
         "delete_many_from_department_waitinglist_action",
-        AdminActions.invite_many_to_activity_common_action,
+        AdminActions.invite_many_to_activity_action,
     ]
 
     def get_actions(self, request):
