@@ -4,6 +4,7 @@ from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
 from members.models import (
     Activity,
@@ -221,7 +222,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         url = reverse(
             "admin:members_union_change", args=[item.activity.department.union_id]
         )
-        link = '<a href="%s">%s</a>' % (url, item.activity.department.union.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.activity.department.union.name))
         return mark_safe(link)
 
     activity_department_union_link.short_description = "Forening"
@@ -233,7 +234,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         url = reverse(
             "admin:members_department_change", args=[item.activity.department_id]
         )
-        link = '<a href="%s">%s</a>' % (url, item.activity.department.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.activity.department.name))
         return mark_safe(link)
 
     activity_department_link.short_description = "Afdeling"
@@ -249,7 +250,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     def person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.person_id])
-        link = '<a href="%s">%s</a>' % (url, item.person.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.name))
         return mark_safe(link)
 
     person_link.short_description = "Person"
