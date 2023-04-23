@@ -1,9 +1,13 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from members.models import Department
-from members.models import ActivityParticipant
 
+from members.models import (
+    ActivityParticipant,
+    AdminUserInformation,
+    Department,
+    Union,
+)
 
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
@@ -32,8 +36,6 @@ class ActivityUnionListFilter(admin.SimpleListFilter):
             .distinct()
         ):
             unions.append((str(union1.pk), str(union1.name)))
-        # remove duplicates:
-        # return list(set([u for u in unions]))
         return unions
 
     def queryset(self, request, queryset):
@@ -59,7 +61,6 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
             .distinct()
         ):
             departments.append((str(department1.pk), str(department1)))
-        # return list(set([d for d in departments]))
         return departments
 
     def queryset(self, request, queryset):
@@ -98,8 +99,8 @@ class ActivityAdmin(admin.ModelAdmin):
         "department",
     )
     list_filter = (
-        "department__union__name",
-        "department__name",
+        ActivityUnionListFilter,
+        ActivityDepartmentListFilter,
         "open_invite",
         "activitytype",
     )
