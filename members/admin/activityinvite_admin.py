@@ -11,7 +11,6 @@ from members.models import (
     ActivityInvite,
     AdminUserInformation,
     Department,
-    Union,
     Person,
 )
 
@@ -24,30 +23,6 @@ class ActivityInviteAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwds):
         super(ActivityInviteAdminForm, self).__init__(*args, **kwds)
         self.fields["person"].queryset = Person.objects.order_by(Lower("name"))
-
-
-class ActivivtyInviteActivityListFilter(admin.SimpleListFilter):
-    title = "Aktiviteter"
-    parameter_name = "activity"
-
-    def lookups(self, request, model_admin):
-        activitys = []
-        for activity in (
-            Activity.objects.filter(
-                department__in=AdminUserInformation.get_departments_admin(request.user)
-            )
-            .order_by("department__name")
-            .distinct()
-        ):
-            activitys.append((str(activity.pk), activity))
-
-        return activitys
-
-    def queryset(self, request, queryset):
-        if self.value() is None:
-            return queryset
-        else:
-            return queryset.filter(activity__pk=self.value())
 
 
 class ActivityInviteUnionListFilter(admin.SimpleListFilter):
@@ -78,9 +53,9 @@ class ActivityInviteDepartmentListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         departments = []
-        for department in AdminUserInformation.get_departments_admin(request.user).order_by(
-            "name"
-        ):
+        for department in AdminUserInformation.get_departments_admin(
+            request.user
+        ).order_by("name"):
             departments.append((str(department.pk), department.name))
         return departments
 
@@ -91,7 +66,7 @@ class ActivityInviteDepartmentListFilter(admin.SimpleListFilter):
             return queryset.filter(activity__department__pk=self.value())
 
 
-class ActivitInviteListCurrentFilter(admin.SimpleListFilter):
+class ActivityInviteListCurrentFilter(admin.SimpleListFilter):
     title = "Nuværende og kommende aktiviteter"
 
     # Parameter for the filter that will be used in the URL query.
@@ -117,7 +92,7 @@ class ActivitInviteListCurrentFilter(admin.SimpleListFilter):
             return queryset.filter(activity=self.value())
 
 
-class ActivitInviteListFinishedFilter(admin.SimpleListFilter):
+class ActivityInviteListFinishedFilter(admin.SimpleListFilter):
     title = "Tidligere aktiviteter"
 
     # Parameter for the filter that will be used in the URL query.
@@ -158,9 +133,8 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     list_filter = (
         ActivityInviteUnionListFilter,
         ActivityInviteDepartmentListFilter,
-        # ActivivtyInviteActivityListFilter,
-        ActivitInviteListCurrentFilter,
-        ActivitInviteListFinishedFilter,
+        ActivityInviteListCurrentFilter,
+        ActivityInviteListFinishedFilter,
     )
     date_hierarchy = "activity__start_date"
     search_fields = (
@@ -222,7 +196,10 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         url = reverse(
             "admin:members_union_change", args=[item.activity.department.union_id]
         )
-        link = '<a href="%s">%s</a>' % (url, escape(item.activity.department.union.name))
+        link = '<a href="%s">%s</a>' % (
+            url,
+            escape(item.activity.department.union.name),
+        )
         return mark_safe(link)
 
     activity_department_union_link.short_description = "Forening"
