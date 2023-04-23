@@ -4,7 +4,6 @@ from .department_factory import DepartmentFactory
 from .family_factory import FamilyFactory
 from .person_factory import PersonFactory
 from .activity_factory import ActivityFactory
-from .member_factory import MemberFactory
 from .waitinglist_factory import WaitingListFactory
 from .activity_participant_factory import ActivityParticipantFactory
 from .payment_factory import PaymentFactory
@@ -20,6 +19,5 @@ __all__ = [
     FamilyFactory,
     PersonFactory,
     ActivityFactory,
-    MemberFactory,
     VolunteerFactory,
 ]

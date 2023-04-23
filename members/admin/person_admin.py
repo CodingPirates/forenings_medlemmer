@@ -1,5 +1,5 @@
+import codecs
 from datetime import timedelta
-
 from django import forms
 from django.contrib import admin
 from django.contrib import messages
@@ -30,7 +30,6 @@ from .person_admin_filters import (
 
 from .inlines import (
     ActivityInviteInline,
-    MemberInline,
     PaymentInline,
     VolunteerInline,
     WaitingListInline,
@@ -67,7 +66,6 @@ class PersonAdmin(admin.ModelAdmin):
         PaymentInline,
         VolunteerInline,
         ActivityInviteInline,
-        MemberInline,
         WaitingListInline,
     ]
 
@@ -124,7 +122,7 @@ class PersonAdmin(admin.ModelAdmin):
         context["persons"] = persons
         context["queryset"] = queryset
 
-        if request.method == "POST" and "department" in request.POST:
+        if request.method == "POST" and "activity" in request.POST:
             # Post request with data
             mass_invitation_form = MassInvitationForm(request.POST)
             context["mass_invitation_form"] = mass_invitation_form
@@ -265,6 +263,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "has_certificate",
                         "added_at",
                         "user",
+                        "gender",
                     ),
                 },
             ),
@@ -314,7 +313,8 @@ class PersonAdmin(admin.ModelAdmin):
     export_emaillist.short_description = "Exporter e-mail liste"
 
     def export_csv(self, request, queryset):
-        result_string = '"Navn";"Alder";"Opskrevet";"Tlf (barn)";"Email (barn)";"Tlf (forælder)";"Email (familie)";"Postnummer"\n'
+        result_string = "Navn;Alder;Opskrevet;Tlf (barn);Email (barn);"
+        result_string += "Tlf (forælder);Email (familie);Postnummer;Noter\n"
         for person in queryset:
             parent = person.family.get_first_parent()
             if parent:
@@ -335,7 +335,7 @@ class PersonAdmin(admin.ModelAdmin):
                 + ";"
                 + str(person.age_years())
                 + ";"
-                + str(person.added_at)
+                + str(person.added_at.strftime("%Y-%m-%d %H:%M"))
                 + ";"
                 + person.phone
                 + ";"
@@ -346,13 +346,20 @@ class PersonAdmin(admin.ModelAdmin):
                 + family_email
                 + ";"
                 + person.zipcode
+                + ";"
+                + '"'
+                + person.notes.replace('"', '""')
+                + '"'
                 + "\n"
             )
-            response = HttpResponse(result_string, content_type="text/csv")
+            response = HttpResponse(
+                f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+                content_type="text/csv; charset=utf-8",
+            )
             response["Content-Disposition"] = 'attachment; filename="personer.csv"'
         return response
 
-    export_csv.short_description = "Exporter CSV"
+    export_csv.short_description = "CSV Export"
 
     # Only view persons related to users department (all family, via participant, waitinglist & invites)
     def get_queryset(self, request):
@@ -367,7 +374,7 @@ class PersonAdmin(admin.ModelAdmin):
             ).values("id")
             return qs.filter(
                 Q(
-                    family__person__member__activityparticipant__activity__department__in=departments
+                    family__person__activityparticipant__activity__department__in=departments
                 )
                 | Q(family__person__waitinglist__department__in=departments)
                 | Q(

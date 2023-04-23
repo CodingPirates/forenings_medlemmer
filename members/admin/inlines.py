@@ -13,7 +13,6 @@ from members.models import (
     Department,
     EmailItem,
     EquipmentLoan,
-    Member,
     Payment,
     Person,
     Volunteer,
@@ -93,13 +92,6 @@ class EquipmentLoanInline(admin.TabularInline):
     formfield_overrides = {
         models.TextField: {"widget": Textarea(attrs={"rows": 2, "cols": 40})}
     }
-    extra = 0
-
-
-class MemberInline(admin.TabularInline):
-    fields = ["department", "member_since", "member_until"]
-    readonly_fields = fields
-    model = Member
     extra = 0
 
 

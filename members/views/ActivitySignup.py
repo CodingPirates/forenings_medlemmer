@@ -8,7 +8,6 @@ from members.forms import ActivitySignupForm
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
-from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
@@ -38,9 +37,9 @@ def ActivitySignup(request, activity_id, person_id=None):
     family_subscriptions = []  # waiting list subscriptions for current family
     if family:
         family_participants = [
-            (act.member.person.id)
+            (act.person.id)
             for act in ActivityParticipant.objects.filter(
-                activity_id=activity.id, member__person__family=family
+                activity_id=activity.id, person__family=family
             )
         ]
 
@@ -56,17 +55,23 @@ def ActivitySignup(request, activity_id, person_id=None):
                 department=activity.department, person=person
             )
             if len(subscriptions) > 0:
+                family_participants.append(person.id)
+
+        for person in family.get_persons():
+            subscriptions = WaitingList.objects.filter(
+                department=activity.department, person=person
+            )
+            if len(subscriptions) > 0:
                 family_subscriptions.append(person.id)
 
     if family and person_id:
-
         try:
             person = family.person_set.get(pk=person_id)
 
             # Check not already signed up
             try:
                 participant = ActivityParticipant.objects.get(
-                    activity=activity, member__person=person
+                    activity=activity, person=person
                 )
                 # found - we can only allow one - switch to view mode
                 participating = True
@@ -112,11 +117,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
         if not (activity.min_age <= person.age_years() <= activity.max_age):
             return HttpResponse(
-                "Barnet skal være mellem "
-                + str(activity.min_age)
-                + " og "
-                + str(activity.max_age)
-                + " år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+                f"Barnet skal være mellem {activity.min_age} og {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
             )
 
         if (
@@ -134,32 +135,11 @@ def ActivitySignup(request, activity_id, person_id=None):
         if signup_form.is_valid():
             # Sign up and redirect to payment link or family page
 
-            # Calculate membership
-            membership_start = timezone.datetime(
-                year=activity.start_date.year, month=1, day=1
-            )
-            membership_end = timezone.datetime(
-                year=activity.start_date.year, month=12, day=31
-            )
-            # check if person is member, otherwise make a member
-            try:
-                member = Member.objects.get(person=person)
-            except Member.DoesNotExist:
-                member = Member(
-                    department=activity.department,
-                    person=person,
-                    member_since=membership_start,
-                    member_until=membership_end,
-                )
-                member.save()
-
-            # update membership end date
-            member.member_until = membership_end
-            member.save()
-
             # Make ActivityParticipant
             participant = ActivityParticipant(
-                member=member, activity=activity, note=signup_form.cleaned_data["note"]
+                person=person,
+                activity=activity,
+                note=signup_form.cleaned_data["note"],
             )
 
             # If conditions not accepted, make error
@@ -179,7 +159,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
 
             # Make payment if activity costs
-            if activity.price_in_dkk is not None and activity.price_in_dkk != 0:
+            if activity.price_in_dkk is not None and activity.price_in_dkk > 0:
                 # using creditcard ?
                 if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
                     payment = Payment(
@@ -221,7 +201,6 @@ def ActivitySignup(request, activity_id, person_id=None):
             return HttpResponseRedirect(return_link_url)
         # fall through else
     else:
-
         signup_form = ActivitySignupForm()
 
     union = activity.department.union
