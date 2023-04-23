@@ -33,15 +33,8 @@
         <div class="description">
           <p>Gennemgå listen og vælg den korrekte afdeling og aktivitet der skal inviteres til.</p>
           <p>Vælg desuden en udløbsdato for invitationen. </p>
-          <p>
-            Når du trykker på <kbd style="background-color:green; color: white;">&nbsp;INVITER&nbsp;</kbd>-knappen vil systemet filtrere følgende for dig:<br>
-              <li>Fjerne person-dupletter</li>
-              <li>Fjerne personer der allerede deltager i aktiviteten</li>
-              <li>Fjerne personer der allerede har modtaget en invitation til denne aktivitet</li>
-              <li>Fjerne personer der ikke er gamle nok den dato aktiviteten starter</li>
-              <li>Fjerne personer der er for gamle den dato aktiviteten starter</li>
-              <li>De resterende personer bliver inviteret og der sendes en email med en beskrivelse af aktiviteten samt et link til tilmelding!</li>
-          </p>
+          <p>Når du trykker på <kbd style="background-color:green; color: white;">&nbsp;INVITER&nbsp;</kbd>-knappen vil systemet invitere personer, der ikke allerede deltager/er inviteret til aktiviteten samt er indenfor aldersgrænsen når aktiviteten starter. Det endeligt antal inviterede kan derfor afvige fra antallet i listen herunder.</p>
+          <p>Der sendes en email med en beskrivelse af aktiviteten samt et link til tilmelding!</p>
         </div>
 
         {% csrf_token %}
