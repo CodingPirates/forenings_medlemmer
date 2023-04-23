@@ -31,16 +31,16 @@ class SendActivitySignupConfirmationsCronJob(CronJobBase):
         for announcement in unannounced_signups:
             context = {
                 "activity": announcement.activity,
-                "person": announcement.member.person,
-                "family": announcement.member.person.family,
+                "person": announcement.person,
+                "family": announcement.person.family,
                 "union": announcement.activity.department.union,
             }
             emails = EmailTemplate.objects.get(idname="ACT_CONFIRM").makeEmail(
-                [announcement.member.person, announcement.member.person.family], context
+                [announcement.person, announcement.person.family], context
             )
             for email in emails:
                 notification = Notification(
-                    family=announcement.member.person.family,
+                    family=announcement.person.family,
                     email=email,
                     anounced_activity_participant=announcement,
                 )
@@ -163,16 +163,16 @@ class ReminderEmailPaymentCronJob(CronJobBase):
         for announcement in unannounced_signups:
             context = {
                 "activity": announcement.activity,
-                "person": announcement.member.person,
-                "family": announcement.member.person.family,
+                "person": announcement.person,
+                "family": announcement.person.family,
                 "union": announcement.activity.department.union,
             }
             emails = EmailTemplate.objects.get(idname="ACT_CONFIRM").makeEmail(
-                [announcement.member.person, announcement.member.person.family], context
+                [announcement.person, announcement.person.family], context
             )
             for email in emails:
                 notification = Notification(
-                    family=announcement.member.person.family,
+                    family=announcement.person.family,
                     email=email,
                     anounced_activity_participant=announcement,
                 )

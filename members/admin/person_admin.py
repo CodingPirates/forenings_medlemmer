@@ -30,7 +30,6 @@ from .person_admin_filters import (
 
 from .inlines import (
     ActivityInviteInline,
-    MemberInline,
     PaymentInline,
     VolunteerInline,
     WaitingListInline,
@@ -67,7 +66,6 @@ class PersonAdmin(admin.ModelAdmin):
         PaymentInline,
         VolunteerInline,
         ActivityInviteInline,
-        MemberInline,
         WaitingListInline,
     ]
 
@@ -265,6 +263,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "has_certificate",
                         "added_at",
                         "user",
+                        "gender",
                     ),
                 },
             ),
@@ -375,7 +374,7 @@ class PersonAdmin(admin.ModelAdmin):
             ).values("id")
             return qs.filter(
                 Q(
-                    family__person__member__activityparticipant__activity__department__in=departments
+                    family__person__activityparticipant__activity__department__in=departments
                 )
                 | Q(family__person__waitinglist__department__in=departments)
                 | Q(
