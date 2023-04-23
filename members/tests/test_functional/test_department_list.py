@@ -3,7 +3,6 @@ import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from members.tests.factories import DepartmentFactory
 from django.utils import timezone
 from datetime import timedelta

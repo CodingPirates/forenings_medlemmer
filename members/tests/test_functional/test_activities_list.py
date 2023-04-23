@@ -5,7 +5,6 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from django.utils import timezone
 from datetime import timedelta
 
