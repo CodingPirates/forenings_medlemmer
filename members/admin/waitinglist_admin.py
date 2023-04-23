@@ -24,8 +24,7 @@ class person_waitinglist_union_filter(admin.SimpleListFilter):
     parameter_name = ""
 
     def lookups(self, request, model_admin):
-        unions = [
-        ]
+        unions = []
         for union in AdminUserInformation.get_unions_admin(request.user).order_by(
             "name"
         ):
@@ -49,8 +48,7 @@ class person_waitinglist_department_filter(admin.SimpleListFilter):
     parameter_name = "waiting_list"
 
     def lookups(self, request, model_admin):
-        departments = [
-        ]
+        departments = []
         for department in AdminUserInformation.get_departments_admin(
             request.user
         ).order_by("name"):
@@ -263,24 +261,15 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(WaitingListAdmin, self).get_queryset(request)
-        #qs = super().get_queryset(request)
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
             return qs
-        departments = Department.objects.filter(
-            adminuserinformation__user=request.user
-            #adminuserinformation__user=request.user
-            #department__in=AdminUserInformation.get_departments_admin(request.user),
-        )
-        unions = Union.objects.filter(
-            adminuserinformation__user=request.user
-        )
+        departments = Department.objects.filter(adminuserinformation__user=request.user)
+        unions = Union.objects.filter(adminuserinformation__user=request.user)
 
         return qs.filter(
-            Q(department__in=departments)
-            |
-            Q(department__union__in=unions)
+            Q(department__in=departments) | Q(department__union__in=unions)
         ).distinct()
 
     def union_link(self, item):

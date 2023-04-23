@@ -1,76 +1,19 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from members.models import (
-    ActivityParticipant,
-    AdminUserInformation,
-    Union,
-    Department,
-)
+from members.models import Department
+from members.models import ActivityParticipant
 
 
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
-    fields = ("member",)
+    fields = ("person",)
     readonly_fields = fields
-    raw_id_fields = ("member",)
+    raw_id_fields = ("person",)
 
     def get_queryset(self, request):
         return ActivityParticipant.objects.all()
-
-
-class ActivityUnionListFilter(admin.SimpleListFilter):
-    title = "Lokalforeninger"
-    parameter_name = "department__union"
-
-    def lookups(self, request, model_admin):
-        unions = []
-        for union1 in (
-            Union.objects.filter(
-                department__union__in=AdminUserInformation.get_unions_admin(
-                    request.user
-                )
-            )
-            .order_by("name")
-            .distinct()
-        ):
-            unions.append((str(union1.pk), str(union1.name)))
-        # remove duplicates:
-        # return list(set([u for u in unions]))
-        return unions
-
-    def queryset(self, request, queryset):
-        if self.value() is None:
-            return queryset
-        else:
-            return queryset.filter(department__union__pk=self.value())
-
-
-class ActivityDepartmentListFilter(admin.SimpleListFilter):
-    title = "Afdelinger"
-    parameter_name = "department"
-
-    def lookups(self, request, model_admin):
-        departments = []
-        for department1 in (
-            Department.objects.filter(
-                activity__department__in=AdminUserInformation.get_departments_admin(
-                    request.user
-                )
-            )
-            .order_by("name")
-            .distinct()
-        ):
-            departments.append((str(department1.pk), str(department1)))
-        # return list(set([d for d in departments]))
-        return departments
-
-    def queryset(self, request, queryset):
-        if self.value() is None:
-            return queryset
-        else:
-            return queryset.filter(department__pk=self.value())
 
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -102,8 +45,8 @@ class ActivityAdmin(admin.ModelAdmin):
         "department",
     )
     list_filter = (
-        ActivityUnionListFilter,
-        ActivityDepartmentListFilter,
+        "department__union__name",
+        "department__name",
         "open_invite",
         "activitytype",
     )
@@ -239,7 +182,7 @@ class ActivityAdmin(admin.ModelAdmin):
         (
             "Tilmeldingsdetaljer",
             {
-                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. </p><p>Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til aktiviteter og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. </p><p>Alle aktiviteter med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
                 "fields": (
                     "instructions",
                     (
