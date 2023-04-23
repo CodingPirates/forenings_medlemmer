@@ -8,7 +8,6 @@ from django.utils import timezone
 from members.tests.factories import DepartmentFactory
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -27,7 +26,8 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.department_1.address.save()
 
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=webdriver.ChromeOptions(),
         )
 
     def tearDown(self):
