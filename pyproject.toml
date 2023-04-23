@@ -14,7 +14,7 @@ authors = ["Kristoffer Rath Hansen <kristoffer@codingpirates.dk>"]
 [tool.poetry.dependencies]
 python = "^3.10.0"
 black = "^22.3"
-codecov = "2.1.12"
+codecov = "2.1.13"
 dj-database-url = "0.5.0"
 dj-email-url = "1.0.6"
 django = "^4.1"
