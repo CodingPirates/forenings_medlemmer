@@ -6,7 +6,6 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 """
 This test goes to the root signup page and creates a child and parent.
@@ -25,7 +24,8 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.email = "parent@example.com"
         self.password = "ois8Ieli7bah"
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=webdriver.ChromeOptions(),
         )
 
     def tearDown(self):
