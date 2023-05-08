@@ -119,15 +119,23 @@ class ActivityInviteListFinishedFilter(admin.SimpleListFilter):
 
 
 class ActivityInviteAdmin(admin.ModelAdmin):
+    class Meta:
+        verbose_name = "Invitation"
+        verbose_name_plural = "Invitationer"
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super().get_form(request, obj=obj, change=change, **kwargs)
+        return form
+
     list_display = (
         "activity_department_union_link",
         "activity_department_link",
         "activity_link",
         "person_link",
-        "invite_dtm",
-        "expire_dtm",
         "person_age_years",
         "person_zipcode",
+        "invite_dtm",
+        "expire_dtm",
         "rejected_at",
     )
     list_filter = (
@@ -137,12 +145,14 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         ActivityInviteListFinishedFilter,
     )
     date_hierarchy = "activity__start_date"
+
     search_fields = (
         "activity__department__union__name",
         "activity__department__name",
         "activity__name",
         "person__name",
     )
+    search_help_text = mark_safe("Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato.")
     list_display_links = None
     form = ActivityInviteAdminForm
 
