@@ -21,6 +21,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.person = PersonFactory.create()
         self.password = "Miss1337"
         self.name = "kaptajn hack"
+        self.person.save()
         self.admin = User.objects.create_superuser(
             self.name, "admin@example.com", self.password
         )
@@ -62,11 +63,13 @@ class SignUpTest(StaticLiveServerTestCase):
 
         # Check that person admin can load
         elment = self.browser.find_element(By.LINK_TEXT, "Personer")
+        self.browser.save_screenshot("test-screens/admin_load_test.AdminPersoner-1.png")
         self.browser.get(elment.get_attribute("href"))
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("person"))
         except Exception:
             self.fail("Could not reach person admin site")
+        self.browser.save_screenshot("test-screens/admin_load_test.AdminPersoner-2.png")
 
         # GO to person change page
         element = self.browser.find_element(By.LINK_TEXT, str(self.person))
