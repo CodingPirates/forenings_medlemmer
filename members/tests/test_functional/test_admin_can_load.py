@@ -1,5 +1,6 @@
 import socket
 import os
+import codecs
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -18,6 +19,8 @@ class SignUpTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
+        if not os.path.exists("test-screens"):
+            os.mkdir("test-screens")
         self.person = PersonFactory.create()
         self.password = "Miss1337"
         self.name = "kaptajn hack"
@@ -25,19 +28,22 @@ class SignUpTest(StaticLiveServerTestCase):
         self.admin = User.objects.create_superuser(
             self.name, "admin@example.com", self.password
         )
+        self.person.save()
+
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
             command_executor="http://selenium:4444/wd/hub",
-            options=webdriver.ChromeOptions(),
+            options=chrome_options,
         )
 
     def tearDown(self):
-        if not os.path.exists("test-screens"):
-            os.mkdir("test-screens")
         self.browser.save_screenshot("test-screens/admin_load_test.png")
         self.browser.quit()
 
     def test_admin_page(self):
         # Loads the admin login page
+        self.browser.maximize_window()
         self.browser.get(f"{self.live_server_url}/admin")
         self.assertIn("admin", self.browser.title)
 
@@ -62,14 +68,20 @@ class SignUpTest(StaticLiveServerTestCase):
         )
 
         # Check that person admin can load
-        elment = self.browser.find_element(By.LINK_TEXT, "Personer")
+        element = self.browser.find_element(By.LINK_TEXT, "Personer")
         self.browser.save_screenshot("test-screens/admin_load_test.AdminPersoner-1.png")
-        self.browser.get(elment.get_attribute("href"))
+        self.browser.get(element.get_attribute("href"))
+
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("person"))
         except Exception:
             self.fail("Could not reach person admin site")
         self.browser.save_screenshot("test-screens/admin_load_test.AdminPersoner-2.png")
+
+        filename = os.path.join("test-screens", "admin_load_test.AdminPersoner1.html")
+        filestream = codecs.open(filename, "w", "utf-8")
+        filehandle = self.browser.page_source
+        filestream.write(filehandle)
 
         # GO to person change page
         element = self.browser.find_element(By.LINK_TEXT, str(self.person))
@@ -83,3 +95,8 @@ class SignUpTest(StaticLiveServerTestCase):
             self.browser.find_element(By.NAME, "email").get_attribute("value"),
             self.person.email,
         )
+
+        filename = os.path.join("test-screens", "admin_load_test.AdminPersoner2.html")
+        filestream = codecs.open(filename, "w", "utf-8")
+        filehandle = self.browser.page_source
+        filestream.write(filehandle)
