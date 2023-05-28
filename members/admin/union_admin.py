@@ -1,11 +1,17 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.conf import settings
 
-from members.models import Address
+from members.models import Address, AdminUserInformation, admin_user_information, person
 
+#class UnionInline(admin.StackedInline):
+#    model = AdminUserInformation
+#    filter_horizontal = ("board_members", "user")
+#    can_delete = False
 
 class UnionAdmin(admin.ModelAdmin):
+    #inlines = (UnionInline,)
     list_display = (
         "id",
         "union_link",
@@ -19,7 +25,7 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
     )
-    filter_horizontal = ["board_members"]
+    filter_horizontal = ["board_members", "adminuserinformation"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
     def get_form(self, request, obj=None, **kwargs):
@@ -41,6 +47,10 @@ class UnionAdmin(admin.ModelAdmin):
                 "description": "<p>Udfyld navnet på foreningen (f.eks København, \
             vestjylland) og adressen<p>",
             },
+        ),
+        (
+            "Admins",
+            {"fields": ("adminuserinformation",)},
         ),
         (
             "Bestyrelsen nye felter",
