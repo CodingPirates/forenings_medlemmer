@@ -25,9 +25,11 @@ class SignUpTest(StaticLiveServerTestCase):
             self.name, "admin@example.com", self.password
         )
 
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
             command_executor="http://selenium:4444/wd/hub",
-            options=webdriver.ChromeOptions(),
+            options=chrome_options,
         )
 
     def tearDown(self):
