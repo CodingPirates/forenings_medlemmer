@@ -13,7 +13,6 @@ from members.models import (
     Union,
     Department,
     AdminUserInformation,
-    WaitingList,
 )
 
 import members.models.emailtemplate

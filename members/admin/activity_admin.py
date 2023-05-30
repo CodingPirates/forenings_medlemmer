@@ -9,6 +9,7 @@ from members.models import (
     Union,
 )
 
+
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
