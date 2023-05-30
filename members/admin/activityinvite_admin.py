@@ -152,7 +152,9 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "activity__name",
         "person__name",
     )
-    search_help_text = mark_safe("Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato.")
+    search_help_text = mark_safe(
+        "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
+    )
     list_display_links = None
     form = ActivityInviteAdminForm
 
