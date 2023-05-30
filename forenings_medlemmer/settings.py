@@ -164,8 +164,6 @@ TIME_ZONE = "Europe/Copenhagen"
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 DATE_INPUT_FORMATS = ("%d/%m/%Y", "%Y-%m-%d")

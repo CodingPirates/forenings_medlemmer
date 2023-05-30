@@ -36,7 +36,7 @@ class StatisticsUnion(DjangoObjectType):
 class UnionType(DjangoObjectType):
     class Meta:
         model = Union
-        exclude_fields = ("bank_main_org", "bank_account")
+        exclude = ("bank_main_org", "bank_account")
 
 
 class DepartmentType(DjangoObjectType):
@@ -47,7 +47,7 @@ class DepartmentType(DjangoObjectType):
 class AddressType(DjangoObjectType):
     class Meta:
         model = Address
-        exclude_fields = ("region",)
+        exclude = ("region",)
 
 
 class Query(graphene.ObjectType):
