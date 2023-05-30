@@ -17,7 +17,6 @@ class ActivityParticipantInline(admin.TabularInline):
 
 
 class ActivityAdmin(admin.ModelAdmin):
-
     list_display = (
         "name",
         "union_link",

@@ -181,7 +181,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
-     ]
+    ]
 
     list_filter = (
         ActivityParticipantUnionFilter,
@@ -369,4 +369,3 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return response
 
     export_csv_full.short_description = "CSV Export"
-
