@@ -5,13 +5,14 @@ from django.conf import settings
 
 from members.models import Address, AdminUserInformation, admin_user_information, person
 
-#class UnionInline(admin.StackedInline):
+# class UnionInline(admin.StackedInline):
 #    model = AdminUserInformation
 #    filter_horizontal = ("board_members", "user")
 #    can_delete = False
 
+
 class UnionAdmin(admin.ModelAdmin):
-    #inlines = (UnionInline,)
+    # inlines = (UnionInline,)
     list_display = (
         "id",
         "union_link",
