@@ -25,11 +25,9 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.department_1.address.region = "Region Hovedstaden"
         self.department_1.address.save()
 
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
             command_executor="http://selenium:4444/wd/hub",
-            options=chrome_options,
+            options=webdriver.ChromeOptions(),
         )
 
     def tearDown(self):
