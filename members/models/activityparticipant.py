@@ -75,9 +75,7 @@ class ActivityParticipant(models.Model):
         if payment.refunded_at is not None:
             result_string = f"{html_warn_pre}Refunderet{html_post}:{self.utc_to_local_ymdhm(payment.refunded_at)}. "
             if payment.confirmed_at is not None:
-                result_string += (
-                    f"Betalt {paid_kr}kr: {self.utc_to_local_ymdhm(payment.confirmed_at)}. "
-                )
+                result_string += f"Betalt {paid_kr}kr: {self.utc_to_local_ymdhm(payment.confirmed_at)}. "
             else:
                 result_string += (
                     f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
