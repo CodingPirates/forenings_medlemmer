@@ -143,9 +143,7 @@ class PersonForm(forms.ModelForm):
             "dawa_id",
         ]
         labels = {"birthday": "Fødselsdato"}
-        error_messages = {
-            "birthday": {"invalid": "Indtast en gyldig dato."}
-        }
+        error_messages = {"birthday": {"invalid": "Indtast en gyldig dato."}}
         widgets = {"dawa_id": forms.HiddenInput()}
 
     search_address = forms.CharField(
