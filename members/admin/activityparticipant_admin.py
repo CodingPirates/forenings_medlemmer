@@ -182,6 +182,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "note",
         "activity_payment_info_html",
         "activity_union_link",
+        "activity_activitytype",
     ]
 
     list_filter = (
@@ -191,6 +192,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         ActivityParticipantListLastYearFilter,
         ActivityParticipantListOldYearsFilter,
         ParticipantPaymentListFilter,
+        "activity__activitytype",
     )
     list_display_links = (
         "added_at",
@@ -207,6 +209,12 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     actions = [
         "export_csv_full",
     ]
+
+    def activity_activitytype(self, item):
+        return item.activity.activitytype
+
+    activity_activitytype.short_description = "Aktivitetstype"
+    activity_activitytype.admin_order_field = "activity__activitytype"
 
     def person_age_years(self, item):
         return item.person.age_years()
