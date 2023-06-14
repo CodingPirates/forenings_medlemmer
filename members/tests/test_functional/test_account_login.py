@@ -4,10 +4,9 @@ import socket
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from members.tests.factories import (
-    MemberFactory,
+    PersonFactory,
 )
 
 """
@@ -20,10 +19,13 @@ class AccountLoginTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        self.member = MemberFactory.create()
+        self.person = PersonFactory.create()
 
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=chrome_options,
         )
 
     def tearDown(self):

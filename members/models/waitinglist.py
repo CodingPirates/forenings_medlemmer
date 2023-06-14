@@ -6,8 +6,8 @@ from django.utils import timezone
 
 class WaitingList(models.Model):
     class Meta:
-        verbose_name = "På venteliste"
-        verbose_name_plural = "På ventelister"
+        verbose_name = "Venteliste"
+        verbose_name_plural = "Ventelister"
         ordering = ["on_waiting_list_since"]
 
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
@@ -31,6 +31,7 @@ class WaitingList(models.Model):
         )
 
     number_on_waiting_list.short_description = "Position på venteliste"
+    number_on_waiting_list.admin_order_field = "on_waiting_list_since"
 
     def save(self, *args, **kwargs):
         """On creation set on_waiting_list"""
