@@ -23,9 +23,11 @@ class AccountCreateTest(StaticLiveServerTestCase):
     def setUp(self):
         self.email = "parent@example.com"
         self.password = "ois8Ieli7bah"
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
             command_executor="http://selenium:4444/wd/hub",
-            options=webdriver.ChromeOptions(),
+            options=chrome_options,
         )
 
     def tearDown(self):
