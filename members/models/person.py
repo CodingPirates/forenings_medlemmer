@@ -115,7 +115,7 @@ class Person(models.Model):
 
     def firstname(self):
         return self.name.partition(" ")[0]
-    
+
     def gender_text(self):
         if self.gender == self.MALE:
             return "Dreng/Mand"
@@ -125,7 +125,6 @@ class Person(models.Model):
             return "Andet"
         else:
             return "N/A"
-
 
     def update_dawa_data(self):
         if self.address_invalid:

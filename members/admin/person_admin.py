@@ -80,8 +80,8 @@ class PersonAdmin(admin.ModelAdmin):
 
     def gender_text(self, item):
         return item.gender_text()
+
     gender_text.short_description = "Køn"
-    
 
     def invite_many_to_activity_action(self, request, queryset):
         # Get list of available departments
