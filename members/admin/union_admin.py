@@ -100,7 +100,7 @@ class UnionAdmin(admin.ModelAdmin):
 
     def export_csv_union_info(self, request, queryset):
         result_string = "Forening;Oprettelsdato;Lukkedato;"
-        result_string += "formandd-navn;formand-email;formand-tlf;"
+        result_string += "formand-navn;formand-email;formand-tlf;"
         result_string += "næstformand-navn;næstformand-email;næstformand-tlf;"
         result_string += "kasserer-navn;kasserer-email;kasserer-tlf;"
         result_string += "sekretær-navn;sekretær-email;sekretær-tlf\n"
