@@ -100,7 +100,7 @@ class vol_signupForm(forms.Form):
     volunteer_email = forms.EmailField(label="Email", required=True)
     volunteer_phone = forms.CharField(label="Telefon", required=True, max_length=50)
     volunteer_birthday = forms.DateField(
-        label="Fødselsdato (dd-mm-åååå)",
+        label="Fødselsdato",
         required=True,
         input_formats=(settings.DATE_INPUT_FORMATS),
         error_messages={"invalid": "Indtast en gyldig dato."},
