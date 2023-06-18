@@ -21,7 +21,7 @@ class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return [
             (str(department.pk), str(department))
-            for department in Department.objects.all()
+            for department in Department.objects.all().order_by("name")
         ]
 
     def queryset(self, request, queryset):
@@ -102,16 +102,19 @@ class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
 
 class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     title = "Lokalforening"
-    parameter_name = "union"
+    parameter_name = "department__union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
+        return [
+            (str(union.pk), str(union.name))
+            for union in Union.objects.all().order_by("department__union__name")
+        ]
 
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
         else:
-            return queryset.filter(activity__union__pk=self.value())
+            return queryset.filter(activity__department__union__pk=self.value())
 
 
 class ParticipantPaymentListFilter(admin.SimpleListFilter):
