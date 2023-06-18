@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from members.models import Department
-from members.models import ActivityParticipant
+
+from members.models import (
+    ActivityParticipant,
+    AdminUserInformation,
+    Department,
+    Union,
+)
 
 
 class ActivityParticipantInline(admin.TabularInline):
@@ -14,6 +19,56 @@ class ActivityParticipantInline(admin.TabularInline):
 
     def get_queryset(self, request):
         return ActivityParticipant.objects.all()
+
+
+class ActivityUnionListFilter(admin.SimpleListFilter):
+    title = "Lokalforeninger"
+    parameter_name = "department__union"
+
+    def lookups(self, request, model_admin):
+        unions = []
+        for union1 in (
+            Union.objects.filter(
+                department__union__in=AdminUserInformation.get_unions_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            unions.append((str(union1.pk), str(union1.name)))
+        return unions
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(department__union__pk=self.value())
+
+
+class ActivityDepartmentListFilter(admin.SimpleListFilter):
+    title = "Afdelinger"
+    parameter_name = "department"
+
+    def lookups(self, request, model_admin):
+        departments = []
+        for department1 in (
+            Department.objects.filter(
+                activity__department__in=AdminUserInformation.get_departments_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            departments.append((str(department1.pk), str(department1)))
+        return departments
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(department__pk=self.value())
 
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -45,8 +100,8 @@ class ActivityAdmin(admin.ModelAdmin):
         "department",
     )
     list_filter = (
-        "department__union__name",
-        "department__name",
+        ActivityUnionListFilter,
+        ActivityDepartmentListFilter,
         "open_invite",
         "activitytype",
     )
