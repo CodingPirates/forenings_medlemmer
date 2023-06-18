@@ -27,17 +27,17 @@ class AdminActions(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
-            deparment_list_query = Department.objects.all()
+            department_list_query = Department.objects.all()
         else:
-            deparment_list_query = Department.objects.filter(
+            department_list_query = Department.objects.filter(
                 adminuserinformation__user=request.user
             )
-        deparment_list = [("-", "-")]
-        for department in deparment_list_query:
-            deparment_list.append((department.id, department.name))
+        department_list = [("-", "-")]
+        for department in department_list_query:
+            department_list.append((department.id, department.name))
 
         # Get list of active and future activities
-        department_ids = deparment_list_query.values_list("id", flat=True)
+        department_ids = department_list_query.values_list("id", flat=True)
         activity_list_query = Activity.objects.filter(end_date__gt=timezone.now())
         if not request.user.is_superuser:
             activity_list_query = activity_list_query.filter(
@@ -51,7 +51,7 @@ class AdminActions(admin.ModelAdmin):
 
         # Form used to select department and activity - redundant department is for double check
         class MassInvitationForm(forms.Form):
-            department = forms.ChoiceField(label="Afdeling", choices=deparment_list)
+            department = forms.ChoiceField(label="Afdeling", choices=department_list)
             activity = forms.ChoiceField(label="Aktivitet", choices=activity_list)
             expire = forms.DateField(
                 label="Udløber",
