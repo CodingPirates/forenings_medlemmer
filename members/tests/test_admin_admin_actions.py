@@ -11,11 +11,9 @@ from members.models.person import Person
 from members.models.family import Family
 from members.models.waitinglist import WaitingList
 from members.admin.admin_actions import AdminActions
-from members.models.department import Department
 
 from .factories import UnionFactory
 from .factories import DepartmentFactory
-from .factories import ActivityParticipantFactory
 
 
 # set MESSAGE_STORAGE to CookieStorage to support django messaging framework
