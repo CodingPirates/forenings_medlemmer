@@ -86,6 +86,14 @@ class ActivityAdmin(admin.ModelAdmin):
         "age",
     )
 
+    def changelist_view(self, request, extra_context=None):
+        # This is to show the membership_union_link for super admins only
+        if request.user.is_superuser:
+            self.list_display += ("activity_membership_union_link",)
+        return super(ActivityAdmin, self).changelist_view(
+            request, extra_context=extra_context
+        )
+
     date_hierarchy = "start_date"
     search_fields = (
         "name",
@@ -108,25 +116,17 @@ class ActivityAdmin(admin.ModelAdmin):
     save_as = True
     inlines = [ActivityParticipantInline]
 
-    def startend(self, obj):
-        return str(obj.start_date) + " - " + str(obj.end_date)
-
-    startend.short_description = "Periode"
-
-    def age(self, obj):
-        return str(obj.min_age) + " - " + str(obj.max_age)
-
-    age.short_description = "Alder"
-
     def start_end(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
 
     start_end.short_description = "Periode"
+    start_end.admin_order_field = "start_date"
 
     def age(self, obj):
         return str(obj.min_age) + " - " + str(obj.max_age)
 
     age.short_description = "Alder"
+    age.admin_order_field = "min_age"
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.department.union_id])
@@ -148,6 +148,7 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.max_participants)
 
     seats_total.short_description = "Total"
+    seats_total.admin_order_field = "max_participants"
 
     def seats_used(self, obj):
         return str(obj.activityparticipant_set.count())
@@ -158,6 +159,16 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.max_participants - obj.activityparticipant_set.count())
 
     seats_free.short_description = "Ubesat"
+
+    def activity_membership_union_link(self, obj):
+        if obj.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
+            url = reverse("admin:members_union_change", args=[obj.union_id])
+            link = '<a href="%s">%s</a>' % (url, obj.union.name)
+            return mark_safe(link)
+        else:
+            return ""
+
+    activity_membership_union_link.short_description = "Forening for medlemskab"
 
     # Only view activities on own department
     def get_queryset(self, request):
@@ -183,13 +194,6 @@ class ActivityAdmin(admin.ModelAdmin):
             {
                 "description": "<p>Du kan ændre afdeling for aktiviteten ved at skrive afdelings-id, eller tryk på søg-ikonet og i det nye vindue skal du finde afdelingen, for derefter at trykke på ID i første kolonne.</p>",
                 "fields": ("department",),
-            },
-        ),
-        (
-            "Forening",
-            {
-                "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.</p>",
-                "fields": ("union",),
             },
         ),
         (
@@ -258,3 +262,18 @@ class ActivityAdmin(admin.ModelAdmin):
             },
         ),
     ]
+
+    def get_fieldsets(self, request, obj=None):
+        # This setup ensures the membership department is visible for super admins only
+        if request.user.is_superuser:
+            return [
+                (
+                    "Forening",
+                    {
+                        "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.<br>Forening er normalt fra den afdeling som aktiviteten er lavet under, og kan ikke rettes her</p>",
+                        "fields": ("union",),
+                    },
+                ),
+            ] + self.fieldsets
+        else:
+            return self.fieldsets

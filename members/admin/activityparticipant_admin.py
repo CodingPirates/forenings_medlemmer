@@ -241,12 +241,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return qs.filter(activity__department__adminuserinformation__user=request.user)
 
     def activity_person_gender(self, item):
-        if item.person.gender == "MA":
-            return "Dreng"
-        elif item.person.gender == "FM":
-            return "Pige"
-        else:
-            return "Andet"
+        return item.person.gender_text()
 
     activity_person_gender.short_description = "Køn"
 
@@ -319,19 +314,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_payment_info_html.short_description = "Betalingsinfo"
 
     def export_csv_full(self, request, queryset):
-        result_string = "Forening;Afdeling;Aktivitet;Navn;Alder;"
-        result_string += "Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;"
-        result_string += "Forældre tlf;Note til arrangørerne\n"
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder"; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
         for p in queryset:
-            if p.person.gender is not None:
-                if p.person.gender == "MA":
-                    gender = "Dreng"
-                elif p.person.gender == "FM":
-                    gender = "Pige"
-                else:
-                    gender = p.person.gender
-            else:
-                gender = "andet"
+            gender = p.person.gender_text()
 
             parent = p.person.family.get_first_parent()
             if parent:

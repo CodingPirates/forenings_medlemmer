@@ -304,12 +304,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     person_age_years.admin_order_field = "-person__birthday"
 
     def person_gender_text(self, item):
-        if item.person.gender == "MA":
-            return "Dreng"
-        elif item.person.gender == "FM":
-            return "Pige"
-        else:
-            return "Andet"
+        return item.person.gender_text()
 
     person_gender_text.short_description = "Køn"
     person_gender_text.admin_order_field = "person__gender"
