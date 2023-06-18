@@ -58,14 +58,10 @@ services:
 
   selenium:
     image: selenium/standalone-chrome
-    build:
-        context: .
-        shm_size: '2gb'
     networks:
       - webnet
     ports:
       - "4444:4444"
-    shm_size: '2gb'
 
 volumes:
   database:
