@@ -8,7 +8,6 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-
 from members.models import (
     Union,
     Department,
@@ -16,6 +15,9 @@ from members.models import (
 )
 
 import members.models.emailtemplate
+
+# import members.admin.admin_actions
+from members.admin.admin_actions import AdminActions
 
 
 class person_waitinglist_union_filter(admin.SimpleListFilter):
@@ -101,6 +103,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     actions = [
         "delete_many_from_department_waitinglist_action",
+        AdminActions.invite_many_to_activity_action,
     ]
 
     def get_actions(self, request):
