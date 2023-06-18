@@ -110,8 +110,6 @@ class ActivityAdmin(admin.ModelAdmin):
             url = reverse("admin:members_union_change", args=[obj.union_id])
             link = '<a href="%s">%s</a>' % (url, obj.union.name)
             return mark_safe(link)
-
-        #            return obj.union
         else:
             return ""
 

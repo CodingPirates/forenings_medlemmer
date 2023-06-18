@@ -40,7 +40,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "membertype",
-        "gender",
+        "gender_text",
         "family_url",
         "age_years",
         "zipcode",
@@ -77,6 +77,11 @@ class PersonAdmin(admin.ModelAdmin):
     family_url.allow_tags = True
     family_url.short_description = "Familie"
     list_per_page = 20
+
+    def gender_text(self, item):
+        return item.gender_text()
+    gender_text.short_description = "Køn"
+    
 
     def invite_many_to_activity_action(self, request, queryset):
         # Get list of available departments
