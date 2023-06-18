@@ -13,6 +13,8 @@ from members.models import (
     Union,
 )
 
+from members.admin.admin_actions import AdminActions
+
 
 class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     title = "Afdeling"
@@ -210,6 +212,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     )
 
     actions = [
+        AdminActions.invite_many_to_activity_action,
         "export_csv_full",
     ]
 
