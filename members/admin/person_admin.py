@@ -75,6 +75,11 @@ class PersonAdmin(admin.ModelAdmin):
     family_url.short_description = "Familie"
     list_per_page = 20
 
+    def gender_text(self, item):
+        return item.gender_text()
+
+    gender_text.short_description = "Køn"
+
     # needs 'view_full_address' to set personal details.
     # email and phonenumber only shown on adults.
     def get_fieldsets(self, request, person=None):
