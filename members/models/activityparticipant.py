@@ -56,6 +56,17 @@ class ActivityParticipant(models.Model):
             activityparticipant=self, accepted_at=None
         )
 
+    def payment_info_text(self):
+        if self.activity.price_in_dkk == 0.00:
+            return "Gratis"
+        else:
+            try:
+                return self.payment_info(False)
+            except Exception:
+                return "Andet er aftalt"
+
+    payment_info_text.short_description = "Betalingsinfo"
+
     def payment_info(self, format_as_html: bool):
         payment = members.models.payment.Payment.objects.get(activityparticipant=self)
 

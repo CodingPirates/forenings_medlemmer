@@ -13,7 +13,12 @@ from members.models import (
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
-    fields = ("person",)
+    fields = (
+        "person",
+        "note",
+        "photo_permission",
+        "payment_info_text",
+    )
     readonly_fields = fields
     raw_id_fields = ("person",)
 
