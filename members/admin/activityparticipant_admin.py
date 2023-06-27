@@ -107,11 +107,19 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     parameter_name = "department__union"
 
     def lookups(self, request, model_admin):
-        return [
-            (str(union.pk), str(union.name))
-            for union in Union.objects.all().order_by("department__union__name")
-        ]
-
+        unions = []
+        for union1 in (
+            Union.objects.filter(
+                department__union__in=AdminUserInformation.get_unions_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            unions.append((str(union1.pk), str(union1.name)))
+        return unions
+    
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
