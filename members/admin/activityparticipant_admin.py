@@ -119,7 +119,7 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
         ):
             unions.append((str(union1.pk), str(union1.name)))
         return unions
-    
+
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
