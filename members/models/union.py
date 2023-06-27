@@ -11,8 +11,7 @@ class Union(models.Model):
         verbose_name = "Forening"
         ordering = ["name"]
 
-    help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi
-    nævner det de fleste steder på siden."""
+    help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
     name = models.CharField("Foreningens navn", max_length=200, help_text=help_union)
 
     chairman = models.ForeignKey(
