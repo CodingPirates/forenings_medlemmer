@@ -1,8 +1,8 @@
 from django.contrib import admin
+from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-
-from members.models import Union, Address
+from members.models import Union, Address, Person
 
 
 class UnionDepartmentFilter(admin.SimpleListFilter):
@@ -52,6 +52,13 @@ class DepartmentAdmin(admin.ModelAdmin):
         form = super(DepartmentAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields["address"].queryset = Address.get_user_addresses(request.user)
         return form
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "department_leaders":
+            kwargs["queryset"] = Person.objects.filter(user__is_staff=True).order_by(
+                Upper("name")
+            )
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_queryset(self, request):
         qs = super(DepartmentAdmin, self).get_queryset(request)
