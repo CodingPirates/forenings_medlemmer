@@ -26,10 +26,10 @@ class UnionAdmin(admin.ModelAdmin):
 
     actions = ["export_csv_union_info"]
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(UnionAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields["address"].queryset = Address.get_user_addresses(request.user)
-        return form
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "address":
+            kwargs["queryset"] = Address.get_user_addresses(request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
         qs = super(UnionAdmin, self).get_queryset(request)
