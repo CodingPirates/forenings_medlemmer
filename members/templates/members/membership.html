@@ -61,7 +61,7 @@
                 </tr>
                 </thead>
                 <tbody class="union-membership-tablebody">
-                {% for activity in region.list %}
+                {% for activity in region.list|dictsort:"department.name" %}
                   <tr>
                     <td>
                       Coding Pirates<br>
