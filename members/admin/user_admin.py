@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from members.models import AdminUserInformation, Person
+from django.contrib.auth.models import Group
+from members.models import AdminUserInformation, Person, Union, Department
 
 
 class AdminUserInformationInline(admin.StackedInline):
@@ -13,6 +14,72 @@ class PersonInline(admin.StackedInline):
     model = Person
     fields = ("name",)
     readonly_fields = ("name",)
+
+
+class AdminUserGroupListFilter(admin.SimpleListFilter):
+    title = "Grupper"
+    parameter_name = "group"
+
+    def lookups(self, request, model_admin):
+        groupList = ()
+        for aGroup in Group.objects.all().order_by("name"):
+            groupList += (
+                (
+                    str(aGroup.id),
+                    str(aGroup.name),
+                ),
+            )
+        return groupList
+
+    def queryset(self, request, queryset):
+        group_id = request.GET.get(self.parameter_name, None)
+        if group_id:
+            return queryset.filter(groups=group_id)
+        return queryset
+
+
+class AdminUserUnionListFilter(admin.SimpleListFilter):
+    title = "Forening"
+    parameter_name = "union"
+
+    def lookups(self, request, model_admin):
+        unionList = ()
+        for aUnion in Union.objects.all().order_by("name"):
+            unionList += (
+                (
+                    str(aUnion.id),
+                    str(aUnion.name),
+                ),
+            )
+        return unionList
+
+    def queryset(self, request, queryset):
+        union_id = request.GET.get(self.parameter_name, None)
+        if union_id:
+            return queryset.filter(groups=union_id)
+        return queryset
+
+
+class AdminUserDepartmentListFilter(admin.SimpleListFilter):
+    title = "Afdeling"
+    parameter_name = "department"
+
+    def lookups(self, request, model_admin):
+        departmentList = ()
+        for aDepartment in Department.objects.all().order_by("name"):
+            departmentList += (
+                (
+                    str(aDepartment.id),
+                    str(aDepartment.name),
+                ),
+            )
+        return departmentList
+
+    def queryset(self, request, queryset):
+        union_id = request.GET.get(self.parameter_name, None)
+        if union_id:
+            return queryset.filter(groups=union_id)
+        return queryset
 
 
 class UserAdmin(UserAdmin):
@@ -38,8 +105,19 @@ class UserAdmin(UserAdmin):
 
     def get_list_filter(self, request):
         if request.user.is_superuser:
-            return ["is_staff", "is_superuser", "is_active"]
+            return [
+                "is_staff",
+                "is_superuser",
+                "is_active",
+                AdminUserGroupListFilter,
+                AdminUserUnionListFilter,
+                AdminUserDepartmentListFilter,
+            ]
         else:
-            return ["is_staff", "is_active"]
-
-    # Note 20221030 by MHewel: get_list_filter could also return "groups__id", but this is id of group. Disabled for now, have to find a way to show group name
+            return [
+                "is_staff",
+                "is_active",
+                AdminUserGroupListFilter,
+                AdminUserUnionListFilter,
+                AdminUserDepartmentListFilter,
+            ]
