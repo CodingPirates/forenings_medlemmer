@@ -107,10 +107,18 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     parameter_name = "department__union"
 
     def lookups(self, request, model_admin):
-        return [
-            (str(union.pk), str(union.name))
-            for union in Union.objects.all().order_by("department__union__name")
-        ]
+        unions = []
+        for union1 in (
+            Union.objects.filter(
+                department__union__in=AdminUserInformation.get_unions_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            unions.append((str(union1.pk), str(union1.name)))
+        return unions
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -186,7 +194,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
-        "activity_union_link",
         "activity_activitytype",
     ]
 
@@ -268,16 +275,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     activity_link.short_description = "Aktivitet"
     activity_link.admin_order_field = "activity__name"
-
-    def activity_union_link(self, item):
-        url = reverse("admin:members_union_change", args=[item.activity.union_id])
-        link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
-        return mark_safe(link)
-
-    activity_union_link.short_description = (
-        "Forening for Foreningsmedlemskab/Støttemedlemskab"
-    )
-    activity_union_link.admin_order_field = "activity__union__name"
 
     def activity_department_link(self, item):
         url = reverse(
