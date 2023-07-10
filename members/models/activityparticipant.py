@@ -71,7 +71,7 @@ class ActivityParticipant(models.Model):
             html_post = ""
 
         result_string = ""
-        paid_kr = f"{payment.amount_ore / 100}"
+        paid_kr = f"{payment.amount_ore/100:.2f}"
         if payment.refunded_at is not None:
             result_string = f"{html_warn_pre}Refunderet{html_post}:{self.utc_to_local_ymdhm(payment.refunded_at)}. "
             if payment.confirmed_at is not None:
