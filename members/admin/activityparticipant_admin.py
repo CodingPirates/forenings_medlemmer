@@ -194,7 +194,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
-        "activity_union_link",
         "activity_activitytype",
     ]
 
@@ -276,16 +275,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     activity_link.short_description = "Aktivitet"
     activity_link.admin_order_field = "activity__name"
-
-    def activity_union_link(self, item):
-        url = reverse("admin:members_union_change", args=[item.activity.union_id])
-        link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
-        return mark_safe(link)
-
-    activity_union_link.short_description = (
-        "Forening for Foreningsmedlemskab/Støttemedlemskab"
-    )
-    activity_union_link.admin_order_field = "activity__union__name"
 
     def activity_department_link(self, item):
         url = reverse(
