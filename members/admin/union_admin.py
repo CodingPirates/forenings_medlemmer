@@ -26,6 +26,8 @@ class UnionAdmin(admin.ModelAdmin):
 
     actions = ["export_csv_union_info"]
 
+    # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
+    # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "address":
             kwargs["queryset"] = Address.get_user_addresses(request.user)
