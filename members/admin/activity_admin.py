@@ -91,14 +91,6 @@ class ActivityAdmin(admin.ModelAdmin):
         "age",
     )
 
-    def changelist_view(self, request, extra_context=None):
-        # This is to show the membership_union_link for super admins only
-        if request.user.is_superuser:
-            self.list_display += ("activity_membership_union_link",)
-        return super(ActivityAdmin, self).changelist_view(
-            request, extra_context=extra_context
-        )
-
     date_hierarchy = "start_date"
     search_fields = (
         "name",
@@ -273,18 +265,3 @@ class ActivityAdmin(admin.ModelAdmin):
             },
         ),
     ]
-
-    def get_fieldsets(self, request, obj=None):
-        # This setup ensures the membership department is visible for super admins only
-        if request.user.is_superuser:
-            return [
-                (
-                    "Forening",
-                    {
-                        "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.<br>Forening er normalt fra den afdeling som aktiviteten er lavet under, og kan ikke rettes her</p>",
-                        "fields": ("union",),
-                    },
-                ),
-            ] + self.fieldsets
-        else:
-            return self.fieldsets
