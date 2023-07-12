@@ -26,10 +26,12 @@ class UnionAdmin(admin.ModelAdmin):
 
     actions = ["export_csv_union_info"]
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(UnionAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields["address"].queryset = Address.get_user_addresses(request.user)
-        return form
+    # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
+    # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "address":
+            kwargs["queryset"] = Address.get_user_addresses(request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
         qs = super(UnionAdmin, self).get_queryset(request)
