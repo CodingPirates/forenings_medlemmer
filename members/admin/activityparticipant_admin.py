@@ -9,7 +9,6 @@ from django.utils.safestring import mark_safe
 from members.models import (
     Activity,
     AdminUserInformation,
-    Department,
     Union,
 )
 
@@ -23,7 +22,9 @@ class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return [
             (str(department.pk), str(department))
-            for department in Department.objects.all().order_by("name")
+            for department in AdminUserInformation.get_departments_admin(
+                request.user
+            ).order_by("name")
         ]
 
     def queryset(self, request, queryset):
