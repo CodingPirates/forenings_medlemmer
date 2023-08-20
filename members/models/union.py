@@ -7,8 +7,8 @@ from django.core.validators import RegexValidator
 
 class Union(models.Model):
     class Meta:
-        verbose_name_plural = "Foreninger"
         verbose_name = "Forening"
+        verbose_name_plural = "Foreninger"
         ordering = ["name"]
 
     help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
@@ -71,6 +71,14 @@ class Union(models.Model):
         "Person", blank=True, verbose_name="Menige medlemmer"
     )
     board_members_old = models.TextField("Menige medlemmer", blank=True)
+    help_text = """Medlemskabet skal koste minimum 75 kr. pga. Dansk Ungdoms Fællesråds medlemsdefinition."""
+    membership_price_in_dkk = models.DecimalField(
+        "Pris for medlemskab",
+        max_digits=10,
+        decimal_places=2,
+        default=75,
+        help_text=help_text,
+    )
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",
         default=True,
@@ -92,6 +100,17 @@ class Union(models.Model):
         return self.name
 
     def clean(self):
+        errors = {}
+        min_amount = 75
+
+        if self.membership_price_in_dkk < min_amount:
+            errors[
+                "membership_price_in_dkk"
+            ] = f"Prisen er for lav. Medlemskaber skal koste mindst {min_amount} kr."
+
+        if errors:
+            raise ValidationError(errors)
+
         if self.bank_main_org is False and not self.bank_account:
             raise ValidationError(
                 "Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal bankkonto udfyldes."

@@ -91,6 +91,7 @@ class UnionAdmin(admin.ModelAdmin):
                     "bank_main_org",
                     "bank_account",
                     "statues",
+                    "membership_price_in_dkk",
                     "founded_at",
                     "closed_at",
                 ),
