@@ -128,11 +128,11 @@ class WaitingListAdmin(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
-            department_list_query = Department.objects.all()
+            department_list_query = Department.objects.all().order_by("name")
         else:
             department_list_query = Department.objects.filter(
                 adminuserinformation__user=request.user
-            )
+            ).order_by("name")
 
         waitinglist_departments = []  # List of unique departments selected by user
         for item in queryset:
