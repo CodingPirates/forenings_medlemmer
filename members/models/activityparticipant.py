@@ -56,9 +56,12 @@ class ActivityParticipant(models.Model):
             activityparticipant=self, accepted_at=None
         )
 
-    def payment_info(self, format_as_html: bool):
-        payment = members.models.payment.Payment.objects.get(activityparticipant=self)
+    def payment_info_text(self):
+        return self.payment_info(False)
 
+    payment_info_text.short_description = "Betalingsinfo"
+
+    def payment_info(self, format_as_html: bool):
         if format_as_html:
             html_error_pre = "<span style='color:red'><b>"
             html_warn_pre = "<span style='color:blue'><b>"
@@ -71,9 +74,27 @@ class ActivityParticipant(models.Model):
             html_post = ""
 
         result_string = ""
-        paid_kr = f"{payment.amount_ore/100:.2f}"
+
+        # Checking for price = 0 before checking for payment
+        if self.activity.price_in_dkk == 0:
+            return f"{html_good_pre}Gratis.{html_post} "
+
+        try:
+            payment = members.models.payment.Payment.objects.get(
+                activityparticipant=self
+            )
+        except Exception:
+            if format_as_html:
+                result_string = format_html(
+                    f"{html_error_pre}Andet er aftalt.{html_post} "
+                )
+            else:
+                result_string = "Andet er aftalt. "
+            return result_string
+
+        paid_kr = f"{payment.amount_ore / 100:.2f}"
         if payment.refunded_at is not None:
-            result_string = f"{html_warn_pre}Refunderet{html_post}:{self.utc_to_local_ymdhm(payment.refunded_at)}. "
+            result_string += f"{html_warn_pre}Refunderet{html_post}:{self.utc_to_local_ymdhm(payment.refunded_at)}. "
             if payment.confirmed_at is not None:
                 result_string += f"Betalt {paid_kr}kr: {self.utc_to_local_ymdhm(payment.confirmed_at)}. "
             else:
@@ -81,27 +102,24 @@ class ActivityParticipant(models.Model):
                     f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
                 )
         elif payment.rejected_at is not None:
-            result_string = f"{html_error_pre}Afvist:{html_post}{self.utc_to_local_ymdhm(payment.rejected_at)}. "
+            result_string += f"{html_error_pre}Afvist:{html_post}{self.utc_to_local_ymdhm(payment.rejected_at)}. "
             result_string += f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
         elif payment.cancelled_at is not None:
-            result_string = f"{html_error_pre}Cancelled:{html_post}{self.utc_to_local_ymdhm(payment.cancelled_at)}. "
+            result_string += f"{html_error_pre}Cancelled:{html_post}{self.utc_to_local_ymdhm(payment.cancelled_at)}. "
             result_string += f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
         else:
             if payment.confirmed_at is not None:
-                result_string = f"{html_good_pre}Betalt {paid_kr}kr:{html_post} {self.utc_to_local_ymdhm(payment.confirmed_at)}. "
+                result_string += f"{html_good_pre}Betalt {paid_kr}kr:{html_post} {self.utc_to_local_ymdhm(payment.confirmed_at)}. "
             else:
-                if payment.activity.price_in_dkk == 0:
-                    result_string = f"{html_good_pre}Gratis.{html_post} "
+                if (
+                    payment.accepted_at is not None
+                    and self.activity.start_date.year > timezone.now().year
+                ):
+                    result_string += f"{html_warn_pre}Betalingsdato:{str(self.activity.start_date.year)}-01-01{html_post} "
                 else:
-                    if (
-                        payment.accepted_at is not None
-                        and self.activity.start_date.year > timezone.now().year
-                    ):
-                        result_string = f"{html_warn_pre}Betalingsdato:{str(self.activity.start_date.year)}-01-01{html_post} "
-                    else:
-                        result_string = (
-                            f"{html_error_pre}Betaling er ikke gennemført{html_post} "
-                        )
+                    result_string += (
+                        f"{html_error_pre}Betaling er ikke gennemført{html_post} "
+                    )
 
             result_string += f"(Oprettet:{self.utc_to_local_ymdhm(payment.added_at)})"
         if format_as_html:
