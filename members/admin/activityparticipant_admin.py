@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from members.models import (
@@ -287,26 +286,12 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_department_link.admin_order_field = "activity__department__name"
 
     def activity_payment_info_txt(self, item):
-        if item.activity.price_in_dkk == 0.00:
-            return "Gratis"
-        else:
-            try:
-                return item.payment_info(False)
-            except Exception:
-                return "Andet er aftalt"
+        return item.payment_info(False)
 
     activity_payment_info_txt.short_description = "Betalingsinfo"
 
     def activity_payment_info_html(self, item):
-        if item.activity.price_in_dkk == 0.00:
-            return format_html("<span style='color:green'><b>Gratis</b></span>")
-        else:
-            try:
-                return item.payment_info(True)
-            except Exception:
-                return format_html(
-                    "<span style='color:red'><b>Andet er aftalt</b></span>"
-                )
+        return item.payment_info(True)
 
     activity_payment_info_html.short_description = "Betalingsinfo"
 
