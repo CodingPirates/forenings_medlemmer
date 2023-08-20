@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models.functions import Upper
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from members.models import AdminUserInformation, Person, Union, Department
@@ -8,6 +9,13 @@ class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ("departments", "unions")
     can_delete = False
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "departments":
+            kwargs["queryset"] = Department.objects.all().order_by(Upper("name").asc())
+        if db_field.name == "unions":
+            kwargs["queryset"] = Union.objects.all().order_by(Upper("name").asc())
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 
 class PersonInline(admin.StackedInline):
@@ -21,7 +29,7 @@ class AdminUserGroupListFilter(admin.SimpleListFilter):
     parameter_name = "group"
 
     def lookups(self, request, model_admin):
-        groupList = ()
+        groupList = [("none", "(ingen gruppe)")]
         for aGroup in Group.objects.all().order_by("name"):
             groupList += (
                 (
@@ -33,6 +41,8 @@ class AdminUserGroupListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         group_id = request.GET.get(self.parameter_name, None)
+        if group_id == "none":
+            return queryset.filter(groups__isnull=True)
         if group_id:
             return queryset.filter(groups=group_id)
         return queryset
@@ -43,7 +53,7 @@ class AdminUserUnionListFilter(admin.SimpleListFilter):
     parameter_name = "union"
 
     def lookups(self, request, model_admin):
-        unionList = ()
+        unionList = [("none", "(ingen forening)"), ("any", "(mindst en forening)")]
         for aUnion in Union.objects.all().order_by("name"):
             unionList += (
                 (
@@ -55,8 +65,12 @@ class AdminUserUnionListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         union_id = request.GET.get(self.parameter_name, None)
-        if union_id:
-            return queryset.filter(groups=union_id)
+        if union_id == "none":
+            return queryset.filter(adminuserinformation__unions__isnull=True)
+        elif union_id == "any":
+            return queryset.exclude(adminuserinformation__unions__isnull=True)
+        elif union_id:
+            return queryset.filter(adminuserinformation__unions=union_id)
         return queryset
 
 
@@ -65,7 +79,7 @@ class AdminUserDepartmentListFilter(admin.SimpleListFilter):
     parameter_name = "department"
 
     def lookups(self, request, model_admin):
-        departmentList = ()
+        departmentList = [("none", "(ingen afdeling)"), ("any", "(mindst en afdeling)")]
         for aDepartment in Department.objects.all().order_by("name"):
             departmentList += (
                 (
@@ -76,9 +90,13 @@ class AdminUserDepartmentListFilter(admin.SimpleListFilter):
         return departmentList
 
     def queryset(self, request, queryset):
-        union_id = request.GET.get(self.parameter_name, None)
-        if union_id:
-            return queryset.filter(groups=union_id)
+        department_id = request.GET.get(self.parameter_name, None)
+        if department_id == "none":
+            return queryset.filter(adminuserinformation__departments__isnull=True)
+        elif department_id == "any":
+            return queryset.exclude(adminuserinformation__departments__isnull=True)
+        if department_id:
+            return queryset.filter(adminuserinformation__departments=department_id)
         return queryset
 
 
