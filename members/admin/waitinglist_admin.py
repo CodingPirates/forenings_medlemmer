@@ -84,8 +84,8 @@ class WaitingListAdmin(admin.ModelAdmin):
         "person_age_years",
         "person_gender_text",
         "user_created",
-        "user_added_waiting_list",
         "user_waiting_list_number",
+        "user_added_waiting_list",
     )
 
     list_filter = (
@@ -325,4 +325,4 @@ class WaitingListAdmin(admin.ModelAdmin):
         return item.number_on_waiting_list()
 
     user_waiting_list_number.short_description = "Nummer på venteliste"
-    user_waiting_list_number.admin_order_field = "added_at"
+    user_waiting_list_number.admin_order_field = "on_waiting_list_since"
