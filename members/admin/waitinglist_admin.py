@@ -83,8 +83,8 @@ class WaitingListAdmin(admin.ModelAdmin):
         "person_link",
         "person_age_years",
         "person_gender_text",
-        "user_created",
         "user_waiting_list_number",
+        "user_created",
         "user_added_waiting_list",
     )
 
@@ -99,7 +99,10 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__union__name",
         "person__name",
     ]
-    search_help_text = "Du kan søge på forening, afdeling eller person"
+    search_help_text = mark_safe(
+        """Du kan søge på forening, afdeling eller person.<br>
+        'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
+    )
 
     actions = [
         "delete_many_from_department_waitinglist_action",
