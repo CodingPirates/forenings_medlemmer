@@ -148,7 +148,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             participant.save()
 
             # return user to list of activities where they are participating
-            return_link_url = f'{reverse("activities")}#tab-tilmeldte-aktiviteter'
+            return_link_url = f'{reverse("activities")}#tilmeldte-aktiviteter'
 
             # Make payment if activity costs
             if activity.price_in_dkk is not None and activity.price_in_dkk > 0:

@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const urlFragment = window.location.hash.substring(1); // Remove the '#' char
 
     // Default to the first list item as active if the ID is not provided or doesn't match any item
-    const activeIndex = tabButtons.findIndex(button => button.id === urlFragment);
+    // we use custom attribute data-navigation to set the "navigation url" for tab
+    const activeIndex = tabButtons.findIndex(button => button.dataset.navigation === urlFragment);
     const defaultIndex = activeIndex !== -1 ? activeIndex : 0;
 
     // Default to first as active
@@ -38,6 +39,9 @@ function toggleActive(sections, buttons, activeIndex) {
   sections[activeIndex].hidden = false;
 
   // set url to include the tab identifier. we overwrite url, since tabs doesn't work otherwise
-  const newUrl = window.location.pathname + `#${buttons[activeIndex].id}`;
-  window.history.replaceState({}, "", newUrl);
+  // we use custom attribute data-navigation to set the url for tab
+  if (buttons[activeIndex].dataset.navigation) {
+    const newUrl = window.location.pathname + `#${buttons[activeIndex].dataset.navigation}`;
+    window.history.replaceState({}, "", newUrl);
+  }
 }
