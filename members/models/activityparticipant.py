@@ -75,6 +75,10 @@ class ActivityParticipant(models.Model):
 
         result_string = ""
 
+        # Checking for price = 0 before checking for payment
+        if self.activity.price_in_dkk == 0:
+            return f"{html_good_pre}Gratis.{html_post} "
+
         try:
             payment = members.models.payment.Payment.objects.get(
                 activityparticipant=self
@@ -87,10 +91,6 @@ class ActivityParticipant(models.Model):
             else:
                 result_string = "Andet er aftalt. "
             return result_string
-
-        # Checking for price = 0 before checking for payment
-        if self.activity.price_in_dkk == 0:
-            result_string = f"{html_good_pre}Gratis.{html_post} "
 
         paid_kr = f"{payment.amount_ore / 100:.2f}"
         if payment.refunded_at is not None:
