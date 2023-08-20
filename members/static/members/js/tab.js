@@ -9,23 +9,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
       Array.from(tabs.children).filter(element => element.tagName === "SECTION")
     );
 
-    // Get the 'active' parameter value from the URL fragment
-    const urlFragment = window.location.hash.substr(1); // Remove the '#' symbol
-    const activeItemId = urlFragment.split("=")[1];
-    
+    // Get the 'active tab' parameter value from the URL fragment (after #-character)
+    const urlFragment = window.location.hash.substring(1); // Remove the '#' char
+
     // Default to the first list item as active if the ID is not provided or doesn't match any item
-    const activeIndex = tabButtons.findIndex(button => button.id === activeItemId);
+    const activeIndex = tabButtons.findIndex(button => button.id === urlFragment);
     const defaultIndex = activeIndex !== -1 ? activeIndex : 0;
-    
+
     // Default to first as active
     toggleActive(sections, tabButtons, defaultIndex);
 
     for (var button of tabButtons) {
       button.addEventListener("click", event =>
-        toggleActive(sections, tabButtons, tabButtons.indexOf(event.srcElement))
+        toggleActive(sections, tabButtons, tabButtons.indexOf(event.target))
       );
-      const newUrl = window.location.pathname; // Remove any query parameters or hash from the URL
-      window.history.pushState({}, "", newUrl);
     }
   }
 });
@@ -39,4 +36,8 @@ function toggleActive(sections, buttons, activeIndex) {
   }
   buttons[activeIndex].classList.add("tab-active");
   sections[activeIndex].hidden = false;
+
+  // set url to include the tab identifier. we overwrite url, since tabs doesn't work otherwise
+  const newUrl = window.location.pathname + `#${buttons[activeIndex].id}`;
+  window.history.replaceState({}, "", newUrl);
 }
