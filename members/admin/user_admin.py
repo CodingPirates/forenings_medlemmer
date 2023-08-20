@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models.functions import Upper
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from members.models import AdminUserInformation, Person, Union, Department
@@ -8,6 +9,13 @@ class AdminUserInformationInline(admin.StackedInline):
     model = AdminUserInformation
     filter_horizontal = ("departments", "unions")
     can_delete = False
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "departments":
+            kwargs["queryset"] = Department.objects.all().order_by(Upper("name").asc())
+        if db_field.name == "unions":
+            kwargs["queryset"] = Union.objects.all().order_by(Upper("name").asc())
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 
 class PersonInline(admin.StackedInline):
