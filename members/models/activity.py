@@ -51,7 +51,7 @@ class Activity(models.Model):
     signup_closing = models.DateField("Tilmelding lukker", null=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
-    help_price = """Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr. 
+    help_price = """Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr.
             til Coding Pirates Denmark pr. barn."""
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=500, help_text=help_price
