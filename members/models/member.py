@@ -26,6 +26,9 @@ class Member(models.Model):
         "Pris", max_digits=10, decimal_places=2, default=75
     )
 
+    def __str__(self):
+        return f"{self.person}, {self.union}, {self.member_since.year}"
+
     def clean(self):
         errors = {}
         min_amount = 75

@@ -14,7 +14,7 @@ class PaymentAdmin(admin.ModelAdmin):
         "activityparticipant",
     ]
     list_filter = ["payment_type", "activity"]
-    raw_id_fields = ("person", "activityparticipant", "family")
+    raw_id_fields = ("person", "activityparticipant", "family", "member")
     date_hierarchy = "added_at"
     search_fields = ("family__email",)
     select_related = "activityparticipant"
