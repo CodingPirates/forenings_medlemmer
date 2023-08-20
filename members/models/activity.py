@@ -28,10 +28,10 @@ class Activity(models.Model):
         on_delete=models.CASCADE,
         default="FORLØB",
         verbose_name="Aktivitetstype",
-        help_text="Angiv typen af aktivtet. "
-        + "Brugere vil se Forløb og Arrangementer under Aktiviteter. "
-        + "Medlemskab og Støttemedlemskab vil blive vist på separate sider. "
-        + "Normalt vil det kun være sekretariatet der oprettet aktiviteter for medlemskaber.",
+        help_text="""Angiv typen af aktivtet.
+        Brugere vil se Forløb og Arrangementer under Aktiviteter.
+        Medlemskab og Støttemedlemskab vil blive vist på separate sider.
+        Normalt vil det kun være sekretariatet der oprettet aktiviteter for medlemskaber.""",
     )
     open_hours = models.CharField("Tidspunkt", max_length=200)
     responsible_name = models.CharField("Ansvarlig", max_length=200)
@@ -51,21 +51,19 @@ class Activity(models.Model):
     signup_closing = models.DateField("Tilmelding lukker", null=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
-    help_price = (
-        "Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr. "
-    )
-    help_price += "til Coding Pirates Denmark pr. barn."
+    help_price = """Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr. 
+            til Coding Pirates Denmark pr. barn."""
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=500, help_text=help_price
     )
     max_participants = models.PositiveIntegerField("Max deltagere", default=30)
     max_age = models.PositiveIntegerField("Maximum Alder", default=17)
     min_age = models.PositiveIntegerField("Minimum Alder", default=7)
-    help_temp = "Bestemmer om personerne bliver til medlemmer i forhold til DUF."
-    help_temp += " De fleste aktiviteter er forløb/sæsoner og medlemsberettiget. Hvis "
-    help_temp += "du er i tvivl, så spørg på Slack i #medlemsssystem-support."
+    help_text = """Bestemmer om personerne bliver til medlem i forhold til DUF.
+        De fleste aktiviteter er forløb/sæsoner og medlemsberettiget. Hvis
+        du er i tvivl, så spørg på Slack i #medlemsssystem-support."""
     member_justified = models.BooleanField(
-        "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
+        "Aktiviteten gør personen til medlem", default=True, help_text=help_text
     )
 
     def is_historic(self):
