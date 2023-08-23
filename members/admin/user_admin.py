@@ -3,6 +3,7 @@ from django.db.models.functions import Upper
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from members.models import AdminUserInformation, Person, Union, Department
+from copy import deepcopy
 
 
 class AdminUserInformationInline(admin.StackedInline):
@@ -113,6 +114,8 @@ class UserAdmin(UserAdmin):
         "last_login",
     )
 
+    readonly_fields = ["date_joined", "last_login", "username"]
+
     def get_queryset(self, request):
         qs = super(UserAdmin, self).get_queryset(request)
 
@@ -139,3 +142,24 @@ class UserAdmin(UserAdmin):
                 AdminUserUnionListFilter,
                 AdminUserDepartmentListFilter,
             ]
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super(UserAdmin, self).get_fieldsets(request, obj)
+        if not obj:
+            return fieldsets
+        if not request.user.is_superuser:
+            fieldsets = deepcopy(fieldsets)
+            for fieldset in fieldsets:
+                if "is_superuser" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("is_superuser")
+                if "user_permissions" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("user_permissions")
+                if "username" in fieldset[1]["fields"]:
+                    if type(fieldset[1]["fields"] == tuple):
+                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
+                        fieldset[1]["fields"].remove("username")
+        return fieldsets
