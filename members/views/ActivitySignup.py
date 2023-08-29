@@ -147,9 +147,8 @@ def ActivitySignup(request, activity_id, person_id=None):
             participant.photo_permission = signup_form.cleaned_data["photo_permission"]
             participant.save()
 
-            return_link_url = reverse(
-                "activity_view_person", args=[activity.id, person.id]
-            )
+            # return user to list of activities where they are participating
+            return_link_url = f'{reverse("activities")}#tilmeldte-aktiviteter'
 
             # Make payment if activity costs
             if activity.price_in_dkk is not None and activity.price_in_dkk > 0:
@@ -171,8 +170,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                     payment.save()
 
                     return_link_url = payment.get_quickpaytransaction().get_link_url(
-                        return_url=settings.BASE_URL
-                        + reverse("activity_view_person", args=[activity.id, person.id])
+                        return_url=settings.BASE_URL + return_link_url
                     )
 
             # expire invitation
