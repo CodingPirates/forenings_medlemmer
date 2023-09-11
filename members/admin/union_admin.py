@@ -5,7 +5,11 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from members.models import Address, Person
+from members.models import (
+    Address,
+    Person,
+    Department,
+)
 
 
 class UnionAdmin(admin.ModelAdmin):
@@ -16,6 +20,7 @@ class UnionAdmin(admin.ModelAdmin):
         "union_email",
         "founded_at",
         "closed_at",
+        "waitinglist_count_link",
     )
     list_filter = (
         "address__region",
@@ -107,6 +112,20 @@ class UnionAdmin(admin.ModelAdmin):
 
     union_link.short_description = "Forening"
     union_link.admin_order_field = "name"
+
+    def waitinglist_count_link(self, item):
+        waitinglist_count = 0
+        for department in Department.objects.all().filter(union=item.id):
+            waitinglist_count += department.waitinglist_set.count()
+        admin_url = reverse("admin:members_waitinglist_changelist")
+        link = f"""<a
+            href="{admin_url}?={item.id}"
+            title="Vis venteliste for forening Coding Pirates {item.name}">
+            {waitinglist_count}
+            </a>"""
+        return mark_safe(link)
+
+    waitinglist_count_link.short_description = "Venteliste"
 
     def export_csv_union_info(self, request, queryset):
         result_string = "Forening;Oprettelsdato;Lukkedato;"
