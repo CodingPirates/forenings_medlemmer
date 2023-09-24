@@ -45,21 +45,6 @@ class ActivityInvite(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
-            template = members.models.emailtemplate.EmailTemplate.objects.get(
-                idname="ACT_INVITE"
-            )
-            context = {
-                "activity": self.activity,
-                "activity_invite": self,
-                "person": self.person,
-                "family": self.person.family,
-            }
-            if self.person.email and (self.person.email != self.person.family.email):
-                # If invited has own email, also send to that.
-                template.makeEmail([self.person, self.person.family], context)
-            else:
-                # otherwise use only family
-                template.makeEmail(self.person.family, context)
             # remove from department waiting list
             if self.activity.is_season():
                 members.models.waitinglist.WaitingList.objects.filter(
