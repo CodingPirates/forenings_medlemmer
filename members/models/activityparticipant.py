@@ -82,7 +82,11 @@ class ActivityParticipant(models.Model):
 
         # Checking for price = 0 before checking for payment
         if self.activity.price_in_dkk == 0:
-            return f"{html_good_pre}Gratis.{html_post} "
+            result_string = f"{html_good_pre}Gratis.{html_post} "
+            if format_as_html:
+                return format_html(result_string)
+            else:
+                return result_string
 
         try:
             payment = members.models.payment.Payment.objects.get(
