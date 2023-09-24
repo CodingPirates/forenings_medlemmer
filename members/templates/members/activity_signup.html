@@ -88,8 +88,8 @@
       {% else %}
         {% if not family %}
           <hr>
-          <a href="{% url 'person_login' %}">Log ind</a>
-          eller 
+          <a href="{% url 'person_login' %}?next={{request.path}}">Log ind</a>
+          eller
           <a href="{% url 'account_create' %}">tilmeld dit barn</a>
           for at tilmelde dig denne aktivitet.
         {% else %}
