@@ -90,7 +90,7 @@
           <hr>
           <a href="{% url 'person_login' %}?next={{request.path}}">Log ind</a>
           eller
-          <a href="{% url 'account_create' %}">tilmeld dit barn</a>
+          <a href="{% url 'account_create' %}?next={{request.path}}">tilmeld dit barn</a>
           for at tilmelde dig denne aktivitet.
         {% else %}
           {% if signup_closed %}

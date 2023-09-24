@@ -9,7 +9,11 @@ from django.contrib.auth.password_validation import validate_password
 
 
 class signupForm(forms.Form):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, next, *args, **kwargs):
+        """
+        Args:
+            next (str): Optional url that will be redirected to after account creation.
+        """
         super(signupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
@@ -17,6 +21,7 @@ class signupForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden("form_id", "signup", id="id_form_id"),
+            Hidden("next", next, id="id_next"),
             Fieldset(
                 "Barnets oplysninger",
                 Div(
