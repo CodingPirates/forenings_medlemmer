@@ -144,22 +144,21 @@ class UserAdmin(UserAdmin):
             ]
 
     def get_fieldsets(self, request, obj=None):
+        # 20230924: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
         fieldsets = super(UserAdmin, self).get_fieldsets(request, obj)
+
         if not obj:
-            return fieldsets
-        if not request.user.is_superuser:
-            fieldsets = deepcopy(fieldsets)
-            for fieldset in fieldsets:
-                if "is_superuser" in fieldset[1]["fields"]:
-                    if type(fieldset[1]["fields"] == tuple):
-                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
-                        fieldset[1]["fields"].remove("is_superuser")
-                if "user_permissions" in fieldset[1]["fields"]:
-                    if type(fieldset[1]["fields"] == tuple):
-                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
-                        fieldset[1]["fields"].remove("user_permissions")
-                if "username" in fieldset[1]["fields"]:
-                    if type(fieldset[1]["fields"] == tuple):
-                        fieldset[1]["fields"] = list(fieldset[1]["fields"])
-                        fieldset[1]["fields"].remove("username")
-        return fieldsets
+            return self.add_fieldsets
+
+        if request.user.is_superuser:
+            perm_fields = ('is_active', 'is_staff', 'is_superuser',
+                           'groups', 'user_permissions')
+        else:
+            # modify these to suit the fields you want your
+            # staff user to be able to edit
+            perm_fields = ('is_active', 'is_staff', 'groups')
+
+        return [(None, {'fields': ('username', 'password')}),
+                (('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+                (('Permissions'), {'fields': perm_fields}),
+                (('Important dates'), {'fields': ('last_login', 'date_joined')})]
