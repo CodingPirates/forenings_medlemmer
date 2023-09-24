@@ -247,10 +247,9 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     person_link.admin_order_field = "person__name"
 
     def participating(self, item):
-        return (
-            item.person.activityparticipant_set.filter(activity=item.activity).count()
-            > 0
-        )
+        return item.person.activityparticipant_set.filter(
+            activity=item.activity
+        ).exists()
 
     participating.short_description = "Deltager"
     participating.boolean = True
