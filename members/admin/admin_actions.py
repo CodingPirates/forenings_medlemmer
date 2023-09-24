@@ -10,6 +10,8 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 from django.shortcuts import render
+import members.models.emailtemplate
+import members.models.waitinglist
 
 from members.models import (
     Activity,
@@ -23,6 +25,10 @@ from members.models import (
 
 class AdminActions(admin.ModelAdmin):
     def invite_many_to_activity_action(modelAdmin, request, queryset):
+        template = members.models.emailtemplate.EmailTemplate.objects.get(
+            idname="ACT_INVITE"
+        )
+
         # Get list of available departments
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
@@ -59,6 +65,9 @@ class AdminActions(admin.ModelAdmin):
                 label="Udløber",
                 widget=AdminDateWidget(),
                 initial=timezone.now() + timedelta(days=30 * 3),
+            )
+            email_text = forms.CharField(
+                label="Email ekstra info", widget=forms.Textarea
             )
 
         # Lookup all the selected persons - to show confirmation list
@@ -180,15 +189,45 @@ class AdminActions(admin.ModelAdmin):
                                                 "expire"
                                             ],
                                         )
+
+                                        email_info = mass_invitation_form.cleaned_data[
+                                            "email_text"
+                                        ]
+
+                                        mail_context = {
+                                            "activity": activity,
+                                            "activity_invite": invitation,
+                                            "person": current_person,
+                                            "family": current_person.family,
+                                            "email_extra_info": email_info,
+                                        }
                                         invitation.save()
+                                        if current_person.email and (
+                                            current_person.email
+                                            != current_person.family.email
+                                        ):
+                                            # If invited has own email, also send to that.
+                                            template.makeEmail(
+                                                [current_person, current_person.family],
+                                                mail_context,
+                                                True,
+                                            )
+                                        else:
+                                            # otherwise use only family
+                                            template.makeEmail(
+                                                current_person.family,
+                                                mail_context,
+                                                True,
+                                            )
                                         persons_invited.append(current_person.name)
 
-                        except Exception:
+                        except Exception as E:
                             messages.error(
                                 request,
                                 "Fejl - ingen personer blev inviteret! Der var problemer med "
                                 + (invitation.person.name if invitation else "(n/a)")
-                                + ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.",
+                                + ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet."
+                                + f"{E=}",
                             )
                             return
 
