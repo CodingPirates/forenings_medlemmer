@@ -26,7 +26,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         "isOpening",
         "created",
         "closed_dtm",
-        "description",
+        "waitinglist_count_link",
     )
     list_filter = (
         "address__region",
@@ -45,7 +45,6 @@ class DepartmentAdmin(admin.ModelAdmin):
         "address__placename",
         "address__zipcode",
         "address__city",
-        "description",
     )
     filter_horizontal = ["department_leaders"]
 
@@ -117,3 +116,14 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     department_link.short_description = "Afdeling"
     department_link.admin_order_field = "name"
+
+    def waitinglist_count_link(self, item):
+        admin_url = reverse("admin:members_waitinglist_changelist")
+        link = f"""<a
+            href="{admin_url}?waiting_list={item.id}"
+            title="Vis venteliste for afdelingen Coding Pirates {item.name}">
+            {item.waitinglist_set.count()}
+            </a>"""
+        return mark_safe(link)
+
+    waitinglist_count_link.short_description = "Venteliste"
