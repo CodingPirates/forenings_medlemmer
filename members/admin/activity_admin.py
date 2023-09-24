@@ -1,19 +1,79 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from members.models import Department
-from members.models import ActivityParticipant
+
+from members.models import (
+    ActivityParticipant,
+    AdminUserInformation,
+    Department,
+    Union,
+)
 
 
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
-    fields = ("person",)
+    fields = (
+        "person",
+        "note",
+        "photo_permission",
+        "payment_info_text",
+    )
     readonly_fields = fields
-    raw_id_fields = ("person",)
+    can_delete = False
 
     def get_queryset(self, request):
         return ActivityParticipant.objects.all()
+
+
+class ActivityUnionListFilter(admin.SimpleListFilter):
+    title = "Lokalforeninger"
+    parameter_name = "department__union"
+
+    def lookups(self, request, model_admin):
+        unions = []
+        for union1 in (
+            Union.objects.filter(
+                department__union__in=AdminUserInformation.get_unions_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            unions.append((str(union1.pk), str(union1.name)))
+        return unions
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(department__union__pk=self.value())
+
+
+class ActivityDepartmentListFilter(admin.SimpleListFilter):
+    title = "Afdelinger"
+    parameter_name = "department"
+
+    def lookups(self, request, model_admin):
+        departments = []
+        for department1 in (
+            Department.objects.filter(
+                activity__department__in=AdminUserInformation.get_departments_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            departments.append((str(department1.pk), str(department1)))
+        return departments
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(department__pk=self.value())
 
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -45,33 +105,31 @@ class ActivityAdmin(admin.ModelAdmin):
         "department",
     )
     list_filter = (
-        "department__union__name",
-        "department__name",
+        ActivityUnionListFilter,
+        ActivityDepartmentListFilter,
         "open_invite",
         "activitytype",
     )
     save_as = True
+
+    class Media:
+        # Remove title for each record
+        # see : https://stackoverflow.com/questions/41376406/remove-title-from-tabularinline-in-admin
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     inlines = [ActivityParticipantInline]
-
-    def startend(self, obj):
-        return str(obj.start_date) + " - " + str(obj.end_date)
-
-    startend.short_description = "Periode"
-
-    def age(self, obj):
-        return str(obj.min_age) + " - " + str(obj.max_age)
-
-    age.short_description = "Alder"
 
     def start_end(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
 
     start_end.short_description = "Periode"
+    start_end.admin_order_field = "start_date"
 
     def age(self, obj):
         return str(obj.min_age) + " - " + str(obj.max_age)
 
     age.short_description = "Alder"
+    age.admin_order_field = "min_age"
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.department.union_id])
@@ -93,6 +151,7 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.max_participants)
 
     seats_total.short_description = "Total"
+    seats_total.admin_order_field = "max_participants"
 
     def seats_used(self, obj):
         return str(obj.activityparticipant_set.count())
@@ -103,6 +162,16 @@ class ActivityAdmin(admin.ModelAdmin):
         return str(obj.max_participants - obj.activityparticipant_set.count())
 
     seats_free.short_description = "Ubesat"
+
+    def activity_membership_union_link(self, obj):
+        if obj.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
+            url = reverse("admin:members_union_change", args=[obj.union_id])
+            link = '<a href="%s">%s</a>' % (url, obj.union.name)
+            return mark_safe(link)
+        else:
+            return ""
+
+    activity_membership_union_link.short_description = "Forening for medlemskab"
 
     # Only view activities on own department
     def get_queryset(self, request):
@@ -128,13 +197,6 @@ class ActivityAdmin(admin.ModelAdmin):
             {
                 "description": "<p>Du kan ændre afdeling for aktiviteten ved at skrive afdelings-id, eller tryk på søg-ikonet og i det nye vindue skal du finde afdelingen, for derefter at trykke på ID i første kolonne.</p>",
                 "fields": ("department",),
-            },
-        ),
-        (
-            "Forening",
-            {
-                "description": "<p><b>Bemærk:</b> Denne værdi bruges kun til foreningsmedlemsskab/støttemedlemsskab.</p>",
-                "fields": ("union",),
             },
         ),
         (

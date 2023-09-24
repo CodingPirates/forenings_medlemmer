@@ -24,6 +24,7 @@ class SignUpTest(StaticLiveServerTestCase):
         self.admin = User.objects.create_superuser(
             self.name, "admin@example.com", self.password
         )
+
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
@@ -65,6 +66,7 @@ class SignUpTest(StaticLiveServerTestCase):
         # Check that person admin can load
         elment = self.browser.find_element(By.LINK_TEXT, "Personer")
         self.browser.get(elment.get_attribute("href"))
+
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("person"))
         except Exception:

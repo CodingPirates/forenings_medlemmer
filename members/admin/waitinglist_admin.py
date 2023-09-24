@@ -8,7 +8,6 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-
 from members.models import (
     Union,
     Department,
@@ -16,6 +15,9 @@ from members.models import (
 )
 
 import members.models.emailtemplate
+
+# import members.admin.admin_actions
+from members.admin.admin_actions import AdminActions
 
 
 class person_waitinglist_union_filter(admin.SimpleListFilter):
@@ -81,9 +83,9 @@ class WaitingListAdmin(admin.ModelAdmin):
         "person_link",
         "person_age_years",
         "person_gender_text",
+        "user_waiting_list_number",
         "user_created",
         "user_added_waiting_list",
-        "user_waiting_list_number",
     )
 
     list_filter = (
@@ -97,10 +99,14 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__union__name",
         "person__name",
     ]
-    search_help_text = "Du kan søge på forening, afdeling eller person"
+    search_help_text = mark_safe(
+        """Du kan søge på forening, afdeling eller person.<br>
+        'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
+    )
 
     actions = [
         "delete_many_from_department_waitinglist_action",
+        AdminActions.invite_many_to_activity_action,
     ]
 
     def get_actions(self, request):
@@ -125,11 +131,11 @@ class WaitingListAdmin(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
-            department_list_query = Department.objects.all()
+            department_list_query = Department.objects.all().order_by("name")
         else:
             department_list_query = Department.objects.filter(
                 adminuserinformation__user=request.user
-            )
+            ).order_by("name")
 
         waitinglist_departments = []  # List of unique departments selected by user
         for item in queryset:
@@ -301,12 +307,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     person_age_years.admin_order_field = "-person__birthday"
 
     def person_gender_text(self, item):
-        if item.person.gender == "MA":
-            return "Dreng"
-        elif item.person.gender == "FM":
-            return "Pige"
-        else:
-            return "Andet"
+        return item.person.gender_text()
 
     person_gender_text.short_description = "Køn"
     person_gender_text.admin_order_field = "person__gender"
@@ -327,4 +328,4 @@ class WaitingListAdmin(admin.ModelAdmin):
         return item.number_on_waiting_list()
 
     user_waiting_list_number.short_description = "Nummer på venteliste"
-    user_waiting_list_number.admin_order_field = "added_at"
+    user_waiting_list_number.admin_order_field = "on_waiting_list_since"

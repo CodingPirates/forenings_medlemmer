@@ -3,15 +3,15 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from members.models import (
     Activity,
     AdminUserInformation,
-    Department,
     Union,
 )
+
+from members.admin.admin_actions import AdminActions
 
 
 class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
@@ -21,7 +21,9 @@ class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return [
             (str(department.pk), str(department))
-            for department in Department.objects.all()
+            for department in AdminUserInformation.get_departments_admin(
+                request.user
+            ).order_by("name")
         ]
 
     def queryset(self, request, queryset):
@@ -102,16 +104,27 @@ class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
 
 class ActivityParticipantUnionFilter(admin.SimpleListFilter):
     title = "Lokalforening"
-    parameter_name = "union"
+    parameter_name = "department__union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
+        unions = []
+        for union1 in (
+            Union.objects.filter(
+                department__union__in=AdminUserInformation.get_unions_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            unions.append((str(union1.pk), str(union1.name)))
+        return unions
 
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
         else:
-            return queryset.filter(activity__union__pk=self.value())
+            return queryset.filter(activity__department__union__pk=self.value())
 
 
 class ParticipantPaymentListFilter(admin.SimpleListFilter):
@@ -181,7 +194,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "photo_permission",
         "note",
         "activity_payment_info_html",
-        "activity_union_link",
+        "activity_activitytype",
     ]
 
     list_filter = (
@@ -191,6 +204,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         ActivityParticipantListLastYearFilter,
         ActivityParticipantListOldYearsFilter,
         ParticipantPaymentListFilter,
+        "activity__activitytype",
     )
     list_display_links = (
         "added_at",
@@ -205,8 +219,15 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     )
 
     actions = [
+        AdminActions.invite_many_to_activity_action,
         "export_csv_full",
     ]
+
+    def activity_activitytype(self, item):
+        return item.activity.activitytype
+
+    activity_activitytype.short_description = "Aktivitetstype"
+    activity_activitytype.admin_order_field = "activity__activitytype"
 
     def person_age_years(self, item):
         return item.person.age_years()
@@ -227,12 +248,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return qs.filter(activity__department__adminuserinformation__user=request.user)
 
     def activity_person_gender(self, item):
-        if item.person.gender == "MA":
-            return "Dreng"
-        elif item.person.gender == "FM":
-            return "Pige"
-        else:
-            return "Andet"
+        return item.person.gender_text()
 
     activity_person_gender.short_description = "Køn"
 
@@ -260,16 +276,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_link.short_description = "Aktivitet"
     activity_link.admin_order_field = "activity__name"
 
-    def activity_union_link(self, item):
-        url = reverse("admin:members_union_change", args=[item.activity.union_id])
-        link = '<a href="%s">%s</a>' % (url, item.activity.union.name)
-        return mark_safe(link)
-
-    activity_union_link.short_description = (
-        "Forening for Foreningsmedlemskab/Støttemedlemskab"
-    )
-    activity_union_link.admin_order_field = "activity__union__name"
-
     def activity_department_link(self, item):
         url = reverse(
             "admin:members_department_change", args=[item.activity.department_id]
@@ -281,43 +287,19 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     activity_department_link.admin_order_field = "activity__department__name"
 
     def activity_payment_info_txt(self, item):
-        if item.activity.price_in_dkk == 0.00:
-            return "Gratis"
-        else:
-            try:
-                return item.payment_info(False)
-            except Exception:
-                return "Andet er aftalt"
+        return item.payment_info(False)
 
     activity_payment_info_txt.short_description = "Betalingsinfo"
 
     def activity_payment_info_html(self, item):
-        if item.activity.price_in_dkk == 0.00:
-            return format_html("<span style='color:green'><b>Gratis</b></span>")
-        else:
-            try:
-                return item.payment_info(True)
-            except Exception:
-                return format_html(
-                    "<span style='color:red'><b>Andet er aftalt</b></span>"
-                )
+        return item.payment_info(True)
 
     activity_payment_info_html.short_description = "Betalingsinfo"
 
     def export_csv_full(self, request, queryset):
-        result_string = "Forening;Afdeling;Aktivitet;Navn;Alder;"
-        result_string += "Køn;Post-nr;Betalingsinfo;Forældre navn;Forældre email;"
-        result_string += "Forældre tlf;Note til arrangørerne\n"
+        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder"; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
         for p in queryset:
-            if p.person.gender is not None:
-                if p.person.gender == "MA":
-                    gender = "Dreng"
-                elif p.person.gender == "FM":
-                    gender = "Pige"
-                else:
-                    gender = p.person.gender
-            else:
-                gender = "andet"
+            gender = p.person.gender_text()
 
             parent = p.person.family.get_first_parent()
             if parent:
