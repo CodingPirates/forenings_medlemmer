@@ -147,6 +147,8 @@ class UserAdmin(UserAdmin):
         if not obj:
             return self.add_fieldsets
 
+        perm_fields = ("is_active", "is_staff", "groups")
+
         if request.user.is_superuser:
             perm_fields = (
                 "is_active",
@@ -155,10 +157,6 @@ class UserAdmin(UserAdmin):
                 "groups",
                 "user_permissions",
             )
-        else:
-            # modify these to suit the fields you want your
-            # staff user to be able to edit
-            perm_fields = ("is_active", "is_staff", "groups")
 
         return [
             (None, {"fields": ("username", "password")}),
