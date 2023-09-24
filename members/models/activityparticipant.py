@@ -61,6 +61,11 @@ class ActivityParticipant(models.Model):
 
     payment_info_text.short_description = "Betalingsinfo"
 
+    def payment_info_html(self):
+        return self.payment_info(True)
+
+    payment_info_html.short_description = "Betalingsinfo"
+
     def payment_info(self, format_as_html: bool):
         if format_as_html:
             html_error_pre = "<span style='color:red'><b>"
