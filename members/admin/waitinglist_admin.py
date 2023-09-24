@@ -266,15 +266,15 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(WaitingListAdmin, self).get_queryset(request)
-        
+
         qs = qs.annotate(
             _waitinglist_position=WaitingList.objects.filter(
-                #department=self.department,
+                # department=self.department,
                 on_waiting_list_since__lt=self.on_waiting_list_since,
             ).count()
             + 1,
         )
-        
+
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
@@ -339,4 +339,4 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     user_waiting_list_number.short_description = "Nummer på venteliste"
     user_waiting_list_number.admin_order_field = "_waitinglist_position"
-    #user_waiting_list_number.admin_order_field = "on_waiting_list_since"
+    # user_waiting_list_number.admin_order_field = "on_waiting_list_since"
