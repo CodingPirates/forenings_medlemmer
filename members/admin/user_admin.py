@@ -3,7 +3,6 @@ from django.db.models.functions import Upper
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from members.models import AdminUserInformation, Person, Union, Department
-from copy import deepcopy
 
 
 class AdminUserInformationInline(admin.StackedInline):
@@ -145,20 +144,25 @@ class UserAdmin(UserAdmin):
 
     def get_fieldsets(self, request, obj=None):
         # 20230924: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
-        fieldsets = super(UserAdmin, self).get_fieldsets(request, obj)
-
         if not obj:
             return self.add_fieldsets
 
         if request.user.is_superuser:
-            perm_fields = ('is_active', 'is_staff', 'is_superuser',
-                           'groups', 'user_permissions')
+            perm_fields = (
+                "is_active",
+                "is_staff",
+                "is_superuser",
+                "groups",
+                "user_permissions",
+            )
         else:
             # modify these to suit the fields you want your
             # staff user to be able to edit
-            perm_fields = ('is_active', 'is_staff', 'groups')
+            perm_fields = ("is_active", "is_staff", "groups")
 
-        return [(None, {'fields': ('username', 'password')}),
-                (('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-                (('Permissions'), {'fields': perm_fields}),
-                (('Important dates'), {'fields': ('last_login', 'date_joined')})]
+        return [
+            (None, {"fields": ("username", "password")}),
+            (("Personal info"), {"fields": ("first_name", "last_name", "email")}),
+            (("Permissions"), {"fields": perm_fields}),
+            (("Important dates"), {"fields": ("last_login", "date_joined")}),
+        ]
