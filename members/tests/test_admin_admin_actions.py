@@ -94,6 +94,7 @@ class TestAdminActions(TestCase):
             "activity": "1",
             "department": "1",
             "expire": datetime.fromisoformat("2023-12-31"),
+            "email_text": "Lidt ekstra tekst",
         }
         request.user = self.user
 
