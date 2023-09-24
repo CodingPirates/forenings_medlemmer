@@ -61,6 +61,11 @@ class ActivityParticipant(models.Model):
 
     payment_info_text.short_description = "Betalingsinfo"
 
+    def payment_info_html(self):
+        return self.payment_info(True)
+
+    payment_info_html.short_description = "Betalingsinfo"
+
     def payment_info(self, format_as_html: bool):
         if format_as_html:
             html_error_pre = "<span style='color:red'><b>"
@@ -77,7 +82,11 @@ class ActivityParticipant(models.Model):
 
         # Checking for price = 0 before checking for payment
         if self.activity.price_in_dkk == 0:
-            return f"{html_good_pre}Gratis.{html_post} "
+            result_string = f"{html_good_pre}Gratis.{html_post} "
+            if format_as_html:
+                return format_html(result_string)
+            else:
+                return result_string
 
         try:
             payment = members.models.payment.Payment.objects.get(
