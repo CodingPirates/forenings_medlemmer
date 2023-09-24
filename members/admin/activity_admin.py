@@ -17,13 +17,13 @@ class ActivityParticipantInline(admin.TabularInline):
         "person",
         "note",
         "photo_permission",
-        "payment_info_text",
+        "payment_info_html",
     )
     readonly_fields = fields
     can_delete = False
 
     def get_queryset(self, request):
-        return ActivityParticipant.objects.all()
+        return ActivityParticipant.objects.all().order_by("person")
 
 
 class ActivityUnionListFilter(admin.SimpleListFilter):
