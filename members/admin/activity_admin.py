@@ -13,12 +13,17 @@ from members.models import (
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
     extra = 0
-    fields = ("person",)
+    fields = (
+        "person",
+        "note",
+        "photo_permission",
+        "payment_info_html",
+    )
     readonly_fields = fields
-    raw_id_fields = ("person",)
+    can_delete = False
 
     def get_queryset(self, request):
-        return ActivityParticipant.objects.all()
+        return ActivityParticipant.objects.all().order_by("person")
 
 
 class ActivityUnionListFilter(admin.SimpleListFilter):
@@ -106,6 +111,12 @@ class ActivityAdmin(admin.ModelAdmin):
         "activitytype",
     )
     save_as = True
+
+    class Media:
+        # Remove title for each record
+        # see : https://stackoverflow.com/questions/41376406/remove-title-from-tabularinline-in-admin
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     inlines = [ActivityParticipantInline]
 
     def start_end(self, obj):

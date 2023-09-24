@@ -83,9 +83,9 @@ class WaitingListAdmin(admin.ModelAdmin):
         "person_link",
         "person_age_years",
         "person_gender_text",
+        "user_waiting_list_number",
         "user_created",
         "user_added_waiting_list",
-        "user_waiting_list_number",
     )
 
     list_filter = (
@@ -99,7 +99,10 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__union__name",
         "person__name",
     ]
-    search_help_text = "Du kan søge på forening, afdeling eller person"
+    search_help_text = mark_safe(
+        """Du kan søge på forening, afdeling eller person.<br>
+        'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
+    )
 
     actions = [
         "delete_many_from_department_waitinglist_action",
@@ -128,11 +131,11 @@ class WaitingListAdmin(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
-            department_list_query = Department.objects.all()
+            department_list_query = Department.objects.all().order_by("name")
         else:
             department_list_query = Department.objects.filter(
                 adminuserinformation__user=request.user
-            )
+            ).order_by("name")
 
         waitinglist_departments = []  # List of unique departments selected by user
         for item in queryset:
@@ -325,4 +328,4 @@ class WaitingListAdmin(admin.ModelAdmin):
         return item.number_on_waiting_list()
 
     user_waiting_list_number.short_description = "Nummer på venteliste"
-    user_waiting_list_number.admin_order_field = "added_at"
+    user_waiting_list_number.admin_order_field = "on_waiting_list_since"

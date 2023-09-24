@@ -137,6 +137,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "invite_dtm",
         "expire_dtm",
         "rejected_at",
+        "participating",
     )
     list_filter = (
         ActivityInviteUnionListFilter,
@@ -244,3 +245,11 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     person_link.short_description = "Person"
     person_link.admin_order_field = "person__name"
+
+    def participating(self, item):
+        return item.person.activityparticipant_set.filter(
+            activity=item.activity
+        ).exists()
+
+    participating.short_description = "Deltager"
+    participating.boolean = True
