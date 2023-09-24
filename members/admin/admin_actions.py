@@ -90,6 +90,7 @@ class AdminActions(admin.ModelAdmin):
 
         context["persons"] = persons
         context["queryset"] = queryset
+        context["emailtemplate"] = template
 
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
