@@ -4,6 +4,9 @@ from django.db import models
 from django.utils import timezone
 
 
+def end_of_year():
+    return date(date.today().year, 12, 31)
+
 class Member(models.Model):
     class Meta:
         verbose_name = "Medlem"
@@ -19,7 +22,7 @@ class Member(models.Model):
     member_until = models.DateField(
         "Medlemskab slut",
         blank=True,
-        default=None,
+        default=end_of_year,
         null=True,
     )
     price_in_dkk = models.DecimalField(
@@ -40,8 +43,3 @@ class Member(models.Model):
 
         if errors:
             raise ValidationError(errors)
-
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.member_until = date(date.today().year, 12, 31)
-        return super(Member, self).save(*args, **kwargs)

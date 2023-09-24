@@ -40,6 +40,9 @@ class ActivityParticipant(models.Model):
     contact_visible = models.BooleanField(
         "Kontaktoplysninger synlige for andre holddeltagere", default=False
     )
+    price_in_dkk = models.DecimalField(
+        "Pris", max_digits=10, decimal_places=2, default=425
+    )
 
     def __str__(self):
         return (

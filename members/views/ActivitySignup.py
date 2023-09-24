@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -21,6 +22,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         view_only_mode = False
 
     activity = get_object_or_404(Activity, pk=activity_id)
+    union = activity.department.union
 
     participating = False
 
@@ -43,18 +45,10 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
         ]
 
-        for child in family.get_children():
-            subscriptions = WaitingList.objects.filter(
-                department=activity.department, person=child
-            )
-            if len(subscriptions) > 0:
-                family_subscriptions.append(child.id)
-
         for person in family.get_persons():
-            subscriptions = WaitingList.objects.filter(
+            if WaitingList.objects.filter(
                 department=activity.department, person=person
-            )
-            if len(subscriptions) > 0:
+            ).exists():
                 family_subscriptions.append(person.id)
 
     if family and person_id:
@@ -114,13 +108,13 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
 
         if (
-            Person.objects.filter(family=family)
+            not Person.objects.filter(family=family)
             .exclude(membertype=Person.CHILD)
-            .count()
-            <= 0
+            .exists()
         ):
-            return HttpResponse(
-                "Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder."
+            raise ValidationError(
+                "Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.",
+                code="no_parent_guardian",
             )
 
         signup_form = ActivitySignupForm(request.POST)
@@ -133,12 +127,15 @@ def ActivitySignup(request, activity_id, person_id=None):
                 person=person,
                 activity=activity,
                 note=signup_form.cleaned_data["note"],
+                price_in_dkk=activity.price_in_dkk - union.membership_price_in_dkk,
             )
 
-            # If conditions not accepted, make error
-            if signup_form.cleaned_data["read_conditions"] == "NO":
-                return HttpResponse(
-                    "For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser."
+            # Make a new member if it's a member activity
+            if (activity.activitytype_id == "FORLØB" or activity.activitytype_id == "FORENINGSMEDLEMSKAB"):
+                Member(
+                    union=union,
+                    person=person,
+                    price_in_dkk=union.membership_price_in_dkk,
                 )
 
             # Make sure people have selected yes or no in photo permission and update photo permission
@@ -195,8 +192,6 @@ def ActivitySignup(request, activity_id, person_id=None):
         # fall through else
     else:
         signup_form = ActivitySignupForm()
-
-    union = activity.department.union
 
     context = {
         "family": family,

@@ -103,3 +103,14 @@ class ActivitySignupForm(forms.Form):
             (Payment.OTHER, "Andet er aftalt"),
         ),
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        read_conditions = self.cleaned_data.get('read_conditions')
+        photo_permission = self.cleaned_data.get('photo_permission')
+
+        if (read_conditions == "NO"):
+            self.add_error('read_conditions', 'For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser.',)
+
+        if (photo_permission == "Choose"):
+            self.add_error('photo_permission', 'Du skal vælge om vi må tage billeder eller ej.')

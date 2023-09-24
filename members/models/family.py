@@ -48,9 +48,6 @@ class Family(models.Model):
             return None
         return parent
 
-    def get_children(self):
-        return Person.objects.filter(family=self, membertype=Person.CHILD)
-
     def get_persons(self):
         return Person.objects.filter(family=self)
 
