@@ -13,8 +13,8 @@ from members.models.person import Person
 def AccountCreate(request):
     if request.method == "POST":
         # support redirecting to specific page after signup
+        # this uses `next` parameter, similar to https://docs.djangoproject.com/en/4.2/topics/auth/default/#the-login-required-decorator
         next_url = request.POST["next"]
-        print(f"next_url: {next_url}")
 
         # figure out which form was filled out.
         if request.POST["form_id"] == "signup":
@@ -107,9 +107,10 @@ def AccountCreate(request):
                 child.save()
 
                 # redirect to success
-                request.session["password"] = password
                 if next_url and next_url != "":
-                    return HttpResponseRedirect(next_url)
+                    return HttpResponseRedirect(
+                        f"{reverse('user_created')}?next={next_url}"
+                    )
                 else:
                     return HttpResponseRedirect(reverse("user_created"))
             else:
@@ -118,5 +119,9 @@ def AccountCreate(request):
                 )
 
     # initial load (if we did not return above)
-    signup = signupForm(next=request.GET.get("next", ""))
+    signup = (
+        signupForm(next_url=request.GET["next"])
+        if "next" in request.GET
+        else signupForm()
+    )
     return render(request, "members/account_create.html", {"signupform": signup})

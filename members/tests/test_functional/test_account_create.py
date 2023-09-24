@@ -36,7 +36,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_final.png")
         self.browser.quit()
 
-    def create_account_ui_flow(self, next=None):
+    def create_account_ui_flow(self, next_url=None):
         """
         Test the account creation flow in UI.
 
@@ -46,10 +46,10 @@ class AccountCreateTest(StaticLiveServerTestCase):
         # Loads the front page
         self.browser.maximize_window()
 
-        if next == None:
+        if next_url == None or next_url == "":
             self.browser.get(f"{self.live_server_url}/account/create")
         else:
-            self.browser.get(f"{self.live_server_url}/account/create?next={next}")
+            self.browser.get(f"{self.live_server_url}/account/create?next={next_url}")
 
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
@@ -168,8 +168,11 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.login_and_assert_frontpage_redirect_ui_flow()
 
     def test_account_create_with_redirection(self):
-        next_url = "department_signup"
-        self.create_account_ui_flow(next=f"/{next_url}")
+        next_url = "/redirect/url/"
+        self.create_account_ui_flow(next_url=next_url)
 
         # Check that we were redirected to expected page
-        self.assertEqual(self.browser.current_url.split("/")[-1], next_url)
+        self.assertTrue(
+            self.browser.current_url.endswith(next_url),
+            f"'{self.browser.current_url}' doesn't end with '{next_url}'",
+        )
