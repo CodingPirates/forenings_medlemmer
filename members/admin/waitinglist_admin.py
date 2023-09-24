@@ -268,14 +268,14 @@ class WaitingListAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(WaitingListAdmin, self).get_queryset(request)
 
-        '''qs = qs.annotate(
+        """qs = qs.annotate(
             _waitinglist_position=WaitingList.objects.filter(
                 # department=self.department,
                 on_waiting_list_since__lt=self.on_waiting_list_since,
             ).count()
             + 1,
         )
-        '''
+        """
 
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
@@ -343,24 +343,31 @@ class WaitingListAdmin(admin.ModelAdmin):
     # user_waiting_list_number.admin_order_field = "_waitinglist_position"
     user_waiting_list_number.admin_order_field = "on_waiting_list_since"
 
-
     def get_rank(self, obj):
         # Use annotate to calculate the rank based on the created_at timestamp
         # rank_expression = models.Count('person', filter=models.Q(person__added_at__lt=F('person__added_at')))
 
         rank_expression = Subquery(
             WaitingList.objects.filter(
-                department=OuterRef('department'),
-                person__added_at__lt=OuterRef('person__added_at')
-            ).values('department').annotate(rank=models.Count('pk')).values('rank')[:1]
+                department=OuterRef("department"),
+                person__added_at__lt=OuterRef("person__added_at"),
+            )
+            .values("department")
+            .annotate(rank=models.Count("pk"))
+            .values("rank")[:1]
         )
 
         # Add 1 to the rank to start from 1 instead of 0
-        rank = WaitingList.objects.annotate(rank=rank_expression).values('rank').first()['rank']
+        rank = (
+            WaitingList.objects.annotate(rank=rank_expression)
+            .values("rank")
+            .first()["rank"]
+        )
         if rank is None:
             return 0
         else:
             return rank + 1
 
-        #return rank
-    get_rank.short_description = 'Rank'
+        # return rank
+
+    get_rank.short_description = "Rank"
