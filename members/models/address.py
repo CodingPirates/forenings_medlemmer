@@ -48,6 +48,7 @@ class Address(models.Model):
         "Oprettet", auto_now=False, auto_now_add=True, auto_created=True
     )
     created_by = models.PositiveIntegerField("Oprettet af", default=0)
+    descriptiontext = models.CharField("Beskrivelse", max_length=100, blank=True)
 
     def __str__(self):
         address = f"{self.streetname} {self.housenumber}"

@@ -19,7 +19,7 @@ def Activities(request):
         signup_closing__gte=timezone.now(),
         end_date__gte=timezone.now(),
         activitytype__in=["FORLØB", "ARRANGEMENT"],
-    ).order_by("department__address__region", "-name", "start_date")
+    ).order_by("address__region", "name", "start_date")
 
     family = None
     invites = None
@@ -129,15 +129,15 @@ def Activities(request):
                         "end_date": curActivity.end_date,
                         "signup_closing": curActivity.signup_closing,
                         "userregion": user_region,
-                        "streetname": curActivity.streetname,
-                        "housenumber": curActivity.housenumber,
-                        "floor": curActivity.floor,
-                        "door": curActivity.door,
-                        "placename": curActivity.placename,
-                        "zipcode": curActivity.zipcode,
-                        "city": curActivity.city,
+                        #"streetname": curActivity.streetname,
+                        #"housenumber": curActivity.housenumber,
+                        #floor": curActivity.floor,
+                        #"door": curActivity.door,
+                        #"placename": curActivity.placename,
+                        #"zipcode": curActivity.zipcode,
+                        #"city": curActivity.city,
                     }
-                    if curActivity.department.address.region == user_region:
+                    if curActivity.address.region == user_region:
                         activities_for_region_of_user.append(a)
                     else:
                         activities_for_other_regions.append(a)

@@ -238,6 +238,7 @@ class ActivityAdmin(admin.ModelAdmin):
                         "city",
                         "placename",
                     ),
+                    ("address",),
                 ),
             },
         ),

@@ -20,10 +20,12 @@ class AddressAdmin(admin.ModelAdmin):
                     "housenumber",
                     "floor",
                     "door",
+                    "placename",
                     "zipcode",
                     "city",
                     "municipality",
                     "region",
+                    "descriptiontext",
                 )
             },
         ),
