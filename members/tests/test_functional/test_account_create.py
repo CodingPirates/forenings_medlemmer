@@ -46,7 +46,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         # Loads the front page
         self.browser.maximize_window()
 
-        if next_url == None or next_url == "":
+        if next_url is None or next_url == "":
             self.browser.get(f"{self.live_server_url}/account/create")
         else:
             self.browser.get(f"{self.live_server_url}/account/create?next={next_url}")

@@ -22,7 +22,7 @@ class signupForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden("form_id", "signup", id="id_form_id"),
-            Hidden("next", next_url if next_url != None else "", id="id_next"),
+            Hidden("next", next_url if next_url is not None else "", id="id_next"),
             Fieldset(
                 "Barnets oplysninger",
                 Div(
