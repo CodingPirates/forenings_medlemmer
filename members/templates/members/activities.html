@@ -239,14 +239,14 @@
                           {% if activity.open_invite %}
                             <a
                               class="button-success"
-                              href="{% url 'person_login' %}"
+                              href="{% url 'person_login' %}?next={{request.path}}"
                             >
                               Tilmeld
                             </a>
                           {% else %}
                             <a
                               class="button-success"
-                              href="{% url 'person_login' %}"
+                              href="{% url 'person_login' %}?next={{request.path}}"
                             >
                               Opskriv på venteliste
                             </a>
