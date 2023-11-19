@@ -113,7 +113,7 @@ class UserAdmin(UserAdmin):
         "last_login",
     )
 
-    readonly_fields = ["date_joined", "last_login", "username"]
+    readonly_fields = ["date_joined", "last_login"]
 
     def get_queryset(self, request):
         qs = super(UserAdmin, self).get_queryset(request)
