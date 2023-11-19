@@ -12,10 +12,14 @@ from members.models.person import Person
 @xframe_options_exempt
 def AccountCreate(request):
     if request.method == "POST":
+        # support redirecting to specific page after signup
+        # this uses `next` parameter, similar to https://docs.djangoproject.com/en/4.2/topics/auth/default/#the-login-required-decorator
+        next_url = request.POST["next"]
+
         # figure out which form was filled out.
         if request.POST["form_id"] == "signup":
             # signup has been filled
-            signup = signupForm(request.POST)
+            signup = signupForm(next_url, request.POST)
             if signup.is_valid():
                 # check if passwords match
                 if signup.cleaned_data["password1"] != signup.cleaned_data["password2"]:
@@ -103,13 +107,21 @@ def AccountCreate(request):
                 child.save()
 
                 # redirect to success
-                request.session["password"] = password
-                return HttpResponseRedirect(reverse("user_created"))
+                if next_url and next_url != "":
+                    return HttpResponseRedirect(
+                        f"{reverse('user_created')}?next={next_url}"
+                    )
+                else:
+                    return HttpResponseRedirect(reverse("user_created"))
             else:
                 return render(
                     request, "members/account_create.html", {"signupform": signup}
                 )
 
     # initial load (if we did not return above)
-    signup = signupForm()
+    signup = (
+        signupForm(next_url=request.GET["next"])
+        if "next" in request.GET
+        else signupForm()
+    )
     return render(request, "members/account_create.html", {"signupform": signup})

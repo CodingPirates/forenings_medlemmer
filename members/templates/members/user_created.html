@@ -27,6 +27,10 @@
         </div>
 
         <hr />
+        {% if next_url %}
+        <a class="btn btn-primary" href="{% url 'person_login' %}?next={{next_url}}">Gå til log ind →</a>
+        {% else %}
         <a class="btn btn-primary" href="{% url 'person_login' %}">Gå til log ind →</a>
+        {% endif %}
       </div>
 {% endblock %}
