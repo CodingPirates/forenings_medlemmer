@@ -162,8 +162,11 @@ class AccountCreateTest(StaticLiveServerTestCase):
     def test_account_create_without_redirect(self):
         self.create_account_ui_flow()
 
-        # Check that we were redirected to front page (default)
-        self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
+        # Check that we were redirected to default 'user_created' page, since no redirect url was given
+        self.assertTrue(
+            self.browser.current_url.endswith("user_created/"),
+            f"After creating account without redirect url, expected '{self.browser.current_url}' to end with default 'user_created/'",
+        )
 
         self.login_and_assert_frontpage_redirect_ui_flow()
 
