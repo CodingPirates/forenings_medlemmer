@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+
+{% block usertools %}
+    <div id="user-tools">
+        {# TODO: Update link if/when we're moving away from frivillig.codingpirates.dk site #}
+        <a href="https://frivillig.codingpirates.dk/medlemssystemet/guides/" target="_blank" style="font-weight: bold;">Admin guide til brug af medlemssystem</a>
+    </div>
+    {{ block.super }}
+{% endblock %}
