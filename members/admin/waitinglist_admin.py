@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
 from members.models import (
     Union,
@@ -278,7 +279,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
-        link = '<a href="%s">%s</a>' % (url, item.department.union.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.union.name))
         return mark_safe(link)
 
     union_link.short_description = "Forening"
@@ -286,7 +287,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     def department_link(self, item):
         url = reverse("admin:members_department_change", args=[item.department_id])
-        link = '<a href="%s">%s</a>' % (url, item.department.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.name))
         return mark_safe(link)
 
     department_link.short_description = "Afdeling"
@@ -294,7 +295,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     def person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.person_id])
-        link = '<a href="%s">%s</a>' % (url, item.person.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.name))
         return mark_safe(link)
 
     person_link.short_description = "Person"
