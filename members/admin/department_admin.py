@@ -3,6 +3,7 @@ from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from members.models import Union, Address, Person
+from django.utils.html import escape
 
 
 class UnionDepartmentFilter(admin.SimpleListFilter):
@@ -103,7 +104,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     def department_union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.union_id])
-        link = '<a href="%s">%s</a>' % (url, item.union.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.union.name))
         return mark_safe(link)
 
     department_union_link.short_description = "Forening"
@@ -111,7 +112,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     def department_link(self, item):
         url = reverse("admin:members_department_change", args=[item.id])
-        link = '<a href="%s">%s</a>' % (url, item.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.name))
         return mark_safe(link)
 
     department_link.short_description = "Afdeling"
