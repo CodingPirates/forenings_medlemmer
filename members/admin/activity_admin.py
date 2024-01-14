@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
 from members.models import (
     ActivityParticipant,
@@ -133,7 +134,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.department.union_id])
-        link = '<a href="%s">%s</a>' % (url, item.department.union.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.union.name))
         return mark_safe(link)
 
     union_link.short_description = "Forening"
@@ -141,7 +142,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def department_link(self, item):
         url = reverse("admin:members_department_change", args=[item.department_id])
-        link = '<a href="%s">%s</a>' % (url, item.department.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.name))
         return mark_safe(link)
 
     department_link.short_description = "Afdeling"
@@ -166,7 +167,7 @@ class ActivityAdmin(admin.ModelAdmin):
     def activity_membership_union_link(self, obj):
         if obj.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
             url = reverse("admin:members_union_change", args=[obj.union_id])
-            link = '<a href="%s">%s</a>' % (url, obj.union.name)
+            link = '<a href="%s">%s</a>' % (url, escape(obj.union.name))
             return mark_safe(link)
         else:
             return ""
