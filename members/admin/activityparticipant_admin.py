@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
 from members.models import (
     Activity,
@@ -254,7 +255,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     def activity_person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.person_id])
-        link = '<a href="%s">%s</a>' % (url, item.person.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.name))
         return mark_safe(link)
 
     activity_person_link.short_description = "Deltager"
@@ -262,7 +263,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     def activity_family_email_link(self, item):
         url = reverse("admin:members_family_change", args=[item.person.family_id])
-        link = '<a href="%s">%s</a>' % (url, item.person.family.email)
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.family.email))
         return mark_safe(link)
 
     activity_family_email_link.short_description = "Familie"
@@ -270,7 +271,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     def activity_link(self, item):
         url = reverse("admin:members_activity_change", args=[item.activity.id])
-        link = '<a href="%s">%s</a>' % (url, item.activity.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.activity.name))
         return mark_safe(link)
 
     activity_link.short_description = "Aktivitet"
@@ -280,7 +281,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         url = reverse(
             "admin:members_department_change", args=[item.activity.department_id]
         )
-        link = '<a href="%s">%s</a>' % (url, item.activity.department.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.activity.department.name))
         return mark_safe(link)
 
     activity_department_link.short_description = "Afdeling"
