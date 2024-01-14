@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from members.models.union import Union
 from members.models.activity import Activity
+from members.models.activitytype import ActivityType
 from members.models.department import Department
 import datetime
 
@@ -62,9 +63,10 @@ class Command(BaseCommand):
             max_participants = 9999
             max_age = 99
             min_age = 16
+            activitytype = ActivityType.objects.get(id="FORENINGSMEDLEMSKAB")
 
             activity = Activity(
-                activitytype="FORENINGSMEDLEMSKAB",
+                activitytype=activitytype,
                 department=department,
                 union=curUnion,
                 name=name,
