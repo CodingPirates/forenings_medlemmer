@@ -48,21 +48,18 @@ class TestAdminActions(TestCase):
         self.family = Family()
         self.family.save()
 
-        self.person_too_young = self.create_person_and_waiting_list_entry(
-            str(datetime.now().year - 5) + "-01-01"
-        )  # 5 years old
-        self.person_exactly_start_age = self.create_person_and_waiting_list_entry(
-            str(datetime.now().year - 7) + "-01-01"
-        )  # 7 years old
-        self.person_correct_age = self.create_person_and_waiting_list_entry(
-            str(datetime.now().year - 10) + "-01-01"
-        )  # 10 years old
-        self.person_exactly_end_age = self.create_person_and_waiting_list_entry(
-            str(datetime.now().year - 17) + "-01-01"
-        )  # 17 years old
-        self.person_too_old = self.create_person_and_waiting_list_entry(
-            str(datetime.now().year - 18) + "-01-01"
-        )  # 18 years old
+        # create test persons with specific ages
+        self.person_too_young = self.create_person_and_waiting_list_entry(age=5)
+        self.person_exactly_start_age = self.create_person_and_waiting_list_entry(age=7)
+        self.person_correct_age = self.create_person_and_waiting_list_entry(age=10)
+        self.person_exactly_end_age = self.create_person_and_waiting_list_entry(age=17)
+        self.person_too_old = self.create_person_and_waiting_list_entry(age=18)
+
+        self.person_too_young_at_activity_start = (
+            self.create_person_and_waiting_list_entry(
+                birthday=str(datetime.now().year - 7) + "-01-02"
+            )
+        )
 
         # setup email template
         EmailTemplate.objects.create(
@@ -70,9 +67,18 @@ class TestAdminActions(TestCase):
             subject="test email subject",
         )
 
-    def create_person_and_waiting_list_entry(self, person_birthday):
+    def create_person_and_waiting_list_entry(self, age=None, birthday=None):
+        if age is not None:
+            person_birthday = str(datetime.now().year - age) + "-01-01"
+            person_name = f"Testperson {age} år, født {person_birthday}"
+        elif birthday is not None:
+            person_birthday = birthday
+            person_name = f"Testperson født {person_birthday} år"
+        else:
+            raise ValueError("Either age or birthday must be specified")
+
         person = Person.objects.create(
-            name=person_birthday,
+            name=person_name,
             family=self.family,
             birthday=datetime.fromisoformat(person_birthday),
         )
@@ -93,7 +99,7 @@ class TestAdminActions(TestCase):
         request.POST = {
             "activity": "1",
             "department": "1",
-            "expire": datetime.fromisoformat("2023-12-31"),
+            "expire": datetime.fromisoformat(f"{datetime.now().year}-12-31"),
             "email_text": "Lidt ekstra tekst",
         }
         request.user = self.user
@@ -110,8 +116,12 @@ class TestAdminActions(TestCase):
         # Assert that the correct persons are invited
         invitations = ActivityInvite.objects.all()
 
-        self.assertEqual(invitations.count(), 3)
-        self.assertTrue(invitations.filter(person=self.person_correct_age).exists())
+        self.assertEqual(invitations.count(), 4)
+        self.assertTrue(
+            invitations.filter(
+                person=self.person_correct_age, activity=self.activity
+            ).exists()
+        )
         self.assertTrue(
             invitations.filter(
                 person=self.person_exactly_start_age, activity=self.activity
@@ -120,5 +130,10 @@ class TestAdminActions(TestCase):
         self.assertTrue(
             invitations.filter(
                 person=self.person_exactly_end_age, activity=self.activity
+            ).exists()
+        )
+        self.assertTrue(
+            invitations.filter(
+                person=self.person_too_young_at_activity_start, activity=self.activity
             ).exists()
         )
