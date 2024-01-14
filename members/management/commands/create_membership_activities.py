@@ -26,13 +26,13 @@ class Command(BaseCommand):
 
             localDepartments = str.join(
                 ", ",
-                Department.objects.filter(union=curUnion).values_list(
+                Department.objects.filter(union=curUnion, closed_dtm=None).values_list(
                     "name", flat=True
                 ),
             )
 
             try:
-                department = Department.objects.get(name=localDepartments)
+                department = Department.objects.get(name=curUnion.name)
             except Exception:
                 print("Using backup main department at %s" % (curUnion.name))
                 pass
