@@ -7,26 +7,6 @@
         <p>Vi har oprettet en bruger til dig. Du logger ind ved hjælp af din e-mail-adresse samt adgangskode.</p>
         <p>Hvis du har glemt din adgangskode kan du få den tilbage med <a href="/account/forgot/">Password nulstilling</a></p>
         <hr />
-        <p>Herunder kan du finde og tilmelde dig vores forskellige communities og kommunikations kanaler, så du kan holde dig godt opdateret:</p>
-
-        <div>
-          <h4>Piratnyt - Nyhedsbrev</h4>
-          <p>PiratNyt er vores månedlige interne nyhedsbrev til alle frivillige i organisationen.</p>
-          <p>Her skriver vi om ting, der er relevante for dig som frivillig samt generelle opdateringer om Coding Pirates. Du vil bl.a. modtage nyt fra Hovedbestyrelsen, inspiration til klubaftenerne, gode råd samt nyheder fra måneden, der er gået.</p>
-          <p>
-            <a href="https://codingpirates.dk/tilmeld-dig-til-piratnyt/" target=”_blank”>Tilmeld dig til PiratNyt her (åbner nyt faneblad)</a>
-          </p>
-        </div>
-
-        <div>
-          <h4>Coding Pirates Facebook</h4>
-          <p>Facebook bruges til at dele idéer og erfaringer blandt frivillige på tværs af afdelinger i hele landet.</p>
-          <p>
-            <a href="https://www.facebook.com/groups/codingpiratescommunity" target=”_blank”>Find Coding Pirates Community gruppen her (åbner nyt faneblad)</a>
-          </p>
-        </div>
-
-        <hr />
         {% if next_url %}
         <a class="btn btn-primary" href="{% url 'person_login' %}?next={{next_url}}">Gå til log ind →</a>
         {% else %}
