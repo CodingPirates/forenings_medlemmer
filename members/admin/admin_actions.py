@@ -152,6 +152,8 @@ class AdminActions(admin.ModelAdmin):
                             with transaction.atomic():
                                 # for current_person in queryset:
                                 for current_person in persons:
+                                    person_age = current_person.age_years()
+
                                     # check for already participant
                                     if current_person.id in already_participant_ids:
                                         persons_already_participant.append(
@@ -165,21 +167,13 @@ class AdminActions(admin.ModelAdmin):
                                         )
 
                                     # Check for age constraint: too young ?
-                                    elif (
-                                        current_person.birthday
-                                        > activity.start_date
-                                        - relativedelta(years=activity.min_age)
-                                    ):
+                                    elif person_age < activity.min_age:
                                         persons_too_young.append(current_person.name)
+
                                     # Check for age constraint: too old ?
-                                    elif (
-                                        current_person.birthday
-                                        < activity.start_date
-                                        - relativedelta(
-                                            years=activity.max_age + 1, days=-1
-                                        )
-                                    ):
+                                    elif person_age > activity.max_age:
                                         persons_too_old.append(current_person.name)
+
                                     # Otherwise - person can be invited
                                     else:
                                         invited_counter = invited_counter + 1
