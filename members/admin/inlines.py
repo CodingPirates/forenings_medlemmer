@@ -26,6 +26,24 @@ class ActivityInviteInline(admin.TabularInline):
     can_delete = False
     raw_id_fields = ("activity",)
 
+    fieldsets = (
+        (
+            None,
+            {
+                "description": '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson. Herefter kan du vælge de personer på listen, du ønsker at invitere og vælge "Inviter alle valgte til en aktivitet" fra rullemenuen foroven.</p>',
+                "fields": (
+                    "person",
+                    "activity",
+                    "invite_dtm",
+                    "expire_dtm",
+                    "rejected_at",
+                    "price_in_dkk",
+                    "price_note",
+                ),
+            },
+        ),
+    )
+
     # Limit the activity possible to invite to: Not finished and belonging to user
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "activity" and not request.user.is_superuser:
@@ -33,7 +51,7 @@ class ActivityInviteInline(admin.TabularInline):
                 adminuserinformation__user=request.user
             )
             kwargs["queryset"] = Activity.objects.filter(
-                end_date__gt=timezone.now(), department__in=departments
+                department__in=departments
             )
         return super(ActivityInviteInline, self).formfield_for_foreignkey(
             db_field, request, **kwargs
@@ -45,11 +63,20 @@ class ActivityInviteInline(admin.TabularInline):
         if request.user.is_superuser:
             return qs
         return qs.filter(
-            activity__end_date__gt=timezone.now(),
             activity__department__in=AdminUserInformation.get_departments_admin(
                 request.user
             ),
         )
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return [
+                "activity",
+                "invite_dtm",
+            ]
+        else:
+            return []
+
 
 
 class ActivityParticipantInline(admin.TabularInline):

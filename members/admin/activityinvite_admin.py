@@ -177,6 +177,8 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                     "invite_dtm",
                     "expire_dtm",
                     "rejected_at",
+                    "price_in_dkk",
+                    "price_note",
                 ),
             },
         ),
