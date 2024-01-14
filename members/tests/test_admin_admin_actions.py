@@ -36,8 +36,8 @@ class TestAdminActions(TestCase):
 
         # logic for inviting is based on activity date, not current date, so we use fixed dates
         self.activity = Activity(
-            start_date=datetime.fromisoformat("2023-01-01"),
-            end_date=datetime.fromisoformat("2023-12-31"),
+            start_date=datetime.fromisoformat(str(datetime.now().year) + "-01-01"),
+            end_date=datetime.fromisoformat(str(datetime.now().year) + "-12-31"),
             min_age=7,
             max_age=17,
             department=self.department,
@@ -49,19 +49,19 @@ class TestAdminActions(TestCase):
         self.family.save()
 
         self.person_too_young = self.create_person_and_waiting_list_entry(
-            "2018-01-01"
+            str(datetime.now().year - 5) + "-01-01"
         )  # 5 years old
         self.person_exactly_start_age = self.create_person_and_waiting_list_entry(
-            "2016-01-01"
+            str(datetime.now().year - 7) + "-01-01"
         )  # 7 years old
         self.person_correct_age = self.create_person_and_waiting_list_entry(
-            "2013-01-01"
+            str(datetime.now().year - 10) + "-01-01"
         )  # 10 years old
         self.person_exactly_end_age = self.create_person_and_waiting_list_entry(
-            "2006-01-01"
+            str(datetime.now().year - 17) + "-01-01"
         )  # 17 years old
         self.person_too_old = self.create_person_and_waiting_list_entry(
-            "2005-01-01"
+            str(datetime.now().year - 18) + "-01-01"
         )  # 18 years old
 
         # setup email template
