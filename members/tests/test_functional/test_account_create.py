@@ -36,10 +36,21 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/sign_up_screen_final.png")
         self.browser.quit()
 
-    def test_account_create(self):
+    def create_account_ui_flow(self, next_url=None):
+        """
+        Test the account creation flow in UI.
+
+        Args:
+            next (str): Optional url that will be redirected to after account creation.
+        """
         # Loads the front page
         self.browser.maximize_window()
-        self.browser.get(f"{self.live_server_url}/account/create")
+
+        if next_url is None or next_url == "":
+            self.browser.get(f"{self.live_server_url}/account/create")
+        else:
+            self.browser.get(f"{self.live_server_url}/account/create?next={next_url}")
+
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
 
@@ -129,9 +140,8 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys(Keys.TAB)
         field.send_keys(Keys.ENTER)
         self.browser.save_screenshot("test-screens/sign_up_screen_4.png")
-        # Check that redirect
-        self.assertEqual(self.browser.current_url.split("/")[-2], "user_created")
 
+    def login_and_assert_frontpage_redirect_ui_flow(self):
         # Go to login page,
         self.browser.find_elements(
             By.XPATH, "//*[text()[contains(.,'Gå til log ind')]]"
@@ -148,3 +158,24 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
         # Check that we were redirectet to front page
         self.assertEqual(f"{self.live_server_url}/", self.browser.current_url)
+
+    def test_account_create_without_redirect(self):
+        self.create_account_ui_flow()
+
+        # Check that we were redirected to default 'user_created' page, since no redirect url was given
+        self.assertTrue(
+            self.browser.current_url.endswith("user_created/"),
+            f"After creating account without redirect url, expected '{self.browser.current_url}' to end with default 'user_created/'",
+        )
+
+        self.login_and_assert_frontpage_redirect_ui_flow()
+
+    def test_account_create_with_redirection(self):
+        next_url = "/redirect/url/"
+        self.create_account_ui_flow(next_url=next_url)
+
+        # Check that we were redirected to expected page
+        self.assertTrue(
+            self.browser.current_url.endswith(next_url),
+            f"'{self.browser.current_url}' doesn't end with '{next_url}'",
+        )
