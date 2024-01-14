@@ -382,7 +382,6 @@ table thead > tr > th {
 }
 table td {
   padding: 10px;
-  word-break: break-all;
 }
 @media only screen and (max-width: 667px) {
   table td,
