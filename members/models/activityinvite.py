@@ -113,6 +113,24 @@ class ActivityInvite(models.Model):
                 "email_extra_info": self.extra_email_info,
             }
 
+            if self.person.email and (
+                self.person.email
+                != self.person.family.email
+            ):
+                # If invited has own email, also send to that.
+                template.makeEmail(
+                    [self.person, self.person.family],
+                    context,
+                    True,
+                )
+            else:
+                # otherwise use only family
+                template.makeEmail(
+                    self.person.family,
+                    context,
+                    True,
+                )
+
             # remove from department waiting list
             if self.activity.is_season():
                 members.models.waitinglist.WaitingList.objects.filter(
