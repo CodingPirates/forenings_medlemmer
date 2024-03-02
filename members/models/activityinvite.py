@@ -59,8 +59,25 @@ class ActivityInvite(models.Model):
         # Make sure price note is filled if there is a special price
         if (self.price_in_dkk is not None and self.price_note == ""):
             raise ValidationError(
-                "Du skal angive en begrundelse for den særlige pris for denne deltager."
+                "Du skal angive en begrundelse for den særlige pris for denne deltager. Noten er ikke synlig for deltageren."
             )
+
+        errors = {}
+        min_amount = 0
+
+        if self.activity.activitytype.id == "FORENINGSMEDLEMSKAB":
+            min_amount = 75
+
+        if self.activity.activitytype.id == "FORLØB":
+            min_amount = 100
+
+        if self.price_in_dkk is not None and self.price_in_dkk < min_amount:
+            errors[
+                "price_in_dkk"
+            ] = f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
+
+        if errors:
+            raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
         if not self.id:
