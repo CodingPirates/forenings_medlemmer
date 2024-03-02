@@ -12,7 +12,7 @@ from django.utils import timezone
 # TODO: make configurable in settings file
 def _defaultInviteExpiretime():
     now = timezone.now()
-    return now + timedelta(days=30 * 3)
+    return now + timedelta(days=14)
 
 
 class ActivityInvite(models.Model):
