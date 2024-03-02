@@ -8,7 +8,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 
-# Calculate a day 3 months in future
+# Calculate a day 14 days in the future
 # TODO: make configurable in settings file
 def _defaultInviteExpiretime():
     now = timezone.now()
