@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from members.models.union import Union
 from members.models.activity import Activity
+from members.models.activitytype import ActivityType
 from members.models.department import Department
 import datetime
 
@@ -19,19 +20,19 @@ class Command(BaseCommand):
 
             self.stdout.write("foreningen %s " % (curUnion.name))
             department = mainDepartment
-            name = "Foreningsmedlemsskab 2023: %s" % (curUnion.name)
+            name = "Foreningsmedlemsskab 2024: %s" % (curUnion.name)
             open_hours = "-"
             dawa_id = ""
 
             localDepartments = str.join(
                 ", ",
-                Department.objects.filter(union=curUnion).values_list(
+                Department.objects.filter(union=curUnion, closed_dtm=None).values_list(
                     "name", flat=True
                 ),
             )
 
             try:
-                department = Department.objects.get(name=localDepartments)
+                department = Department.objects.get(name=curUnion.name)
             except Exception:
                 print("Using backup main department at %s" % (curUnion.name))
                 pass
@@ -54,16 +55,18 @@ class Command(BaseCommand):
                 localDepartments,
             )
             instructions = ""
-            start_date = datetime.date(year=2023, month=1, day=1)
-            end_date = datetime.date(year=2023, month=12, day=31)
-            signup_closing = datetime.date(year=2023, month=12, day=31)
+            start_date = datetime.date(year=2024, month=1, day=1)
+            end_date = datetime.date(year=2024, month=12, day=31)
+            signup_closing = datetime.date(year=2024, month=12, day=31)
             open_invite = True
             price_in_dkk = 75
             max_participants = 9999
             max_age = 99
             min_age = 16
+            activitytype = ActivityType.objects.get(id="FORENINGSMEDLEMSKAB")
 
             activity = Activity(
+                activitytype=activitytype,
                 department=department,
                 union=curUnion,
                 name=name,

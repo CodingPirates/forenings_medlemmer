@@ -67,7 +67,7 @@ class AdminActions(admin.ModelAdmin):
                 initial=timezone.now() + timedelta(days=30 * 3),
             )
             email_text = forms.CharField(
-                label="Email ekstra info", widget=forms.Textarea
+                label="Email ekstra info", widget=forms.Textarea, required=False
             )
 
         # Lookup all the selected persons - to show confirmation list

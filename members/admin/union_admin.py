@@ -4,6 +4,7 @@ from django.db.models.functions import Upper
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
 from members.models import (
     Address,
@@ -107,7 +108,7 @@ class UnionAdmin(admin.ModelAdmin):
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
-        link = '<a href="%s">%s</a>' % (url, item.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.name))
         return mark_safe(link)
 
     union_link.short_description = "Forening"

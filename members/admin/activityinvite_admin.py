@@ -234,7 +234,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     def activity_link(self, item):
         url = reverse("admin:members_activity_change", args=[item.activity.id])
-        link = '<a href="%s">%s</a>' % (url, item.activity.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.activity.name))
         return mark_safe(link)
 
     activity_link.short_description = "Aktivitet"
