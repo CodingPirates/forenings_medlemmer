@@ -50,9 +50,7 @@ class ActivityInviteInline(admin.TabularInline):
             departments = Department.objects.filter(
                 adminuserinformation__user=request.user
             )
-            kwargs["queryset"] = Activity.objects.filter(
-                department__in=departments
-            )
+            kwargs["queryset"] = Activity.objects.filter(department__in=departments)
         return super(ActivityInviteInline, self).formfield_for_foreignkey(
             db_field, request, **kwargs
         )
@@ -76,7 +74,6 @@ class ActivityInviteInline(admin.TabularInline):
             ]
         else:
             return []
-
 
 
 class ActivityParticipantInline(admin.TabularInline):
