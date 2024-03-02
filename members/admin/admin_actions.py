@@ -189,37 +189,11 @@ class AdminActions(admin.ModelAdmin):
                                             expire_dtm=mass_invitation_form.cleaned_data[
                                                 "expire"
                                             ],
+                                            extra_email_info=mass_invitation_form.cleaned_data[
+                                                "email_text"
+                                            ],
                                         )
-
-                                        email_info = mass_invitation_form.cleaned_data[
-                                            "email_text"
-                                        ]
-
-                                        mail_context = {
-                                            "activity": activity,
-                                            "activity_invite": invitation,
-                                            "person": current_person,
-                                            "family": current_person.family,
-                                            "email_extra_info": email_info,
-                                        }
                                         invitation.save()
-                                        if current_person.email and (
-                                            current_person.email
-                                            != current_person.family.email
-                                        ):
-                                            # If invited has own email, also send to that.
-                                            template.makeEmail(
-                                                [current_person, current_person.family],
-                                                mail_context,
-                                                True,
-                                            )
-                                        else:
-                                            # otherwise use only family
-                                            template.makeEmail(
-                                                current_person.family,
-                                                mail_context,
-                                                True,
-                                            )
                                         persons_invited.append(current_person.name)
 
                         except Exception as E:
