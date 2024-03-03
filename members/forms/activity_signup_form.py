@@ -4,7 +4,6 @@ from crispy_forms.layout import Layout, Fieldset, Submit, Field, HTML, Div
 from crispy_forms.bootstrap import FormActions
 
 from members.models.activityparticipant import ActivityParticipant
-from members.models.payment import Payment
 
 
 class ActivitySignupForm(forms.Form):
