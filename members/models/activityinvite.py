@@ -74,7 +74,10 @@ class ActivityInvite(models.Model):
             )
 
         # Make sure price note is filled if there is a special price
-        if self.price_in_dkk is not None and self.price_note == "":
+        if self.price_in_dkk is None:
+            self.price_in_dkk = self.activity.price_in_dkk
+
+        if self.price_in_dkk != self.activity.price_in_dkk and self.price_note == "":
             raise ValidationError(
                 "Du skal angive en begrundelse for den særlige pris for denne deltager. Noten er ikke synlig for deltageren."
             )

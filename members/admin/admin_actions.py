@@ -64,11 +64,13 @@ class AdminActions(admin.ModelAdmin):
             expire = forms.DateField(
                 label="Udløber",
                 widget=AdminDateWidget(),
-                initial=timezone.now() + timedelta(days=30 * 3),
+                initial=timezone.now() + timedelta(days=14),
             )
             email_text = forms.CharField(
                 label="Email ekstra info", widget=forms.Textarea, required=False
             )
+            special_price_in_dkk = forms.DecimalField(label="Særpris", max_digits=10, decimal_places=2, required=False)
+            special_price_note = forms.CharField(label="Note om særpris", widget=forms.Textarea, required=False)
 
         # Lookup all the selected persons - to show confirmation list
         # Check if it's called from Waiting List
@@ -106,6 +108,33 @@ class AdminActions(admin.ModelAdmin):
                 activity = Activity.objects.get(
                     pk=mass_invitation_form.cleaned_data["activity"]
                 )
+
+                if mass_invitation_form.cleaned_data["special_price_in_dkk"] is None:
+                    special_price_in_dkk = activity.price_in_dkk
+                else:
+                    special_price_in_dkk = mass_invitation_form.cleaned_data["special_price_in_dkk"]
+
+                if special_price_in_dkk != activity.price_in_dkk and mass_invitation_form.cleaned_data["special_price_note"] == "":
+                    messages.error(
+                        request,
+                        "Fejl - ingen personer blev inviteret! Du skal angive en begrundelse for den særlige pris. Noten er ikke synlig for deltageren."
+                    )
+                    return
+
+                min_amount = 0
+
+                if activity.activitytype.id == "FORENINGSMEDLEMSKAB":
+                    min_amount = 75
+
+                if activity.activitytype.id == "FORLØB":
+                    min_amount = 100
+
+                if special_price_in_dkk is not None and special_price_in_dkk < min_amount:
+                    messages.error(
+                        request,
+                        f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
+                    )
+                    return
 
                 # validate activity belongs to user and matches selected department
                 if (
@@ -192,6 +221,8 @@ class AdminActions(admin.ModelAdmin):
                                             extra_email_info=mass_invitation_form.cleaned_data[
                                                 "email_text"
                                             ],
+                                            price_in_dkk=special_price_in_dkk,
+                                            price_note=mass_invitation_form.cleaned_data["special_price_note"],
                                         )
                                         invitation.save()
                                         persons_invited.append(current_person.name)

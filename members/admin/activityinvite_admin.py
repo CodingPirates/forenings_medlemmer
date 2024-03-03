@@ -123,21 +123,26 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         verbose_name = "Invitation"
         verbose_name_plural = "Invitationer"
 
+    # @mhewel can you please explain why we are overwriting the form with getting the default form? Essentially changing nothing
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj=obj, change=change, **kwargs)
         return form
 
     list_display = (
-        "activity_department_union_link",
-        "activity_department_link",
-        "activity_link",
+        "pk",
         "person_link",
+        "activity_link",
         "person_age_years",
         "person_zipcode",
         "invite_dtm",
         "expire_dtm",
         "rejected_at",
+        "price_in_dkk",
+        "price_note",
+        "extra_email_info",
         "participating",
+        "activity_department_union_link",
+        "activity_department_link",
     )
     list_filter = (
         ActivityInviteUnionListFilter,
@@ -156,7 +161,6 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     search_help_text = mark_safe(
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
-    list_display_links = None
     form = ActivityInviteAdminForm
 
     # Only show invitation to own activities
