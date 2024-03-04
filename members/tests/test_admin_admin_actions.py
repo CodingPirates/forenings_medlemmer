@@ -151,7 +151,7 @@ class TestAdminActions(TestCase):
         return request
 
     # test for person who is within age range for activity in future
-    def skip_test_invite_many_to_activity_starting_in_two_days(self):
+    def test_invite_many_to_activity_starting_in_two_days(self):
         request = self.create_mock_request_object(
             activity=self.activity_starting_in_two_days
         )
