@@ -102,6 +102,11 @@ def ActivitySignup(request, activity_id, person_id=None):
         view_only_mode = True  # activity full
         signup_closed = True
 
+    if invitation is not None:
+        price = invitation.price_in_dkk
+    else:
+        price = activity.price_in_dkk
+
     if request.method == "POST":
         if view_only_mode:
             return HttpResponse(
@@ -151,27 +156,25 @@ def ActivitySignup(request, activity_id, person_id=None):
             return_link_url = f'{reverse("activities")}#tilmeldte-aktiviteter'
 
             # Make payment if activity costs
-            if activity.price_in_dkk is not None and activity.price_in_dkk > 0:
-                # using creditcard ?
-                if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
-                    payment = Payment(
-                        payment_type=Payment.CREDITCARD,
-                        activity=activity,
-                        activityparticipant=participant,
-                        person=person,
-                        family=family,
-                        body_text=timezone.now().strftime("%Y-%m-%d")
-                        + " Betaling for "
-                        + activity.name
-                        + " på "
-                        + activity.department.name,
-                        amount_ore=int(activity.price_in_dkk * 100),
-                    )
-                    payment.save()
+            if price is not None and price > 0:
+                payment = Payment(
+                    payment_type=Payment.CREDITCARD,
+                    activity=activity,
+                    activityparticipant=participant,
+                    person=person,
+                    family=family,
+                    body_text=timezone.now().strftime("%Y-%m-%d")
+                    + " Betaling for "
+                    + activity.name
+                    + " på "
+                    + activity.department.name,
+                    amount_ore=int(price * 100),
+                )
+                payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(
-                        return_url=settings.BASE_URL + return_link_url
-                    )
+                return_link_url = payment.get_quickpaytransaction().get_link_url(
+                    return_url=settings.BASE_URL + return_link_url
+                )
 
             # expire invitation
             if invitation:
@@ -201,7 +204,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         "activity": activity,
         "person": person,
         "invitation": invitation,
-        "price": activity.price_in_dkk,
+        "price": price,
         "seats_left": activity.seats_left(),
         "signupform": signup_form,
         "signup_closed": signup_closed,
