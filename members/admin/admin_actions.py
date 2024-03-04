@@ -199,10 +199,14 @@ class AdminActions(admin.ModelAdmin):
                                             current_person.name
                                         )
 
-                                    # Check for age constraint: too young ?
+                                    # Check for age constraint: too young ? (check both at activity start and today)
                                     elif (
                                         current_person.birthday
                                         > activity.start_date
+                                        - relativedelta(years=activity.min_age)
+                                    ) and (
+                                        current_person.birthday
+                                        > timezone.now().date()
                                         - relativedelta(years=activity.min_age)
                                     ):
                                         persons_too_young.append(current_person.name)
