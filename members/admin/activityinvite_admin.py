@@ -123,11 +123,6 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         verbose_name = "Invitation"
         verbose_name_plural = "Invitationer"
 
-    # @mhewel can you please explain why we are overwriting the form with getting the default form? Essentially changing nothing
-    def get_form(self, request, obj=None, change=False, **kwargs):
-        form = super().get_form(request, obj=obj, change=change, **kwargs)
-        return form
-
     list_display = (
         "pk",
         "person_link",
