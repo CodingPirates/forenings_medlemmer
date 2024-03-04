@@ -11,6 +11,10 @@ class Activity(models.Model):
         verbose_name_plural = "Aktiviteter"
         ordering = ["department__address__zipcode", "start_date"]
 
+    MEMBER_AMOUNT = 75
+    ACTIVITY_AMOUNT = 100
+    NO_MINIMUM = 0
+
     department = models.ForeignKey(
         "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
     )
@@ -95,15 +99,20 @@ class Activity(models.Model):
 
     participants.short_description = "Deltagere"
 
+    def get_min_amount(self, activitytype):
+        min_amount = self.NO_MINIMUM
+
+        if activitytype == "FORENINGSMEDLEMSKAB":
+            min_amount = self.MEMBER_AMOUNT
+
+        if activitytype == "FORLØB":
+            min_amount = self.ACTIVITY_AMOUNT
+
+        return min_amount
+
     def clean(self):
         errors = {}
-        min_amount = 0
-
-        if self.activitytype.id == "FORENINGSMEDLEMSKAB":
-            min_amount = 75
-
-        if self.activitytype.id == "FORLØB":
-            min_amount = 100
+        min_amount = self.get_min_amount(self.activitytype.id)
 
         if self.price_in_dkk < min_amount:
             errors[

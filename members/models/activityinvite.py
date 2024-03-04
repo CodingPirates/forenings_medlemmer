@@ -83,13 +83,7 @@ class ActivityInvite(models.Model):
             )
 
         errors = {}
-        min_amount = 0
-
-        if self.activity.activitytype.id == "FORENINGSMEDLEMSKAB":
-            min_amount = 75
-
-        if self.activity.activitytype.id == "FORLØB":
-            min_amount = 100
+        min_amount = self.activity.get_min_amount(self.activity.activitytype.id)
 
         if self.price_in_dkk is not None and self.price_in_dkk < min_amount:
             errors[

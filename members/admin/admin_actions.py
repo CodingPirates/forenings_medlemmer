@@ -130,13 +130,7 @@ class AdminActions(admin.ModelAdmin):
                     )
                     return
 
-                min_amount = 0
-
-                if activity.activitytype.id == "FORENINGSMEDLEMSKAB":
-                    min_amount = 75
-
-                if activity.activitytype.id == "FORLØB":
-                    min_amount = 100
+                min_amount = activity.get_min_amount(activity.activitytype.id)
 
                 if (
                     special_price_in_dkk is not None
