@@ -73,10 +73,6 @@ class ActivityInvite(models.Model):
                 + " år"
             )
 
-        # Make sure price note is filled if there is a special price
-        if self.price_in_dkk is None:
-            self.price_in_dkk = self.activity.price_in_dkk
-
         if self.price_in_dkk != self.activity.price_in_dkk and self.price_note == "":
             raise ValidationError(
                 "Du skal angive en begrundelse for den særlige pris for denne deltager. Noten er ikke synlig for deltageren."
@@ -94,6 +90,10 @@ class ActivityInvite(models.Model):
             raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
+        # Make sure price note is filled if there is a special price
+        if self.price_in_dkk is None:
+            self.price_in_dkk = self.activity.price_in_dkk
+
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
 
