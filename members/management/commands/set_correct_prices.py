@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from members.models.activityinvite import ActivityInvite
 
+
 class Command(BaseCommand):
     help = "This command populates the price in dkk for the activity invites based on the activities if no note has been made. This is due to wrong code"
 
