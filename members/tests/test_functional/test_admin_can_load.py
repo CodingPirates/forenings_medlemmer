@@ -2,7 +2,7 @@ import socket
 import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from django.contrib.auth.models import User
@@ -24,8 +24,12 @@ class SignUpTest(StaticLiveServerTestCase):
         self.admin = User.objects.create_superuser(
             self.name, "admin@example.com", self.password
         )
+
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=chrome_options,
         )
 
     def tearDown(self):
@@ -40,42 +44,43 @@ class SignUpTest(StaticLiveServerTestCase):
         self.assertIn("admin", self.browser.title)
 
         # Enter login details
-        field = self.browser.find_element_by_name("username")
+        field = self.browser.find_element(By.NAME, "username")
         field.send_keys(self.name)
 
-        field = self.browser.find_element_by_name("password")
+        field = self.browser.find_element(By.NAME, "password")
         field.send_keys(self.password)
 
         # Submit form
-        self.browser.find_element_by_xpath("//input[@type='submit']").click()
+        self.browser.find_element(By.XPATH, "//input[@type='submit']").click()
 
         # Check that we are logged in with welcome message in top right
         self.assertGreater(
             len(
-                self.browser.find_elements_by_xpath(
-                    "//*[text()[contains(.,'Velkommen')]]"
+                self.browser.find_elements(
+                    By.XPATH, "//*[text()[contains(.,'Velkommen')]]"
                 )
             ),
             0,
         )
 
         # Check that person admin can load
-        elment = self.browser.find_element_by_link_text("Personer")
+        elment = self.browser.find_element(By.LINK_TEXT, "Personer")
         self.browser.get(elment.get_attribute("href"))
+
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("person"))
         except Exception:
             self.fail("Could not reach person admin site")
 
         # GO to person change page
-        elment = self.browser.find_element_by_link_text(str(self.person))
-        self.browser.get(elment.get_attribute("href"))
+        element = self.browser.find_element(By.LINK_TEXT, str(self.person))
+        self.browser.get(element.get_attribute("href"))
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("change"))
         except Exception:
             self.fail("Could not reach person admin site")
 
         self.assertEqual(
-            self.browser.find_element_by_name("email").get_attribute("value"),
+            self.browser.find_element(By.NAME, "email").get_attribute("value"),
             self.person.email,
         )

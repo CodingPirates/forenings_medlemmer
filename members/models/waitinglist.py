@@ -6,16 +6,18 @@ from django.utils import timezone
 
 class WaitingList(models.Model):
     class Meta:
-        verbose_name = "På venteliste"
-        verbose_name_plural = "På ventelister"
+        verbose_name = "Venteliste"
+        verbose_name_plural = "Ventelister"
         ordering = ["on_waiting_list_since"]
 
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
+    department = models.ForeignKey(
+        "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
+    )
     on_waiting_list_since = models.DateTimeField(
         "Venteliste position", blank=False, null=False
     )
-    added_dtm = models.DateTimeField(
+    added_at = models.DateTimeField(
         "Tilføjet", blank=False, null=False, default=timezone.now
     )
 
@@ -29,11 +31,12 @@ class WaitingList(models.Model):
         )
 
     number_on_waiting_list.short_description = "Position på venteliste"
+    number_on_waiting_list.admin_order_field = "on_waiting_list_since"
 
     def save(self, *args, **kwargs):
         """On creation set on_waiting_list"""
         if not self.id:
-            self.on_waiting_list_since = self.person.added
+            self.on_waiting_list_since = self.person.added_at
         return super(WaitingList, self).save(*args, **kwargs)
 
     @staticmethod
@@ -42,6 +45,16 @@ class WaitingList(models.Model):
         waitlists = [
             (waitinglist.department, waitinglist.number_on_waiting_list())
             for waitinglist in WaitingList.objects.filter(person=child)
+        ]
+        waitlists.sort(key=lambda tup: tup[1])
+        return waitlists
+
+    @staticmethod
+    def get_by_person(person):
+        """Returns a list of (department, waitinglist_tuple) tuples"""
+        waitlists = [
+            (waitinglist.department, waitinglist.number_on_waiting_list())
+            for waitinglist in WaitingList.objects.filter(person=person)
         ]
         waitlists.sort(key=lambda tup: tup[1])
         return waitlists

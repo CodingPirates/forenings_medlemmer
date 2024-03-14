@@ -10,8 +10,10 @@ class AdminUserInformation(models.Model):
         return self.user.username + " admin data"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    departments = models.ManyToManyField(Department, blank=True)
-    unions = models.ManyToManyField(Union, blank=True)
+    departments = models.ManyToManyField(
+        Department, blank=True, verbose_name="Afdelinger"
+    )
+    unions = models.ManyToManyField(Union, blank=True, verbose_name="Foreninger")
 
     @staticmethod
     def get_departments_admin(user):
@@ -19,3 +21,10 @@ class AdminUserInformation(models.Model):
             return Department.objects.all()
         else:
             return Department.objects.filter(adminuserinformation__user=user)
+
+    @staticmethod
+    def get_unions_admin(user):
+        if user.is_superuser:
+            return Union.objects.all()
+        else:
+            return Union.objects.filter(adminuserinformation__user=user)

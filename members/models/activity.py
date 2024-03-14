@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -10,8 +11,17 @@ class Activity(models.Model):
         verbose_name_plural = "Aktiviteter"
         ordering = ["department__address__zipcode", "start_date"]
 
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
-    union = models.ForeignKey("Union", blank=True, on_delete=models.CASCADE, default=1)
+    department = models.ForeignKey(
+        "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
+    )
+    # Please note: Activity.Union is used as a hack for the Foreningsmedlemskab / Støttemedlemskab
+    # It's not used for anything else
+    union = models.ForeignKey(
+        "Union",
+        on_delete=models.CASCADE,
+        default=1,
+        verbose_name="Forening",
+    )
     name = models.CharField("Navn", max_length=200)
     activitytype = models.ForeignKey(
         "ActivityType",
@@ -41,8 +51,10 @@ class Activity(models.Model):
     signup_closing = models.DateField("Tilmelding lukker", null=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
-    help_price = "På prisen for aktiviteten fratrækker vi automatisk 100 kr."
-    help_price += " pr. barn hvis det er en sæsonaktivitet."
+    help_price = (
+        "Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr. "
+    )
+    help_price += "til Coding Pirates Denmark pr. barn."
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=500, help_text=help_price
     )
@@ -50,7 +62,7 @@ class Activity(models.Model):
     max_age = models.PositiveIntegerField("Maximum Alder", default=17)
     min_age = models.PositiveIntegerField("Minimum Alder", default=7)
     help_temp = "Bestemmer om personerne bliver til medlemmer i forhold til DUF."
-    help_temp += " De fleste aktiviteter er sæsoner og medlemsberettiget. Hvis "
+    help_temp += " De fleste aktiviteter er forløb/sæsoner og medlemsberettiget. Hvis "
     help_temp += "du er i tvivl, så spørg på Slack i #medlemsssystem-support."
     member_justified = models.BooleanField(
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
@@ -64,6 +76,9 @@ class Activity(models.Model):
     def __str__(self):
         return self.department.name + ", " + self.name
 
+    def filterinfo(self):
+        return self.department.name + ": " + self.name
+
     def is_season(self):
         return (self.end_date - self.start_date).days > 30
 
@@ -72,3 +87,28 @@ class Activity(models.Model):
 
     def seats_left(self):
         return self.max_participants - self.activityparticipant_set.count()
+
+    seats_left.short_description = "Ledige pladser"
+
+    def participants(self):
+        return self.activityparticipant_set.count()
+
+    participants.short_description = "Deltagere"
+
+    def clean(self):
+        errors = {}
+        min_amount = 0
+
+        if self.activitytype.id == "FORENINGSMEDLEMSKAB":
+            min_amount = 75
+
+        if self.activitytype.id == "FORLØB":
+            min_amount = 100
+
+        if self.price_in_dkk < min_amount:
+            errors[
+                "price_in_dkk"
+            ] = f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
+
+        if errors:
+            raise ValidationError(errors)

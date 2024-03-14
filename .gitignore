@@ -5,8 +5,14 @@ staticfiles
 test-results
 .coverage
 .sass-cache/
+.vscode/
 public_data.zip
 test-screens
 /node_modules
 members.db
 *.bak
+.vs/
+
+# MacOS temp file
+.DS_Store
+live_data_dump

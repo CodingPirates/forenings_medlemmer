@@ -3,10 +3,10 @@ import socket
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.by import By
 
 from members.tests.factories import (
-    MemberFactory,
+    PersonFactory,
 )
 
 """
@@ -19,10 +19,13 @@ class AccountLoginTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        self.member = MemberFactory.create()
+        self.person = PersonFactory.create()
 
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=chrome_options,
         )
 
     def tearDown(self):
@@ -37,20 +40,20 @@ class AccountLoginTest(StaticLiveServerTestCase):
             "Log ind",
             [
                 e.text
-                for e in self.browser.find_elements_by_xpath(
-                    "//body/descendant-or-self::*"
+                for e in self.browser.find_elements(
+                    By.XPATH, "//body/descendant-or-self::*"
                 )
             ],
         )
-        self.browser.find_element_by_link_text("Log ind")
+        self.browser.find_elements(By.LINK_TEXT, "Log ind")
         self.assertIn(
             "Opret bruger",
             [
                 e.text
-                for e in self.browser.find_elements_by_xpath(
-                    "//body/descendant-or-self::*"
+                for e in self.browser.find_elements(
+                    By.XPATH, "//body/descendant-or-self::*"
                 )
             ],
         )
-        self.browser.find_element_by_link_text("Tilmeld barn")
-        self.browser.find_element_by_link_text("Bliv frivillig")
+        self.browser.find_elements(By.LINK_TEXT, "Tilmeldt barn")
+        self.browser.find_elements(By.LINK_TEXT, "Bliv frivillig")

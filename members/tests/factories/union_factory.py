@@ -10,7 +10,7 @@ class UnionFactory(DjangoModelFactory):
     class Meta:
         model = Union
 
-    name = factory.LazyAttribute(lambda u: "Coding Pirates {}".format(u.address.city))
+    name = factory.LazyAttribute(lambda u: "{}".format(u.address.city))
     chairman_old = Faker("name")
     chairman_email_old = Faker("email")
     second_chair_old = Faker("name")
@@ -21,7 +21,8 @@ class UnionFactory(DjangoModelFactory):
     secretary_email_old = Faker("email")
     union_email = Faker("email")
     statues = Faker("url")
-    founded = Faker("date_time", tzinfo=TIMEZONE)
+    founded_at = Faker("date_time", tzinfo=TIMEZONE)
+    closed_at = Faker("date_time", tzinfo=TIMEZONE)
     address = SubFactory(AddressFactory)
     board_members_old = Faker("text")
     bank_main_org = Faker("boolean")

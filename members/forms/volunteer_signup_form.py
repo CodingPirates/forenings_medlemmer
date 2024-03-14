@@ -6,6 +6,8 @@ from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 from members.models.department import Department
 from members.models.person import Person
 
+from django.contrib.auth.password_validation import validate_password
+
 
 class vol_signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -31,6 +33,14 @@ class vol_signupForm(forms.Form):
                     Div(Field("volunteer_email"), css_class="col-md-3"),
                     Div(Field("volunteer_phone"), css_class="col-md-3"),
                     Div(Field("volunteer_department"), css_class="col-md-3"),
+                    css_class="row",
+                ),
+            ),
+            Fieldset(
+                "Adgangskode",
+                Div(
+                    Div(Field("password1"), css_class="col"),
+                    Div(Field("password2"), css_class="col"),
                     css_class="row",
                 ),
             ),
@@ -90,17 +100,31 @@ class vol_signupForm(forms.Form):
     volunteer_email = forms.EmailField(label="Email", required=True)
     volunteer_phone = forms.CharField(label="Telefon", required=True, max_length=50)
     volunteer_birthday = forms.DateField(
-        label="Fødselsdato (dd-mm-åååå)",
+        label="Fødselsdato",
         required=True,
         input_formats=(settings.DATE_INPUT_FORMATS),
         error_messages={"invalid": "Indtast en gyldig dato."},
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     volunteer_department = forms.ModelChoiceField(
-        queryset=Department.objects.filter(closed_dtm__isnull=True),
+        queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
         required=True,
         label="Afdeling",
         empty_label="-",
+    )
+
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Adgangskode",
+        required=True,
+        max_length=20,
+        validators=[validate_password],
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Gentag adgangskode",
+        required=True,
+        max_length=20,
     )
 
     search_address = forms.CharField(

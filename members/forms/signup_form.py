@@ -5,9 +5,16 @@ from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 
 from members.models.person import Person
 
+from django.contrib.auth.password_validation import validate_password
+
 
 class signupForm(forms.Form):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, next_url=None, *args, **kwargs):
+        """
+        Args:
+            next_url (str): Optional url that user will be redirected to after account creation and login.
+                            Note: The user still needs to login, but will then be redirected to this url.
+        """
         super(signupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
@@ -15,6 +22,7 @@ class signupForm(forms.Form):
         self.helper.html5_required = True
         self.helper.layout = Layout(
             Hidden("form_id", "signup", id="id_form_id"),
+            Hidden("next", next_url if next_url is not None else "", id="id_next"),
             Fieldset(
                 "Barnets oplysninger",
                 Div(
@@ -44,6 +52,14 @@ class signupForm(forms.Form):
                     ),
                     Div(Field("parent_email"), css_class="col-md-4"),
                     Div(Field("parent_phone"), css_class="col-md-4"),
+                    css_class="row",
+                ),
+            ),
+            Fieldset(
+                "Adgangskode",
+                Div(
+                    Div(Field("password1"), css_class="col"),
+                    Div(Field("password2"), css_class="col"),
                     css_class="row",
                 ),
             ),
@@ -123,6 +139,20 @@ class signupForm(forms.Form):
         input_formats=(settings.DATE_INPUT_FORMATS),
         error_messages={"invalid": "Indtast en gyldig dato."},
         widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Adgangskode",
+        required=True,
+        max_length=20,
+        validators=[validate_password],
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Gentag adgangskode",
+        required=True,
+        max_length=20,
     )
 
     search_address = forms.CharField(

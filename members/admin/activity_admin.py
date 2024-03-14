@@ -1,23 +1,178 @@
 from django.contrib import admin
-from members.models import Department
+from django.urls import reverse
+from django.utils.safestring import mark_safe
+from django.utils.html import escape
+
+from members.models import (
+    ActivityParticipant,
+    AdminUserInformation,
+    Department,
+    Union,
+)
+
+
+class ActivityParticipantInline(admin.TabularInline):
+    model = ActivityParticipant
+    extra = 0
+    fields = (
+        "person",
+        "note",
+        "photo_permission",
+        "payment_info_html",
+    )
+    readonly_fields = fields
+    can_delete = False
+
+    def get_queryset(self, request):
+        return ActivityParticipant.objects.all().order_by("person")
+
+
+class ActivityUnionListFilter(admin.SimpleListFilter):
+    title = "Lokalforeninger"
+    parameter_name = "department__union"
+
+    def lookups(self, request, model_admin):
+        unions = []
+        for union1 in (
+            Union.objects.filter(
+                department__union__in=AdminUserInformation.get_unions_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            unions.append((str(union1.pk), str(union1.name)))
+        return unions
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(department__union__pk=self.value())
+
+
+class ActivityDepartmentListFilter(admin.SimpleListFilter):
+    title = "Afdelinger"
+    parameter_name = "department"
+
+    def lookups(self, request, model_admin):
+        departments = []
+        for department1 in (
+            Department.objects.filter(
+                activity__department__in=AdminUserInformation.get_departments_admin(
+                    request.user
+                )
+            )
+            .order_by("name")
+            .distinct()
+        ):
+            departments.append((str(department1.pk), str(department1)))
+        return departments
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(department__pk=self.value())
 
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "department",
+        "union_link",
+        "department_link",
         "activitytype",
-        "start_date",
+        "start_end",
         "open_invite",
         "price_in_dkk",
-        "max_participants",
+        "seats_total",
+        "seats_used",
+        "seats_free",
+        "age",
     )
+
     date_hierarchy = "start_date"
-    search_fields = ("name", "department__name")
+    search_fields = (
+        "name",
+        "department__union__name",
+        "department__name",
+        "description",
+    )
+    readonly_fields = ("seats_left", "participants")
     list_per_page = 20
-    raw_id_fields = ("department",)
-    list_filter = ("department", "open_invite", "activitytype")
+    raw_id_fields = (
+        "union",
+        "department",
+    )
+    list_filter = (
+        ActivityUnionListFilter,
+        ActivityDepartmentListFilter,
+        "open_invite",
+        "activitytype",
+    )
     save_as = True
+
+    class Media:
+        # Remove title for each record
+        # see : https://stackoverflow.com/questions/41376406/remove-title-from-tabularinline-in-admin
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
+    inlines = [ActivityParticipantInline]
+
+    def start_end(self, obj):
+        return str(obj.start_date) + " - " + str(obj.end_date)
+
+    start_end.short_description = "Periode"
+    start_end.admin_order_field = "start_date"
+
+    def age(self, obj):
+        return str(obj.min_age) + " - " + str(obj.max_age)
+
+    age.short_description = "Alder"
+    age.admin_order_field = "min_age"
+
+    def union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.department.union_id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.union.name))
+        return mark_safe(link)
+
+    union_link.short_description = "Forening"
+    union_link.admin_order_field = "department__union__name"
+
+    def department_link(self, item):
+        url = reverse("admin:members_department_change", args=[item.department_id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.name))
+        return mark_safe(link)
+
+    department_link.short_description = "Afdeling"
+    department_link.admin_order_field = "department__name"
+
+    def seats_total(self, obj):
+        return str(obj.max_participants)
+
+    seats_total.short_description = "Total"
+    seats_total.admin_order_field = "max_participants"
+
+    def seats_used(self, obj):
+        return str(obj.activityparticipant_set.count())
+
+    seats_used.short_description = "Besat"
+
+    def seats_free(self, obj):
+        return str(obj.max_participants - obj.activityparticipant_set.count())
+
+    seats_free.short_description = "Ubesat"
+
+    def activity_membership_union_link(self, obj):
+        if obj.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
+            url = reverse("admin:members_union_change", args=[obj.union_id])
+            link = '<a href="%s">%s</a>' % (url, escape(obj.union.name))
+            return mark_safe(link)
+        else:
+            return ""
+
+    activity_membership_union_link.short_description = "Forening for medlemskab"
 
     # Only view activities on own department
     def get_queryset(self, request):
@@ -37,19 +192,29 @@ class ActivityAdmin(admin.ModelAdmin):
             db_field, request, **kwargs
         )
 
-    fieldsets = (
-        ("Afdeling", {"fields": ("department",)}),
+    fieldsets = [
+        (
+            "Afdeling",
+            {
+                "description": "<p>Du kan ændre afdeling for aktiviteten ved at skrive afdelings-id, eller tryk på søg-ikonet og i det nye vindue skal du finde afdelingen, for derefter at trykke på ID i første kolonne.</p>",
+                "fields": ("department",),
+            },
+        ),
         (
             "Aktivitet",
             {
                 "description": "<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårssæson 2018</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>",
                 "fields": (
-                    "name",
-                    "activitytype",
+                    (
+                        "name",
+                        "activitytype",
+                    ),
                     "open_hours",
                     "description",
-                    "start_date",
-                    "end_date",
+                    (
+                        "start_date",
+                        "end_date",
+                    ),
                     "member_justified",
                 ),
             },
@@ -59,31 +224,45 @@ class ActivityAdmin(admin.ModelAdmin):
             {
                 "description": "<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer (f.eks. et gamejam der foregår et andet sted).</p>",
                 "fields": (
-                    "responsible_name",
-                    "responsible_contact",
-                    "streetname",
-                    "housenumber",
-                    "floor",
-                    "door",
-                    "zipcode",
-                    "city",
-                    "placename",
+                    (
+                        "responsible_name",
+                        "responsible_contact",
+                    ),
+                    (
+                        "streetname",
+                        "housenumber",
+                        "floor",
+                        "door",
+                    ),
+                    (
+                        "zipcode",
+                        "city",
+                        "placename",
+                    ),
                 ),
             },
         ),
         (
             "Tilmeldingsdetaljer",
             {
-                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til arrangementer og klubaften-sæsoner i områder, hvor der ikke er nogen venteliste. Alle arrangementer med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til aktiviteter og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. </p><p>Alle aktiviteter med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
                 "fields": (
                     "instructions",
-                    "open_invite",
+                    (
+                        "signup_closing",
+                        "open_invite",
+                    ),
                     "price_in_dkk",
-                    "signup_closing",
-                    "max_participants",
-                    "min_age",
-                    "max_age",
+                    (
+                        "max_participants",
+                        "participants",
+                        "seats_left",
+                    ),
+                    (
+                        "min_age",
+                        "max_age",
+                    ),
                 ),
             },
         ),
-    )
+    ]

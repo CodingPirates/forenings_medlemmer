@@ -352,6 +352,17 @@ label[for=id_password] {
   text-align: left;
 }
 
+#input-search-text {
+  background-image: url("/static/searchicon.png");
+  background-position: 10px 12px;
+  background-repeat: no-repeat;
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 3px solid #ddd;
+  margin-bottom: 12px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -371,7 +382,6 @@ table thead > tr > th {
 }
 table td {
   padding: 10px;
-  word-break: break-all;
 }
 @media only screen and (max-width: 667px) {
   table td,

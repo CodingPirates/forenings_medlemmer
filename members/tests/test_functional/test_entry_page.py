@@ -3,10 +3,10 @@ import socket
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.by import By
 
 from members.tests.factories import (
-    MemberFactory,
+    PersonFactory,
 )
 from members.tests.test_functional.functional_helpers import log_in
 
@@ -21,9 +21,12 @@ class EntryPageTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        self.member = MemberFactory.create()
+        self.person = PersonFactory.create()
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=chrome_options,
         )
 
     def tearDown(self):
@@ -32,49 +35,48 @@ class EntryPageTest(StaticLiveServerTestCase):
         self.browser.save_screenshot("test-screens/activities_list_final.png")
         self.browser.quit()
 
-    def test_entry_page_as_member(self):
+    def test_entry_page_as_person(self):
         # Login
-        log_in(self, self.member.person)
+        log_in(self, self.person)
 
-        self.browser.find_element_by_link_text("Familie")
-        self.browser.find_element_by_link_text("Log ud")
+        self.browser.find_element(By.LINK_TEXT, "Familie")
+        self.browser.find_element(By.LINK_TEXT, "Log ud")
 
     def test_entry_page(self):
         self.browser.get(f"{self.live_server_url}")
 
-        self.browser.find_element_by_link_text("Log ind")
-        self.browser.find_element_by_link_text("Tilmeld barn")
-        self.browser.find_element_by_link_text("Bliv frivillig")
-
-        self.browser.find_element_by_link_text("Afdelinger")
-        self.browser.find_element_by_link_text("Arrangementer")
-        self.browser.find_element_by_link_text("Medlemskaber")
-        self.browser.find_element_by_link_text("Støttemedlemskaber")
+        self.browser.find_element(By.LINK_TEXT, "Log ind")
+        self.browser.find_element(By.LINK_TEXT, "Tilmeld barn")
+        self.browser.find_element(By.LINK_TEXT, "Bliv frivillig")
+        self.browser.find_element(By.LINK_TEXT, "Afdelinger")
+        self.browser.find_element(By.LINK_TEXT, "Aktiviteter")
+        self.browser.find_element(By.LINK_TEXT, "Medlemskaber")
+        self.browser.find_element(By.LINK_TEXT, "Støttemedlemskaber")
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Arrangementer"),
+                self.browser.find_elements(By.LINK_TEXT, "Aktiviteter"),
             )
         )
         self.assertEqual(links[0], links[1])
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Afdelinger"),
+                self.browser.find_elements(By.LINK_TEXT, "Afdelinger"),
             )
         )
         self.assertEqual(links[0], links[1])
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Medlemskaber"),
+                self.browser.find_elements(By.LINK_TEXT, "Medlemskaber"),
             )
         )
         self.assertEqual(links[0], links[1])
         links = list(
             map(
                 lambda e: e.get_attribute("href"),
-                self.browser.find_elements_by_link_text("Støttemedlemskaber"),
+                self.browser.find_elements(By.LINK_TEXT, "Støttemedlemskaber"),
             )
         )
         self.assertEqual(links[0], links[1])

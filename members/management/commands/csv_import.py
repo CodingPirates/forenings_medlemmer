@@ -55,7 +55,6 @@ class Command(BaseCommand):
     args = "csvfile"
 
     def handle(self, *args, **options):
-
         if len(args) != 1:
             self.stdout.write("Invalid number of arguments")
             exit()
@@ -91,7 +90,6 @@ class Command(BaseCommand):
         datetimeobject = datetime.datetime.today()
 
         for entry in entries:
-
             email = entry[options["email_column"]].lower()
             name = entry[options["name_column"]].title().strip()
 
@@ -131,14 +129,14 @@ class Command(BaseCommand):
                 # Ved ikke hvorfor den ikke ser person
 
                 # if current waiting list is older, replace timestamp
-                if date < person.added:
-                    person.added = date
+                if date < person.added_at:
+                    person.added_at = date
                     person.save()
 
             except ObjectDoesNotExist:
                 # create the person
                 person = person(
-                    name=name, membertype=person.CHILD, family=family, added=date
+                    name=name, membertype=person.CHILD, family=family, added_at=date
                 )
                 person.save()
             except person.MultipleObjectsReturned:

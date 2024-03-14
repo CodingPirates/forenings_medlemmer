@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.utils import timezone
+
 from members.models import Activity, AdminUserInformation
 
 
 class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
     title = "Deltager på (år " + str(timezone.now().year) + ")"
-    parameter_name = "participant_list_active"
+    parameter_name = "participant_list_current_year"
 
     def lookups(self, request, _model_admin):
         return [
@@ -19,18 +20,18 @@ class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "none":
-            return queryset.filter(member__activityparticipant__isnull=True)
+            return queryset.filter(activityparticipant__isnull=True)
         elif self.value() == "any":
-            return queryset.exclude(member__activityparticipant__isnull=True)
+            return queryset.exclude(activityparticipant__isnull=True)
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(member__activityparticipant__activity=self.value())
+            return queryset.filter(activityparticipant__activity=self.value())
 
 
 class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
     title = "Deltager på (år " + str(timezone.now().year - 1) + ")"
-    parameter_name = "participant_list_active"
+    parameter_name = "participant_list_last_year"
 
     def lookups(self, request, _model_admin):
         return [
@@ -44,13 +45,13 @@ class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "none":
-            return queryset.filter(member__activityparticipant__isnull=True)
+            return queryset.filter(activityparticipant__isnull=True)
         elif self.value() == "any":
-            return queryset.exclude(member__activityparticipant__isnull=True)
+            return queryset.exclude(activityparticipant__isnull=True)
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(member__activityparticipant__activity=self.value())
+            return queryset.filter(activityparticipant__activity=self.value())
 
 
 class PersonParticipantActiveListFilter(admin.SimpleListFilter):
@@ -69,13 +70,13 @@ class PersonParticipantActiveListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "none":
-            return queryset.filter(member__activityparticipant__isnull=True)
+            return queryset.filter(activityparticipant__isnull=True)
         elif self.value() == "any":
-            return queryset.exclude(member__activityparticipant__isnull=True)
+            return queryset.exclude(activityparticipant__isnull=True)
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(member__activityparticipant__activity=self.value())
+            return queryset.filter(activityparticipant__activity=self.value())
 
 
 class PersonParticipantListFilter(admin.SimpleListFilter):
@@ -93,13 +94,13 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "none":
-            return queryset.filter(member__activityparticipant__isnull=True)
+            return queryset.filter(activityparticipant__isnull=True)
         elif self.value() == "any":
-            return queryset.exclude(member__activityparticipant__isnull=True)
+            return queryset.exclude(activityparticipant__isnull=True)
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(member__activityparticipant__activity=self.value())
+            return queryset.filter(activityparticipant__activity=self.value())
 
 
 class PersonInvitedListFilter(admin.SimpleListFilter):

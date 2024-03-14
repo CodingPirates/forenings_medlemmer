@@ -17,8 +17,8 @@ def ConfirmFamily(request):
     subscribed_waiting_lists = WaitingList.objects.filter(person__family=family)
 
     if request.method == "POST":
-        """No data recieved - just set confirmed_dtm date to now"""
-        family.confirmed_dtm = timezone.now()
+        """No data recieved - just set confirmed_at date to now"""
+        family.confirmed_at = timezone.now()
         family.save()
         return HttpResponseRedirect(reverse("family_detail"))
     else:

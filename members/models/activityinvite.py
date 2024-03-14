@@ -21,11 +21,13 @@ class ActivityInvite(models.Model):
         verbose_name_plural = "Invitationer"
         unique_together = ("activity", "person")
 
-    activity = models.ForeignKey("Activity", on_delete=models.CASCADE)
+    activity = models.ForeignKey(
+        "Activity", on_delete=models.CASCADE, verbose_name="Aktivitet"
+    )
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
     invite_dtm = models.DateField("Inviteret", default=timezone.now)
     expire_dtm = models.DateField("Udløber", default=_defaultInviteExpiretime)
-    rejected_dtm = models.DateField("Afslået", blank=True, null=True)
+    rejected_at = models.DateField("Afslået", blank=True, null=True)
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
@@ -43,21 +45,6 @@ class ActivityInvite(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             super(ActivityInvite, self).save(*args, **kwargs)
-            template = members.models.emailtemplate.EmailTemplate.objects.get(
-                idname="ACT_INVITE"
-            )
-            context = {
-                "activity": self.activity,
-                "activity_invite": self,
-                "person": self.person,
-                "family": self.person.family,
-            }
-            if self.person.email and (self.person.email != self.person.family.email):
-                # If invited has own email, also send to that.
-                template.makeEmail([self.person, self.person.family], context)
-            else:
-                # otherwise use only family
-                template.makeEmail(self.person.family, context)
             # remove from department waiting list
             if self.activity.is_season():
                 members.models.waitinglist.WaitingList.objects.filter(

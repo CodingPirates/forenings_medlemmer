@@ -4,7 +4,7 @@ import socket
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from factory import Faker
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.by import By
 
 from members.tests.factories import (
     DepartmentFactory,
@@ -27,8 +27,11 @@ class VolunteerTest(StaticLiveServerTestCase):
             name="Lukket afdeling", closed_dtm=Faker("past_datetime")
         )
 
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
-            "http://selenium:4444/wd/hub", DesiredCapabilities.CHROME
+            command_executor="http://selenium:4444/wd/hub",
+            options=chrome_options,
         )
 
     def tearDown(self):
@@ -41,8 +44,8 @@ class VolunteerTest(StaticLiveServerTestCase):
         self.browser.get(f"{self.live_server_url}/volunteer")
         options_texts = [
             e.text
-            for e in self.browser.find_elements_by_xpath(
-                "//*/select[@id='id_volunteer_department']/option"
+            for e in self.browser.find_elements(
+                By.XPATH, "//*/select[@id='id_volunteer_department']/option"
             )
         ]
         self.assertIn(
