@@ -1,9 +1,11 @@
+import codecs
 from django.contrib import admin
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from members.models import Union, Address, Person
+from members.models import Union, Address, Person, Activity
 from django.utils.html import escape
+from django.http import HttpResponse
 
 
 class UnionDepartmentFilter(admin.SimpleListFilter):
@@ -48,6 +50,10 @@ class DepartmentAdmin(admin.ModelAdmin):
         "address__city",
     )
     filter_horizontal = ["department_leaders"]
+
+    actions = [
+        "export_department_info_csv",
+    ]
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
@@ -128,3 +134,102 @@ class DepartmentAdmin(admin.ModelAdmin):
         return mark_safe(link)
 
     waitinglist_count_link.short_description = "Venteliste"
+
+    def export_department_info_csv(self, request, queryset):
+        result_string = """"Forening"; "Afdeling"; "Afdeling-Startdato"; "Afdeling-lukkedato";\
+          "Kaptajn"; "Kaptajn-email"; "Kaptajn-telefon";\
+          "Adresse"; "Post#"; "By"; "Region";\
+          "Dato-sidste-forløb";\
+          "Dato-sidste-arrangement";\
+          "Dato-sidste-foreningsmedlemskab";\
+          "Dato-sidste-støttemedlemskab"\n"""
+
+        # There can be multiple departmentleaders (or even none)
+
+        for d in queryset.order_by("name"):
+            info1 = d.union.name + ";"
+            info1 += d.name + ";"
+            if d.created is not None:
+                info1 += d.created.strftime("%Y-%m-%d")
+            info1 += ";"
+            if d.closed_dtm is not None:
+                info1 += d.closed_dtm.strftime("%Y-%m-%d")
+            info1 += ";"
+            info2 = d.address.streetname
+            if d.address.housenumber != "":
+                info2 += " " + d.address.housenumber
+            if d.address.floor != "" or d.address.door != "":
+                info2 += ", "
+            if d.address.floor != "":
+                info2 += d.address.floor + "."
+            if d.address.door != "":
+                info2 += d.address.door
+            info2 += ";"
+            info2 += d.address.zipcode + ";"
+            info2 += d.address.city + ";"
+            info2 += d.address.region + ";"
+
+            leaders = d.department_leaders.all().order_by("name")
+
+            last_activity = (
+                Activity.objects.all()
+                .filter(department=d, activitytype="FORLØB")
+                .order_by("-start_date")
+                .first()
+            )
+            if last_activity is None:
+                info2 += ";"
+            else:
+                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
+
+            last_activity = (
+                Activity.objects.all()
+                .filter(department=d, activitytype="ARRANGEMENT")
+                .order_by("-start_date")
+                .first()
+            )
+            if last_activity is None:
+                info2 += ";"
+            else:
+                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
+
+            last_activity = (
+                Activity.objects.all()
+                .filter(department=d, activitytype="FORENINGSMEDLEMSKAB")
+                .order_by("-start_date")
+                .first()
+            )
+            if last_activity is None:
+                info2 += ";"
+            else:
+                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
+
+            last_activity = (
+                Activity.objects.all()
+                .filter(department=d, activitytype="STØTTEMEDLEMSKAB")
+                .order_by("-start_date")
+                .first()
+            )
+            if last_activity is None:
+                info2 += ";"
+            else:
+                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
+
+            if leaders.count() == 0:
+                result_string += info1 + ";;;" + info2 + "\n"
+            else:
+                for leader in leaders:
+                    result_string += info1
+                    result_string += leader.name + ";"
+                    result_string += leader.email + ";"
+                    result_string += leader.phone + ";"
+                    result_string += info2 + "\n"
+
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = 'attachment; filename="afdelingsinfo.csv"'
+        return response
+
+    export_department_info_csv.short_description = "Exporter Afdelingsinfo (CSV)"
