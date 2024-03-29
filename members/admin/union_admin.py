@@ -49,7 +49,9 @@ class UnionAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(UnionAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_unions"
+        ):
             return qs
         return qs.filter(adminuserinformation__user=request.user)
 

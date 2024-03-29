@@ -244,7 +244,9 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     # Only show participants to own departments
     def get_queryset(self, request):
         qs = super(ActivityParticipantAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_departments"
+        ):
             return qs
         return qs.filter(activity__department__adminuserinformation__user=request.user)
 
