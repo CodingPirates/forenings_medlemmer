@@ -118,7 +118,7 @@
     <section id="current-activities">
       {% if current_activities %}
         <h2>Nuværende og kommende aktiviteter</h2>
-        {% regroup current_activities by department.address.region as departments_region %}
+        {% regroup current_activities by address.region as departments_region %}
         <p>Denne liste indeholder igangværende og kommende aktiviteter.<br>
           For aktiviteter med fri tilmelding, kan I tilmelde Jer direkte, og ellers
           kan I opskrive Jer på venteliste til afdelingen.
@@ -137,12 +137,12 @@
         <br><br>
         <div class="tabs" id="region-tabs">
           <ul>
-            {% for region in address_region %}
+            {% for region in departments_region %}
               <li id="tab-{{region.grouper|slugify}}">{{ region.grouper }}</li>
             {% endfor %}
           </ul>
 
-          {% for region in address_region %}
+          {% for region in departments_region %}
             <section class="activity-per-region" id="{{region.grouper|slugify}}">
               <table>
                 <thead>
@@ -164,9 +164,9 @@
                       </td>
                       <td>{{ activity.name }}</td>
                       <td>
-                        {{% if activity.address.descriptiontext %}}
+                        {% if activity.address.descriptiontext %}
                           {{ activity.address.descriptiontext }}<br>
-                        {{% endif %}}
+                        {% endif %}
                         {{ activity.address.streetname }}
                         {{ activity.address.housenumber }}
                         {% if activity.address.floor %}

@@ -129,13 +129,7 @@ def Activities(request):
                         "end_date": curActivity.end_date,
                         "signup_closing": curActivity.signup_closing,
                         "userregion": user_region,
-                        # "streetname": curActivity.streetname,
-                        # "housenumber": curActivity.housenumber,
-                        # floor": curActivity.floor,
-                        # "door": curActivity.door,
-                        # "placename": curActivity.placename,
-                        # "zipcode": curActivity.zipcode,
-                        # "city": curActivity.city,
+                        "address": curActivity.address,
                     }
                     if curActivity.address.region == user_region:
                         activities_for_region_of_user.append(a)

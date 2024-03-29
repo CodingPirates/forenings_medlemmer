@@ -47,6 +47,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         "address__zipcode",
         "address__city",
     )
+    ordering = ["name"]
     filter_horizontal = ["department_leaders"]
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
