@@ -1,6 +1,4 @@
-import codecs
 from django.contrib import admin
-from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -221,7 +219,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
 
     actions = [
         AdminActions.invite_many_to_activity_action,
-        "export_csv_full",
+        AdminActions.export_participants_csv,
     ]
 
     def activity_activitytype(self, item):
@@ -296,59 +294,3 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         return item.payment_info(True)
 
     activity_payment_info_html.short_description = "Betalingsinfo"
-
-    def export_csv_full(self, request, queryset):
-        result_string = '"Forening"; "Afdeling"; "Aktivitet"; "Navn"; "Alder"; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn"; "forældre email"; "forældre tlf"; "Note til arrangørerne"\n'
-        for p in queryset:
-            gender = p.person.gender_text()
-
-            parent = p.person.family.get_first_parent()
-            if parent:
-                parent_name = parent.name
-                parent_phone = parent.phone
-                if not p.person.family.dont_send_mails:
-                    parent_email = parent.email
-                else:
-                    parent_email = ""
-            else:
-                parent_name = ""
-                parent_phone = ""
-                parent_email = ""
-
-            result_string = (
-                result_string
-                + p.activity.department.union.name
-                + ";"
-                + p.activity.department.name
-                + ";"
-                + p.activity.name
-                + ";"
-                + p.person.name
-                + ";"
-                + str(p.person.age_years())
-                + ";"
-                + gender
-                + ";"
-                + p.person.zipcode
-                + ";"
-                + self.activity_payment_info_txt(p)
-                + ";"
-                + parent_name
-                + ";"
-                + parent_email
-                + ";"
-                + parent_phone
-                + ";"
-                + '"'
-                + p.note.replace('"', '""')
-                + '"'
-                + "\n"
-            )
-        response = HttpResponse(
-            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
-            content_type="text/csv; charset=utf-8",
-        )
-        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
-        return response
-
-    export_csv_full.short_description = "CSV Export"

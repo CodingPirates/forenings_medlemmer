@@ -10,6 +10,8 @@ from members.models import (
     Union,
 )
 
+from members.admin.admin_actions import AdminActions
+
 
 class ActivityParticipantInline(admin.TabularInline):
     model = ActivityParticipant
@@ -111,6 +113,9 @@ class ActivityAdmin(admin.ModelAdmin):
         "open_invite",
         "activitytype",
     )
+    actions = [
+        AdminActions.export_participants_csv,
+    ]
     save_as = True
 
     class Media:
