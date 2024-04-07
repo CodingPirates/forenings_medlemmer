@@ -12,8 +12,12 @@ from members.models import (
 
 
 class ActivityParticipantInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     model = ActivityParticipant
     extra = 0
+    classes = ["hideheader"]
     fields = (
         "person",
         "note",
@@ -114,8 +118,6 @@ class ActivityAdmin(admin.ModelAdmin):
     save_as = True
 
     class Media:
-        # Remove title for each record
-        # see : https://stackoverflow.com/questions/41376406/remove-title-from-tabularinline-in-admin
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
 
     inlines = [ActivityParticipantInline]

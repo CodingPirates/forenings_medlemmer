@@ -200,9 +200,15 @@ class AdminActions(admin.ModelAdmin):
                                         )
 
                                     # Check for age constraint: too young ?
+                                    # Since it's a "negative-list" of people who won't be invited, we use AND operator
+                                    # to add to list if person is too young at activity start AND today
                                     elif (
                                         current_person.birthday
                                         > activity.start_date
+                                        - relativedelta(years=activity.min_age)
+                                    ) and (
+                                        current_person.birthday
+                                        > timezone.now().date()
                                         - relativedelta(years=activity.min_age)
                                     ):
                                         persons_too_young.append(current_person.name)
