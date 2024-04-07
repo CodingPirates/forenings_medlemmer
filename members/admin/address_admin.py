@@ -11,6 +11,9 @@ from members.models import (
 class AddressUnionInline(admin.TabularInline):
     # Tabular Inline list of Unions using this address object. Read Only
     model = Union
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+    classes = ["hideheader"]
     extra = 0
     fields = ("name",)
     readonly_fields = fields
@@ -26,6 +29,9 @@ class AddressUnionInline(admin.TabularInline):
 class AddressDepartmentInline(admin.TabularInline):
     # Tabular Inline list of Departments using this address object. Read Only
     model = Department
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+    classes = ["hideheader"]
     extra = 0
     fields = ("name",)
     readonly_fields = fields
@@ -41,6 +47,9 @@ class AddressDepartmentInline(admin.TabularInline):
 class AddressActivityInline(admin.TabularInline):
     # Tabular Inline list of Activities using this address object. Read Only
     model = Activity
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+    classes = ["hideheader"]
     extra = 0
     fields = (
         "name",
