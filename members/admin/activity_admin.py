@@ -180,7 +180,9 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def activity_link(self, obj):
         url = reverse("activity_view_family", args=[obj.id])
-        link = '<a href="%s">%s</a>' % (url, "Link")
+        full_url = obj.get_queryset.build_absolute_uri(url)
+        print(full_url)
+        link = '<a href="%s">%s</a> | <a href="#" onclick="document.querySelector(\'#{%s}\').select(); document.execCommand(\'copy\');">%s</a>' % (url, "Se aktiviteten som forældre", url, 'Kopier link til aktiviteten til udklipsholder')
         return mark_safe(link)
 
     activity_link.short_description = "Link til aktivitet"
