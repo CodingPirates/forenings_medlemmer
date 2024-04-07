@@ -73,6 +73,7 @@ class Address(models.Model):
                 params={"betegnelse": str(self)},
             )
             _category = wash_resp.json()["kategori"]
+            # DAWA category "C" means that it was a low probability address match
             if wash_resp.status_code != 200 or _category == "C":
                 return False
             else:
