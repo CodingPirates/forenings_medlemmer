@@ -7,7 +7,6 @@ from django.utils.html import format_html
 from members.models import (
     Activity,
     ActivityInvite,
-    ActivityParticipant,
     AdminUserInformation,
     Department,
     EmailItem,
@@ -75,17 +74,13 @@ class ActivityInviteInline(admin.TabularInline):
             return []
 
 
-class ActivityParticipantInline(admin.TabularInline):
-    model = ActivityParticipant
-    extra = 0
-
-    def get_queryset(self, request):
-        return ActivityParticipant.objects.all()
-
-
 class EmailItemInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     model = EmailItem
-    fields = ["reciever", "subject", "sent_dtm"]
+    classes = ["hideheader"]
+    fields = ["sent_ymdhm_html", "reciever", "subject_and_email_html"]
     can_delete = False
     readonly_fields = fields
 
@@ -119,6 +114,10 @@ class EquipmentLoanInline(admin.TabularInline):
 
 
 class PaymentInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
+    classes = ["showheader"]
     model = Payment
     fields = ("added_at", "payment_type", "confirmed_at", "rejected_at", "amount_ore")
     readonly_fields = ("family",)
@@ -126,6 +125,9 @@ class PaymentInline(admin.TabularInline):
 
 
 class PersonInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     def admin_link(self, instance):
         url = reverse(
             "admin:%s_%s_change"
@@ -140,6 +142,7 @@ class PersonInline(admin.TabularInline):
     fields = ("admin_link", "membertype", "zipcode", "added_at", "notes")
     readonly_fields = fields
     can_delete = False
+    classes = ["hideheader"]
     extra = 0
 
 

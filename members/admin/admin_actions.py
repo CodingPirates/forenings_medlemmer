@@ -1,3 +1,4 @@
+import codecs
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -6,6 +7,8 @@ from django.contrib import messages
 
 from django.contrib.admin.widgets import AdminDateWidget
 from django.db import transaction
+from django.http import HttpResponse
+
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
@@ -341,3 +344,80 @@ class AdminActions(admin.ModelAdmin):
     invite_many_to_activity_action.short_description = (
         "Inviter valgte personer til en aktivitet"
     )
+
+    def export_participants_csv(self, request, queryset):
+        print(f"queryset:[{queryset}]")
+        if queryset.model is Activity:
+            activities = [a.pk for a in queryset]
+            participants = ActivityParticipant.objects.filter(activity__in=activities)
+        elif queryset.model is ActivityParticipant:
+            participants = queryset
+
+        context = admin.site.each_context(request)
+        context["participants"] = participants
+        context["queryset"] = queryset
+
+        result_string = """"Forening"; "Afdeling"; "Aktivitet"; "Navn";\
+            "Alder"; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn";\
+            "forældre email"; "forældre tlf"; "Foto-tilladelse";\
+            "Note til arrangørerne"\n"""
+        for p in participants:
+            gender = p.person.gender_text()
+
+            parent = p.person.family.get_first_parent()
+            if parent:
+                parent_name = parent.name
+                parent_phone = parent.phone
+                if not p.person.family.dont_send_mails:
+                    parent_email = parent.email
+                else:
+                    parent_email = ""
+            else:
+                parent_name = ""
+                parent_phone = ""
+                parent_email = ""
+
+            if p.photo_permission == "OK":
+                photo = "Tilladelse givet"
+            else:
+                photo = "Ikke tilladt"
+
+            result_string = (
+                result_string
+                + p.activity.department.union.name
+                + ";"
+                + p.activity.department.name
+                + ";"
+                + p.activity.name
+                + ";"
+                + p.person.name
+                + ";"
+                + str(p.person.age_years())
+                + ";"
+                + gender
+                + ";"
+                + p.person.zipcode
+                + ";"
+                + str(p.payment_info(False))
+                + ";"
+                + parent_name
+                + ";"
+                + parent_email
+                + ";"
+                + parent_phone
+                + ";"
+                + photo
+                + ";"
+                + '"'
+                + p.note.replace('"', '""')
+                + '"'
+                + "\n"
+            )
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
+        return response
+
+    export_participants_csv.short_description = "Eksporter deltagerliste (CSV)"
