@@ -4,6 +4,7 @@ from members.tests.factories.providers import DanishProvider, CodingPiratesProvi
 from members.models import Activity
 from members.tests.factories.union_factory import UnionFactory
 from members.tests.factories.department_factory import DepartmentFactory
+from members.tests.factories.address_factory import AddressFactory
 from django.utils import timezone
 from factory import Faker, SubFactory, LazyAttribute
 from factory.django import DjangoModelFactory
@@ -63,3 +64,4 @@ class ActivityFactory(DjangoModelFactory):
         lambda a: a.min_age + Faker("random_int", min=10, max=80).generate({})
     )
     member_justified = Faker("boolean")
+    address = SubFactory(AddressFactory)
