@@ -179,7 +179,9 @@ class ActivityAdmin(admin.ModelAdmin):
     # Only view activities on own department
     def get_queryset(self, request):
         qs = super(ActivityAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_departments"
+        ):
             return qs
         departments = Department.objects.filter(adminuserinformation__user=request.user)
         return qs.filter(department__in=departments)

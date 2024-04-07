@@ -115,14 +115,25 @@ class Address(models.Model):
     def get_user_addresses(user):
         if user.is_superuser:
             return Address.objects.all()
-        department_address_id = [
-            department.address.id
-            for department in Department.objects.filter(adminuserinformation__user=user)
-        ]
-        union_address_id = [
-            union.address.id
-            for union in Union.objects.filter(adminuserinformation__user=user)
-        ]
+        if user.has_perm("members.view_all_departments"):
+            department_address_id = [
+                department.address.id for department in Department.objects.all()
+            ]
+        else:
+            department_address_id = [
+                department.address.id
+                for department in Department.objects.filter(
+                    adminuserinformation__user=user
+                )
+            ]
+
+        if user.has_perm("members.view_all_unions"):
+            union_address_id = [union.address.id for union in Union.objects.all()]
+        else:
+            union_address_id = [
+                union.address.id
+                for union in Union.objects.filter(adminuserinformation__user=user)
+            ]
 
         # Find all addresses not used by Union nor Department
         address_id_all = [address.id for address in Address.objects.all()]
