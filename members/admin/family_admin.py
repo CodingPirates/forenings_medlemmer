@@ -19,6 +19,7 @@ class FamilyAdmin(admin.ModelAdmin):
             return ("email",)
 
     search_fields = ("email",)
+
     inlines = [PersonInline, PaymentInline, EmailItemInline]
     actions = [
         "create_new_uuid",
