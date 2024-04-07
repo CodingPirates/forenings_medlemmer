@@ -122,18 +122,33 @@ class Address(models.Model):
     def get_user_addresses(user):
         if user.is_superuser:
             return Address.objects.all()
-        department_address_id = [
-            department.address.id
-            for department in Department.objects.filter(adminuserinformation__user=user)
-        ]
-        department_id = [
-            department.id
-            for department in Department.objects.filter(adminuserinformation__user=user)
-        ]
-        union_address_id = [
-            union.address.id
-            for union in Union.objects.filter(adminuserinformation__user=user)
-        ]
+        if user.has_perm("members.view_all_departments"):
+            department_address_id = [
+                department.address.id for department in Department.objects.all()
+            ]
+            department_id = [department.id for department in Department.objects.all()]
+        else:
+            department_address_id = [
+                department.address.id
+                for department in Department.objects.filter(
+                    adminuserinformation__user=user
+                )
+            ]
+            department_id = [
+                department.id
+                for department in Department.objects.filter(
+                    adminuserinformation__user=user
+                )
+            ]
+
+        if user.has_perm("members.view_all_unions"):
+            union_address_id = [union.address.id for union in Union.objects.all()]
+        else:
+            union_address_id = [
+                union.address.id
+                for union in Union.objects.filter(adminuserinformation__user=user)
+            ]
+
         activity_address_id = []
         for department in department_id:
             for activity in Activity.objects.filter(department_id=department):

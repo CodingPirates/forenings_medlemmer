@@ -1,7 +1,23 @@
-.inline-group .tabular tr.has_original td {
-    padding-top: 8px;
+.inline-group .tabular .showheader td.original p {
+    display: table-cell;
+    font-size: 0.8rem;
+    color: blue;
 }
 
-.original {
-    display: none;
+.inline-group .tabular .hideheader  td.original,
+.inline-group .tabular .hideheader  th.original
+{
+    display:none;
+
 }
+
+.inline-group .tabule .hideheader td{
+    padding:0px;
+    margin:0px;
+}
+
+.inline-group .tabular .hideheader tr.has_original td {
+    padding-top:0px;
+    
+}
+

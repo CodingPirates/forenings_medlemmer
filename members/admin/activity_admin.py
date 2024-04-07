@@ -11,10 +11,16 @@ from members.models import (
     Address,
 )
 
+from members.admin.admin_actions import AdminActions
+
 
 class ActivityParticipantInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     model = ActivityParticipant
     extra = 0
+    classes = ["hideheader"]
     fields = (
         "person",
         "note",
@@ -117,11 +123,12 @@ class ActivityAdmin(admin.ModelAdmin):
         "address",
         "department",
     )
+    actions = [
+        AdminActions.export_participants_csv,
+    ]
     save_as = True
 
     class Media:
-        # Remove title for each record
-        # see : https://stackoverflow.com/questions/41376406/remove-title-from-tabularinline-in-admin
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
 
     inlines = [ActivityParticipantInline]
@@ -188,7 +195,9 @@ class ActivityAdmin(admin.ModelAdmin):
     # Only view activities on own department
     def get_queryset(self, request):
         qs = super(ActivityAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_departments"
+        ):
             return qs
         departments = Department.objects.filter(adminuserinformation__user=request.user)
         return qs.filter(department__in=departments)
