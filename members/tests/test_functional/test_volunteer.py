@@ -1,5 +1,6 @@
 import os
 import socket
+import codecs
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from factory import Faker
@@ -20,6 +21,9 @@ class VolunteerTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
+        if not os.path.exists("test-screens"):
+            os.mkdir("test-screens")
+
         self.open_department = DepartmentFactory.create(
             name="Åben afdeling", closed_dtm=None
         )
@@ -33,21 +37,27 @@ class VolunteerTest(StaticLiveServerTestCase):
             command_executor="http://selenium:4444/wd/hub",
             options=chrome_options,
         )
+        self.browser.save_screenshot("test-screens/volunteer_start.png")
 
     def tearDown(self):
-        if not os.path.exists("test-screens"):
-            os.mkdir("test-screens")
-        self.browser.save_screenshot("test-screens/activities_list_final.png")
+        self.browser.save_screenshot("test-screens/volunteer_final.png")
         self.browser.quit()
 
     def test_volunteer_signup(self):
         self.browser.get(f"{self.live_server_url}/volunteer")
+
         options_texts = [
             e.text
             for e in self.browser.find_elements(
                 By.XPATH, "//*/select[@id='id_volunteer_department']/option"
             )
         ]
+        # Save HTML file
+        filename = os.path.join("test-screens", "volunteer.html")
+        filestream = codecs.open(filename, "w", "utf-8")
+        filehandle = self.browser.page_source
+        filestream.write(filehandle)
+
         self.assertIn(
             "Åben afdeling",
             options_texts,
