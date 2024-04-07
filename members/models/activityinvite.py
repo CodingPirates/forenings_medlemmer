@@ -82,9 +82,9 @@ class ActivityInvite(models.Model):
         min_amount = self.activity.get_min_amount(self.activity.activitytype.id)
 
         if self.price_in_dkk is not None and self.price_in_dkk < min_amount:
-            errors["price_in_dkk"] = (
-                f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
-            )
+            errors[
+                "price_in_dkk"
+            ] = f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
 
         if errors:
             raise ValidationError(errors)

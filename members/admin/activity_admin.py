@@ -99,7 +99,11 @@ class ActivityAdmin(admin.ModelAdmin):
         "department__name",
         "description",
     )
-    readonly_fields = ("seats_left", "participants")
+    readonly_fields = (
+        "seats_left",
+        "participants",
+        "activity_link",
+    )
     list_per_page = 20
     raw_id_fields = (
         "union",
@@ -174,6 +178,13 @@ class ActivityAdmin(admin.ModelAdmin):
 
     activity_membership_union_link.short_description = "Forening for medlemskab"
 
+    def activity_link(self, obj):
+        url = reverse("activity_view_family", args=[obj.id])
+        link = '<a href="%s">%s</a>' % (url, "Link")
+        return mark_safe(link)
+
+    activity_link.short_description = "Link til aktivitet"
+
     # Only view activities on own department
     def get_queryset(self, request):
         qs = super(ActivityAdmin, self).get_queryset(request)
@@ -208,6 +219,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     (
                         "name",
                         "activitytype",
+                        "activity_link",
                     ),
                     "open_hours",
                     "description",
