@@ -78,7 +78,10 @@ class Activity(models.Model):
         return self.department.name + ": " + self.name
 
     def is_season(self):
-        return (self.end_date - self.start_date).days > 30
+        return self.activitytype_id == "FORLØB"
+
+    def is_eligable_for_membership(self):
+        return self.activitytype_id == "FORLØB" or self.activitytype_id == "FORENINGSMEDLEMSKAB"
 
     def will_reserve(self):
         return self.start_date.year > timezone.now().year

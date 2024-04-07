@@ -131,7 +131,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
 
             # Make a new member if it's a member activity
-            if (activity.activitytype_id == "FORLØB" or activity.activitytype_id == "FORENINGSMEDLEMSKAB"):
+            if activity.is_eligable_for_membership():
                 Member(
                     union=union,
                     person=person,
