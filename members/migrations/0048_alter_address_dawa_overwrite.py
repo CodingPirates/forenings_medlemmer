@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name="dawa_overwrite",
             field=models.BooleanField(
                 default=False,
-                help_text="\n    Lader dig gemme en anden Længdegrad og Breddegrad end oplyst fra  DAWA     (hvor vi henter adressedata).     Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.\n    ",
+                help_text="\n    Lader dig gemme en anden længde- og breddegrad end oplyst fra DAWA     (hvor vi henter adressedata).     Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.\n    ",
                 verbose_name="Overskriv DAWA",
             ),
         ),

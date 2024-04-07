@@ -38,7 +38,7 @@ class Address(models.Model):
         "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
     help_temp = """
-    Lader dig gemme en anden Længdegrad og Breddegrad end oplyst fra  DAWA \
+    Lader dig gemme en anden længde- og breddegrad end oplyst fra DAWA \
     (hvor vi henter adressedata). \
     Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.
     """

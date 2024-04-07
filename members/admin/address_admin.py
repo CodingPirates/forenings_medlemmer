@@ -163,7 +163,7 @@ class AddressAdmin(admin.ModelAdmin):
             "Dawa info",
             {
                 "description": """
-                    <p>ID, ategori, længde- og breddegrad fra Dawa.</p>
+                    <p>ID, kategori, længde- og breddegrad fra DAWA.</p>
                     <p>Du kan vælge at sætte egne værdier for længde- og breddegrad.</p>""",
                 "fields": (
                     (
