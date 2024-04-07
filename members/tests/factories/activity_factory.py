@@ -47,9 +47,11 @@ class ActivityFactory(DjangoModelFactory):
         "date_time_between", tzinfo=TIMEZONE, start_date="-100d", end_date="+100d"
     )
     start_date = LazyAttribute(
-        lambda d: datetime_before(d.now)
-        if d.active
-        else Faker("date_time", tzinfo=TIMEZONE).generate({})
+        lambda d: (
+            datetime_before(d.now)
+            if d.active
+            else Faker("date_time", tzinfo=TIMEZONE).generate({})
+        )
     )
     end_date = LazyAttribute(
         lambda d: datetime_after(d.now) if d.active else datetime_before(d.now)

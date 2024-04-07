@@ -10,6 +10,7 @@ class Department(models.Model):
         verbose_name_plural = "Afdelinger"
         verbose_name = "Afdeling"
         ordering = ["address__zipcode"]
+        permissions = (("view_all_departments", "Can view all Afdelinger"),)
 
     help_dept = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi
     nævner det de fleste steder på siden."""
