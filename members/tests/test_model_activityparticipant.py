@@ -1,15 +1,14 @@
 from django.test import TestCase
 from datetime import datetime, timedelta
-from members.models.activity import Activity
 from members.models.person import Person
-from members.models.family import Family
 from members.models.waitinglist import WaitingList
 from members.models.activityparticipant import ActivityParticipant
 from django.utils import timezone
 
 from .factories import UnionFactory
 from .factories import DepartmentFactory
-from .factories import ActivityParticipantFactory
+from .factories import FamilyFactory
+from .factories import ActivityFactory
 
 
 class TestModelActivityParticipant(TestCase):
@@ -18,17 +17,17 @@ class TestModelActivityParticipant(TestCase):
         self.union = UnionFactory()
         self.department = DepartmentFactory(union=self.union)
 
-        self.activity = Activity(
-            start_date=datetime.now(),
-            end_date=datetime.now()
-            + timedelta(days=365),  # Has to be long enough to be a season
-            department=self.department,
-            union=self.union,
-        )
+        self.activity = ActivityFactory()
+        self.activity.start_date = datetime.now()
+        self.activity.end_date = datetime.now() + timedelta(
+            days=365
+        )  # Has to be long enough to be a season
+        self.activity.department = self.department
+        self.activity.union = self.union
         self.activity.save()
         self.assertTrue(self.activity.is_season())  # If this fail increase the end_date
 
-        self.family = Family(email="family@example.com")
+        self.family = FamilyFactory()
         self.family.save()
 
         self.person = Person(family=self.family)
@@ -42,14 +41,9 @@ class TestModelActivityParticipant(TestCase):
         waitinglist.save()
         self.waitinglist_id = waitinglist.id
 
-        self.ap = ActivityParticipantFactory(
-            person=self.person,
-        )
-        self.ap.save()
-
     def test_save_waiting_list(self):
         self.participant = ActivityParticipant(
-            activity=self.activity, person=self.person
+            note="test_save_waiting_list", activity=self.activity, person=self.person
         )
         self.participant.save()
         self.assertFalse(WaitingList.objects.filter(pk=self.waitinglist_id).exists())
