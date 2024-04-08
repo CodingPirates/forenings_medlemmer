@@ -169,8 +169,8 @@ class EmailTemplate(models.Model):
         return emails
 
 
-def renderAndValidate(self, context):
-    rendered = self.render(context)
-    validated = rendered.replace("{", "").replace("}", "")
+    def renderAndValidate(self, context):
+        rendered = self.render(context)
+        validated = rendered.replace("{", "").replace("}", "")
 
-    return validated
+        return validated
