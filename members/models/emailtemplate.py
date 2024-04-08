@@ -126,13 +126,21 @@ class EmailTemplate(models.Model):
             context = Context(context)
 
             # render the template
-            html_template = Engine.get_default().from_string(self.body_html)
-            text_template = Engine.get_default().from_string(self.body_text)
-            subject_template = Engine.get_default().from_string(self.subject)
-
-            html_content = html_template.renderAndValidate(context)
-            text_content = text_template.renderAndValidate(context)
-            subject_content = subject_template.renderAndValidate(context)
+            html_template = (
+                Engine.get_default()
+                .from_string(self.body_html)
+                .renderAndValidate(context)
+            )
+            text_template = (
+                Engine.get_default()
+                .from_string(self.body_text)
+                .renderAndValidate(context)
+            )
+            subject_template = (
+                Engine.get_default()
+                .from_string(self.subject)
+                .renderAndValidate(context)
+            )
 
             if (
                 allow_multiple_emails
