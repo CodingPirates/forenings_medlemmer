@@ -160,6 +160,7 @@ class EmailTemplate(models.Model):
                 emails.append(email)
         return emails
 
+
 def renderAndValidate(self, context):
     rendered = self.render(context)
     validated = rendered.replace("{", "").replace("}", "")
