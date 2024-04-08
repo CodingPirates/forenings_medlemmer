@@ -133,6 +133,12 @@ class EmailTemplate(models.Model):
             html_content = html_template.render(context)
             text_content = text_template.render(context)
             subject_content = subject_template.render(context)
+
+            # strip invalid characters like curly brackets
+            html_content = html_content.replace("{", "").replace("}", "")
+            text_content = text_content.replace("{", "").replace("}", "")
+            subject_content = subject_content.replace("{", "").replace("}", "")
+
             if (
                 allow_multiple_emails
                 or members.models.emailitem.EmailItem.objects.filter(

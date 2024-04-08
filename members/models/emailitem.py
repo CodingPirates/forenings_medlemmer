@@ -67,9 +67,7 @@ class EmailItem(models.Model):
     def subject_and_email(self, format_as_html: bool):
         if format_as_html:
             return format_html(
-                f'<div title="{escape(self.body_html)}">{self.subject}</div>'.replace(
-                    "{", ""
-                ).replace("}", "")
+                f'<div title="{escape(self.body_html)}">{self.subject}</div>'
             )
         else:
             return f"Subject:{self.subject}\nEmail:\n{self.body_text}"
