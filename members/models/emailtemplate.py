@@ -126,17 +126,17 @@ class EmailTemplate(models.Model):
             context = Context(context)
 
             # render the template
-            html_template = (
+            html_content = (
                 Engine.get_default()
                 .from_string(self.body_html)
                 .renderAndValidate(context)
             )
-            text_template = (
+            text_content = (
                 Engine.get_default()
                 .from_string(self.body_text)
                 .renderAndValidate(context)
             )
-            subject_template = (
+            subject_content = (
                 Engine.get_default()
                 .from_string(self.subject)
                 .renderAndValidate(context)
