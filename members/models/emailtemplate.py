@@ -130,14 +130,9 @@ class EmailTemplate(models.Model):
             text_template = Engine.get_default().from_string(self.body_text)
             subject_template = Engine.get_default().from_string(self.subject)
 
-            html_content = html_template.render(context)
-            text_content = text_template.render(context)
-            subject_content = subject_template.render(context)
-
-            # strip invalid characters like curly brackets
-            html_content = html_content.replace("{", "").replace("}", "")
-            text_content = text_content.replace("{", "").replace("}", "")
-            subject_content = subject_content.replace("{", "").replace("}", "")
+            html_content = html_template.renderAndValidate(context)
+            text_content = text_template.renderAndValidate(context)
+            subject_content = subject_template.renderAndValidate(context)
 
             if (
                 allow_multiple_emails
@@ -164,3 +159,9 @@ class EmailTemplate(models.Model):
                 email.save()
                 emails.append(email)
         return emails
+
+def renderAndValidate(self, context):
+    rendered = self.render(context)
+    validated = rendered.replace("{", "").replace("}", "")
+
+    return validated
