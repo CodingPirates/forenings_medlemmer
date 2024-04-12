@@ -34,7 +34,7 @@ class AdminActions(admin.ModelAdmin):
 
         # Get list of available departments
         if request.user.is_superuser or request.user.has_perm(
-            "members.view_all_persons"
+            "members.view_all_departments"
         ):
             department_list_query = Department.objects.all().order_by("name")
         else:
@@ -50,7 +50,9 @@ class AdminActions(admin.ModelAdmin):
         activity_list_query = Activity.objects.filter(
             end_date__gt=timezone.now()
         ).order_by("department__name", "name")
-        if not request.user.is_superuser:
+        if not request.user.is_superuser and not request.user.has_perm(
+            "members.view_all_departments"
+        ):
             activity_list_query = activity_list_query.filter(
                 department__in=department_ids
             ).order_by("department__name", "name")

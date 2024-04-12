@@ -193,7 +193,11 @@ class ActivityAdmin(admin.ModelAdmin):
 
     # Only show own departments when creating new activity
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "department" and not request.user.is_superuser:
+        if (
+            db_field.name == "department"
+            and not request.user.is_superuser
+            and not request.user.has_perm("members.view_all_departments")
+        ):
             kwargs["queryset"] = Department.objects.filter(
                 adminuserinformation__user=request.user
             )
