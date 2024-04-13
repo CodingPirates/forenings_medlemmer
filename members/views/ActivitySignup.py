@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
@@ -113,9 +114,27 @@ def ActivitySignup(request, activity_id, person_id=None):
                 "Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)"
             )
 
-        if not (activity.min_age <= person.age_years() <= activity.max_age):
+        # check if person is old enough
+        # a: if we are before start of activity: is the age correct when actity starts ?
+        # b: if after activity started (and before end): is age correct with min activity age ?
+
+        if (
+            person.birthday
+            > activity.start_date - relativedelta(years=activity.min_age)
+        ) and (
+            person.birthday
+            > timezone.now().date() - relativedelta(years=activity.min_age)
+        ):
             return HttpResponse(
-                f"Barnet skal være mellem {activity.min_age} og {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+                f"Deltageren skal være minimum {activity.min_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+            )
+
+        # Check if person is too old
+        if person.birthday < activity.start_date - relativedelta(
+            years=activity.max_age + 1, days=-1
+        ):
+            return HttpResponse(
+                f"Deltageren skal være maksimum {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
             )
 
         if (
