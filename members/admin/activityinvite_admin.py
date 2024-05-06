@@ -187,7 +187,11 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     # Limit the activity possible to invite to: Not finished and belonging to user
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "activity" and not request.user.is_superuser:
+        if (
+            db_field.name == "activity"
+            and not request.user.is_superuser
+            and not request.user.has_perm("members.view_all_departments")
+        ):
             departments = Department.objects.filter(
                 adminuserinformation__user=request.user
             )

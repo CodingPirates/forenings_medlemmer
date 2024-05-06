@@ -17,14 +17,14 @@ class AdminUserInformation(models.Model):
 
     @staticmethod
     def get_departments_admin(user):
-        if user.is_superuser:
+        if user.is_superuser or user.has_perm("members.view_all_departments"):
             return Department.objects.all()
         else:
             return Department.objects.filter(adminuserinformation__user=user)
 
     @staticmethod
     def get_unions_admin(user):
-        if user.is_superuser:
+        if user.is_superuser or user.has_perm("members.view_all_unions"):
             return Union.objects.all()
         else:
             return Union.objects.filter(adminuserinformation__user=user)
