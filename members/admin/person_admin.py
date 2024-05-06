@@ -217,8 +217,10 @@ class PersonAdmin(admin.ModelAdmin):
     # Only view persons related to users department (all family, via participant, waitinglist & invites)
     def get_queryset(self, request):
         qs = super(PersonAdmin, self).get_queryset(request)
-        if request.user.is_superuser or request.user.has_perm(
-            "members.view_all_persons"
+        if (
+            request.user.is_superuser
+            or request.user.has_perm("members.view_all_persons")
+            or request.user.has_perm("members.view_all_departments")
         ):
             return qs
         else:
