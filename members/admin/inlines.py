@@ -44,7 +44,11 @@ class ActivityInviteInline(admin.TabularInline):
 
     # Limit the activity possible to invite to: Not finished and belonging to user
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "activity" and not request.user.is_superuser:
+        if (
+            db_field.name == "activity"
+            and not request.user.is_superuser
+            and not request.user.has_perm("members.view_all_departments")
+        ):
             departments = Department.objects.filter(
                 adminuserinformation__user=request.user
             )
@@ -56,8 +60,6 @@ class ActivityInviteInline(admin.TabularInline):
     # Only view invites it would be possible for user to give out
     def get_queryset(self, request):
         qs = super(ActivityInviteInline, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
         return qs.filter(
             activity__department__in=AdminUserInformation.get_departments_admin(
                 request.user
