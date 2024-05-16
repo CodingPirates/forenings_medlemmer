@@ -1,4 +1,3 @@
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
@@ -13,6 +12,9 @@ from members.models.payment import Payment
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
+
+from members.utils.age_check import check_is_person_too_young
+from members.utils.age_check import check_is_person_too_old
 
 
 def ActivitySignup(request, activity_id, person_id=None):
@@ -115,24 +117,13 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
 
         # check if person is old enough
-        # a: if we are before start of activity: is the age correct when actity starts ?
-        # b: if after activity started (and before end): is age correct with min activity age ?
-
-        if (
-            person.birthday
-            > activity.start_date - relativedelta(years=activity.min_age)
-        ) and (
-            person.birthday
-            > timezone.now().date() - relativedelta(years=activity.min_age)
-        ):
+        if check_is_person_too_young(activity, person):
             return HttpResponse(
                 f"Deltageren skal være minimum {activity.min_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
             )
 
         # Check if person is too old
-        if person.birthday < activity.start_date - relativedelta(
-            years=activity.max_age + 1, days=-1
-        ):
+        if check_is_person_too_old(activity, person):
             return HttpResponse(
                 f"Deltageren skal være maksimum {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
             )
