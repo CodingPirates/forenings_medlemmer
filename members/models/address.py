@@ -120,7 +120,7 @@ class Address(models.Model):
 
     @staticmethod
     def get_user_addresses(user):
-        if user.is_superuser:
+        if user.is_superuser or user.has_perm("members.view_all_departments"):
             return Address.objects.all()
         if user.has_perm("members.view_all_departments"):
             department_address_id = [
