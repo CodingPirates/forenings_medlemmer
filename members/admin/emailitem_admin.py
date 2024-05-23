@@ -1,6 +1,5 @@
 from typing import Any
 from django.contrib import admin
-from django.db.models import Q
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -61,11 +60,6 @@ class activityFilter(admin.SimpleListFilter):
         for activity in Activity.objects.filter(id__in=activities).order_by("name"):
             activityList.append((str(activity.id), str(activity.name)))
         return activityList
-        # return [
-        # (str(activity.id), str(activity.name))
-
-    #            for activity in Activity.objects.filter(id__in=activities).order_by("name")
-    #       ]
 
     def queryset(self, request, queryset):
         if self.value() == "none":
