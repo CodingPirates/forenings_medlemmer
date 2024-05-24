@@ -52,7 +52,12 @@ class ActivitySignupForm(forms.Form):
                                 '<span class="paymentHelp"><p>{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
                             ),
                             Submit(
-                                "submit", "Tilmeld og betal", css_class="button-success"
+                                "submit",
+                                "Tilmeld"
+                                + "{%if price > 0 %}"
+                                + "og betal"
+                                + "{% endif %}",
+                                css_class="button-success",
                             ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
