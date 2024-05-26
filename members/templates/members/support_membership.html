@@ -56,20 +56,24 @@
                   {{ activity.union.name }}
                 </td>
                 <td>
-                  {% if activity.union.address.placename %}
-                    {{ activity.union.address.placename }}<br>
+                  {% if activity.address.descriptiontext %}
+                    {{ activity.address.descriptiontext }}
+                    <br>
                   {% endif %}
-                  {{ activity.union.address.streetname }}
-                  {{ activity.union.address.housenumber }}
-                  {% if activity.union.address.floor %}
-                    {{ activity.union.address.floor }}
+                  {{ activity.address.streetname }}
+                  {{ activity.address.housenumber }}
+                  {% if activity.address.floor %}
+                    {{ activity.address.floor }}
                   {% endif %}
-                  {% if activity.union.address.door %}
-                    {{ activity.union.address.door }}
+                  {% if activity.address.door %}
+                    {{ activity.address.door }}
                   {% endif %}
                   <br>
-                  {{ activity.union.address.zipcode }}
-                  {{ activity.union.address.city }}
+                  {% if activity.address.placename %}
+                    {{ activity.address.placename }}<br>
+                  {% endif %}
+                  {{ activity.address.zipcode }}
+                  {{ activity.address.city }}
                 </td>
 
                 <td>{{ activity.name }}</td>

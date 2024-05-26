@@ -21,7 +21,7 @@ def Membership(request):
     current_activities = Activity.objects.filter(
         signup_closing__gte=timezone.now(),
         activitytype__in=["FORENINGSMEDLEMSKAB"],
-    ).order_by("department__union__address__region", "name", "start_date")
+    ).order_by("address__region", "name", "start_date")
 
     family = None
     participating = None
@@ -73,18 +73,13 @@ def Membership(request):
                         "union": curActivity.union,
                         "persons": applicablePersons,
                         "department": curActivity.department,
-                        "streetname": curActivity.streetname,
-                        "housenumber": curActivity.housenumber,
-                        "floor": curActivity.floor,
-                        "door": curActivity.door,
-                        "zipcode": curActivity.zipcode,
-                        "city": curActivity.city,
+                        "address": curActivity.address,
                         "price_in_dkk": curActivity.price_in_dkk,
                         "start_date": curActivity.start_date,
                         "end_date": curActivity.end_date,
                     }
 
-                    if curActivity.union.address.region == user_region:
+                    if curActivity.address.region == user_region:
                         membership_activities_for_region_of_user.append(a)
                     else:
                         membership_activities_for_other_regions.append(a)

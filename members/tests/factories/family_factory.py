@@ -1,4 +1,3 @@
-import factory
 from factory import Faker
 from factory.django import DjangoModelFactory
 from members.models import Family
@@ -10,10 +9,7 @@ class FamilyFactory(DjangoModelFactory):
         model = Family
 
     unique = Faker("uuid4")
-    # email = Faker("email")
-    email = factory.Sequence(
-        lambda n: "family{0}@example.com".format(n)
-    )  # Faker("email")
+    email = Faker("email")
     # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     confirmed_at = Faker("date_time", tzinfo=TIMEZONE)

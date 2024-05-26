@@ -9,6 +9,7 @@ from members.models import (
     AdminUserInformation,
     Department,
     Union,
+    Address,
 )
 
 from .inlines import (
@@ -114,6 +115,7 @@ class ActivityAdmin(admin.ModelAdmin):
         "seats_left",
         "participants",
         "activity_link",
+        "addressregion",
     )
     list_per_page = 20
     raw_id_fields = (
@@ -125,6 +127,11 @@ class ActivityAdmin(admin.ModelAdmin):
         ActivityDepartmentListFilter,
         "open_invite",
         "activitytype",
+        "address__region",
+    )
+    autocomplete_fields = (
+        "address",
+        "department",
     )
     actions = [
         AdminActions.export_participants_csv,
@@ -181,6 +188,11 @@ class ActivityAdmin(admin.ModelAdmin):
 
     seats_free.short_description = "Ubesat"
 
+    def addressregion(self, obj):
+        return str(obj.address.region)
+
+    addressregion.short_description = "Region"
+
     def activity_membership_union_link(self, obj):
         if obj.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
             url = reverse("admin:members_union_change", args=[obj.union_id])
@@ -220,8 +232,10 @@ class ActivityAdmin(admin.ModelAdmin):
         departments = Department.objects.filter(adminuserinformation__user=request.user)
         return qs.filter(department__in=departments)
 
-    # Only show own departments when creating new activity
+    # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
+    # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Only show own departments when creating new activity
         if (
             db_field.name == "department"
             and not request.user.is_superuser
@@ -230,22 +244,25 @@ class ActivityAdmin(admin.ModelAdmin):
             kwargs["queryset"] = Department.objects.filter(
                 adminuserinformation__user=request.user
             )
-        return super(ActivityAdmin, self).formfield_for_foreignkey(
-            db_field, request, **kwargs
-        )
+        if db_field.name == "address":
+            kwargs["queryset"] = Address.get_user_addresses(request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     fieldsets = [
         (
             "Afdeling",
             {
-                "description": "<p>Du kan ændre afdeling for aktiviteten ved at skrive afdelings-id, eller tryk på søg-ikonet og i det nye vindue skal du finde afdelingen, for derefter at trykke på ID i første kolonne.</p>",
+                "description": "<p>Du kan ændre afdeling for aktiviteten ved at vælge en afdeling i listen, evt bruge søgefunktionen.</p>",
                 "fields": ("department",),
             },
         ),
         (
             "Aktivitet",
             {
-                "description": "<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårssæson 2018</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>",
+                "description": """<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt.
+                F.eks. <em>Forårssæson 2018</em>.</p>
+                <p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>
+                <p>Startdato er første dag for aktiviteten, og slutdato er sidste for aktiviteten</p>""",
                 "fields": (
                     (
                         "name",
@@ -265,30 +282,30 @@ class ActivityAdmin(admin.ModelAdmin):
         (
             "Lokation og ansvarlig",
             {
-                "description": "<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer (f.eks. et gamejam der foregår et andet sted).</p>",
+                "description": """<p>Adresse samt ansvarlig kan adskille sig fra afdelingens
+                informationer (f.eks. et gamejam der kan foregå et andet sted).</p>""",
                 "fields": (
-                    (
-                        "responsible_name",
-                        "responsible_contact",
-                    ),
-                    (
-                        "streetname",
-                        "housenumber",
-                        "floor",
-                        "door",
-                    ),
-                    (
-                        "zipcode",
-                        "city",
-                        "placename",
-                    ),
+                    "address",
+                    "addressregion",
+                    "responsible_name",
+                    "responsible_contact",
                 ),
             },
         ),
         (
             "Tilmeldingsdetaljer",
             {
-                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til aktiviteter og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. </p><p>Alle aktiviteter med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+                "description": """<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på
+                betalingsformularen på tilmeldingssiden.</p>
+                <p>Den skal bruges til at stille spørgsmål, som den, der tilmelder sig,
+                kan besvare ved tilmelding.</p>
+                <p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne
+                aktivitet - efter "først til mølle"-princippet.
+                Dette er kun til aktiviteter og klubaften-forløb/sæsoner i områder,
+                hvor der ikke er nogen venteliste. </p>
+                <p>Alle aktiviteter med fri tilmelding kommer til at stå med en stor "tilmeld"
+                knap på medlemssiden. <b>Afdelinger med venteliste bruger typisk ikke fri
+                tilmelding - spørg i Slack hvis du er i tvivl!</b></p>""",
                 "fields": (
                     "instructions",
                     (

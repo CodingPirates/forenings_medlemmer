@@ -51,6 +51,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         "address__zipcode",
         "address__city",
     )
+    ordering = ["name"]
     filter_horizontal = ["department_leaders"]
 
     actions = [
