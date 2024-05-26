@@ -40,7 +40,7 @@
   <div class="tabs" id="menu-tabs">
     <ul>
       <li id="menu-alle-ventelister">Alle ventelister</li>
-      <li id="menu-timeldte-ventelister">Tilmeldte ventelister</li>
+      <li id="menu-tilmeldte-ventelister">Tilmeldte ventelister</li>
       <li id="menu-kort-over-afdelinger">Kort over afdelinger</li>
     </ul>
     <section id="alle-ventelister">
@@ -98,20 +98,26 @@
                   <td>{{ department.address }}</td>
                   <td>{{ department.open_hours }}</td>
                   <td>
-                    {% for child in children %}
+                    {% if department.has_waiting_list %}
+                      {% for child in children %}
+                        <div>
+                          {% if department in child.departments_is_waiting %}
+                            {{ child.person.firstname }} er opskrevet
+                          {% else %}
+                            <a
+                                class="button"
+                                href="{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
+                            >
+                              Opskriv: {{ child.person.firstname }}
+                            </a>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    {% else %}
                       <div>
-                        {% if department in child.departments_is_waiting %}
-                          {{ child.person.firstname }} er opskrevet
-                        {% else %}
-                          <a
-                              class="button"
-                              href="{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
-                          >
-                            Opskriv: {{ child.person.firstname }}
-                          </a>
-                        {% endif %}
+                        Ingen venteliste, se afdelingens aktiviteter under <b>Aktiviteter</b>
                       </div>
-                    {% endfor %}
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}

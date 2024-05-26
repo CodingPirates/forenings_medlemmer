@@ -28,6 +28,7 @@ class Department(models.Model):
     address = models.ForeignKey(
         "Address", on_delete=models.PROTECT, verbose_name="Adresse"
     )
+    has_waiting_list = models.BooleanField("Brug af venteliste", default=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField(
         "Oprettet",
