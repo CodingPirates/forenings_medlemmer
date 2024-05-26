@@ -53,10 +53,7 @@ class ActivitySignupForm(forms.Form):
                             ),
                             Submit(
                                 "submit",
-                                "Tilmeld"
-                                + "{%if price > 0 %}"
-                                + "og betal"
-                                + "{% endif %}",
+                                "Tilmeld{% if price > 0 %} og betal{% endif %}",
                                 css_class="button-success",
                             ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
