@@ -126,13 +126,14 @@ class EmailTemplate(models.Model):
             context = Context(context)
 
             # render the template
-            html_template = Engine.get_default().from_string(self.body_html)
-            text_template = Engine.get_default().from_string(self.body_text)
-            subject_template = Engine.get_default().from_string(self.subject)
+            html_content = Engine.get_default().from_string(self.body_html)
+            text_content = Engine.get_default().from_string(self.body_text)
+            subject_content = Engine.get_default().from_string(self.subject)
 
-            html_content = html_template.render(context)
-            text_content = text_template.render(context)
-            subject_content = subject_template.render(context)
+            html_content = self.renderAndValidate(html_content, context)
+            text_content = self.renderAndValidate(text_content, context)
+            subject_content = self.renderAndValidate(subject_content, context)
+
             if (
                 allow_multiple_emails
                 or members.models.emailitem.EmailItem.objects.filter(
@@ -158,3 +159,9 @@ class EmailTemplate(models.Model):
                 email.save()
                 emails.append(email)
         return emails
+
+    def renderAndValidate(self, template, context):
+        rendered = template.render(context)
+        validated = rendered.replace("{", "").replace("}", "")
+
+        return validated

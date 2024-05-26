@@ -47,8 +47,6 @@ class EmailItem(models.Model):
             hoover_msg = "Oprettet: " + escape(
                 self.created_dtm.strftime("%Y-%m-%d %H:%M")
             )
-            if self.send_error != "":
-                hoover_msg += "\nError:\n" + self.send_error
 
             return format_html(f'<div title=" {hoover_msg}">{msg}</div>')
         else:
