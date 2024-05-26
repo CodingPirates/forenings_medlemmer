@@ -12,6 +12,10 @@ from members.models import (
     Address,
 )
 
+from .inlines import (
+    EmailItemInline,
+)
+
 from members.admin.admin_actions import AdminActions
 
 
@@ -138,7 +142,7 @@ class ActivityAdmin(admin.ModelAdmin):
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
         js = ("members/js/copy_to_clipboard.js",)
 
-    inlines = [ActivityParticipantInline]
+    inlines = [ActivityParticipantInline, EmailItemInline]
 
     def start_end(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
