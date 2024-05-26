@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.html import escape
+from django.utils.html import escape, format_html
 
 from members.models import (
     ActivityParticipant,
@@ -105,7 +106,11 @@ class ActivityAdmin(admin.ModelAdmin):
         "department__name",
         "description",
     )
-    readonly_fields = ("seats_left", "participants")
+    readonly_fields = (
+        "seats_left",
+        "participants",
+        "activity_link",
+    )
     list_per_page = 20
     raw_id_fields = (
         "union",
@@ -124,6 +129,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+        js = ("members/js/copy_to_clipboard.js",)
 
     inlines = [ActivityParticipantInline]
 
@@ -181,6 +187,22 @@ class ActivityAdmin(admin.ModelAdmin):
 
     activity_membership_union_link.short_description = "Forening for medlemskab"
 
+    def activity_link(self, obj):
+        full_url = (
+            f"{settings.BASE_URL}{reverse('activity_view_family', args=[obj.id])}"
+        )
+        link = format_html(
+            '<a href="{}" target="_blank">{}</a> '
+            '<button type="button" class="copy-btn" data-url="{}">Copy to clipboard</button>',
+            full_url,
+            full_url,
+            full_url,
+        )
+
+        return mark_safe(link)
+
+    activity_link.short_description = "Link til aktivitet"
+
     # Only view activities on own department
     def get_queryset(self, request):
         qs = super(ActivityAdmin, self).get_queryset(request)
@@ -221,6 +243,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     (
                         "name",
                         "activitytype",
+                        "activity_link",
                     ),
                     "open_hours",
                     "description",
