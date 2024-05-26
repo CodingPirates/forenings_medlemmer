@@ -24,7 +24,6 @@ from .inlines import (
     PaymentInline,
     VolunteerInline,
     WaitingListInline,
-    EmailItemInline,
 )
 
 from members.admin.admin_actions import AdminActions
@@ -65,7 +64,6 @@ class PersonAdmin(admin.ModelAdmin):
         VolunteerInline,
         ActivityInviteInline,
         WaitingListInline,
-        EmailItemInline,
     ]
 
     def family_url(self, item):

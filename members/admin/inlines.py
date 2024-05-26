@@ -81,13 +81,8 @@ class EmailItemInline(admin.TabularInline):
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
 
     model = EmailItem
-    classes = ["hideheader", "collapse"]
-    fields = [
-        "created_ymdhm",
-        "sent_ymdhm_text",
-        "receiver",
-        "email_link",
-    ]
+    classes = ["hideheader"]
+    fields = ["sent_ymdhm_html", "reciever", "subject_and_email_html"]
     can_delete = False
     readonly_fields = fields
 
