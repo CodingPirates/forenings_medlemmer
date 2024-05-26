@@ -72,7 +72,7 @@ class Activity(models.Model):
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
     )
     address = models.ForeignKey(
-        "Address", on_delete=models.PROTECT, verbose_name="Adresse", default=1
+        "Address", on_delete=models.PROTECT, verbose_name="Adresse", null=False
     )
 
     def is_historic(self):
