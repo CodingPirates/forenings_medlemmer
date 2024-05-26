@@ -1,6 +1,8 @@
+import codecs
 from django import forms
 from django.contrib import admin
 from django.db.models.functions import Lower
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -156,6 +158,9 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     search_help_text = mark_safe(
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
+
+    actions = ["export_csv_invitation_info"]
+
     form = ActivityInviteAdminForm
 
     # Only show invitation to own activities
@@ -260,3 +265,53 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     participating.short_description = "Deltager"
     participating.boolean = True
+
+    def export_csv_invitation_info(self, request, queryset):
+        result_string = """"Forening"; "Afdeling"; "Aktivitet"; "Deltager";\
+            "Deltager-email"; "Familie-email"; "Pris"; "Pris note"; "Ekstra email info" ;\
+            "Deltager i aktiviteten"; "Invitationsdato"; "Udløbsdato"; "Afslåetdato"\n"""
+
+        for invitation in queryset:
+            participate = (
+                "Ja"
+                if invitation.person.activityparticipant_set.filter(
+                    activity=invitation.activity
+                ).exists()
+                else "Nej"
+            )
+            expire_date = (
+                ""
+                if invitation.expire_dtm is None
+                else invitation.expire_dtm.strftime("%Y-%m-%d")
+            )
+            rejected_date = (
+                ""
+                if invitation.rejected_at is None
+                else invitation.rejected_at.strftime("%Y-%m-%d")
+            )
+
+            result_string += (
+                f"{invitation.activity.department.union.name};"
+                f"{invitation.activity.department.name};"
+                f"{invitation.activity.name};"
+                f"{invitation.person.name};"
+                f"{invitation.person.email};"
+                f"{invitation.person.family.email};"
+                f"{str(invitation.price_in_dkk)};"
+                '"' + invitation.price_note.replace('"', '""') + '";'
+                '"' + invitation.extra_email_info.replace('"', '""') + '";'
+                f"{participate};"
+                f'{invitation.invite_dtm.strftime("%Y-%m-%d")};'
+                f"{expire_date};"
+                f"{rejected_date}\n"
+            )
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = (
+            'attachment; filename="invitationsoversigt.csv"'
+        )
+        return response
+
+    export_csv_invitation_info.short_description = "Exporter Invitationsinformationer"
