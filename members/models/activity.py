@@ -80,6 +80,10 @@ class Activity(models.Model):
 
     is_historic.short_description = "Historisk?"
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs
+
     def __str__(self):
         return self.department.name + ", " + self.name
 

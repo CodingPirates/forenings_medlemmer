@@ -38,63 +38,63 @@ class EmailTemplate(models.Model):
     # If possible it will also be filled with:
     #  person, family
 
-    # recievers is expected to be a list of Person, Family or strings (email adresses)
+    # receivers are expected to be a list of Person, Family or strings (email adresses)
 
-    def makeEmail(self, recievers, context, allow_multiple_emails=False):
-        if type(recievers) is not list:
-            recievers = [recievers]
+    def makeEmail(self, receivers, context, allow_multiple_emails=False):
+        if type(receivers) is not list:
+            receivers = [receivers]
 
         emails = []
 
-        for reciever in recievers:
-            # each reciever must be Person, Family or string (email)
+        for receiver in receivers:
+            # each receiver must be Person, Family or string (email)
 
             # Note - string specifically removed. We use family.dont_send_mails to make sure
             # we dont send unwanted mails.
 
-            if type(reciever) not in (
+            if type(receiver) not in (
                 members.models.person.Person,
                 members.models.family.Family,
                 members.models.department.Department,
             ):
                 raise Exception(
-                    "Reciever must be of type Person or Family not "
-                    + str(type(reciever))
+                    "Receiver must be of type Person or Family not "
+                    + str(type(receiver))
                 )
 
-            # figure out reciever
-            if type(reciever) is str:
+            # figure out receiver
+            if type(receiver) is str:
                 # check if family blacklisted. (TODO)
-                destination_address = reciever
-            elif type(reciever) is members.models.person.Person:
+                destination_address = receiver
+            elif type(receiver) is members.models.person.Person:
                 # skip if family does not want email
-                if reciever.family.dont_send_mails:
+                if receiver.family.dont_send_mails:
                     continue
-                context["person"] = reciever
-                destination_address = reciever.email
-            elif type(reciever) is members.models.family.Family:
+                context["person"] = receiver
+                destination_address = receiver.email
+            elif type(receiver) is members.models.family.Family:
                 # skip if family does not want email
-                if reciever.dont_send_mails:
+                if receiver.dont_send_mails:
                     continue
-                context["family"] = reciever
-                destination_address = reciever.email
-            elif type(reciever) is members.models.department.Department:
-                context["department"] = reciever
-                destination_address = reciever.department_email
+                context["family"] = receiver
+                destination_address = receiver.email
+            elif type(receiver) is members.models.department.Department:
+                context["department"] = receiver
+                destination_address = receiver.department_email
 
             # figure out Person and Family is applicable
-            if type(reciever) is members.models.person.Person:
-                person = reciever
+            if type(receiver) is members.models.person.Person:
+                person = receiver
             elif "person" in context:
                 person = context["person"]
             else:
                 person = None
 
             # figure out family
-            if type(reciever) is members.models.family.Family:
-                family = reciever
-            elif type(reciever) is members.models.person.Person:
-                family = reciever.family
+            if type(receiver) is members.models.family.Family:
+                family = receiver
+            elif type(receiver) is members.models.person.Person:
+                family = receiver.family
             elif "family" in context:
                 family = context["family"]
             else:
@@ -138,7 +138,7 @@ class EmailTemplate(models.Model):
                 allow_multiple_emails
                 or members.models.emailitem.EmailItem.objects.filter(
                     person=person,
-                    reciever=destination_address,
+                    receiver=destination_address,
                     activity=activity,
                     template=self,
                     department=department,
@@ -147,7 +147,7 @@ class EmailTemplate(models.Model):
             ):
                 email = members.models.emailitem.EmailItem.objects.create(
                     template=self,
-                    reciever=destination_address,
+                    receiver=destination_address,
                     person=person,
                     family=family,
                     activity=activity,

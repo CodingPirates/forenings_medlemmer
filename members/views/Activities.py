@@ -146,6 +146,5 @@ def Activities(request):
         "current_activities": current_activities_with_persons,
         "children": children,
         "persons": persons,
-        "persons": persons,
     }
     return render(request, "members/activities.html", context)
