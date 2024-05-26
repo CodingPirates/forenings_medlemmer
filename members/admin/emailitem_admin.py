@@ -17,43 +17,34 @@ class activityFilter(admin.SimpleListFilter):
     parameter_name = "activity"
 
     def lookups(self, request: Any, model_admin: Any) -> list[tuple[Any, str]]:
-        year = ""
-        month = ""
-        day = ""
-        if "created_dtm__year" in request.GET:
-            year = request.GET["created_dtm__year"]
-            queryset = EmailItem.objects.filter(created_dtm__year=year)
-            if "created_dtm__month" in request.GET:
-                month = request.GET["created_dtm__month"]
-                queryset = queryset.filter(created_dtm__month=month)
-                if "created_dtm__day" in request.GET:
-                    day = request.GET["created_dtm__day"]
-                    queryset = queryset.filter(created_dtm__day=day)
+
+        queryset = EmailItem.objects
+        filtervalue = None
+        queryset, filtervalue = getRequestDateFilter(
+            request, "created_dtm__year", queryset, filtervalue
+        )
+        queryset, filtervalue = getRequestDateFilter(
+            request, "created_dtm__month", queryset, filtervalue
+        )
+        queryset, filtervalue = getRequestDateFilter(
+            request, "created_dtm__day", queryset, filtervalue
+        )
+        if filtervalue is not None:
             activities = (
                 queryset.filter(activity__isnull=False)
                 .values_list("activity", flat=True)
+                .order_by("id")
                 .distinct()
             )
         else:
             activities = (
                 EmailItem.objects.filter(activity__isnull=False)
                 .values_list("activity", flat=True)
+                .order_by("id")
                 .distinct()
             )
-        filtervalue = ""
-        if len(month) == 1:
-            month = f"0{month}"
-        if len(day) == 1:
-            day = f"0{day}"
 
-        if year != "":
-            filtervalue = year
-
-        if month != "":
-            filtervalue += f"-{month}"
-        if day != "":
-            filtervalue += f"-{day}"
-        if filtervalue != "":
+        if filtervalue is not None:
             self.title = f"Aktivitet (mail {filtervalue})"
 
         activityList = [("none", "(Ingen aktivitet)")]
@@ -74,18 +65,18 @@ class departmentFilter(admin.SimpleListFilter):
     parameter_name = "department__calculated"
 
     def lookups(self, request: Any, model_admin: Any) -> list[tuple[Any, str]]:
-        year = ""
-        month = ""
-        day = ""
-        if "created_dtm__year" in request.GET:
-            year = request.GET["created_dtm__year"]
-            queryset = EmailItem.objects.filter(created_dtm__year=year)
-            if "created_dtm__month" in request.GET:
-                month = request.GET["created_dtm__month"]
-                queryset = queryset.filter(created_dtm__month=month)
-                if "created_dtm__day" in request.GET:
-                    day = request.GET["created_dtm__day"]
-                    queryset = queryset.filter(created_dtm__day=day)
+        queryset = EmailItem.objects
+        filtervalue = None
+        queryset, filtervalue = getRequestDateFilter(
+            request, "created_dtm__year", queryset, filtervalue
+        )
+        queryset, filtervalue = getRequestDateFilter(
+            request, "created_dtm__month", queryset, filtervalue
+        )
+        queryset, filtervalue = getRequestDateFilter(
+            request, "created_dtm__day", queryset, filtervalue
+        )
+        if filtervalue is not None:
             departments = (
                 queryset.filter(department__isnull=False)
                 .values_list("department__id", flat=True)
@@ -109,20 +100,7 @@ class departmentFilter(admin.SimpleListFilter):
                     "activity__department", flat=True
                 ).distinct()
             )
-        filtervalue = ""
-        if len(month) == 1:
-            month = f"0{month}"
-        if len(day) == 1:
-            day = f"0{day}"
-
-        if year != "":
-            filtervalue = year
-
-        if month != "":
-            filtervalue += f"-{month}"
-        if day != "":
-            filtervalue += f"-{day}"
-        if filtervalue != "":
+        if filtervalue is not None:
             self.title = f"Afdeling (mail {filtervalue})"
 
         return [
@@ -198,3 +176,21 @@ class EmailItemAdmin(admin.ModelAdmin):
             },
         ),
     ]
+
+
+def getRequestDateFilter(request, date_type, queryset, filtervalue):
+    if date_type in request.GET:
+        date_part = request.GET[date_type]
+        if date_type != "created_dtm__year":
+            if len(date_part) == 1:
+                date_part = f"0{date_part}"
+
+        if filtervalue is None:
+            filtervalue = date_part
+        else:
+            filtervalue += "-" + date_part
+
+        kwargs = {f"{date_type}": date_part}
+
+        return [queryset.filter(**kwargs), filtervalue]
+    return [queryset, filtervalue]
