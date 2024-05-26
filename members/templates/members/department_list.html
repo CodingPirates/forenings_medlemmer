@@ -28,6 +28,11 @@
           {{department.name}}
           {% endif %}
         </li>
+        {% if department.isOpening %}
+          <li>
+            <b>Afdelingen er under opstart</b>
+          </li>
+        {% endif %}
 
         <li>
           <strong>Adresse:</strong> {{department.address}}

@@ -1,7 +1,6 @@
 .inline-group .tabular .showheader td.original p {
     display: table-cell;
     font-size: 0.8rem;
-    color: blue;
 }
 
 .inline-group .tabular .hideheader  td.original,
