@@ -192,6 +192,9 @@ class ActivityAdmin(admin.ModelAdmin):
     activity_membership_union_link.short_description = "Forening for medlemskab"
 
     def activity_link(self, obj):
+        if obj.id is None:
+            return ""
+
         full_url = (
             f"{settings.BASE_URL}{reverse('activity_view_family', args=[obj.id])}"
         )
