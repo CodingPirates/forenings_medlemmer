@@ -28,6 +28,9 @@ class Member(models.Model):
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=75
     )
+    paid_at = models.DateTimeField(
+        "Betalt", blank=True, null=True
+    )
 
     def __str__(self):
         return f"{self.person}, {self.union}, {self.member_since.year}"
