@@ -71,6 +71,9 @@ class Activity(models.Model):
     member_justified = models.BooleanField(
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
     )
+    address = models.ForeignKey(
+        "Address", on_delete=models.PROTECT, verbose_name="Adresse", default=1
+    )
 
     def is_historic(self):
         return self.end_date < timezone.now()

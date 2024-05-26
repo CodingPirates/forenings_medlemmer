@@ -15,6 +15,7 @@ from members.admin.admin_actions import AdminActions
 
 from .factories import UnionFactory
 from .factories import DepartmentFactory
+from .factories import ActivityFactory
 
 
 # set MESSAGE_STORAGE to CookieStorage to support django messaging framework
@@ -36,7 +37,7 @@ class TestAdminActions(TestCase):
         )
 
         # activity starts in two days, so we can test situation where person is too young today, but will be ok at activity start
-        self.activity_starting_in_two_days = Activity(
+        self.activity_starting_in_two_days = ActivityFactory(
             start_date=datetime.now() + relativedelta(days=2),
             end_date=datetime.now() + relativedelta(months=1),
             min_age=7,
@@ -47,7 +48,7 @@ class TestAdminActions(TestCase):
         self.activity_starting_in_two_days.save()
 
         # activity started two days ago, so we can test situation where person wasn't old enough at activity start, but is today
-        self.activity_started_two_days_ago = Activity(
+        self.activity_started_two_days_ago = ActivityFactory(
             start_date=datetime.now() - relativedelta(days=2),
             end_date=datetime.now() + relativedelta(months=1),
             min_age=7,

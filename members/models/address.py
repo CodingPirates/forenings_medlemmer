@@ -5,6 +5,7 @@ from django.conf import settings
 
 from .department import Department
 from .union import Union
+from .activity import Activity
 
 
 class Address(models.Model):
@@ -26,6 +27,8 @@ class Address(models.Model):
         ("Region Nordjylland", "Nordjylland"),
         ("Region Midtjylland", "Midtjylland"),
         ("Region Sjælland", "Sjælland"),
+        ("Online", "Online"),
+        ("Andet", "Andet"),
     )
     region = models.CharField("Region", choices=REGION_CHOICES, max_length=20)
     municipality = models.CharField("Kommune", max_length=100, blank=True)
@@ -36,7 +39,7 @@ class Address(models.Model):
         "Breddegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )
     help_temp = """
-    Lader dig gemme en anden Længdegrad og breddegrad end den gemt i DAWA \
+    Lader dig gemme en anden længde- og breddegrad end oplyst fra DAWA \
     (hvor vi henter adressedata). \
     Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.
     """
@@ -44,10 +47,12 @@ class Address(models.Model):
         "Overskriv DAWA", default=False, help_text=help_temp
     )
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
+    dawa_category = models.CharField("DAWA kategori", max_length=1, blank=True)
     created_at = models.DateTimeField(
         "Oprettet", auto_now=False, auto_now_add=True, auto_created=True
     )
     created_by = models.PositiveIntegerField("Oprettet af", default=0)
+    descriptiontext = models.CharField("Beskrivelse", max_length=100, blank=True)
 
     def __str__(self):
         address = f"{self.streetname} {self.housenumber}"
@@ -68,10 +73,13 @@ class Address(models.Model):
                 "https://dawa.aws.dk/datavask/adresser",
                 params={"betegnelse": str(self)},
             )
-            if wash_resp.status_code != 200 or wash_resp.json()["kategori"] == "C":
+            _category = wash_resp.json()["kategori"]
+            # DAWA category "C" means that it was a low probability address match
+            if wash_resp.status_code != 200 or _category == "C":
                 return False
             else:
                 self.dawa_id = wash_resp.json()["resultater"][0]["adresse"]["id"]
+                self.dawa_category = _category
 
         data_resp = requests.request(
             "GET",
@@ -115,9 +123,20 @@ class Address(models.Model):
     def get_user_addresses(user):
         if user.is_superuser or user.has_perm("members.view_all_departments"):
             return Address.objects.all()
+        if user.has_perm("members.view_all_departments"):
+            department_address_id = [
+                department.address.id for department in Department.objects.all()
+            ]
+            department_id = [department.id for department in Department.objects.all()]
         else:
             department_address_id = [
                 department.address.id
+                for department in Department.objects.filter(
+                    adminuserinformation__user=user
+                )
+            ]
+            department_id = [
+                department.id
                 for department in Department.objects.filter(
                     adminuserinformation__user=user
                 )
@@ -131,16 +150,32 @@ class Address(models.Model):
                 for union in Union.objects.filter(adminuserinformation__user=user)
             ]
 
-        # Find all addresses not used by Union nor Department
+        activity_address_id = []
+        for department in department_id:
+            for activity in Activity.objects.filter(department_id=department):
+                activity_address_id += [activity.address.id]
+
+        # Find all addresses not used by Union nor Department nor Activity
         address_id_all = [address.id for address in Address.objects.all()]
+
         department_address_id_all = [
             department.address.id for department in Department.objects.all()
         ]
         union_address_id_all = [union.address.id for union in Union.objects.all()]
+        activity_address_id_all = [
+            activity.address.id for activity in Activity.objects.all()
+        ]
+
         address_unused_ids = list(
             set(address_id_all)
             - set(department_address_id_all)
             - set(union_address_id_all)
+            - set(activity_address_id_all)
         )
-        address_ids = address_unused_ids + department_address_id + union_address_id
+        address_ids = (
+            address_unused_ids
+            + department_address_id
+            + union_address_id
+            + activity_address_id
+        )
         return Address.objects.filter(pk__in=address_ids)
