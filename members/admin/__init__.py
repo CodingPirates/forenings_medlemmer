@@ -14,6 +14,8 @@ from members.models import (
     Payment,
     Person,
     Union,
+    VolunteerRequest,
+    VolunteerRequestDepartment,
     WaitingList,
 )
 
@@ -28,6 +30,8 @@ from .payment_admin import PaymentAdmin
 from .person_admin import PersonAdmin
 from .union_admin import UnionAdmin
 from .user_admin import UserAdmin
+from .volunteerrequest_admin import VolunteerRequestAdmin
+from .volunteerrequestdepartment_admin import VolunteerRequestDepartmentAdmin
 from .waitinglist_admin import WaitingListAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
@@ -45,6 +49,8 @@ admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Union, UnionAdmin)
 admin.site.register(WaitingList, WaitingListAdmin)
+admin.site.register(VolunteerRequest, VolunteerRequestAdmin)
+admin.site.register(VolunteerRequestDepartment, VolunteerRequestDepartmentAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 # admin.site.register(AdminUserInformation, AdminUserInformationAdmin)

@@ -21,6 +21,8 @@ import members.models.person
 import members.models.quickpaytransaction
 import members.models.union
 import members.models.volunteer
+import members.models.volunteerrequest
+import members.models.volunteerrequestdepartment
 import members.models.waitinglist
 import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
@@ -46,6 +48,8 @@ from .payment import Payment
 from .person import Person
 from .union import Union
 from .volunteer import Volunteer
+from .volunteerrequest import VolunteerRequest
+from .volunteerrequestdepartment import VolunteerRequestDepartment
 from .waitinglist import WaitingList
 from .zipcoderegion import ZipcodeRegion
 
@@ -74,6 +78,8 @@ __all__ = [
     Person,
     Union,
     Volunteer,
+    VolunteerRequest,
+    VolunteerRequestDepartment,
     WaitingList,
     ZipcodeRegion,
 ]
