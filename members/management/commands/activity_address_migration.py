@@ -1,6 +1,7 @@
 import requests
 
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from members.models.activity import Activity
 from members.models.address import Address
 
@@ -16,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for activity in Activity.objects.filter(
-            address=None,
+            Q(address_id=None) | Q(address_id=1)
         ).order_by("-id"):
             _create_new_address = True
             _streetname = self.default_value(activity.streetname, "")
