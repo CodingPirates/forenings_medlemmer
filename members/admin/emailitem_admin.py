@@ -112,7 +112,10 @@ class departmentFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(department=self.value()).order_by("department")
+            return queryset.filter(department=self.value()) | queryset.filter(
+                activity__department=self.value()
+            )
+
         return queryset.order_by("department")
 
 
