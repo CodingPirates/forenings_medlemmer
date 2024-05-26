@@ -13,6 +13,9 @@ from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
 
+from members.utils.age_check import check_is_person_too_young
+from members.utils.age_check import check_is_person_too_old
+
 
 def ActivitySignup(request, activity_id, person_id=None):
     if person_id is None:
@@ -113,9 +116,16 @@ def ActivitySignup(request, activity_id, person_id=None):
                 "Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)"
             )
 
-        if not (activity.min_age <= person.age_years() <= activity.max_age):
+        # check if person is old enough
+        if check_is_person_too_young(activity, person):
             return HttpResponse(
-                f"Barnet skal være mellem {activity.min_age} og {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+                f"Deltageren skal være minimum {activity.min_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+            )
+
+        # Check if person is too old
+        if check_is_person_too_old(activity, person):
+            return HttpResponse(
+                f"Deltageren skal være maksimum {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
             )
 
         if (
