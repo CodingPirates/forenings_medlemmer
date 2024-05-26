@@ -171,51 +171,12 @@ class DepartmentAdmin(admin.ModelAdmin):
             info2 += d.address.city + ";"
             info2 += d.address.region + ";"
 
+            info2 += GetLastDate(d, "FORLØB") + ";"
+            info2 += GetLastDate(d, "ARRANGEMENT") + ";"
+            info2 += GetLastDate(d, "FORENINGSMEDLEMSKAB") + ";"
+            info2 += GetLastDate(d, "STØTTEMEDLEMSKAB") + ";"
+
             leaders = d.department_leaders.all().order_by("name")
-
-            last_activity = (
-                Activity.objects.all()
-                .filter(department=d, activitytype="FORLØB")
-                .order_by("-start_date")
-                .first()
-            )
-            if last_activity is None:
-                info2 += ";"
-            else:
-                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
-
-            last_activity = (
-                Activity.objects.all()
-                .filter(department=d, activitytype="ARRANGEMENT")
-                .order_by("-start_date")
-                .first()
-            )
-            if last_activity is None:
-                info2 += ";"
-            else:
-                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
-
-            last_activity = (
-                Activity.objects.all()
-                .filter(department=d, activitytype="FORENINGSMEDLEMSKAB")
-                .order_by("-start_date")
-                .first()
-            )
-            if last_activity is None:
-                info2 += ";"
-            else:
-                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
-
-            last_activity = (
-                Activity.objects.all()
-                .filter(department=d, activitytype="STØTTEMEDLEMSKAB")
-                .order_by("-start_date")
-                .first()
-            )
-            if last_activity is None:
-                info2 += ";"
-            else:
-                info2 += last_activity.start_date.strftime("%Y-%m-%d") + ";"
 
             if leaders.count() == 0:
                 result_string += info1 + ";;;" + info2 + "\n"
@@ -235,3 +196,15 @@ class DepartmentAdmin(admin.ModelAdmin):
         return response
 
     export_department_info_csv.short_description = "Exporter Afdelingsinfo (CSV)"
+
+
+def GetLastDate(department_id, activity_type):
+    last_activity = (
+        Activity.objects.all()
+        .filter(department=department_id, activitytype=activity_type)
+        .order_by("-start_date")
+        .first()
+    )
+    return (
+        "" if last_activity is None else last_activity.start_date.strftime("%Y-%m-%d")
+    )
