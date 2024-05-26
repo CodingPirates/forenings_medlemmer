@@ -272,24 +272,38 @@ class ActivityInviteAdmin(admin.ModelAdmin):
             "Deltager i aktiviteten"; "Invitationsdato"; "Udløbsdato"; "Afslåetdato"\n"""
 
         for invitation in queryset:
-            participate = "Ja" if invitation.person.activityparticipant_set.filter(activity=invitation.activity).exists() else "Nej"
-            expire_date = "" if invitation.expire_dtm is None else invitation.expire_dtm.strftime("%Y-%m-%d")
-            rejected_date = "" if invitation.rejected_at is None else invitation.rejected_at.strftime("%Y-%m-%d")
+            participate = (
+                "Ja"
+                if invitation.person.activityparticipant_set.filter(
+                    activity=invitation.activity
+                ).exists()
+                else "Nej"
+            )
+            expire_date = (
+                ""
+                if invitation.expire_dtm is None
+                else invitation.expire_dtm.strftime("%Y-%m-%d")
+            )
+            rejected_date = (
+                ""
+                if invitation.rejected_at is None
+                else invitation.rejected_at.strftime("%Y-%m-%d")
+            )
 
             result_string += (
-                f'{invitation.activity.department.union.name};'
-                f'{invitation.activity.department.name};'
-                f'{invitation.activity.name};'
-                f'{invitation.person.name};'
-                f'{invitation.person.email};'
-                f'{invitation.person.family.email};'
-                f'{str(invitation.price_in_dkk)};'
-                f'"' + invitation.price_note.replace('"', '""') + '";'
-                f'"' + invitation.extra_email_info.replace('"', '""') + '";'
-                f'{participate};'
+                f"{invitation.activity.department.union.name};"
+                f"{invitation.activity.department.name};"
+                f"{invitation.activity.name};"
+                f"{invitation.person.name};"
+                f"{invitation.person.email};"
+                f"{invitation.person.family.email};"
+                f"{str(invitation.price_in_dkk)};"
+                '"' + invitation.price_note.replace('"', '""') + '";'
+                '"' + invitation.extra_email_info.replace('"', '""') + '";'
+                f"{participate};"
                 f'{invitation.invite_dtm.strftime("%Y-%m-%d")};'
-                f'{expire_date};'
-                f'{rejected_date}\n'
+                f"{expire_date};"
+                f"{rejected_date}\n"
             )
         response = HttpResponse(
             f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
