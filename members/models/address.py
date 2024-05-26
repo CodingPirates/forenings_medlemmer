@@ -28,6 +28,7 @@ class Address(models.Model):
         ("Region Midtjylland", "Midtjylland"),
         ("Region Sjælland", "Sjælland"),
         ("Online", "Online"),
+        ("Andet", "Andet"),
     )
     region = models.CharField("Region", choices=REGION_CHOICES, max_length=20)
     municipality = models.CharField("Kommune", max_length=100, blank=True)
