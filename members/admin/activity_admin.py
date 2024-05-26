@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.html import escape
+from django.utils.html import escape, format_html
 
 from members.models import (
     ActivityParticipant,
@@ -128,6 +129,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+        js = ("members/js/copy_to_clipboard.js",)
 
     inlines = [ActivityParticipantInline]
 
@@ -186,10 +188,17 @@ class ActivityAdmin(admin.ModelAdmin):
     activity_membership_union_link.short_description = "Forening for medlemskab"
 
     def activity_link(self, obj):
-        url = reverse("activity_view_family", args=[obj.id])
-        full_url = obj.get_queryset.build_absolute_uri(url)
-        print(full_url)
-        link = '<a href="%s">%s</a> | <a href="#" onclick="document.querySelector(\'#{%s}\').select(); document.execCommand(\'copy\');">%s</a>' % (url, "Se aktiviteten som forældre", url, 'Kopier link til aktiviteten til udklipsholder')
+        full_url = (
+            f"{settings.BASE_URL}{reverse('activity_view_family', args=[obj.id])}"
+        )
+        link = format_html(
+            '<a href="{}" target="_blank">{}</a> '
+            '<button type="button" class="copy-btn" data-url="{}">Copy to clipboard</button>',
+            full_url,
+            full_url,
+            full_url,
+        )
+
         return mark_safe(link)
 
     activity_link.short_description = "Link til aktivitet"
