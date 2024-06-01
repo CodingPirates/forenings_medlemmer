@@ -276,6 +276,7 @@ class ActivityAdmin(admin.ModelAdmin):
                         "end_date",
                     ),
                     "member_justified",
+                    "visible_from",
                 ),
             },
         ),
