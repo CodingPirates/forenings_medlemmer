@@ -139,6 +139,17 @@ class EmailItemAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created_dtm", "send_error", "sent_dtm")
 
+    def get_queryset(self, request):
+        qs = super(EmailItemAdmin, self).get_queryset(request)
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_departments"
+        ):
+            return qs
+        departments = Department.objects.filter(adminuserinformation__user=request.user)
+        return qs.filter(department__in=departments) | qs.filter(
+            activity__department__in=departments
+        )
+
     fieldsets = [
         (
             "Modtager information",
