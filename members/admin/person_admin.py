@@ -190,7 +190,7 @@ class PersonAdmin(admin.ModelAdmin):
                 + ";"
                 + str(person.age_years())
                 + ";"
-                + person.gender_text()
+                + str(person.gender_text())
                 + ";"
                 + str(person.added_at.strftime("%Y-%m-%d %H:%M"))
                 + ";"
