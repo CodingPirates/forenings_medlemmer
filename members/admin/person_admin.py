@@ -168,7 +168,7 @@ class PersonAdmin(admin.ModelAdmin):
     export_emaillist.short_description = "Exporter e-mail liste"
 
     def export_csv(self, request, queryset):
-        result_string = "Navn;Alder;Opskrevet;Tlf (barn);Email (barn);"
+        result_string = "Navn;Alder;Køn;Opskrevet;Tlf (barn);Email (barn);"
         result_string += "Tlf (forælder);Email (familie);Postnummer;Noter\n"
         for person in queryset:
             parent = person.family.get_first_parent()
@@ -189,6 +189,8 @@ class PersonAdmin(admin.ModelAdmin):
                 + person.name
                 + ";"
                 + str(person.age_years())
+                + ";"
+                + person.gender_text()
                 + ";"
                 + str(person.added_at.strftime("%Y-%m-%d %H:%M"))
                 + ";"
