@@ -74,6 +74,16 @@ class Activity(models.Model):
     address = models.ForeignKey(
         "Address", on_delete=models.PROTECT, verbose_name="Adresse", null=False
     )
+    visible_from = models.DateTimeField(
+        "Aktiviteten er synlig fra", null=False, blank=False, default=timezone.now
+    )
+    visible = models.BooleanField(
+        "Vises denne aktivitet",
+        null=False,
+        blank=False,
+        default=True,
+        help_text="Vises i denne aktivtet. Kan bruges sammen med feltet 'Aktiviteten er synlig fra'",
+    )
 
     def is_historic(self):
         return self.end_date < timezone.now()

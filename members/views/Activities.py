@@ -19,6 +19,8 @@ def Activities(request):
         signup_closing__gte=timezone.now(),
         end_date__gte=timezone.now(),
         activitytype__in=["FORLØB", "ARRANGEMENT"],
+        visible=True,
+        visible_from__lte=timezone.now(),
     ).order_by("address__region", "name", "start_date")
 
     family = None
