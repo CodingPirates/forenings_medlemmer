@@ -78,8 +78,11 @@ class Activity(models.Model):
         "Aktiviteten er synlig fra", null=False, blank=False, default=timezone.now
     )
     visible = models.BooleanField(
-        "Vises denne aktivitet", null=False, blank=False, default=True, 
-        help_text ="Vises i denne aktivtet. Kan bruges sammen med feltet 'Aktiviteten er synlig fra'"
+        "Vises denne aktivitet",
+        null=False,
+        blank=False,
+        default=True,
+        help_text="Vises i denne aktivtet. Kan bruges sammen med feltet 'Aktiviteten er synlig fra'",
     )
 
     def is_historic(self):
