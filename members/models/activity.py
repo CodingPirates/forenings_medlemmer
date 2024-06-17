@@ -109,11 +109,13 @@ class Activity(models.Model):
     def get_min_amount(self, activitytype):
         min_amount = self.NO_MINIMUM_AMOUNT
 
-        if activitytype == "FORENINGSMEDLEMSKAB":
-            min_amount = self.MEMBERSHIP_MIN_AMOUNT
+        # Issue 1058: If activity is in the past then skip this check
+        if self.end_date > timezone.now().date():
+            if activitytype == "FORENINGSMEDLEMSKAB":
+                min_amount = self.MEMBERSHIP_MIN_AMOUNT
 
-        if activitytype == "FORLØB":
-            min_amount = self.ACTIVITY_MIN_AMOUNT
+            if activitytype == "FORLØB":
+                min_amount = self.ACTIVITY_MIN_AMOUNT
 
         return min_amount
 
