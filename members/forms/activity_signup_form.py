@@ -4,7 +4,6 @@ from crispy_forms.layout import Layout, Fieldset, Submit, Field, HTML, Div
 from crispy_forms.bootstrap import FormActions
 
 from members.models.activityparticipant import ActivityParticipant
-from members.models.payment import Payment
 
 
 class ActivitySignupForm(forms.Form):
@@ -32,7 +31,7 @@ class ActivitySignupForm(forms.Form):
                         css_class="row",
                     ),
                     Fieldset(
-                        "Tilmeldings oplysninger",
+                        "Tilmeldingsoplysninger",
                         Div(
                             Div(
                                 Field("note", aria_describedby="noteHelp"),
@@ -48,16 +47,14 @@ class ActivitySignupForm(forms.Form):
                             ),
                             css_class="row",
                         ),
-                    ),
-                    Fieldset(
-                        "Betaling",
-                        Field("payment_option", aria_describedby="paymentHelp"),
-                        HTML(
-                            '<span class="paymentHelp"><p>Vælg kun <i>"andet er aftalt"</i>, <u>hvis</u> der er en klar aftale med den aktivitets ansvarlige, ellers vil tilmeldingen blive annulleret igen.{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
-                        ),
                         FormActions(
+                            HTML(
+                                '<span class="paymentHelp"><p>{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
+                            ),
                             Submit(
-                                "submit", "Tilmeld og betal", css_class="button-success"
+                                "submit",
+                                "Tilmeld{% if price > 0 %} og betal{% endif %}",
+                                css_class="button-success",
                             ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
@@ -94,12 +91,4 @@ class ActivitySignupForm(forms.Form):
         initial="NO",
         required=True,
         choices=(("YES", "Ja"), ("NO", "Nej")),
-    )
-    payment_option = forms.ChoiceField(
-        label="Vælg betalings metode",
-        required=True,
-        choices=(
-            (Payment.CREDITCARD, "Betalingskort / MobilePay"),
-            (Payment.OTHER, "Andet er aftalt"),
-        ),
     )

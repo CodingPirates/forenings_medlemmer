@@ -1,10 +1,11 @@
 FROM python:3.10
 WORKDIR /app
 
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update && apt-get install -y \
     graphviz \
     nodejs
+
 
 RUN npm install -g npm
 

@@ -10,8 +10,10 @@ class Union(models.Model):
         verbose_name_plural = "Foreninger"
         verbose_name = "Forening"
         ordering = ["name"]
+        permissions = (("view_all_unions", "Can view all Foreninger"),)
 
-    name = models.CharField("Foreningens navn", max_length=200)
+    help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
+    name = models.CharField("Foreningens navn", max_length=200, help_text=help_union)
 
     chairman = models.ForeignKey(
         "Person",

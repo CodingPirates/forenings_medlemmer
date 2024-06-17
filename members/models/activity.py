@@ -11,6 +11,10 @@ class Activity(models.Model):
         verbose_name_plural = "Aktiviteter"
         ordering = ["department__address__zipcode", "start_date"]
 
+    MEMBERSHIP_MIN_AMOUNT = 75
+    ACTIVITY_MIN_AMOUNT = 100
+    NO_MINIMUM_AMOUNT = 0
+
     department = models.ForeignKey(
         "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
     )
@@ -67,11 +71,18 @@ class Activity(models.Model):
     member_justified = models.BooleanField(
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
     )
+    address = models.ForeignKey(
+        "Address", on_delete=models.PROTECT, verbose_name="Adresse", null=False
+    )
 
     def is_historic(self):
         return self.end_date < timezone.now()
 
     is_historic.short_description = "Historisk?"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs
 
     def __str__(self):
         return self.department.name + ", " + self.name
@@ -95,20 +106,25 @@ class Activity(models.Model):
 
     participants.short_description = "Deltagere"
 
+    def get_min_amount(self, activitytype):
+        min_amount = self.NO_MINIMUM_AMOUNT
+
+        if activitytype == "FORENINGSMEDLEMSKAB":
+            min_amount = self.MEMBERSHIP_MIN_AMOUNT
+
+        if activitytype == "FORLØB":
+            min_amount = self.ACTIVITY_MIN_AMOUNT
+
+        return min_amount
+
     def clean(self):
         errors = {}
-        min_amount = 0
-
-        if self.activitytype.id == "FORENINGSMEDLEMSKAB":
-            min_amount = 75
-
-        if self.activitytype.id == "FORLØB":
-            min_amount = 100
+        min_amount = self.get_min_amount(self.activitytype.id)
 
         if self.price_in_dkk < min_amount:
-            errors[
-                "price_in_dkk"
-            ] = f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
+            errors["price_in_dkk"] = (
+                f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
+            )
 
         if errors:
             raise ValidationError(errors)

@@ -76,7 +76,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         # check that the test activity is present
         activity_name = self.browser.find_element(
             By.XPATH,
-            f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/section[@id='{slugify(self.activity_1.department.address.region)}']/table/tbody/tr[1]/td[@data-label='Aktivitet']",
+            f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/section[@id='{slugify(self.activity_1.address.region)}']/table/tbody/tr[1]/td[@data-label='Aktivitet']",
         ).get_attribute("textContent")
         self.assertEqual(activity_name, self.activity_1.name)
 
@@ -85,7 +85,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
             len(
                 self.browser.find_elements(
                     By.XPATH,
-                    f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/section[@id='{slugify(self.activity_1.department.address.region)}']/table/tbody",
+                    f"//div[@id='tab-menu']/section[@id='current-activities']/div[@id='region-tabs']/section[@id='{slugify(self.activity_1.address.region)}']/table/tbody",
                 )
             ),
             1,

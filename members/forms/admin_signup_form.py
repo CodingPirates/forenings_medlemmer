@@ -94,10 +94,10 @@ class adminSignupForm(forms.Form):
         required=True,
         input_formats=(settings.DATE_INPUT_FORMATS),
         widget=forms.DateInput(attrs={"type": "date"}),
-        error_messages={"invalid": "Indtast en gyldig dato. (dd-mm-åååå)"},
+        error_messages={"invalid": "Indtast en gyldig dato."},
     )
     volunteer_department = forms.ModelChoiceField(
-        queryset=Department.objects.all(),
+        queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
         required=True,
         label="Afdeling",
         empty_label="-",

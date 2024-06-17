@@ -36,7 +36,7 @@
         placeholder="Søg efter..."
       >
       <br>
-      {% regroup current_activities by department.union.address.region as departments_region %}
+      {% regroup current_activities by address.region as departments_region %}
       {% if current_activities %}
         <div class="tabs">
           <ul>
@@ -61,27 +61,35 @@
                 </tr>
                 </thead>
                 <tbody class="union-membership-tablebody">
-                {% for activity in region.list %}
+                {% for activity in region.list|dictsort:"department.union.name" %}
                   <tr>
                     <td>
                       Coding Pirates<br>
                       {{ activity.department.union.name }}
                     </td>
                     <td>
-                      {% if activity.placename %}
-                        {{ activity.placename }}<br>
+                      {% if activity.descriptiontext %}
+                        {{ activity.descriptiontext }}
+                        <br>
                       {% endif %}
-                      {{ activity.streetname }}
-                      {{ activity.housenumber }}
-                      {% if activity.floor %}
-                        {{ activity.floor }}
+                      {% if activity.address.placename %}
+                        {{ activity.address.placename }}<br>
                       {% endif %}
-                      {% if activity.door %}
-                        {{ activity.door }}
+                      {{ activity.address.streetname }}
+                      {{ activity.address.housenumber }}
+                      {% if activity.address.floor %}
+                        {{ activity.address.floor }}
+                      {% endif %}
+                      {% if activity.address.door %}
+                        {{ activity.address.door }}
                       {% endif %}
                       <br>
-                      {{ activity.zipcode }}
-                      {{ activity.city }}
+                      {% if activity.address.placename %}
+                        {{ activity.address.placename}}
+                        <br>
+                      {% endif%}
+                      {{ activity.address.zipcode }}
+                      {{ activity.address.city }}
                     </td>
 
                     <td>{{ activity.name }}</td>

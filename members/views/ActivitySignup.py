@@ -13,6 +13,9 @@ from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
 
+from members.utils.age_check import check_is_person_too_young
+from members.utils.age_check import check_is_person_too_old
+
 
 def ActivitySignup(request, activity_id, person_id=None):
     if person_id is None:
@@ -102,15 +105,27 @@ def ActivitySignup(request, activity_id, person_id=None):
         view_only_mode = True  # activity full
         signup_closed = True
 
+    if invitation is not None:
+        price = invitation.price_in_dkk
+    else:
+        price = activity.price_in_dkk
+
     if request.method == "POST":
         if view_only_mode:
             return HttpResponse(
                 "Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)"
             )
 
-        if not (activity.min_age <= person.age_years() <= activity.max_age):
+        # check if person is old enough
+        if check_is_person_too_young(activity, person):
             return HttpResponse(
-                f"Barnet skal være mellem {activity.min_age} og {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+                f"Deltageren skal være minimum {activity.min_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
+            )
+
+        # Check if person is too old
+        if check_is_person_too_old(activity, person):
+            return HttpResponse(
+                f"Deltageren skal være maksimum {activity.max_age} år gammel for at deltage. (Er fødselsdatoen udfyldt korrekt ?)"
             )
 
         if (
@@ -147,33 +162,29 @@ def ActivitySignup(request, activity_id, person_id=None):
             participant.photo_permission = signup_form.cleaned_data["photo_permission"]
             participant.save()
 
-            return_link_url = reverse(
-                "activity_view_person", args=[activity.id, person.id]
-            )
+            # return user to list of activities where they are participating
+            return_link_url = f'{reverse("activities")}#tilmeldte-aktiviteter'
 
             # Make payment if activity costs
-            if activity.price_in_dkk is not None and activity.price_in_dkk > 0:
-                # using creditcard ?
-                if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
-                    payment = Payment(
-                        payment_type=Payment.CREDITCARD,
-                        activity=activity,
-                        activityparticipant=participant,
-                        person=person,
-                        family=family,
-                        body_text=timezone.now().strftime("%Y-%m-%d")
-                        + " Betaling for "
-                        + activity.name
-                        + " på "
-                        + activity.department.name,
-                        amount_ore=int(activity.price_in_dkk * 100),
-                    )
-                    payment.save()
+            if price is not None and price > 0:
+                payment = Payment(
+                    payment_type=Payment.CREDITCARD,
+                    activity=activity,
+                    activityparticipant=participant,
+                    person=person,
+                    family=family,
+                    body_text=timezone.now().strftime("%Y-%m-%d")
+                    + " Betaling for "
+                    + activity.name
+                    + " på "
+                    + activity.department.name,
+                    amount_ore=int(price * 100),
+                )
+                payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(
-                        return_url=settings.BASE_URL
-                        + reverse("activity_view_person", args=[activity.id, person.id])
-                    )
+                return_link_url = payment.get_quickpaytransaction().get_link_url(
+                    return_url=settings.BASE_URL + return_link_url
+                )
 
             # expire invitation
             if invitation:
@@ -203,7 +214,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         "activity": activity,
         "person": person,
         "invitation": invitation,
-        "price": activity.price_in_dkk,
+        "price": price,
         "seats_left": activity.seats_left(),
         "signupform": signup_form,
         "signup_closed": signup_closed,

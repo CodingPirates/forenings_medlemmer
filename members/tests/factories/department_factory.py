@@ -23,6 +23,7 @@ class DepartmentFactory(DjangoModelFactory):
     closed_dtm = LazyAttribute(lambda d: datetime_after(d.created))
     isVisible = Faker("boolean")
     isOpening = Faker("boolean")
+    has_waiting_list = Faker("boolean")
     website = Faker("url")
     union = SubFactory(UnionFactory)
     address = SubFactory(AddressFactory)

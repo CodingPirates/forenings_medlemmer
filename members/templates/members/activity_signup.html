@@ -10,13 +10,14 @@
         <div class="col-lg-6">
           <strong>Sted:</strong><br>
             <address>
-              {{activity.streetname}} {{activity.housenumber}}{%if activity.floor or activity.door%}, {%endif%}
-              {%if activity.floor %}{{activity.floor}}.{%endif%}
-              {%if activity.door%}{{activity.door}}{%endif%}
+              {{activity.address.streetname}} {{activity.address.housenumber}}
+              {%if activity.address.floor or activity.address.door%}, {%endif%}
+              {%if activity.address.floor %}{{activity.address.floor}}.{%endif%}
+              {%if activity.address.door%}{{activity.address.door}}{%endif%}
               <br>
-              {%if activity.placename%}{{activity.placename}}<br>{%endif%}
-              {{activity.zipcode}} {{activity.city}}<br>
-              {{activity.placenave}}<br>
+              {%if activity.address.placename%}{{activity.address.placename}}<br>{%endif%}
+              {{activity.address.zipcode}} {{activity.address.city}}<br>
+              {{activity.address.placenave}}<br>
             </address>
         </div>
         <div class="col-lg-6">
@@ -88,9 +89,9 @@
       {% else %}
         {% if not family %}
           <hr>
-          <a href="{% url 'person_login' %}">Log ind</a>
-          eller 
-          <a href="{% url 'account_create' %}">tilmeld dit barn</a>
+          <a href="{% url 'person_login' %}?next={{request.path}}">Log ind</a>
+          eller
+          <a href="{% url 'account_create' %}?next={{request.path}}">tilmeld dit barn</a>
           for at tilmelde dig denne aktivitet.
         {% else %}
           {% if signup_closed %}

@@ -31,20 +31,23 @@ class Person(models.Model):
         (PARENT, "Forælder"),
         (GUARDIAN, "Værge"),
         (CHILD, "Barn"),
-        (OTHER, "Anden"),
+        (OTHER, "Andet"),
     )
     MALE = "MA"
     FEMALE = "FM"
+    OTHER_GENDER = "OT"
     SELECT_GENDER_TEXT = "(Vælg køn)"
     MEMBER_GENDER_CHOICES = (
         ("", SELECT_GENDER_TEXT),
         (MALE, "Dreng"),
         (FEMALE, "Pige"),
+        (OTHER_GENDER, "Andet"),
     )
     MEMBER_ADULT_GENDER_CHOICES = (
         ("", SELECT_GENDER_TEXT),
         (MALE, "Mand"),
         (FEMALE, "Kvinde"),
+        (OTHER_GENDER, "Andet"),
     )
     membertype = models.CharField(
         "Type", max_length=2, choices=MEMBER_TYPE_CHOICES, default=PARENT
@@ -112,6 +115,16 @@ class Person(models.Model):
 
     def firstname(self):
         return self.name.partition(" ")[0]
+
+    def gender_text(self):
+        if self.gender == self.MALE:
+            return "Dreng/Mand"
+        elif self.gender == self.FEMALE:
+            return "Pige/Kvinde"
+        elif self.gender == self.OTHER_GENDER:
+            return "Andet"
+        else:
+            return "N/A"
 
     def update_dawa_data(self):
         if self.address_invalid:

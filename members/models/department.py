@@ -10,6 +10,7 @@ class Department(models.Model):
         verbose_name_plural = "Afdelinger"
         verbose_name = "Afdeling"
         ordering = ["address__zipcode"]
+        permissions = (("view_all_departments", "Can view all Afdelinger"),)
 
     help_dept = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi
     nævner det de fleste steder på siden."""
@@ -27,6 +28,7 @@ class Department(models.Model):
     address = models.ForeignKey(
         "Address", on_delete=models.PROTECT, verbose_name="Adresse"
     )
+    has_waiting_list = models.BooleanField("Brug af venteliste", default=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     created = models.DateField(
         "Oprettet",
