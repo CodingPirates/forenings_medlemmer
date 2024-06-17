@@ -13,8 +13,8 @@ import uuid
 
 class EmailItem(models.Model):
     class Meta:
-        verbose_name = "Email"
-        verbose_name_plural = "Emails"
+        verbose_name = "Afsendt email"
+        verbose_name_plural = "Afsendte emails"
         ordering = ["-created_dtm"]
 
     person = models.ForeignKey(

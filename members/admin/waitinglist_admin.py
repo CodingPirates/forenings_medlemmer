@@ -278,7 +278,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         ).distinct()
 
     def union_link(self, item):
-        url = reverse("admin:members_union_change", args=[item.id])
+        url = reverse("admin:members_union_change", args=[item.department.union_id])
         link = '<a href="%s">%s</a>' % (url, escape(item.department.union.name))
         return mark_safe(link)
 
