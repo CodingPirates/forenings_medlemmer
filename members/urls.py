@@ -14,6 +14,7 @@ from members.views import (
     PersonUpdate,
     QuickpayCallback,
     SupportMembership,
+    VolunteerRequestNew,
     WaitingListSetSubscription,
     departmentView,
     paymentGatewayErrorView,
@@ -73,7 +74,10 @@ urlpatterns = [
     re_path(r"^activities/$", Activities, name="activities"),
     re_path(r"^membership/$", Membership, name="membership"),
     re_path(r"^support_membership/$", SupportMembership, name="support_membership"),
-    re_path(r"^volunteer$", volunteerSignup, name="volunteer_signup"),
+    re_path(r"^volunteer/$", volunteerSignup, name="volunteer_signup"),
+    re_path(
+        r"^volunteer_request_new/$", VolunteerRequestNew, name="volunteer_request_new"
+    ),
     re_path(r"^user_created/$", userCreated, name="user_created"),
     re_path(r"^admin_signup/$", AdminSignup, name="admin_signup"),
     re_path(r"^family/$", FamilyDetails, name="family_detail"),

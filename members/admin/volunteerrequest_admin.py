@@ -10,7 +10,7 @@ class VolunteerRequestAdmin(admin.ModelAdmin):
         "phone",
         "created",
         "finished",
-        "token"
+        "token",
     )
 
     date_hierarchy = "created"
