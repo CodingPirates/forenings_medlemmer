@@ -1,8 +1,12 @@
 import codecs
+from datetime import timedelta
 from django import forms
 from django.contrib import admin
+from django.contrib import messages
+from django.contrib.admin.widgets import AdminDateWidget
 from django.db.models.functions import Lower
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -159,7 +163,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
 
-    actions = ["export_csv_invitation_info"]
+    actions = ["export_csv_invitation_info", "extend_invitations"]
 
     form = ActivityInviteAdminForm
 
@@ -315,3 +319,89 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         return response
 
     export_csv_invitation_info.short_description = "Exporter Invitationsinformationer"
+
+    def extend_invitations(modelAdmin, request, queryset):
+        print("=== extend_invitations")
+        # Get list of available departments
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_departments"
+        ):
+            department_list_query = Department.objects.all().order_by("name")
+        else:
+            department_list_query = Department.objects.filter(
+                adminuserinformation__user=request.user
+            ).order_by("name")
+        department_list = [("-", "-")]
+        for department in department_list_query:
+            department_list.append((department.id, department.name))
+
+        # Get list of active and future activities
+        department_ids = department_list_query.values_list("id", flat=True)
+        activity_list_query = Activity.objects.filter(
+            end_date__gt=timezone.now()
+        ).order_by("department__name", "name")
+        if not request.user.is_superuser and not request.user.has_perm(
+            "members.view_all_departments"
+        ):
+            activity_list_query = activity_list_query.filter(
+                department__in=department_ids
+            ).order_by("department__name", "name")
+        activity_list = [("-", "-")]
+        for activity in activity_list_query:
+            activity_list.append(
+                (activity.id, activity.department.name + ", " + activity.name)
+            )
+
+        # Form used to select department and activity - redundant department is for double check
+        class ExtendInvitationsForm(forms.Form):
+            print("=== ExtendInvitationsForm")
+            expires = forms.DateField(
+                label="Udløber",
+                widget=AdminDateWidget(),
+                initial=timezone.now() + timedelta(days=14),
+            )
+
+        # Lookup all the selected persons - to show confirmation list
+        # Check if it's called from Waiting List
+        # if queryset.model is WaitingList:
+        #     q = [wl.person.pk for wl in queryset]
+        #     persons = Person.objects.filter(pk__in=q)
+        # # or if it's called from the Participants list
+        # elif queryset.model is ActivityParticipant:
+        #     q = [pa.person.pk for pa in queryset]
+        #     persons = Person.objects.filter(pk__in=q)
+        # else:
+        persons = queryset
+
+        context = admin.site.each_context(request)
+        if persons is None:
+            q = [wl.person.pk for wl in queryset]
+            persons = Person.objects.filter(pk__in=q)
+            # queryset = persons
+
+        context["persons"] = persons
+        context["queryset"] = queryset
+
+        expires = timezone.now() + timedelta(days=14)
+        context["expires"] = expires
+
+        if request.method == "POST":  # and "activityinvite" in request.POST:
+            print("=== POST")
+            print(f"=== request.POST: {request.POST}")
+            # Post request with data
+            extend_invitations_form = ExtendInvitationsForm(request.POST)
+            context["extend_invitations_form"] = extend_invitations_form
+
+            if extend_invitations_form.is_valid():
+                #  Department and Activity selected
+                activity = Activity.objects.get(
+                    pk=extend_invitations_form.cleaned_data["activity"]
+                )
+                expires = extend_invitations_form.cleaned_data["expires"]
+                print(f"=== expires: {expires}")
+        else:
+            context["extend_invitations_form"] = ExtendInvitationsForm()
+
+        return render(request, "admin/extend_invitations.html", context)
+
+    extend_invitations.short_description = "Forlæng invitationer"
