@@ -28,7 +28,7 @@ class EmailItem(models.Model):
         "EmailTemplate", null=True, on_delete=models.DO_NOTHING
     )
     bounce_token = models.UUIDField(default=uuid.uuid4, null=False)
-    activity = models.ForeignKey("Activity", null=True, on_delete=models.DO_NOTHING)
+    activity = models.ForeignKey("Activity", null=True, on_delete=models.CASCADE)
     department = models.ForeignKey(
         "Department", blank=True, null=True, on_delete=models.DO_NOTHING
     )
