@@ -37,6 +37,14 @@ class VolunteerRequestDepartment(models.Model):
 
     status = models.IntegerField("Status", choices=STATUS_CHOICES, default=1)
 
+    def whishes(self):
+        return self.volunteer_request.info_whishes
+    whishes.short_description = "Ønsker"
+
+    def reference(self):
+        return self.volunteer_request.info_reference
+    reference.short_description = "Reference"
+
     def __str__(self):
         return f"{self.department}: {self.volunteer_request}"
 

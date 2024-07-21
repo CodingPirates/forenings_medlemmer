@@ -45,9 +45,9 @@ class VolunteerRequest(models.Model):
 
     def __str__(self):
         if self.name is not None:
-            return f"{self.name} <{self.email}> ({self.created.strftime('%Y-%m-%d %H:%M:%s')})"
+            return f"{self.name} <{self.email}> ({self.created.strftime('%Y-%m-%d %H:%M:%S')})"
         else:
-            return f"{self.person} ({self.created.strftime('%Y-%m-%d %H:%M:%s')})"
+            return f"{self.person} ({self.created.strftime('%Y-%m-%d %H:%M:%S')})"
 
     """
     def save(self, *args, **kwargs):

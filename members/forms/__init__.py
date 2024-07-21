@@ -14,5 +14,4 @@ __all__ = [
     vol_signupForm,
     adminSignupForm,
     volunteerRequestNewForm,
-   
 ]
