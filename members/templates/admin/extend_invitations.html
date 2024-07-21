@@ -48,8 +48,8 @@
         <div class="description">
           <p>Forlæng invitation for følgende ({{ persons.count }}) personer:</p>
           <ul>
-              {% for item in persons %}
-              <li>{{ item.person.name }} ({{ item.person.email }})</li>
+              {% for invitation in invitations %}
+              <li>{{ invitation.person.name }}</li>
               {% endfor %}
           </ul>
         </div>
