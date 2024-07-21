@@ -12,10 +12,12 @@ from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
+from django.db.models import Exists, OuterRef
 
 from members.models import (
     Activity,
     ActivityInvite,
+    ActivityParticipant,
     AdminUserInformation,
     Department,
     Person,
@@ -170,7 +172,15 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     # Only show invitation to own activities
     def get_queryset(self, request):
-        qs = super(ActivityInviteAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
+        qs = queryset.annotate(
+            is_participating=Exists(
+                ActivityParticipant.objects.filter(
+                    person=OuterRef("person"), activity=OuterRef("activity")
+                )
+            )
+        )
+
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_departments"
         ):
@@ -216,11 +226,13 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         return item.person.age_years()
 
     person_age_years.short_description = "Alder"
+    person_age_years.admin_order_field = "person__birthday"
 
     def person_zipcode(self, item):
         return item.person.zipcode
 
     person_zipcode.short_description = "Postnummer"
+    person_zipcode.admin_order_field = "person__zipcode"
 
     def activity_department_union_link(self, item):
         url = reverse(
@@ -264,12 +276,11 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     person_link.admin_order_field = "person__name"
 
     def participating(self, item):
-        return item.person.activityparticipant_set.filter(
-            activity=item.activity
-        ).exists()
+        return item.is_participating
 
     participating.short_description = "Deltager"
     participating.boolean = True
+    participating.admin_order_field = "is_participating"
 
     def export_csv_invitation_info(self, request, queryset):
         result_string = """"Forening"; "Afdeling"; "Aktivitet"; "Deltager";\
