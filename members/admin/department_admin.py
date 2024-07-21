@@ -12,6 +12,7 @@ from members.models import (
 )
 from django.utils.html import escape
 from django.http import HttpResponse
+from django.db.models import Count
 
 
 class AdminUserDepartmentInline(admin.TabularInline):
@@ -97,8 +98,6 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 class DepartmentAdmin(admin.ModelAdmin):
     inlines = [AdminUserDepartmentInline]
     list_display = (
-        "id",
-        "department_union_link",
         "department_link",
         "address",
         "isVisible",
@@ -107,6 +106,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         "created",
         "closed_dtm",
         "waitinglist_count_link",
+        "department_union_link",
     )
     list_filter = (
         "address__region",
@@ -149,7 +149,9 @@ class DepartmentAdmin(admin.ModelAdmin):
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_queryset(self, request):
-        qs = super(DepartmentAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
+        qs = queryset.annotate(waitinglist_count=Count("waitinglist"))
+
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_departments"
         ):
@@ -210,11 +212,12 @@ class DepartmentAdmin(admin.ModelAdmin):
         link = f"""<a
             href="{admin_url}?waiting_list={item.id}"
             title="Vis venteliste for afdelingen Coding Pirates {item.name}">
-            {item.waitinglist_set.count()}
+            {item.waitinglist_count}
             </a>"""
         return mark_safe(link)
 
     waitinglist_count_link.short_description = "Venteliste"
+    waitinglist_count_link.admin_order_field = "waitinglist_count"
 
     def export_department_info_csv(self, request, queryset):
         result_string = """"Forening"; "Afdeling"; "Afdeling-Startdato"; "Afdeling-lukkedato";\
