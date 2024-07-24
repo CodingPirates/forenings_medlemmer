@@ -36,8 +36,8 @@
         placeholder="Søg efter..."
       >
       <br>
-      {% regroup current_activities by department.union.address.region as departments_region %}
-      {% if current_activities %}
+      {% regroup memberships_available by union.address.region as departments_region %}
+      {% if memberships_available %}
         <div class="tabs">
           <ul>
             {% for region in departments_region %}
@@ -61,52 +61,52 @@
                 </tr>
                 </thead>
                 <tbody class="union-membership-tablebody">
-                {% for activity in region.list|dictsort:"department.name" %}
+                {% for union in region.list|dictsort:"name" %}
                   <tr>
                     <td>
                       Coding Pirates<br>
-                      {{ activity.department.union.name }}
+                      {{ union.name }}
                     </td>
                     <td>
-                      {% if activity.placename %}
-                        {{ activity.placename }}<br>
+                      {% if union.placename %}
+                        {{ union.placename }}<br>
                       {% endif %}
-                      {{ activity.streetname }}
-                      {{ activity.housenumber }}
-                      {% if activity.floor %}
-                        {{ activity.floor }}
+                      {{ union.streetname }}
+                      {{ union.housenumber }}
+                      {% if union.floor %}
+                        {{ union.floor }}
                       {% endif %}
-                      {% if activity.door %}
-                        {{ activity.door }}
+                      {% if union.door %}
+                        {{ union.door }}
                       {% endif %}
                       <br>
-                      {{ activity.zipcode }}
-                      {{ activity.city }}
+                      {{ union.zipcode }}
+                      {{ union.city }}
                     </td>
 
-                    <td>{{ activity.name }}</td>
-                    <td>{{ activity.price_in_dkk }} kr</td>
+                    <td>{{ union.name }}</td>
+                    <td>{{ union.price_in_dkk }} kr</td>
                     <td>
-                      {% if activity.start_date == activity.end_date %}
-                        {{ activity.start_date }}
+                      {% if union.start_date == union.end_date %}
+                        {{ union.start_date }}
                       {% else %}
-                        {{ activity.start_date }} <br> - {{ activity.end_date }}
+                        {{ union.start_date }} <br> - {{ union.end_date }}
                       {% endif %}
                     </td>
                         <td>
                       <a
                           class="button"
-                          href="{% url 'activity_view_family' activity.id %}"
+                          href=" url 'membership_view_family' activity.id "
                           target="_blank"
                       >
                         Læs mere
                       </a>
                     </td>
                     <td>
-                      {% for person in activity.persons %}
+                      {% for person in union.persons %}
                         <a
                             class="button-success"
-                            href="{% url 'activity_signup' activity.id person.id %}"
+                            href=" url 'membership_signup' union.id person.id "
                         >
                           Tilmeld {{ person.firstname }}
                         </a>
@@ -131,9 +131,9 @@
         <p>
           Se her hvor du eller dit barn er medlem.
         </p>
-        {% if participating %}
+        {% if members %}
           <p>
-            Hvis en aktivitet har en <kbd style="background-color:red">Betal</kbd>-knap, er betalingen ikke
+            Hvis et medlemskab har en <kbd style="background-color:red">Betal</kbd>-knap, er betalingen ikke
             registreret. Tryk på knappen for at betale.
           </p>
           <table>
@@ -146,25 +146,25 @@
             </tr>
             </thead>
             <tbody>
-            {% for participation in participating %}
+            {% for member in members %}
               <tr>
-                <td>{{ participation.person.name }}</td>
+                <td>{{ member.person.name }}</td>
                 <td>
-                  <a href="{% url 'activity_view_person' participation.activity.id participation.person.id %}">
-                    {{ participation.activity.name }}
+                  <a href=" url 'activity_view_person' participation.activity.id participation.person.id ">
+                    {{ member.name }}
                   </a>
-                  {% if not participation.paid %}
-                    <a class="button-danger" href="{{ participation.get_payment_link }}">
+                  {% if not member.paid %}
+                    <a class="button-danger" href="{{ member.get_payment_link }}">
                       Betal
                     </a>
                   {% endif %}
                 </td>
-                <td>Coding Pirates {{ participation.activity.department.union.name }}</td>
+                <td>Coding Pirates {{ member.union.name }}</td>
                 <td>
-                  {% if participation.activity.start_date == participation.activity.end_date %}
-                    {{ participation.activity.start_date }}
+                  {% if member.member_since == member.member_until or member.member_until is None %}
+                    {{ member.member_since }}
                   {% else %}
-                    {{ participation.activity.start_date }} <br> - {{ participation.activity.end_date }}
+                    {{ member.member_since }} <br> - {{ member.member_until }}
                   {% endif %}
                 </td>
               </tr>

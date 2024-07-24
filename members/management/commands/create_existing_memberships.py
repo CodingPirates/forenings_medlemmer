@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = "Creates all existing memberships when migrating to new membership structure"
 
     def handle(self, *args, **kwargs):
-        # Move members from dedicated activities
+        # Move members from activities
         membership_activities = Activity.objects.filter(
             activitytype="FORENINGSMEDLEMSKAB"
         ) | Activity.objects.filter(

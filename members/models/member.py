@@ -46,3 +46,18 @@ class Member(models.Model):
 
         if errors:
             raise ValidationError(errors)
+
+    def paid(self):
+        # not paid if unconfirmed payments on this activity participation
+        return not members.models.payment.Payment.objects.filter(
+            member=self, accepted_at=None
+        )
+
+    def get_payment_link(self):
+        payment = members.models.payment.Payment.objects.get(
+            member=self, confirmed_at=None
+        )
+        if payment.payment_type == members.models.payment.Payment.CREDITCARD:
+            return payment.get_quickpaytransaction().get_link_url()
+        else:
+            return 'javascript:alert("Kan ikke betales her:  Kontakt Coding Pirates for hjælp");'
