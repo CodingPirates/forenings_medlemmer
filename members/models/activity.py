@@ -139,5 +139,10 @@ class Activity(models.Model):
                 f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
             )
 
+        if self.signup_closing > self.end_date:
+            errors["signup_closing"] = (
+                "Tilmeldingsfristen skal være før aktiviteten slutter"
+            )
+
         if errors:
             raise ValidationError(errors)
