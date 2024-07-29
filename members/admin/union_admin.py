@@ -81,7 +81,6 @@ class AdminUserUnionInline(admin.TabularInline):
 class UnionAdmin(admin.ModelAdmin):
     inlines = [AdminUserUnionInline]
     list_display = (
-        "id",
         "union_link",
         "address",
         "union_email",
