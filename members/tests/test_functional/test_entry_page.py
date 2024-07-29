@@ -32,7 +32,7 @@ class EntryPageTest(StaticLiveServerTestCase):
     def tearDown(self):
         if not os.path.exists("test-screens"):
             os.mkdir("test-screens")
-        self.browser.save_screenshot("test-screens/activities_list_final.png")
+        self.browser.save_screenshot("test-screens/entry_page_final.png")
         self.browser.quit()
 
     def test_entry_page_as_person(self):

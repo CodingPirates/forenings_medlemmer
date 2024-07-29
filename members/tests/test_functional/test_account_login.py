@@ -31,7 +31,7 @@ class AccountLoginTest(StaticLiveServerTestCase):
     def tearDown(self):
         if not os.path.exists("test-screens"):
             os.mkdir("test-screens")
-        self.browser.save_screenshot("test-screens/activities_list_final.png")
+        self.browser.save_screenshot("test-screens/account_login_final.png")
         self.browser.quit()
 
     def test_account_login(self):
