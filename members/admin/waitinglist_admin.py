@@ -79,7 +79,6 @@ class WaitingListAdmin(admin.ModelAdmin):
         return form
 
     list_display = (
-        "union_link",
         "department_link",
         "person_link",
         "person_age_years",
@@ -89,6 +88,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         "user_waiting_list_number",
         "user_created",
         "user_added_waiting_list",
+        "union_link",
     )
 
     list_filter = (
