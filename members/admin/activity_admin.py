@@ -138,6 +138,8 @@ class ActivityAdmin(admin.ModelAdmin):
     ]
     save_as = True
 
+    ordering = ("-start_date", "department__name", "name")
+
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
         js = ("members/js/copy_to_clipboard.js",)
