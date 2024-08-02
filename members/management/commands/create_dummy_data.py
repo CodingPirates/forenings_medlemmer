@@ -17,17 +17,14 @@ from django.utils import timezone
 from collections import namedtuple
 
 # We're creating a union for each region.
-# TODO: foreningerne skal bare hedde fx "Syddanmark", men skal bruge "region" foran for at den finder den rigtige region.
-# - Enten: hardcode "Region" ind foran
-# - Eller: Tuple med "union name" og "region name"
-# - Eller: Tag listen fra address.py (lidt svært at udvide på, hvis man vil have andre unions)
-Union_to_create = namedtuple('Union_to_create', 'region_name union_name')
+# A named tuple with a name for the Union, and a name for the region to use in its address.
+Union_to_create = namedtuple("Union_to_create", "union_name region_name")
 UNIONS_TO_CREATE = [
-    "Region Syddanmark",
-    "Region Hovedstaden",
-    "Region Nordjylland",
-    "Region Midtjylland",
-    "Region Sjælland",
+    Union_to_create(union_name="Syddanmark", region_name="Region Syddanmark"),
+    Union_to_create(union_name="Hovedstaden", region_name="Region Hovedstaden"),
+    Union_to_create(union_name="Nordjylland", region_name="Region Nordjylland"),
+    Union_to_create(union_name="Midtjylland", region_name="Region Midtjylland"),
+    Union_to_create(union_name="Sjælland", region_name="Region Sjælland")
 ]
 
 
@@ -43,10 +40,10 @@ class Command(BaseCommand):
     # TODO: Refactor handle()
     def handle(self, *args, **options):
         # Setting up unions
-        for union_name in UNIONS_TO_CREATE:
-            print(f"**Creating union: {union_name}**")
+        for union_to_create in UNIONS_TO_CREATE:
+            print(f"**Creating union: {union_to_create.union_name}**")
             union = UnionFactory(
-                name=union_name, address=AddressFactory(region=union_name)
+                name=union_to_create.union_name, address=AddressFactory(region=union_to_create.region_name)
             )
             departments = [
                 _create_department(union=union),
