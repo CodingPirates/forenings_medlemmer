@@ -24,7 +24,7 @@ UNIONS_TO_CREATE = [
     Union_to_create(union_name="Hovedstaden", region_name="Region Hovedstaden"),
     Union_to_create(union_name="Nordjylland", region_name="Region Nordjylland"),
     Union_to_create(union_name="Midtjylland", region_name="Region Midtjylland"),
-    Union_to_create(union_name="Sjælland", region_name="Region Sjælland")
+    Union_to_create(union_name="Sjælland", region_name="Region Sjælland"),
 ]
 
 
@@ -43,7 +43,8 @@ class Command(BaseCommand):
         for union_to_create in UNIONS_TO_CREATE:
             print(f"**Creating union: {union_to_create.union_name}**")
             union = UnionFactory(
-                name=union_to_create.union_name, address=AddressFactory(region=union_to_create.region_name)
+                name=union_to_create.union_name,
+                address=AddressFactory(region=union_to_create.region_name),
             )
             departments = [
                 _create_department(union=union),
