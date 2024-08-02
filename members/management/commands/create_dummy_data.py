@@ -1,4 +1,7 @@
 from django.core.management.base import BaseCommand
+from factory.fuzzy import FuzzyChoice
+
+from members.models import Address
 from members.tests.factories import (
     PersonFactory,
     UnionFactory,
@@ -11,15 +14,20 @@ from members.tests.factories import (
 )
 from factory import Faker
 from django.utils import timezone
-
+from collections import namedtuple
 
 # We're creating a union for each region.
+# TODO: foreningerne skal bare hedde fx "Syddanmark", men skal bruge "region" foran for at den finder den rigtige region.
+# - Enten: hardcode "Region" ind foran
+# - Eller: Tuple med "union name" og "region name"
+# - Eller: Tag listen fra address.py (lidt svært at udvide på, hvis man vil have andre unions)
+Union_to_create = namedtuple('Union_to_create', 'region_name union_name')
 UNIONS_TO_CREATE = [
-    "Syddanmark",
-    "Hovedstaden",
-    "Nordjylland",
-    "Midtjylland",
-    "Sjælland",
+    "Region Syddanmark",
+    "Region Hovedstaden",
+    "Region Nordjylland",
+    "Region Midtjylland",
+    "Region Sjælland",
 ]
 
 
@@ -32,6 +40,7 @@ class Command(BaseCommand):
         f"Unions that'll be created: {str.join(', ', UNIONS_TO_CREATE)}"
     )
 
+    # TODO: Refactor handle()
     def handle(self, *args, **options):
         # Setting up unions
         for union_name in UNIONS_TO_CREATE:
@@ -63,7 +72,11 @@ class Command(BaseCommand):
 
 # Creates a department following the requirements: 2 activities per department with 2 children per activity.
 def _create_department(union):
-    department = DepartmentFactory(union=union)
+    department = DepartmentFactory(
+        union=union,
+        address=AddressFactory(region=union.address.region),
+        closed_dtm=None,
+    )
     _create_activity(department)
     _create_activity(department)
     print("Created department")
@@ -84,6 +97,7 @@ def _create_activity(department):
         end_date=end_date,
         max_participants=Faker("random_int", min=10, max=100),
         price_in_dkk=Faker("random_int", min=500, max=1000),
+        address=AddressFactory(region=department.address.region),
     )
     # Creates 2 children and assigns them to the activity
     ActivityParticipantFactory(person=_create_child(), activity=activity)
