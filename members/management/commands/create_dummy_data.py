@@ -34,10 +34,9 @@ class Command(BaseCommand):
         f"{len(UNIONS_TO_CREATE)} unions in total. 2 departments per union. 2 activities per department, "
         "with 2 children in each. Additionally each department will have 1 or 2 children on the "
         "waiting list, and all children will have one parent and family. "
-        f"Unions that'll be created: {str.join(', ', UNIONS_TO_CREATE)}"
+        f"Unions that'll be created: {str.join(', ', (x.union_name for x in UNIONS_TO_CREATE))}"
     )
 
-    # TODO: Refactor handle()
     def handle(self, *args, **options):
         # Setting up unions
         for union_to_create in UNIONS_TO_CREATE:
@@ -46,26 +45,23 @@ class Command(BaseCommand):
                 name=union_to_create.union_name,
                 address=AddressFactory(region=union_to_create.region_name),
             )
-            departments = [
-                _create_department(union=union),
-                _create_department(union=union),
-            ]
-            print("Creating waiting list.")
-            # Create 2 children and make them waitlisted (One child on waiting list for
-            # the first department only, and one child on waiting list for both departments)
-            # Child on waiting list for the first department only:
-            WaitingListFactory(person=_create_child(), department=departments[0])
-            # Child on waiting list for both departments:
-            child_on_both_waiting_lists = _create_child()
-            WaitingListFactory(
-                person=child_on_both_waiting_lists, department=departments[0]
+            _setup_waitlist(
+                _create_department(union=union), _create_department(union=union)
             )
-            WaitingListFactory(
-                person=child_on_both_waiting_lists, department=departments[1]
-            )
-
         # Notify when command has finished
         print("**Finished**")
+
+
+# Creates 2 children and makes them waitlisted (One child on waiting list for
+# the first department only, and one child on waiting list for both departments)
+def _setup_waitlist(department1, department2):
+    print("Creating waiting list.")
+    # Child on waiting list for the first department only:
+    WaitingListFactory(person=_create_child(), department=department1)
+    # Child on waiting list for both departments:
+    child_on_both_waiting_lists = _create_child()
+    WaitingListFactory(person=child_on_both_waiting_lists, department=department1)
+    WaitingListFactory(person=child_on_both_waiting_lists, department=department2)
 
 
 # Creates a department following the requirements: 2 activities per department with 2 children per activity.
