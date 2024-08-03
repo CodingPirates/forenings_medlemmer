@@ -16,6 +16,8 @@ from factory import Faker
 from django.utils import timezone
 from collections import namedtuple
 
+from members.tests.factories.factory_helpers import TIMEZONE
+
 # We're creating a union for each region.
 # A named tuple with a name for the Union, and a name for the region to use in its address.
 Union_to_create = namedtuple("Union_to_create", "union_name region_name")
@@ -92,6 +94,9 @@ def _create_activity(department):
         max_participants=Faker("random_int", min=10, max=100),
         price_in_dkk=Faker("random_int", min=500, max=1000),
         address=AddressFactory(region=department.address.region),
+        signup_closing=Faker(
+            "date_time_between", tzinfo=TIMEZONE, start_date="+1d", end_date="+10d"
+        ),
     )
     # Creates 2 children and assigns them to the activity
     ActivityParticipantFactory(person=_create_child(), activity=activity)
