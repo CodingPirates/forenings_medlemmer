@@ -105,7 +105,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         "person__municipality",
     ]
     search_help_text = mark_safe(
-        """Du kan søge på foreningsnavn, afdelingsnavn eller person (navn, postnummer eller kommune).<br>
+        """Du kan søge på forening (navn), afdeling (navn) eller person (navn, postnummer eller kommune).<br>
         'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
     )
 
