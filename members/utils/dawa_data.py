@@ -4,10 +4,9 @@
 import json
 import requests
 
+
 def get_user_region(person):
-    dawa_req = (
-        f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
-    )
+    dawa_req = f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
     try:
         dawa_reply = json.loads(requests.get(dawa_req).text)
         user_region = dawa_reply["properties"]["regionsnavn"]

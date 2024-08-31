@@ -6,9 +6,9 @@ from crispy_forms.bootstrap import FormActions
 from members.models.activityparticipant import ActivityParticipant
 
 
-class ActivitySignupForm(forms.Form):
+class MembershipSignupForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(ActivitySignupForm, self).__init__(*args, **kwargs)
+        super(MembershipSignupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.form_action = ""

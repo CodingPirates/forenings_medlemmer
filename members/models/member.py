@@ -7,6 +7,7 @@ from django.utils import timezone
 def end_of_year():
     return date(date.today().year, 12, 31)
 
+
 class Member(models.Model):
     class Meta:
         verbose_name = "Medlem"
@@ -28,9 +29,7 @@ class Member(models.Model):
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=75
     )
-    paid_at = models.DateTimeField(
-        "Betalt", blank=True, null=True
-    )
+    paid_at = models.DateTimeField("Betalt", blank=True, null=True)
 
     def __str__(self):
         return f"{self.person}, {self.union}, {self.member_since.year}"
@@ -40,9 +39,9 @@ class Member(models.Model):
         min_amount = 75
 
         if self.price_in_dkk < min_amount:
-            errors[
-                "price_in_dkk"
-            ] = f"Prisen er for lav. Medlemskaber skal koste mindst {min_amount} kr."
+            errors["price_in_dkk"] = (
+                f"Prisen er for lav. Medlemskaber skal koste mindst {min_amount} kr."
+            )
 
         if errors:
             raise ValidationError(errors)

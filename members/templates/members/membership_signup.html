@@ -15,6 +15,12 @@
             <p>Medlemskab giver hverken dig eller evt. dit barn ret til at deltage i aktiviteter i foreningerne - det skal der tilmeldes og betales særskilt for. Ligeledes giver medlemskab af Coding Pirates {{ union.name }} og Coding Pirates Denmark dig ikke rettigheder i andre Coding Pirates foreninger.</p>
         {% endif %}
         <div class="col-lg-6">
+          <p>
+            <strong>Lokalforening:</strong><br>
+            {{ union.name }}
+          </p>
+        </div>
+        <div class="col-lg-6">
           <strong>Foreningsadresse:</strong><br>
             <address>
               {{union.address.streetname}} {{union.address.housenumber}}{%if union.address.floor or union.address.door%}, {%endif%}
@@ -31,20 +37,13 @@
         <div class="col-lg-6">
           <p>
           <strong>Kontakt:</strong><br>
-            <a href="mailto:{{ union.union_email }}" value="Kontakt foreningen">{{ union.union_email }}</a><br>
+            <a href="mailto:{{ union.email }}" value="Kontakt foreningen">{{ union.email }}</a><br>
           </p>
         </div>
         <div class="col-lg-6">
           <p>
           <strong>Pris:</strong><br>
           {{ price | floatformat:2}} kr<br>
-          </p>
-        </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <p>
-            <strong>Lokalforening:</strong><br>
-            {{ union.name }}
           </p>
         </div>
       </div>
@@ -55,16 +54,17 @@
       {% else %}
         {% if not family %}
           <hr>
-          <a href="{% url 'person_login' %}">Log ind</a>
+          <a href="{% url 'person_login' %}">Log ind</a>,
+          <a href="{% url 'account_create' %}">opret en konto til en voksen og børn</a>
           eller
-          <a href="{% url 'account_create' %}">opret en konto</a>
+          <a href="{% url 'volunteer_signup' %}">opret en konto til en voksen</a>
           for at blive medlem.
         {% else %}
           {% if signup_closed %}
           <!--and not participating % -->
             <hr>
               <div class="alert alert-primary">
-                <p>Aktiviteten er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
+                <p>Medlemskab af foreningen er desværre ikke muligt på nuværende tidspunkt. Dette kan for eksempel skyldes, at foreningen ikke er åben.</p>
               </div>
             <hr/>
           {% else %}

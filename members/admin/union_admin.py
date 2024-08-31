@@ -167,6 +167,7 @@ class UnionAdmin(admin.ModelAdmin):
                     "membership_price_in_dkk",
                     "founded_at",
                     "closed_at",
+                    "memberships_allowed_at",
                 ),
                 "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
                 generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",

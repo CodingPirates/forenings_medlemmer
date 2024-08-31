@@ -5,9 +5,8 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
-from members.forms import ActivitySignupForm
-from members.models.activityinvite import ActivityInvite
-from members.models.activityparticipant import ActivityParticipant
+from members.forms import MembershipSignupForm
+from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
 from members.models.union import Union
@@ -49,9 +48,7 @@ def MembershipSignup(request, union_id, person_id=None):
 
             # Check not already signed up
             try:
-                member = Member.objects.get(
-                    union=union, person=person
-                )
+                member = Member.objects.get(union=union, person=person)
                 # found - we can only allow one - switch to view mode
                 participating = True
                 view_only_mode = True
@@ -65,6 +62,9 @@ def MembershipSignup(request, union_id, person_id=None):
 
     # signup_closed should default to False
     signup_closed = False
+
+    if not union.memberships_allowed_at or union.memberships_allowed_at < timezone.now().date:
+        signup_closed = True
 
     if request.method == "POST":
         if view_only_mode:
@@ -82,7 +82,7 @@ def MembershipSignup(request, union_id, person_id=None):
                 code="no_parent_guardian",
             )
 
-        signup_form = ActivitySignupForm(request.POST)
+        signup_form = MembershipSignupForm(request.POST)
 
         if signup_form.is_valid():
             # Sign up and redirect to payment link or family page
@@ -156,7 +156,7 @@ def MembershipSignup(request, union_id, person_id=None):
             return HttpResponseRedirect(return_link_url)
         # fall through else
     else:
-        signup_form = ActivitySignupForm()
+        signup_form = MembershipSignupForm()
 
     context = {
         "family": family,

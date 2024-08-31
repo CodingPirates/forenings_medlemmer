@@ -102,7 +102,10 @@ class Activity(models.Model):
         return self.activitytype_id == "FORLØB"
 
     def is_eligable_for_membership(self):
-        return self.activitytype_id == "FORLØB" or self.activitytype_id == "FORENINGSMEDLEMSKAB"
+        return (
+            self.activitytype_id == "FORLØB"
+            or self.activitytype_id == "FORENINGSMEDLEMSKAB"
+        )
 
     def will_reserve(self):
         return self.start_date.year > timezone.now().year

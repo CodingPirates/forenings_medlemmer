@@ -13,9 +13,7 @@ class Command(BaseCommand):
         # Move members from activities
         membership_activities = Activity.objects.filter(
             activitytype="FORENINGSMEDLEMSKAB"
-        ) | Activity.objects.filter(
-                activitytype="FORLØB"
-            )
+        ) | Activity.objects.filter(activitytype="FORLØB")
 
         for activity in membership_activities:
             activityparticipants = ActivityParticipant.objects.filter(activity=activity)
@@ -24,17 +22,17 @@ class Command(BaseCommand):
                 self.create_membership_if_not_exists(activityparticipant)
 
     def create_membership_if_not_exists(self, activityparticipant):
-        if (not Member.objects.filter(
+        if not Member.objects.filter(
             union=activityparticipant.activity.union,
             person=activityparticipant.person,
-            member_since__year=activityparticipant.added_at.year
-        ).exists()):
+            member_since__year=activityparticipant.added_at.year,
+        ).exists():
             payment = Payment.objects.filter(
                 activity=activityparticipant.activity,
-                activityparticipant=activityparticipant
+                activityparticipant=activityparticipant,
             )
 
-            if (payment.exists()):
+            if payment.exists():
                 amount = payment.first().amount_ore / 100
                 paid_at = payment.first().confirmed_at
             else:
@@ -50,6 +48,8 @@ class Command(BaseCommand):
                 paid_at=paid_at,
             )
 
-            if (activityparticipant.activity.activitytype == "FORLØB"):
-                activityparticipant.price_in_dkk = activityparticipant.activity.price_in_dkk - 75
+            if activityparticipant.activity.activitytype == "FORLØB":
+                activityparticipant.price_in_dkk = (
+                    activityparticipant.activity.price_in_dkk - 75
+                )
                 activityparticipant.save()

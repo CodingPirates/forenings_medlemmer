@@ -3,6 +3,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.utils import timezone
 
 
 class Union(models.Model):
@@ -65,6 +66,13 @@ class Union(models.Model):
         default=None,
         help_text="Dato for lukning af denne forening",
     )
+    memberships_allowed_at = models.DateField(
+        "Dato hvor medlemskaber er tilladt fra",
+        help_text="Hvis feltet er tomt, vil det ikke være tilladt at være medlem af foreningen.",
+        default=timezone.now,
+        blank=True,
+        null=True,
+    )
     address = models.ForeignKey(
         "Address", on_delete=models.PROTECT, verbose_name="Adresse"
     )
@@ -105,9 +113,9 @@ class Union(models.Model):
         min_amount = 75
 
         if self.membership_price_in_dkk < min_amount:
-            errors[
-                "membership_price_in_dkk"
-            ] = f"Prisen er for lav. Medlemskaber skal koste mindst {min_amount} kr."
+            errors["membership_price_in_dkk"] = (
+                f"Prisen er for lav. Medlemskaber skal koste mindst {min_amount} kr."
+            )
 
         if errors:
             raise ValidationError(errors)
