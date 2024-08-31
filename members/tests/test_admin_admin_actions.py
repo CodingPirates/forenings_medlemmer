@@ -74,6 +74,9 @@ class TestAdminActions(TestCase):
         self.person_above_max_age = self.create_person_and_waiting_list_entry(
             name="person_above_max_age", age=18
         )
+        self.person_without_age = self.create_person_and_waiting_list_entry(
+            name="person_without_age"
+        )
 
         # activity starts in two days, person has birthday two weeks after
         self.person_too_young = self.create_person_and_waiting_list_entry(
@@ -108,6 +111,7 @@ class TestAdminActions(TestCase):
         )
 
     def create_person_and_waiting_list_entry(self, name=None, age=None, birthday=None):
+        person_birthday = None
         if age is not None:
             person_birthday = (
                 datetime.now() - relativedelta(years=age) - relativedelta(weeks=1)
@@ -117,16 +121,20 @@ class TestAdminActions(TestCase):
             person_birthday = birthday
             person_name = f"Testperson født {person_birthday}"
         else:
-            raise ValueError("Either age or birthday must be specified")
+            person_name = "Testperson uden fødselsdato"
 
         if name is not None:
             person_name = name
 
-        person = Person.objects.create(
-            name=person_name,
-            family=self.family,
-            birthday=person_birthday,
-        )
+        if person_birthday is not None:
+            person = Person.objects.create(
+                name=person_name,
+                family=self.family,
+                birthday=person_birthday,
+            )
+        else:
+            person = Person.objects.create(name=person_name, family=self.family)
+
         WaitingList(
             person=person,
             department=self.department,
