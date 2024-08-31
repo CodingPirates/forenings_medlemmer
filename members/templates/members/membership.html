@@ -36,7 +36,7 @@
         placeholder="Søg efter..."
       >
       <br>
-      {% regroup memberships_available by union.address.region as departments_region %}
+      {% regroup memberships_available by address.region as departments_region %}
       {% if memberships_available %}
         <div class="tabs">
           <ul>
@@ -55,9 +55,10 @@
                   <th>Adresse</th>
                   <th>Medlemskab</th>
                   <th>Pris</th>
-                  <th>Dato</th>
                   <th>Info</th>
-                  <th>Handling</th>
+                  {% if family %}
+                    <th>Handling</th>
+                  {% endif %}
                 </tr>
                 </thead>
                 <tbody class="union-membership-tablebody">
@@ -68,31 +69,24 @@
                       {{ union.name }}
                     </td>
                     <td>
-                      {% if union.placename %}
-                        {{ union.placename }}<br>
+                      {% if union.address.placename %}
+                        {{ union.address.placename }}<br>
                       {% endif %}
-                      {{ union.streetname }}
-                      {{ union.housenumber }}
-                      {% if union.floor %}
-                        {{ union.floor }}
+                      {{ union.address.streetname }}
+                      {{ union.address.housenumber }}
+                      {% if union.address.floor %}
+                        {{ union.address.floor }}
                       {% endif %}
-                      {% if union.door %}
-                        {{ union.door }}
+                      {% if union.address.door %}
+                        {{ union.address.door }}
                       {% endif %}
                       <br>
-                      {{ union.zipcode }}
-                      {{ union.city }}
+                      {{ union.address.zipcode }}
+                      {{ union.address.city }}
                     </td>
 
                     <td>{{ union.name }}</td>
-                    <td>{{ union.price_in_dkk }} kr</td>
-                    <td>
-                      {% if union.start_date == union.end_date %}
-                        {{ union.start_date }}
-                      {% else %}
-                        {{ union.start_date }} <br> - {{ union.end_date }}
-                      {% endif %}
-                    </td>
+                    <td>{{ union.membership_price_in_dkk }} kr</td>
                         <td>
                       <a
                           class="button"
@@ -102,16 +96,18 @@
                         Læs mere
                       </a>
                     </td>
-                    <td>
-                      {% for person in union.persons %}
-                        <a
+                    {% if union.persons %}
+                      <td>
+                        {% for person in union.persons %}
+                          <a
                             class="button-success"
                             href=" url 'membership_signup' union.id person.id "
-                        >
-                          Tilmeld {{ person.firstname }}
-                        </a>
-                      {% endfor %}
-                    </td>
+                          >
+                            Tilmeld {{ person.firstname }}
+                          </a>
+                        {% endfor %}
+                      </td>
+                    {% endif %}
                   </tr>
                 {% endfor %}
                 </tbody>

@@ -25,7 +25,7 @@ def Membership(request):
 
     family = None
     members = None
-    membership_activities_with_persons = unions
+    memberships_with_persons = unions
     if request.user.is_authenticated:
         person = user_to_person(request.user)
 
@@ -51,13 +51,8 @@ def Membership(request):
                         "id": union.id,
                         "name": union.name,
                         "persons": applicablePersons,
-                        "streetname": union.address.streetname,
-                        "housenumber": union.address.housenumber,
-                        "floor": union.address.floor,
-                        "door": union.address.door,
-                        "zipcode": union.address.zipcode,
-                        "city": union.address.city,
-                        "price_in_dkk": union.membership_price_in_dkk,
+                        "address": union.address,
+                        "membership_price_in_dkk": union.membership_price_in_dkk,
                         "start_date": date(date.today().year, 1, 1),
                         "end_date": date(date.today().year, 12, 31),
                     }
