@@ -98,6 +98,16 @@ urlpatterns = [
         name="activity_view_family",
     ),
     re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/person/(?P<person_id>[\d]+)/$",
+        MembershipSignup,
+        name="membership_signup",
+    ),
+    re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/person/(?P<person_id>[\d]+)/view/$",
+        MembershipSignup,
+        name="membership_view_person",
+    ),
+    re_path(
         r"^family/membership/(?P<union_id>[\d]+)/view/$",
         MembershipSignup,
         name="membership_view_family",

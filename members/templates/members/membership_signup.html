@@ -68,29 +68,9 @@
               </div>
             <hr/>
           {% else %}
-            {% if activity.open_invite %}
-              {% for person in family.get_persons %}
-                {% if person.id in family_participants %}
-                  {{ person.firstname}} er tilmeldt
-                {% else %}
-                  {% if activity.min_age <= person.age_years and person.age_years <= activity.max_age %}
-                    <a class="button" href="{% url 'activity_signup' activity.id person.id %}">
-                      Tilmeld {{ person.firstname }}
-                    </a>
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
-            {% else %}
-              {% for child in family.get_children %}
-                {% if child.id in family_subscriptions %}
-                  {{ child.firstname }} er opskrevet&nbsp;&nbsp;
-                {% else %}
-                  <a class="button" href="{% url 'waiting_list_subscription' child.id activity.department.id 'subscribe' %}">
-                    Opskriv {{ child.firstname }} på venteliste
-                  </a>
-                {% endif %}
-              {% endfor %}
-            {% endif %}
+            <a class="button" href="{% url 'membership_signup' union.id person.id %}">
+              Tilmeld {{ person.firstname }}
+            </a>
           {% endif %}
         {% endif %}
       {% endif %}

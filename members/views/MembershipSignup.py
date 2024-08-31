@@ -63,13 +63,13 @@ def MembershipSignup(request, union_id, person_id=None):
     # signup_closed should default to False
     signup_closed = False
 
-    if not union.memberships_allowed_at or union.memberships_allowed_at < timezone.now().date:
+    if not union.memberships_allowed_at or union.memberships_allowed_at < timezone.now().date():
         signup_closed = True
 
     if request.method == "POST":
         if view_only_mode:
             return HttpResponse(
-                "Du kan ikke tilmelde dette event nu. (ikke inviteret / tilmelding lukket / du er allerede tilmeldt eller aktiviteten er fuldt booket)"
+                "Du kan ikke tilmelde denne forening nu. Foreningen kan være lukket, eller der kan være andre ting, der gør at man ikke kan tilmelde sig pt."
             )
 
         if (
