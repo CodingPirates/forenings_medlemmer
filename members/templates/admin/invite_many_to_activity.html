@@ -32,9 +32,12 @@
         <h2>Vælg aktivitet</h2>
         <div class="description">
           <p>Gennemgå listen og vælg den korrekte afdeling og aktivitet der skal inviteres til.</p>
-          <p>Vælg desuden en udløbsdato for invitationen. </p>
+          <p>Vælg desuden en udløbsdato for invitationen.</p>
+          <p>Skriv noget ekstra tekst</p>
           <p>Når du trykker på <kbd style="background-color:green; color: white;">&nbsp;INVITER&nbsp;</kbd>-knappen vil systemet invitere personer, der ikke allerede deltager/er inviteret til aktiviteten samt er indenfor aldersgrænsen når aktiviteten starter. Det endeligt antal inviterede kan derfor afvige fra antallet i listen herunder.</p>
           <p>Der sendes en email med en beskrivelse af aktiviteten samt et link til tilmelding!</p>
+          <p>Hvis du angiver en særpris <b>skal du også angive en note om særprisen</b>. Noten er kun synlig i admin.</p>
+          <p>Prisen kan ikke være under de fastsatte minimumsgrænser beskrevet under aktiviteter.</p>
         </div>
 
         {% csrf_token %}
@@ -51,6 +54,19 @@
           </div>
         {% endfor %}
 
+        <h2>Email template</h2>
+        <div class="description">
+          <p>Alle personer inviteres og der sendes en email udfra følgende mail template:</p><br>
+          <b>ID: </b>
+          <text readonly><pre>{{ emailtemplate.idname }}</pre></text><br>
+          <b>Subject: </b>
+          <text readonly><pre>{{ emailtemplate.subject }}</pre></text><br>
+          <b>HTML: </b>
+          <text readonly><pre>{{ emailtemplate.body_html }}</pre></text>
+          <b>Text: </b>
+          <text readonly><pre>{{ emailtemplate.body_text }}</pre></text>
+        </div>
+
         <h2>Bekræft deltagere</h2>
         <div class="description">
           <p>Følgende ({{persons.count}}) personer inviteres:</p>
@@ -64,7 +80,7 @@
         </div>
 
         <div class="submit-row">
-          <p class="deletelink-box"><a href="../" class="deletelink">Fortryd</a></p>
+          <p class="deletelink-box"><a href="#" id="abort" class="deletelink">Fortryd</a></p>
           <p><input class="default" style="background-color:green; float: right;" type="submit" value="Inviter"></p>
         </div>
       </fieldset>
@@ -72,5 +88,11 @@
   </form>
 
 </div>
+
+<script type="text/javascript">
+    document.getElementById("abort").addEventListener("click", () => {
+        history.back();
+    });
+</script>
 
 {% endblock %}

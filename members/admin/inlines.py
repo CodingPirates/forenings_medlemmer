@@ -2,13 +2,11 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.html import format_html
 
 from members.models import (
     Activity,
     ActivityInvite,
-    ActivityParticipant,
     AdminUserInformation,
     Department,
     EmailItem,
@@ -26,15 +24,35 @@ class ActivityInviteInline(admin.TabularInline):
     can_delete = False
     raw_id_fields = ("activity",)
 
+    fieldsets = (
+        (
+            None,
+            {
+                "description": '<p>Invitationer til en aktivitet laves nemmere via "person" oversigten. Gå derind og filtrer efter f.eks. børn på venteliste til din afdeling og sorter efter opskrivningsdato, eller filter medlemmer på forrige sæson. Herefter kan du vælge de personer på listen, du ønsker at invitere og vælge "Inviter alle valgte til en aktivitet" fra rullemenuen foroven.</p>',
+                "fields": (
+                    "person",
+                    "activity",
+                    "invite_dtm",
+                    "expire_dtm",
+                    "rejected_at",
+                    "price_in_dkk",
+                    "price_note",
+                ),
+            },
+        ),
+    )
+
     # Limit the activity possible to invite to: Not finished and belonging to user
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "activity" and not request.user.is_superuser:
+        if (
+            db_field.name == "activity"
+            and not request.user.is_superuser
+            and not request.user.has_perm("members.view_all_departments")
+        ):
             departments = Department.objects.filter(
                 adminuserinformation__user=request.user
             )
-            kwargs["queryset"] = Activity.objects.filter(
-                end_date__gt=timezone.now(), department__in=departments
-            )
+            kwargs["queryset"] = Activity.objects.filter(department__in=departments)
         return super(ActivityInviteInline, self).formfield_for_foreignkey(
             db_field, request, **kwargs
         )
@@ -42,27 +60,34 @@ class ActivityInviteInline(admin.TabularInline):
     # Only view invites it would be possible for user to give out
     def get_queryset(self, request):
         qs = super(ActivityInviteInline, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
         return qs.filter(
-            activity__end_date__gt=timezone.now(),
             activity__department__in=AdminUserInformation.get_departments_admin(
                 request.user
             ),
         )
 
-
-class ActivityParticipantInline(admin.TabularInline):
-    model = ActivityParticipant
-    extra = 0
-
-    def get_queryset(self, request):
-        return ActivityParticipant.objects.all()
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return [
+                "activity",
+                "invite_dtm",
+            ]
+        else:
+            return []
 
 
 class EmailItemInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     model = EmailItem
-    fields = ["reciever", "subject", "sent_dtm"]
+    classes = ["hideheader", "collapse"]
+    fields = [
+        "created_ymdhm",
+        "sent_ymdhm_text",
+        "receiver",
+        "email_link",
+    ]
     can_delete = False
     readonly_fields = fields
 
@@ -96,6 +121,10 @@ class EquipmentLoanInline(admin.TabularInline):
 
 
 class PaymentInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
+    classes = ["showheader"]
     model = Payment
     fields = ("added_at", "payment_type", "confirmed_at", "rejected_at", "amount_ore")
     readonly_fields = ("family",)
@@ -103,6 +132,9 @@ class PaymentInline(admin.TabularInline):
 
 
 class PersonInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
     def admin_link(self, instance):
         url = reverse(
             "admin:%s_%s_change"
@@ -117,6 +149,7 @@ class PersonInline(admin.TabularInline):
     fields = ("admin_link", "membertype", "zipcode", "added_at", "notes")
     readonly_fields = fields
     can_delete = False
+    classes = ["hideheader"]
     extra = 0
 
 

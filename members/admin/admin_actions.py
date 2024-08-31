@@ -1,15 +1,21 @@
+import codecs
 from datetime import timedelta
-from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import admin
 from django.contrib import messages
 
 from django.contrib.admin.widgets import AdminDateWidget
 from django.db import transaction
+from django.http import HttpResponse
+
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 from django.shortcuts import render
+import members.models.emailtemplate
+import members.models.waitinglist
+from members.utils.age_check import check_is_person_too_young
+from members.utils.age_check import check_is_person_too_old
 
 from members.models import (
     Activity,
@@ -23,9 +29,13 @@ from members.models import (
 
 class AdminActions(admin.ModelAdmin):
     def invite_many_to_activity_action(modelAdmin, request, queryset):
+        template = members.models.emailtemplate.EmailTemplate.objects.get(
+            idname="ACT_INVITE"
+        )
+
         # Get list of available departments
         if request.user.is_superuser or request.user.has_perm(
-            "members.view_all_persons"
+            "members.view_all_departments"
         ):
             department_list_query = Department.objects.all().order_by("name")
         else:
@@ -41,7 +51,9 @@ class AdminActions(admin.ModelAdmin):
         activity_list_query = Activity.objects.filter(
             end_date__gt=timezone.now()
         ).order_by("department__name", "name")
-        if not request.user.is_superuser:
+        if not request.user.is_superuser and not request.user.has_perm(
+            "members.view_all_departments"
+        ):
             activity_list_query = activity_list_query.filter(
                 department__in=department_ids
             ).order_by("department__name", "name")
@@ -58,7 +70,16 @@ class AdminActions(admin.ModelAdmin):
             expire = forms.DateField(
                 label="Udløber",
                 widget=AdminDateWidget(),
-                initial=timezone.now() + timedelta(days=30 * 3),
+                initial=timezone.now() + timedelta(days=14),
+            )
+            email_text = forms.CharField(
+                label="Email ekstra info", widget=forms.Textarea, required=False
+            )
+            special_price_in_dkk = forms.DecimalField(
+                label="Særpris", max_digits=10, decimal_places=2, required=False
+            )
+            special_price_note = forms.CharField(
+                label="Note om særpris", widget=forms.Textarea, required=False
             )
 
         # Lookup all the selected persons - to show confirmation list
@@ -81,6 +102,7 @@ class AdminActions(admin.ModelAdmin):
 
         context["persons"] = persons
         context["queryset"] = queryset
+        context["emailtemplate"] = template
 
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
@@ -96,6 +118,35 @@ class AdminActions(admin.ModelAdmin):
                 activity = Activity.objects.get(
                     pk=mass_invitation_form.cleaned_data["activity"]
                 )
+
+                if mass_invitation_form.cleaned_data["special_price_in_dkk"] is None:
+                    special_price_in_dkk = activity.price_in_dkk
+                else:
+                    special_price_in_dkk = mass_invitation_form.cleaned_data[
+                        "special_price_in_dkk"
+                    ]
+
+                if (
+                    special_price_in_dkk != activity.price_in_dkk
+                    and mass_invitation_form.cleaned_data["special_price_note"] == ""
+                ):
+                    messages.error(
+                        request,
+                        "Fejl - ingen personer blev inviteret! Du skal angive en begrundelse for den særlige pris. Noten er ikke synlig for deltageren.",
+                    )
+                    return
+
+                min_amount = activity.get_min_amount(activity.activitytype.id)
+
+                if (
+                    special_price_in_dkk is not None
+                    and special_price_in_dkk < min_amount
+                ):
+                    messages.error(
+                        request,
+                        f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr.",
+                    )
+                    return
 
                 # validate activity belongs to user and matches selected department
                 if (
@@ -155,19 +206,13 @@ class AdminActions(admin.ModelAdmin):
                                         )
 
                                     # Check for age constraint: too young ?
-                                    elif (
-                                        current_person.birthday
-                                        > activity.start_date
-                                        - relativedelta(years=activity.min_age)
+                                    elif check_is_person_too_young(
+                                        activity, current_person
                                     ):
                                         persons_too_young.append(current_person.name)
                                     # Check for age constraint: too old ?
-                                    elif (
-                                        current_person.birthday
-                                        < activity.start_date
-                                        - relativedelta(
-                                            years=activity.max_age + 1, days=-1
-                                        )
+                                    elif check_is_person_too_old(
+                                        activity, current_person
                                     ):
                                         persons_too_old.append(current_person.name)
                                     # Otherwise - person can be invited
@@ -179,16 +224,24 @@ class AdminActions(admin.ModelAdmin):
                                             expire_dtm=mass_invitation_form.cleaned_data[
                                                 "expire"
                                             ],
+                                            extra_email_info=mass_invitation_form.cleaned_data[
+                                                "email_text"
+                                            ],
+                                            price_in_dkk=special_price_in_dkk,
+                                            price_note=mass_invitation_form.cleaned_data[
+                                                "special_price_note"
+                                            ],
                                         )
                                         invitation.save()
                                         persons_invited.append(current_person.name)
 
-                        except Exception:
+                        except Exception as E:
                             messages.error(
                                 request,
                                 "Fejl - ingen personer blev inviteret! Der var problemer med "
                                 + (invitation.person.name if invitation else "(n/a)")
-                                + ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet.",
+                                + ". Vær sikker på personen ikke allerede er inviteret og opfylder alderskravet."
+                                + f"{E=}",
                             )
                             return
 
@@ -282,3 +335,80 @@ class AdminActions(admin.ModelAdmin):
     invite_many_to_activity_action.short_description = (
         "Inviter valgte personer til en aktivitet"
     )
+
+    def export_participants_csv(self, request, queryset):
+        print(f"queryset:[{queryset}]")
+        if queryset.model is Activity:
+            activities = [a.pk for a in queryset]
+            participants = ActivityParticipant.objects.filter(activity__in=activities)
+        elif queryset.model is ActivityParticipant:
+            participants = queryset
+
+        context = admin.site.each_context(request)
+        context["participants"] = participants
+        context["queryset"] = queryset
+
+        result_string = """"Forening"; "Afdeling"; "Aktivitet"; "Navn";\
+            "Alder"; "Køn"; "Post-nr"; "Betalingsinfo"; "forældre navn";\
+            "forældre email"; "forældre tlf"; "Foto-tilladelse";\
+            "Note til arrangørerne"\n"""
+        for p in participants:
+            gender = p.person.gender_text()
+
+            parent = p.person.family.get_first_parent()
+            if parent:
+                parent_name = parent.name
+                parent_phone = parent.phone
+                if not p.person.family.dont_send_mails:
+                    parent_email = parent.email
+                else:
+                    parent_email = ""
+            else:
+                parent_name = ""
+                parent_phone = ""
+                parent_email = ""
+
+            if p.photo_permission == "OK":
+                photo = "Tilladelse givet"
+            else:
+                photo = "Ikke tilladt"
+
+            result_string = (
+                result_string
+                + p.activity.department.union.name
+                + ";"
+                + p.activity.department.name
+                + ";"
+                + p.activity.name
+                + ";"
+                + p.person.name
+                + ";"
+                + str(p.person.age_years())
+                + ";"
+                + gender
+                + ";"
+                + p.person.zipcode
+                + ";"
+                + str(p.payment_info(False))
+                + ";"
+                + parent_name
+                + ";"
+                + parent_email
+                + ";"
+                + parent_phone
+                + ";"
+                + photo
+                + ";"
+                + '"'
+                + p.note.replace('"', '""')
+                + '"'
+                + "\n"
+            )
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = 'attachment; filename="deltagere.csv"'
+        return response
+
+    export_participants_csv.short_description = "Eksporter deltagerliste (CSV)"

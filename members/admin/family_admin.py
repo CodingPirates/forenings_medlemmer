@@ -19,6 +19,7 @@ class FamilyAdmin(admin.ModelAdmin):
             return ("email",)
 
     search_fields = ("email",)
+
     inlines = [PersonInline, PaymentInline, EmailItemInline]
     actions = [
         "create_new_uuid",
@@ -56,7 +57,9 @@ class FamilyAdmin(admin.ModelAdmin):
     # Only view familys related to users department (via participant, waitinglist & invites)
     def get_queryset(self, request):
         qs = super(FamilyAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_departments"
+        ):
             return qs
         departments = Department.objects.filter(
             adminuserinformation__user=request.user

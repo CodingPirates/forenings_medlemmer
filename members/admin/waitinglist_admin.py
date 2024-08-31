@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
 from members.models import (
     Union,
@@ -78,14 +79,16 @@ class WaitingListAdmin(admin.ModelAdmin):
         return form
 
     list_display = (
-        "union_link",
         "department_link",
         "person_link",
         "person_age_years",
         "person_gender_text",
+        "zipcode",
+        "municipality",
+        "user_waiting_list_number",
         "user_created",
         "user_added_waiting_list",
-        "user_waiting_list_number",
+        "union_link",
     )
 
     list_filter = (
@@ -98,8 +101,13 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__name",
         "department__union__name",
         "person__name",
+        "person__zipcode",
+        "person__municipality",
     ]
-    search_help_text = "Du kan søge på forening, afdeling eller person"
+    search_help_text = mark_safe(
+        """Du kan søge på forening (navn), afdeling (navn) eller person (navn, postnummer eller kommune).<br>
+        'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
+    )
 
     actions = [
         "delete_many_from_department_waitinglist_action",
@@ -128,11 +136,11 @@ class WaitingListAdmin(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_persons"
         ):
-            department_list_query = Department.objects.all()
+            department_list_query = Department.objects.all().order_by("name")
         else:
             department_list_query = Department.objects.filter(
                 adminuserinformation__user=request.user
-            )
+            ).order_by("name")
 
         waitinglist_departments = []  # List of unique departments selected by user
         for item in queryset:
@@ -274,8 +282,8 @@ class WaitingListAdmin(admin.ModelAdmin):
         ).distinct()
 
     def union_link(self, item):
-        url = reverse("admin:members_union_change", args=[item.id])
-        link = '<a href="%s">%s</a>' % (url, item.department.union.name)
+        url = reverse("admin:members_union_change", args=[item.department.union_id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.union.name))
         return mark_safe(link)
 
     union_link.short_description = "Forening"
@@ -283,7 +291,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     def department_link(self, item):
         url = reverse("admin:members_department_change", args=[item.department_id])
-        link = '<a href="%s">%s</a>' % (url, item.department.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.department.name))
         return mark_safe(link)
 
     department_link.short_description = "Afdeling"
@@ -291,7 +299,7 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     def person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.person_id])
-        link = '<a href="%s">%s</a>' % (url, item.person.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.name))
         return mark_safe(link)
 
     person_link.short_description = "Person"
@@ -324,5 +332,17 @@ class WaitingListAdmin(admin.ModelAdmin):
     def user_waiting_list_number(self, item):
         return item.number_on_waiting_list()
 
-    user_waiting_list_number.short_description = "Nummer på venteliste"
-    user_waiting_list_number.admin_order_field = "added_at"
+    user_waiting_list_number.short_description = "Ventelistenummer"
+    user_waiting_list_number.admin_order_field = "on_waiting_list_since"
+
+    def zipcode(self, item):
+        return item.person.zipcode
+
+    zipcode.short_description = "Post nr"
+    zipcode.admin_order_field = "person__zipcode"
+
+    def municipality(self, item):
+        return item.person.municipality
+
+    municipality.short_description = "Kommune"
+    municipality.admin_order_field = "person__municipality"

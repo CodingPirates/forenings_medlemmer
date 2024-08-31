@@ -4,18 +4,89 @@ from django.db.models.functions import Upper
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
-from members.models import Address, Person
+from members.models import Address, Person, Department, AdminUserInformation
+
+
+class AdminUserUnionInline(admin.TabularInline):
+    model = AdminUserInformation.unions.through
+
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
+    classes = ["hideheader"]
+
+    extra = 0
+    verbose_name = "Admin Bruger"
+    verbose_name_plural = "Admin Brugere"
+
+    fields = (
+        "user_username",
+        "user_first_name",
+        "user_last_name",
+        "user_email",
+        "user_last_login",
+    )
+    readonly_fields = (
+        "user_username",
+        "user_first_name",
+        "user_last_name",
+        "user_email",
+        "user_last_login",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filter out inactive users and non-staff users
+        return qs.filter(
+            adminuserinformation__user__is_active=True,
+            adminuserinformation__user__is_staff=True,
+        ).select_related("adminuserinformation__user")
+
+    def user_username(self, instance):
+        return instance.adminuserinformation.user.username
+
+    user_username.short_description = "Brugernavn"
+
+    def user_first_name(self, instance):
+        return instance.adminuserinformation.user.first_name
+
+    user_first_name.short_description = "Fornavn"
+
+    def user_last_name(self, instance):
+        return instance.adminuserinformation.user.last_name
+
+    user_last_name.short_description = "Efternavn"
+
+    def user_email(self, instance):
+        return instance.adminuserinformation.user.email
+
+    user_email.short_description = "Email"
+
+    def user_last_login(self, instance):
+        return instance.adminuserinformation.user.last_login.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+    user_last_login.short_description = "Sidste login"
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class UnionAdmin(admin.ModelAdmin):
+    inlines = [AdminUserUnionInline]
     list_display = (
-        "id",
         "union_link",
         "address",
-        "union_email",
+        "email",
         "founded_at",
         "closed_at",
+        "waitinglist_count_link",
     )
     list_filter = (
         "address__region",
@@ -43,7 +114,9 @@ class UnionAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(UnionAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_unions"
+        ):
             return qs
         return qs.filter(adminuserinformation__user=request.user)
 
@@ -51,7 +124,7 @@ class UnionAdmin(admin.ModelAdmin):
         (
             "Navn og Adresse",
             {
-                "fields": ("name", "union_email", "address"),
+                "fields": ("name", "email", "address"),
                 "description": "<p>Udfyld navnet på foreningen (f.eks København, \
             vestjylland) og adressen<p>",
             },
@@ -103,11 +176,25 @@ class UnionAdmin(admin.ModelAdmin):
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
-        link = '<a href="%s">%s</a>' % (url, item.name)
+        link = '<a href="%s">%s</a>' % (url, escape(item.name))
         return mark_safe(link)
 
     union_link.short_description = "Forening"
     union_link.admin_order_field = "name"
+
+    def waitinglist_count_link(self, item):
+        waitinglist_count = 0
+        for department in Department.objects.all().filter(union=item.id):
+            waitinglist_count += department.waitinglist_set.count()
+        admin_url = reverse("admin:members_waitinglist_changelist")
+        link = f"""<a
+            href="{admin_url}?={item.id}"
+            title="Vis venteliste for forening Coding Pirates {item.name}">
+            {waitinglist_count}
+            </a>"""
+        return mark_safe(link)
+
+    waitinglist_count_link.short_description = "Venteliste"
 
     def export_csv_union_info(self, request, queryset):
         result_string = "Forening;Oprettelsdato;Lukkedato;"

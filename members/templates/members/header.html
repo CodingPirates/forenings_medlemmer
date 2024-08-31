@@ -18,7 +18,7 @@
     {% else %}
         <a href="{% url "account_create" %}">Tilmeld barn</a>
         <a href="{% url "volunteer_signup" %}">Bliv frivillig</a>
-        <a id="login-logout" href="{% url 'person_login' %}">Log ind</a>
+        <a id="login-logout" href="{% url 'person_login' %}{% if not 'logout' in request.path %}?next={{request.path}}{% endif %}">Log ind</a>
     {% endif %}
     <a href="https://codingpirates.dk" target="_blank">
         <img src="{% static "logo.png" %}"/>

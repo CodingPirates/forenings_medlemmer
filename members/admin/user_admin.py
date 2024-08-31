@@ -113,6 +113,8 @@ class UserAdmin(UserAdmin):
         "last_login",
     )
 
+    readonly_fields = ["date_joined", "last_login"]
+
     def get_queryset(self, request):
         qs = super(UserAdmin, self).get_queryset(request)
 
@@ -139,3 +141,26 @@ class UserAdmin(UserAdmin):
                 AdminUserUnionListFilter,
                 AdminUserDepartmentListFilter,
             ]
+
+    def get_fieldsets(self, request, obj=None):
+        # 20230924: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
+        if not obj:
+            return self.add_fieldsets
+
+        perm_fields = ("is_active", "is_staff", "groups")
+
+        if request.user.is_superuser:
+            perm_fields = (
+                "is_active",
+                "is_staff",
+                "is_superuser",
+                "groups",
+                "user_permissions",
+            )
+
+        return [
+            (None, {"fields": ("username", "password")}),
+            (("Personal info"), {"fields": ("first_name", "last_name", "email")}),
+            (("Permissions"), {"fields": perm_fields}),
+            (("Important dates"), {"fields": ("last_login", "date_joined")}),
+        ]
