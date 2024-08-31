@@ -4,7 +4,7 @@ You are more than welcome to contribute to the system. This guide documents how 
 
 ## Getting a local setup
 
-- Installing Docker: Download and install [docker-compose][docker-guide]. If
+- Installing Docker: Download and install [Docker Compose][docker-guide]. If
     you use Ubuntu 18.04 (LTS), you can use [this guide][docker-ubuntu-guide] to
     set up Docker.
 
@@ -13,15 +13,15 @@ You are more than welcome to contribute to the system. This guide documents how 
 - The setup adheres to the [twelve-factor-app][12f] principles. To get a
     local development configuration, copy the file `.env.example` to `.env`
 
-- Run `docker-compose up` to start your local system.
+- Run `docker compose up` to start your local system.
 
-- Run `docker-compose run web ./manage.py get_live_data` to download public
+- Run `docker compose run web ./manage.py get_live_data` to download public
     data and insert it into your local database.
 
 - To get some dummy members, families, etc. you can use the [factories][factories] to create them.
 
     ```bash
-        docker-compose run web ./manage.py shell
+        docker compose run web ./manage.py shell
         from members.tests.factories import MemberFactory
         MemberFactory.create_batch(20)
     ```
@@ -31,7 +31,7 @@ You are more than welcome to contribute to the system. This guide documents how 
     with the real world. For instance each member belongs to their own department.
 
 - To create a super user for the admin interface you can run
-    `docker-compose run web ./manage.py createsuperuser`
+    `docker compose run web ./manage.py createsuperuser`
 
 - A pgAdmin container is configured as part of Docker Compose, and can be accessed on <http://localhost:5050>.
     Log in with credentials `admin@example.com`/`admin`. Connection to database has been configured in
@@ -65,15 +65,15 @@ You are more than welcome to contribute to the system. This guide documents how 
 
 - [Django][django]: The base web framework used. The link is to their great
     tutorial which takes an hour or two to complete.
-- [Docker][docker-tutorial]: We use `docker-compose` to setup database,
+- [Docker][docker-tutorial]: We use `docker compose` to setup database,
     environment and dependencies. The following commands is all that's required
     to work on the system.
 
-  - `docker-compose build` -- Builds the system.
-  - `docker-compose up` -- Starts the systems.
-  - `docker-compose down && docker volume rm backend_database`
+  - `docker compose build` -- Builds the system.
+  - `docker compose up` -- Starts the systems.
+  - `docker compose down && docker volume rm backend_database`
         \-- Deletes your local database
-  - `docker-compose run web command` -- Replace `command` with what you want
+  - `docker compose run web command` -- Replace `command` with what you want
         to run in the system.
 
 - [SASS][sass]: CSS files belong in `members/static/members/sass`,
@@ -82,7 +82,7 @@ You are more than welcome to contribute to the system. This guide documents how 
     following command in a separate terminal:
 
     ```bash
-    docker-compose run web node_modules/.bin/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
+    docker compose run web node_modules/.bin/sass --watch members/static/members/sass/main.scss members/static/members/css/main.css
     ```
 
     It will compile SASS when you save a file.
@@ -94,7 +94,7 @@ You are more than welcome to contribute to the system. This guide documents how 
 - [Selenium][selenium]: runs the functional tests. To run a specific test run
 
     ```bash
-        docker-compose run web ./manage.py test members.tests.test_functional.test_create_family
+        docker compose run web ./manage.py test members.tests.test_functional.test_create_family
     ```
 
     where the name of your tests replaces the last part.
@@ -102,7 +102,7 @@ You are more than welcome to contribute to the system. This guide documents how 
 - [Unit tests][unittest]: runs the unittests. You run the unit tests the same way as the selenium tests. To run a specific test run
 
     ```bash
-        docker-compose run web ./manage.py test members.tests.test_dump_data
+        docker compose run web ./manage.py test members.tests.test_dump_data
     ```
 
     where the name of your tests replaces the last part.
@@ -122,7 +122,7 @@ Pragmatic development is to use docker for database and run server and/or tests 
 - Install npm dependencies: `npm install`
 - Copy the sample environment file: `cp .env.example .env`
 
-- boot the database with `docker-compose start database`
+- boot the database with `docker compose start database`
 - boot a selenium docker with `docker run -it -p 4444:4444 -p 7900:7900 --network="host" -v /dev/shm:/dev/shm selenium/standalone-chrome`
 - start the virtual env shell and work from there further on with `poetry shell`
 - Run sass: `./node_modules/.bin/sass members/static/members/sass/main.scss`
@@ -159,13 +159,13 @@ p.user.username # show login email
     discussion happens before the code and limits duplicate work.
 4. Help us specify the requirements specification.
 5. Code the features with tests, see the [testing guide][test_guide]
-6. Run the entire test suite with: `docker-compose run web ./manage.py test`
+6. Run the entire test suite with: `docker compose run web ./manage.py test`
 7. Check that the following requirements are meet:
     - The code has tests, code without tests is not accepted. (Except for
         minimal CSS and text changes). Use the existing test as inspiration and
         the [factories][factories] to create dummy data.
     - The code conforms to the [black][black] formatting rules. To format your
-        code run `docker-compose run web black .`. Consider looking for an
+        code run `docker compose run web black .`. Consider looking for an
         editor integration.
     - The code passes [flake8][flake8] checks.
 8. Submit the pull request.

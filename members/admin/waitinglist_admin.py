@@ -79,7 +79,6 @@ class WaitingListAdmin(admin.ModelAdmin):
         return form
 
     list_display = (
-        "union_link",
         "department_link",
         "person_link",
         "person_age_years",
@@ -89,6 +88,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         "user_waiting_list_number",
         "user_created",
         "user_added_waiting_list",
+        "union_link",
     )
 
     list_filter = (
@@ -101,10 +101,11 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__name",
         "department__union__name",
         "person__name",
-        "zipcode",
+        "person__zipcode",
+        "person__municipality",
     ]
     search_help_text = mark_safe(
-        """Du kan søge på forening, afdeling eller person.<br>
+        """Du kan søge på forening (navn), afdeling (navn) eller person (navn, postnummer eller kommune).<br>
         'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
     )
 
