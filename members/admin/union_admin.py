@@ -83,7 +83,7 @@ class UnionAdmin(admin.ModelAdmin):
     list_display = (
         "union_link",
         "address",
-        "union_email",
+        "email",
         "founded_at",
         "closed_at",
         "waitinglist_count_link",
@@ -124,7 +124,7 @@ class UnionAdmin(admin.ModelAdmin):
         (
             "Navn og Adresse",
             {
-                "fields": ("name", "union_email", "address"),
+                "fields": ("name", "email", "address"),
                 "description": "<p>Udfyld navnet på foreningen (f.eks København, \
             vestjylland) og adressen<p>",
             },
