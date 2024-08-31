@@ -92,8 +92,6 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "union_link",
-        "department_link",
         "activitytype",
         "start_end",
         "open_invite",
@@ -102,6 +100,8 @@ class ActivityAdmin(admin.ModelAdmin):
         "seats_used",
         "seats_free",
         "age",
+        "union_link",
+        "department_link",
     )
 
     date_hierarchy = "start_date"
@@ -137,6 +137,8 @@ class ActivityAdmin(admin.ModelAdmin):
         AdminActions.export_participants_csv,
     ]
     save_as = True
+
+    ordering = ("-start_date", "department__name", "name")
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
