@@ -31,7 +31,7 @@
         <div class="col-lg-6">
           <p>
           <strong>Kontakt:</strong><br>
-          {{ union.email }}<br>
+            <a href="mailto:{{ union.union_email }}" value="Kontakt foreningen">{{ union.union_email }}</a><br>
           </p>
         </div>
         <div class="col-lg-6">
@@ -40,44 +40,11 @@
           {{ price | floatformat:2}} kr<br>
           </p>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <p>
-          <strong>Tilmeldingsfrist:</strong><br>
-            {{ activity.signup_closing}} (om {{ activity.signup_closing|timeuntil}})
-          </p>
-        </div>
-        <div class="col-lg-6">
-          <p>
-          <strong>Periode:</strong><br>
-            {{ activity.start_date }} - {{ activity.end_date }}
-          </p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <p>
-          <strong>Venteliste:</strong><br>
-            {% if activity.open_invite %}
-              Nej. Åben invitation uden venteliste
-            {% else %}
-              Ja. Kræver invitation igennem ventelisten
-            {%endif%}
-          </p>
-        </div>
-      </div>
       <div class="row">
         <div class="col-lg-6">
           <p>
             <strong>Lokalforening:</strong><br>
             {{ union.name }}
-          </p>
-        </div>
-        <div class="col-lg-6">
-          <p>
-            <strong>Aldersbegrænsning:</strong><br>
-            {{ activity.min_age }} - {{ activity.max_age }} år.
           </p>
         </div>
       </div>
@@ -90,8 +57,8 @@
           <hr>
           <a href="{% url 'person_login' %}">Log ind</a>
           eller
-          <a href="{% url 'account_create' %}">tilmeld dit barn</a>
-          for at tilmelde dig denne aktivitet.
+          <a href="{% url 'account_create' %}">opret en konto</a>
+          for at blive medlem.
         {% else %}
           {% if signup_closed %}
           <!--and not participating % -->
