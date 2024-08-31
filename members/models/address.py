@@ -44,7 +44,7 @@ class Address(models.Model):
     Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.
     """
     dawa_overwrite = models.BooleanField(
-        "Overskriv DAWA", default=False, help_text=help_text
+        "Overskriv DAWA", default=False, help_text=help_temp
     )
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
     dawa_category = models.CharField("DAWA kategori", max_length=1, blank=True)
