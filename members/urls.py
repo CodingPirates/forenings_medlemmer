@@ -10,6 +10,7 @@ from members.views import (
     EntryPage,
     FamilyDetails,
     Membership,
+    MembershipSignup,
     PersonCreate,
     PersonUpdate,
     QuickpayCallback,
@@ -95,6 +96,11 @@ urlpatterns = [
         r"^family/activity/(?P<activity_id>[\d]+)/view/$",
         ActivitySignup,
         name="activity_view_family",
+    ),
+    re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/view/$",
+        MembershipSignup,
+        name="membership_view_family",
     ),
     re_path(
         r"^family/(?P<unique>[\w-]+)/invitation_decline/(?P<invitation_id>[\d]+)/$",
