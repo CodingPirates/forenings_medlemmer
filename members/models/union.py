@@ -88,6 +88,12 @@ class Union(models.Model):
             )
         ],
     )
+    gl_account = models.CharField(
+        "Finanskonto:",
+        max_length=4,
+        blank=True,
+        help_text="Kontonummer i formatet 1234",
+    )
 
     def __str__(self):
         return self.name

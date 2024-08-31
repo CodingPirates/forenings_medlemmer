@@ -166,6 +166,7 @@ class UnionAdmin(admin.ModelAdmin):
                     "statues",
                     "founded_at",
                     "closed_at",
+                    "gl_account",
                 ),
                 "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
                 generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
