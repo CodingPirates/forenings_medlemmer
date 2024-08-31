@@ -9,7 +9,7 @@ def check_is_person_too_young(activity, person):
     # 3. if we are at or after activity starts: is person too young now ?
 
     if person.birthday is None:
-        return False
+        return True
 
     if timezone.now().date() <= activity.start_date:
         return (
@@ -30,7 +30,7 @@ def check_is_person_too_old(activity, person):
     # 3. if we are at or after activity starts: is person too old now ?
 
     if person.birthday is None:
-        return False
+        return True
 
     if timezone.now().date() <= activity.start_date:
         return (
