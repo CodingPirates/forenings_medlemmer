@@ -114,6 +114,9 @@ class Activity(models.Model):
     def participants(self):
         return self.activityparticipant_set.count()
 
+    def invitations(self):
+        return self.activityinvite_set.count()
+
     participants.short_description = "Deltagere"
 
     def get_min_amount(self, activitytype):
@@ -146,3 +149,10 @@ class Activity(models.Model):
 
         if errors:
             raise ValidationError(errors)
+
+    def delete(self, *args, **kwargs):
+        if (self.invitations() > 0 or self.participants() > 0):
+            raise ValidationError(
+                f"Aktivitet \"{self.name}\" kan ikke slettes, da der er tilmeldte eller inviterede personer."
+            )
+        super().delete(*args, **kwargs)
