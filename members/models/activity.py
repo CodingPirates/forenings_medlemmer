@@ -139,10 +139,20 @@ class Activity(models.Model):
                 f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
             )
 
-        if self.signup_closing > self.end_date:
-            errors["signup_closing"] = (
-                "Tilmeldingsfristen skal være før aktiviteten slutter"
-            )
+        if self.start_date is None:
+            errors["start_date"] = "Der skal angives en startdato for aktiviteten"
+
+        if self.end_date is None:
+            errors["end_date"] = "Der skal angives en slutdato for aktiviteten"
+
+        if self.signup_closing is None:
+            errors["signup_closing"] = "Der skal angives en dato for tilmeldingsfrist"
+
+        if (self.start_date is not None) and (self.end_date is not None) and (self.start_date > self.end_date):
+            errors["signup_closing"] = "Startdato skal være før aktivitetens slutdato"
+
+        if (self.signup_closing is not None) and (self.end_date is not None) and (self.signup_closing > self.end_date):
+            errors["signup_closing"] = "Tilmeldingsfristen skal være før aktiviteten slutter"
 
         if errors:
             raise ValidationError(errors)
