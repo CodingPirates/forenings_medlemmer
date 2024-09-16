@@ -148,11 +148,21 @@ class Activity(models.Model):
         if self.signup_closing is None:
             errors["signup_closing"] = "Der skal angives en dato for tilmeldingsfrist"
 
-        if (self.start_date is not None) and (self.end_date is not None) and (self.start_date > self.end_date):
+        if (
+            (self.start_date is not None)
+            and (self.end_date is not None)
+            and (self.start_date > self.end_date)
+        ):
             errors["signup_closing"] = "Startdato skal være før aktivitetens slutdato"
 
-        if (self.signup_closing is not None) and (self.end_date is not None) and (self.signup_closing > self.end_date):
-            errors["signup_closing"] = "Tilmeldingsfristen skal være før aktiviteten slutter"
+        if (
+            (self.signup_closing is not None)
+            and (self.end_date is not None)
+            and (self.signup_closing > self.end_date)
+        ):
+            errors["signup_closing"] = (
+                "Tilmeldingsfristen skal være før aktiviteten slutter"
+            )
 
         if errors:
             raise ValidationError(errors)
