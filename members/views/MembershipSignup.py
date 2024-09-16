@@ -63,7 +63,7 @@ def MembershipSignup(request, union_id, person_id=None):
     # signup_closed should default to False
     signup_closed = False
 
-    if not union.memberships_allowed_at or union.memberships_allowed_at < timezone.now().date():
+    if not union.memberships_allowed_at or timezone.now().date() < union.memberships_allowed_at:
         signup_closed = True
 
     if request.method == "POST":
