@@ -42,23 +42,24 @@ class VolunteerRequestDepartmentAdmin(admin.ModelAdmin):
         "status",
     )
 
-
     fieldsets = [
         (
             "Forespørgsel",
             {
                 "description": "Information fra person om at blive frivillig",
-                "fields": ("volunteer_request", "department","whishes",
-                           "reference",
-                           ),
+                "fields": (
+                    "volunteer_request",
+                    "department",
+                    "whishes",
+                    "reference",
+                ),
             },
         ),
         (
             "Dato og status",
             {
                 "description": "Information om oprettelse og status",
-                "fields": ("created", "finished", "status")
-,
+                "fields": ("created", "finished", "status"),
             },
         ),
     ]

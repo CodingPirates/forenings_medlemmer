@@ -39,10 +39,12 @@ class VolunteerRequestDepartment(models.Model):
 
     def whishes(self):
         return self.volunteer_request.info_whishes
+
     whishes.short_description = "Ønsker"
 
     def reference(self):
         return self.volunteer_request.info_reference
+
     reference.short_description = "Reference"
 
     def __str__(self):

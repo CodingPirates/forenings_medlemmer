@@ -20,7 +20,7 @@
     <script src="{% static "members/js/better-dom.min.js" %}"></script>
     <script src="{% static "members/js/better-dateinput-polyfill.min.js" %}"></script>
     <script src="{% static "members/js/tablesearch.js" %}"></script>
-    {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" or "/voilunteer_request" in request.path %}
+    {% if request.path == "/" or request.path == "/volunteer/" or "/family/Person/" or "/admin_signup/" or "/new_vr/" in request.path %}
         {% load crispy_forms_tags %}
         <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
         <script src="{% static "members/js/dawa-form-fill.js" %}"></script>
