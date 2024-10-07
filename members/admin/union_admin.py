@@ -93,6 +93,7 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
     )
+    search_fields = ("name",)
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
