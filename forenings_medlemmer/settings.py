@@ -99,6 +99,8 @@ INSTALLED_APPS = (
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = os.environ["DATA_UPLOAD_MAX_NUMBER_FIELDS"]
+
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
