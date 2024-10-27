@@ -1,0 +1,11 @@
+# use this file as override, if on Arm64 architecture, e.g. Mac M1
+# example commands:
+# - docker compose -f docker-compose.yml -f docker-compose.arm64.yml up --build
+# - docker compose -f docker-compose.yml -f docker-compose.arm64.yml run --build web ./manage.py test
+services:
+  selenium:
+    image: seleniarm/standalone-chromium
+    networks:
+      - webnet
+    ports:
+      - "4444:4444"
