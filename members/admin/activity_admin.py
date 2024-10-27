@@ -259,7 +259,7 @@ class ActivityAdmin(admin.ModelAdmin):
     def delete_model(self, request, activity):
         try:
             activity.delete()
-            messages.success(request, f"Aktivitet \"{activity.name}\" slettet.")
+            messages.success(request, f'Aktivitet "{activity.name}" slettet.')
         except ValidationError as e:
             messages.error(request, e.message)
 

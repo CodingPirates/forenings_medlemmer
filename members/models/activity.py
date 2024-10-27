@@ -171,8 +171,8 @@ class Activity(models.Model):
             raise ValidationError(errors)
 
     def delete(self, *args, **kwargs):
-        if (self.invitations() > 0 or self.participants() > 0):
+        if self.invitations() > 0 or self.participants() > 0:
             raise ValidationError(
-                f"Aktivitet \"{self.name}\" kan ikke slettes, da der er tilmeldte eller inviterede personer."
+                f'Aktivitet "{self.name}" kan ikke slettes, da der er tilmeldte eller inviterede personer.'
             )
         super().delete(*args, **kwargs)
