@@ -20,18 +20,22 @@ class Command(BaseCommand):
         csv_file_path = kwargs["csv_file"]
 
         try:
+            # Delete existing rows in Municipality model
+            Municipality.objects.all().delete()
+            self.stdout.write("Deleted all existing municipalities.")
+
             with open(csv_file_path, mode="r", encoding="utf-8") as file:
                 reader = csv.reader(file, delimiter=";")
                 for row in reader:
-                    municipality, address, zipcode, city, email = row
+                    name, address, zipcode, city, dawa_id = row
                     Municipality.objects.create(
-                        municipality=municipality,
+                        name=name,
                         address=address,
                         zipcode=zipcode,
                         city=city,
-                        email=email,
+                        dawa_id=dawa_id,
                     )
-                    self.stdout.write(f"Added municipality: {municipality}")
+                    self.stdout.write(f"Added municipality: {name}")
 
             self.stdout.write(
                 self.style.SUCCESS("Successfully imported all municipalities")
