@@ -28,7 +28,7 @@ class TestAdminActions(TestCase):
         self.admin = AdminActions(Activity, admin.site)
 
         self.union = UnionFactory()
-        self.department = DepartmentFactory(union=self.union)
+        self.department = DepartmentFactory(union=self.union, closed_dtm=None)
 
         self.user = User.objects.create_user(
             username="user",
