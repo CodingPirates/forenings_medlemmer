@@ -6,19 +6,84 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 
-from members.models import (
-    Address,
-    Person,
-    Department,
-)
+from members.models import Address, Person, Department, AdminUserInformation
+
+
+class AdminUserUnionInline(admin.TabularInline):
+    model = AdminUserInformation.unions.through
+
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
+    classes = ["hideheader"]
+
+    extra = 0
+    verbose_name = "Admin Bruger"
+    verbose_name_plural = "Admin Brugere"
+
+    fields = (
+        "user_username",
+        "user_first_name",
+        "user_last_name",
+        "user_email",
+        "user_last_login",
+    )
+    readonly_fields = (
+        "user_username",
+        "user_first_name",
+        "user_last_name",
+        "user_email",
+        "user_last_login",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filter out inactive users and non-staff users
+        return qs.filter(
+            adminuserinformation__user__is_active=True,
+            adminuserinformation__user__is_staff=True,
+        ).select_related("adminuserinformation__user")
+
+    def user_username(self, instance):
+        return instance.adminuserinformation.user.username
+
+    user_username.short_description = "Brugernavn"
+
+    def user_first_name(self, instance):
+        return instance.adminuserinformation.user.first_name
+
+    user_first_name.short_description = "Fornavn"
+
+    def user_last_name(self, instance):
+        return instance.adminuserinformation.user.last_name
+
+    user_last_name.short_description = "Efternavn"
+
+    def user_email(self, instance):
+        return instance.adminuserinformation.user.email
+
+    user_email.short_description = "Email"
+
+    def user_last_login(self, instance):
+        return instance.adminuserinformation.user.last_login.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+    user_last_login.short_description = "Sidste login"
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class UnionAdmin(admin.ModelAdmin):
+    inlines = [AdminUserUnionInline]
     list_display = (
-        "id",
         "union_link",
         "address",
-        "union_email",
+        "email",
         "founded_at",
         "closed_at",
         "waitinglist_count_link",
@@ -28,6 +93,7 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
     )
+    search_fields = ("name",)
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
@@ -59,7 +125,7 @@ class UnionAdmin(admin.ModelAdmin):
         (
             "Navn og Adresse",
             {
-                "fields": ("name", "union_email", "address"),
+                "fields": ("name", "email", "address"),
                 "description": "<p>Udfyld navnet på foreningen (f.eks København, \
             vestjylland) og adressen<p>",
             },

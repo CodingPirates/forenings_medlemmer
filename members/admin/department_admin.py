@@ -3,9 +3,85 @@ from django.contrib import admin
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from members.models import Union, Address, Person, Activity
+from members.models import (
+    Union,
+    Address,
+    Person,
+    Activity,
+    AdminUserInformation,
+)
 from django.utils.html import escape
 from django.http import HttpResponse
+from django.db.models import Count
+
+
+class AdminUserDepartmentInline(admin.TabularInline):
+    model = AdminUserInformation.departments.through
+
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+
+    classes = ["hideheader"]
+
+    extra = 0
+    verbose_name = "Admin Bruger"
+    verbose_name_plural = "Admin Brugere"
+
+    fields = (
+        "user_username",
+        "user_first_name",
+        "user_last_name",
+        "user_email",
+        "user_last_login",
+    )
+    readonly_fields = (
+        "user_username",
+        "user_first_name",
+        "user_last_name",
+        "user_email",
+        "user_last_login",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filter out inactive users and non-staff users
+        return qs.filter(
+            adminuserinformation__user__is_active=True,
+            adminuserinformation__user__is_staff=True,
+        ).select_related("adminuserinformation__user")
+
+    def user_username(self, instance):
+        return instance.adminuserinformation.user.username
+
+    user_username.short_description = "Brugernavn"
+
+    def user_first_name(self, instance):
+        return instance.adminuserinformation.user.first_name
+
+    user_first_name.short_description = "Fornavn"
+
+    def user_last_name(self, instance):
+        return instance.adminuserinformation.user.last_name
+
+    user_last_name.short_description = "Efternavn"
+
+    def user_email(self, instance):
+        return instance.adminuserinformation.user.email
+
+    user_email.short_description = "Email"
+
+    def user_last_login(self, instance):
+        return instance.adminuserinformation.user.last_login.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+    user_last_login.short_description = "Sidste login"
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class UnionDepartmentFilter(admin.SimpleListFilter):
@@ -20,9 +96,8 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
 
 class DepartmentAdmin(admin.ModelAdmin):
+    inlines = [AdminUserDepartmentInline]
     list_display = (
-        "id",
-        "department_union_link",
         "department_link",
         "address",
         "isVisible",
@@ -31,6 +106,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         "created",
         "closed_dtm",
         "waitinglist_count_link",
+        "department_union_link",
     )
     list_filter = (
         "address__region",
@@ -41,6 +117,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         "closed_dtm",
         "has_waiting_list",
     )
+    autocomplete_fields = ("union",)
     raw_id_fields = ("union",)
     search_fields = (
         "name",
@@ -73,7 +150,9 @@ class DepartmentAdmin(admin.ModelAdmin):
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_queryset(self, request):
-        qs = super(DepartmentAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
+        qs = queryset.annotate(waitinglist_count=Count("waitinglist"))
+
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_departments"
         ):
@@ -134,11 +213,12 @@ class DepartmentAdmin(admin.ModelAdmin):
         link = f"""<a
             href="{admin_url}?waiting_list={item.id}"
             title="Vis venteliste for afdelingen Coding Pirates {item.name}">
-            {item.waitinglist_set.count()}
+            {item.waitinglist_count}
             </a>"""
         return mark_safe(link)
 
     waitinglist_count_link.short_description = "Venteliste"
+    waitinglist_count_link.admin_order_field = "waitinglist_count"
 
     def export_department_info_csv(self, request, queryset):
         result_string = """"Forening"; "Afdeling"; "Afdeling-Startdato"; "Afdeling-lukkedato";\
