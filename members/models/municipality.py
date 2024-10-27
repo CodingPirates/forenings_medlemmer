@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Municipality(models.Model):
     municipality = models.CharField(max_length=255, verbose_name="Kommune")
     address = models.CharField(max_length=255, verbose_name="Adresse")
