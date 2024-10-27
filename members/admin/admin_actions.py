@@ -37,10 +37,12 @@ class AdminActions(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_departments"
         ):
-            department_list_query = Department.objects.all().order_by("name")
+            department_list_query = Department.objects.filter(
+                closed_dtm__isnull=True
+            ).order_by("name")
         else:
             department_list_query = Department.objects.filter(
-                adminuserinformation__user=request.user
+                adminuserinformation__user=request.user, closed_dtm__isnull=True
             ).order_by("name")
         department_list = [("-", "-")]
         for department in department_list_query:
