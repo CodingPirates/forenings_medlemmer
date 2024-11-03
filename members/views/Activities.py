@@ -132,7 +132,7 @@ def Activities(request):
                         "signup_closing": curActivity.signup_closing,
                         "userregion": user_region,
                         "address": curActivity.address,
-                        "seats_left" : curActivity.seats_left(),
+                        "seats_left": curActivity.seats_left(),
                     }
                     if curActivity.address.region == user_region:
                         activities_for_region_of_user.append(a)
