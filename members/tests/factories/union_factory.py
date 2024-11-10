@@ -19,7 +19,7 @@ class UnionFactory(DjangoModelFactory):
     cashier_email_old = Faker("email")
     secretary_old = Faker("name")
     secretary_email_old = Faker("email")
-    union_email = Faker("email")
+    email = Faker("email")
     statues = Faker("url")
     founded_at = Faker("date_time", tzinfo=TIMEZONE)
     closed_at = Faker("date_time", tzinfo=TIMEZONE)

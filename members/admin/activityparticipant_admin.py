@@ -182,18 +182,18 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_display = [
-        "activity_department_link",
         "activity_link",
         "added_at",
         "activity_person_link",
         "activity_person_gender",
         "person_age_years",
-        "activity_family_email_link",
-        "person_zipcode",
         "photo_permission",
         "note",
         "activity_payment_info_html",
+        "activity_family_email_link",
+        "person_zipcode",
         "activity_activitytype",
+        "activity_department_link",
     ]
 
     list_filter = (

@@ -99,6 +99,8 @@ INSTALLED_APPS = (
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = int(os.environ["DATA_UPLOAD_MAX_NUMBER_FIELDS"])
+
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -229,6 +231,8 @@ if (
 
 SECURE_SSL_REDIRECT = env.bool("FORCE_HTTPS")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 LOGIN_URL = "/account/login/"

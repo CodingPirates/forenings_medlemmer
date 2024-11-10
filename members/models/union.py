@@ -55,7 +55,7 @@ class Union(models.Model):
     )
     secretary_old = models.CharField("Sekretær", max_length=200, blank=True)
     secretary_email_old = models.EmailField("Sekretærens email", blank=True)
-    union_email = models.EmailField("Foreningens email", blank=True)
+    email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
     founded_at = models.DateField("Stiftet", blank=True, null=True)
     closed_at = models.DateField(

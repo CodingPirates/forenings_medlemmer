@@ -1,5 +1,6 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.html import escape, format_html
@@ -92,8 +93,6 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "union_link",
-        "department_link",
         "activitytype",
         "start_end",
         "open_invite",
@@ -102,6 +101,8 @@ class ActivityAdmin(admin.ModelAdmin):
         "seats_used",
         "seats_free",
         "age",
+        "union_link",
+        "department_link",
     )
 
     date_hierarchy = "start_date"
@@ -137,6 +138,8 @@ class ActivityAdmin(admin.ModelAdmin):
         AdminActions.export_participants_csv,
     ]
     save_as = True
+
+    ordering = ("-start_date", "department__name", "name")
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
@@ -247,6 +250,21 @@ class ActivityAdmin(admin.ModelAdmin):
         if db_field.name == "address":
             kwargs["queryset"] = Address.get_user_addresses(request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def delete_queryset(self, request, queryset):
+        for activity in queryset:
+            print(activity)
+            self.delete_model(request, activity)
+
+    def delete_model(self, request, activity):
+        try:
+            activity.delete()
+            messages.success(request, f'Aktivitet "{activity.name}" slettet.')
+        except ValidationError as e:
+            messages.error(request, e.message)
+
+        except Exception as e:
+            messages.error(request, f"Fejl: {str(e)}")
 
     fieldsets = [
         (

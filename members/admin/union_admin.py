@@ -81,10 +81,9 @@ class AdminUserUnionInline(admin.TabularInline):
 class UnionAdmin(admin.ModelAdmin):
     inlines = [AdminUserUnionInline]
     list_display = (
-        "id",
         "union_link",
         "address",
-        "union_email",
+        "email",
         "founded_at",
         "closed_at",
         "waitinglist_count_link",
@@ -94,6 +93,7 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
     )
+    search_fields = ("name",)
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
@@ -125,7 +125,7 @@ class UnionAdmin(admin.ModelAdmin):
         (
             "Navn og Adresse",
             {
-                "fields": ("name", "union_email", "address"),
+                "fields": ("name", "email", "address"),
                 "description": "<p>Udfyld navnet på foreningen (f.eks København, \
             vestjylland) og adressen<p>",
             },

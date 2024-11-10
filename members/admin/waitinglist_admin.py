@@ -79,14 +79,16 @@ class WaitingListAdmin(admin.ModelAdmin):
         return form
 
     list_display = (
-        "union_link",
         "department_link",
         "person_link",
         "person_age_years",
         "person_gender_text",
+        "zipcode",
+        "municipality",
         "user_waiting_list_number",
         "user_created",
         "user_added_waiting_list",
+        "union_link",
     )
 
     list_filter = (
@@ -99,9 +101,11 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__name",
         "department__union__name",
         "person__name",
+        "person__zipcode",
+        "person__municipality",
     ]
     search_help_text = mark_safe(
-        """Du kan søge på forening, afdeling eller person.<br>
+        """Du kan søge på forening (navn), afdeling (navn) eller person (navn, postnummer eller kommune).<br>
         'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
     )
 
@@ -328,5 +332,17 @@ class WaitingListAdmin(admin.ModelAdmin):
     def user_waiting_list_number(self, item):
         return item.number_on_waiting_list()
 
-    user_waiting_list_number.short_description = "Nummer på venteliste"
+    user_waiting_list_number.short_description = "Ventelistenummer"
     user_waiting_list_number.admin_order_field = "on_waiting_list_since"
+
+    def zipcode(self, item):
+        return item.person.zipcode
+
+    zipcode.short_description = "Post nr"
+    zipcode.admin_order_field = "person__zipcode"
+
+    def municipality(self, item):
+        return item.person.municipality
+
+    municipality.short_description = "Kommune"
+    municipality.admin_order_field = "person__municipality"
