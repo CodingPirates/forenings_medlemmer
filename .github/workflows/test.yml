@@ -25,7 +25,7 @@ jobs:
           path: ./test-screens
       - name: Create and upload UML diagram
         run: mkdir -p UML && docker compose run web ./manage.py graph_models members -o UML/UML_diagram.png
-      - uses: actions/upload-artifact@v2.1.4
+      - uses: actions/upload-artifact@v4
         with:
           name: UML_diagram.png
           path: UML
