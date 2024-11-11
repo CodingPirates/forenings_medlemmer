@@ -104,7 +104,7 @@
                         {% for person in union.persons %}
                           <a
                             class="button-success"
-                            href=" url 'membership_signup' union.id person.id "
+                            href="{% url 'membership_signup' union.id person.id %}"
                           >
                             Tilmeld {{ person.firstname }}
                           </a>
@@ -149,7 +149,7 @@
               <tr>
                 <td>{{ member.person.name }}</td>
                 <td>
-                  <a href=" url 'activity_view_person' participation.activity.id participation.person.id ">
+                  <a href="{% url 'membership_view_person' member.union.id member.person.id %}">
                     {{ member.name }}
                   </a>
                   {% if not member.paid %}

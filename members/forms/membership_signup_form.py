@@ -21,9 +21,9 @@ class MembershipSignupForm(forms.Form):
                         Div(
                             HTML(
                                 """
-                    <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
-                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
-                    <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
+                    <p class="lead">Du melder nu <strong>{{person.name}}</strong> ind som medlem i Coding Pirates <strong>{{union.name}}</strong>.
+                    Medlemsskabet starter i dag og løber til og med d. 31. december {% now "Y" %}. Det koster <strong>{{ price | floatformat:2}} kr</strong> at melde sig ind. Medlemskabet giver adgang til at stemme hos Coding Pirates {{union.name}}{% if union.name != 'Denmark' %} og Coding Pirates Denmark{% endif %}</p>
+                    <p class="lead"><em>Medlemskabet er kun gyldig når der er betalt!</em></p>
                     """
                             ),
                             css_class="col-md-12",
@@ -34,23 +34,12 @@ class MembershipSignupForm(forms.Form):
                         "Tilmeldingsoplysninger",
                         Div(
                             Div(
-                                Field("note", aria_describedby="noteHelp"),
-                                HTML(
-                                    '<span class="noteHelp"><p>{{activity.instructions|linebreaksbr}}</p></span>'
-                                ),
-                                css_class="col-md-6",
-                            ),
-                            Div(
-                                "photo_permission",
                                 "read_conditions",
                                 css_class="col-md-6",
                             ),
                             css_class="row",
                         ),
                         FormActions(
-                            HTML(
-                                '<span class="paymentHelp"><p>{% if activity.will_reserve %} Denne betaling vil kun blive reserveret på dit kort. Vi hæver den først endeligt d. 1/1 det år aktiviteten starter for at sikre, at {{ person.name }} er meldt korrekt ind i foreningen i kalenderåret.{% endif %}</p></span>'
-                            ),
                             Submit(
                                 "submit",
                                 "Tilmeld{% if price > 0 %} og betal{% endif %}",
@@ -65,27 +54,6 @@ class MembershipSignupForm(forms.Form):
             )
         )
 
-    note = forms.CharField(
-        label="<span style='color:red'><b>Besked til arrangør</b></span> (Særlige hensyn, gener, allergi, medicin etc.)",
-        widget=forms.Textarea,
-        required=False,
-    )
-    photo_permission = forms.ChoiceField(
-        label="Må Coding Pirates tage og bruge billeder og videoer af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)",
-        initial="Choose",
-        required=True,
-        choices=(
-            (
-                "Choose",
-                "Vælg om Coding Pirates må tage billeder af mit barn til denne aktivitet",
-            ),
-            (ActivityParticipant.PHOTO_OK, "Ja, det er OK"),
-            (
-                ActivityParticipant.PHOTO_NOTOK,
-                "Nej, vi vil ikke have I fotograferer mit barn",
-            ),
-        ),
-    )
     read_conditions = forms.ChoiceField(
         label="Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?",
         initial="NO",
@@ -96,15 +64,9 @@ class MembershipSignupForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         read_conditions = self.cleaned_data.get("read_conditions")
-        photo_permission = self.cleaned_data.get("photo_permission")
 
         if read_conditions == "NO":
             self.add_error(
                 "read_conditions",
-                "For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser.",
-            )
-
-        if photo_permission == "Choose":
-            self.add_error(
-                "photo_permission", "Du skal vælge om vi må tage billeder eller ej."
+                "For at være medlem af en Coding Pirates forening skal du acceptere vores betingelser.",
             )

@@ -82,7 +82,7 @@ class ActivitySignupForm(forms.Form):
             (ActivityParticipant.PHOTO_OK, "Ja, det er OK"),
             (
                 ActivityParticipant.PHOTO_NOTOK,
-                "Nej, vi vil ikke have I fotograferer mit barn",
+                "Nej, I må ikke fotografere mit barn",
             ),
         ),
     )

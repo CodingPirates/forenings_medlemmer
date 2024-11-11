@@ -68,9 +68,11 @@
               </div>
             <hr/>
           {% else %}
-            <a class="button" href="{% url 'membership_signup' union.id person.id %}">
-              Tilmeld {{ person.firstname }}
-            </a>
+            {% for person in family.get_persons %}
+              <a class="button" href="{% url 'membership_signup' union.id person.id %}">
+                Tilmeld {{ person.firstname }}
+              </a>
+            {% endfor %}
           {% endif %}
         {% endif %}
       {% endif %}

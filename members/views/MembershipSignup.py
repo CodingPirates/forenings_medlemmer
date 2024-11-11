@@ -5,6 +5,8 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
+from datetime import datetime
+
 from members.forms import MembershipSignupForm
 from members.models.member import Member
 from members.models.payment import Payment
@@ -22,7 +24,7 @@ def MembershipSignup(request, union_id, person_id=None):
 
     union = get_object_or_404(Union, pk=union_id)
 
-    participating = False
+    is_member = False
 
     if request.resolver_match.url_name == "membership_view_person":
         view_only_mode = True
@@ -48,12 +50,13 @@ def MembershipSignup(request, union_id, person_id=None):
 
             # Check not already signed up
             try:
-                member = Member.objects.get(union=union, person=person)
+                end_date = datetime.now().date().replace(month=12, day=31)
+                member = Member.objects.get(union=union, person=person, member_until=end_date)
                 # found - we can only allow one - switch to view mode
-                participating = True
+                is_member = True
                 view_only_mode = True
             except Member.DoesNotExist:
-                participating = False  # this was expected - if not signed up yet
+                is_member = False  # this was expected - if not signed up yet
 
         except Person.DoesNotExist:
             raise Http404("Person not found on family")
@@ -72,86 +75,40 @@ def MembershipSignup(request, union_id, person_id=None):
                 "Du kan ikke tilmelde denne forening nu. Foreningen kan være lukket, eller der kan være andre ting, der gør at man ikke kan tilmelde sig pt."
             )
 
-        if (
-            not Person.objects.filter(family=family)
-            .exclude(membertype=Person.CHILD)
-            .exists()
-        ):
-            raise ValidationError(
-                "Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.",
-                code="no_parent_guardian",
-            )
-
         signup_form = MembershipSignupForm(request.POST)
 
         if signup_form.is_valid():
             # Sign up and redirect to payment link or family page
 
-            # Make ActivityParticipant
-            participant = ActivityParticipant(
+            # Make membership
+            member = Member(
                 person=person,
-                activity=activity,
-                note=signup_form.cleaned_data["note"],
-                price_in_dkk=activity.price_in_dkk - union.membership_price_in_dkk,
+                union=union,
+                price_in_dkk=union.membership_price_in_dkk,
             )
-
-            # Make a new member if it's a member activity
-            if activity.is_eligable_for_membership():
-                Member(
-                    union=union,
-                    person=person,
-                    price_in_dkk=union.membership_price_in_dkk,
-                )
-
-            # Make sure people have selected yes or no in photo permission and update photo permission
-            if signup_form.cleaned_data["photo_permission"] == "Choose":
-                return HttpResponse("Du skal vælge om vi må tage billeder eller ej.")
-            participant.photo_permission = signup_form.cleaned_data["photo_permission"]
-            participant.save()
+            member.save()
 
             return_link_url = reverse(
-                "activity_view_person", args=[activity.id, person.id]
+                "membership_view_person", args=[union.id, person.id]
             )
 
-            # Make payment if activity costs
-            if activity.price_in_dkk is not None and activity.price_in_dkk > 0:
-                # using creditcard ?
-                if signup_form.cleaned_data["payment_option"] == Payment.CREDITCARD:
-                    payment = Payment(
-                        payment_type=Payment.CREDITCARD,
-                        activity=activity,
-                        activityparticipant=participant,
-                        person=person,
-                        family=family,
-                        body_text=timezone.now().strftime("%Y-%m-%d")
-                        + " Betaling for "
-                        + activity.name
-                        + " på "
-                        + activity.department.name,
-                        amount_ore=int(activity.price_in_dkk * 100),
-                    )
-                    payment.save()
+            # Make payment
+            payment = Payment(
+                payment_type=Payment.CREDITCARD,
+                member=member,
+                person=person,
+                family=family,
+                body_text=timezone.now().strftime("%Y-%m-%d")
+                + " Betaling for medlemskab hos Coding Pirates "
+                + union.name,
+                amount_ore=int(union.membership_price_in_dkk * 100),
+            )
+            payment.save()
 
-                    return_link_url = payment.get_quickpaytransaction().get_link_url(
-                        return_url=settings.BASE_URL
-                        + reverse("activity_view_person", args=[activity.id, person.id])
-                    )
-
-            # expire invitation
-            if invitation:
-                invitation.expire_dtm = timezone.now() - timezone.timedelta(days=1)
-                invitation.save()
-
-            # reject all seasonal invitations on person if this was a seasonal invite
-            # (to avoid signups on multiple departments for club season)
-            if activity.is_season():
-                invites = ActivityInvite.objects.filter(person=person).exclude(
-                    activity=activity
-                )
-                for invite in invites:
-                    if invite.activity.is_season():
-                        invite.rejected_at = timezone.now()
-                        invite.save()
+            return_link_url = payment.get_quickpaytransaction().get_link_url(
+                return_url=settings.BASE_URL
+                + reverse("membership_view_person", args=[union.id, person.id])
+            )
 
             return HttpResponseRedirect(return_link_url)
         # fall through else
@@ -165,7 +122,7 @@ def MembershipSignup(request, union_id, person_id=None):
         "signupform": signup_form,
         "signup_closed": signup_closed,
         "view_only_mode": view_only_mode,
-        "participating": participating,
+        "is_member": is_member,
         "family_members": family_members,
         "union": union,
     }

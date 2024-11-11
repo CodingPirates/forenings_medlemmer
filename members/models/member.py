@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+import members.models.payment
+
 
 def end_of_year():
     return date(date.today().year, 12, 31)
@@ -54,7 +56,7 @@ class Member(models.Model):
 
     def get_payment_link(self):
         payment = members.models.payment.Payment.objects.get(
-            member=self, confirmed_at=None
+            member=self, accepted_at=None
         )
         if payment.payment_type == members.models.payment.Payment.CREDITCARD:
             return payment.get_quickpaytransaction().get_link_url()

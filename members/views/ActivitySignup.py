@@ -9,6 +9,7 @@ from members.forms import ActivitySignupForm
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
+from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
