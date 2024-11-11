@@ -18,7 +18,7 @@ jobs:
         run: docker compose run web flake8
       - name: Test
         run: docker compose run web ./manage.py test
-      - uses: actions/upload-artifact@v2.1.4
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: selenium-screens
