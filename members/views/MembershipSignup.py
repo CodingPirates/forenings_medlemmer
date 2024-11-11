@@ -51,7 +51,9 @@ def MembershipSignup(request, union_id, person_id=None):
             # Check not already signed up
             try:
                 end_date = datetime.now().date().replace(month=12, day=31)
-                member = Member.objects.get(union=union, person=person, member_until=end_date)
+                member = Member.objects.get(
+                    union=union, person=person, member_until=end_date
+                )
                 # found - we can only allow one - switch to view mode
                 is_member = True
                 view_only_mode = True
@@ -66,7 +68,10 @@ def MembershipSignup(request, union_id, person_id=None):
     # signup_closed should default to False
     signup_closed = False
 
-    if not union.memberships_allowed_at or timezone.now().date() < union.memberships_allowed_at:
+    if (
+        not union.memberships_allowed_at
+        or timezone.now().date() < union.memberships_allowed_at
+    ):
         signup_closed = True
 
     if request.method == "POST":
