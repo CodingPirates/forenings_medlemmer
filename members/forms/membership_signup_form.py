@@ -3,8 +3,6 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions
 
-from members.models.activityparticipant import ActivityParticipant
-
 
 class MembershipSignupForm(forms.Form):
     def __init__(self, *args, **kwargs):
