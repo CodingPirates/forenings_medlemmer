@@ -117,6 +117,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         "closed_dtm",
         "has_waiting_list",
     )
+    autocomplete_fields = ("union",)
     raw_id_fields = ("union",)
     search_fields = (
         "name",

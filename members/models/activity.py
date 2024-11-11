@@ -114,6 +114,9 @@ class Activity(models.Model):
     def participants(self):
         return self.activityparticipant_set.count()
 
+    def invitations(self):
+        return self.activityinvite_set.count()
+
     participants.short_description = "Deltagere"
 
     def get_min_amount(self, activitytype):
@@ -139,10 +142,37 @@ class Activity(models.Model):
                 f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
             )
 
-        if self.signup_closing > self.end_date:
+        if self.start_date is None:
+            errors["start_date"] = "Der skal angives en startdato for aktiviteten"
+
+        if self.end_date is None:
+            errors["end_date"] = "Der skal angives en slutdato for aktiviteten"
+
+        if self.signup_closing is None:
+            errors["signup_closing"] = "Der skal angives en dato for tilmeldingsfrist"
+
+        if (
+            (self.start_date is not None)
+            and (self.end_date is not None)
+            and (self.start_date > self.end_date)
+        ):
+            errors["signup_closing"] = "Startdato skal være før aktivitetens slutdato"
+
+        if (
+            (self.signup_closing is not None)
+            and (self.end_date is not None)
+            and (self.signup_closing > self.end_date)
+        ):
             errors["signup_closing"] = (
                 "Tilmeldingsfristen skal være før aktiviteten slutter"
             )
 
         if errors:
             raise ValidationError(errors)
+
+    def delete(self, *args, **kwargs):
+        if self.invitations() > 0 or self.participants() > 0:
+            raise ValidationError(
+                f'Aktivitet "{self.name}" kan ikke slettes, da der er tilmeldte eller inviterede personer. Muligvis vil systemet skrive at aktiviteten er slettet, men det er den ikke.'
+            )
+        super().delete(*args, **kwargs)

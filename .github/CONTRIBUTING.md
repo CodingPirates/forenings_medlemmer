@@ -13,7 +13,8 @@ You are more than welcome to contribute to the system. This guide documents how 
 - The setup adheres to the [twelve-factor-app][12f] principles. To get a
     local development configuration, copy the file `.env.example` to `.env`
 
-- Run `docker compose up` to start your local system.
+- Run `docker compose up` to start your local system.  
+  (If on Apple Silicon machine, run `docker compose -f docker-compose.yml -f docker-compose.arm64.yml up --build`)
 
 - Run `docker compose run web ./manage.py get_live_data` to download public
     data and insert it into your local database.
