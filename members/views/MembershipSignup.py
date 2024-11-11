@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -12,7 +11,6 @@ from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
 from members.models.union import Union
-from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
 
 

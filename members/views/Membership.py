@@ -2,9 +2,6 @@ from datetime import date
 from django.shortcuts import render
 from django.utils import timezone
 
-from members.models.activity import Activity
-
-from members.models.activityparticipant import ActivityParticipant
 from members.models.member import Member
 from members.models.person import Person
 from members.models.union import Union

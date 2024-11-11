@@ -94,7 +94,6 @@ class ActivitySignupForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
         read_conditions = self.cleaned_data.get("read_conditions")
         photo_permission = self.cleaned_data.get("photo_permission")
 

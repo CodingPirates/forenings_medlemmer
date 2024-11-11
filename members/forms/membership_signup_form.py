@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Field, HTML, Div
+from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions
 
 from members.models.activityparticipant import ActivityParticipant
@@ -62,7 +62,6 @@ class MembershipSignupForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
         read_conditions = self.cleaned_data.get("read_conditions")
 
         if read_conditions == "NO":
