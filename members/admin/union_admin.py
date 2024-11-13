@@ -103,7 +103,6 @@ class UnionAdmin(admin.ModelAdmin):
         # 20241113: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
 
         if not obj:
-            print("not obj")
             return self.add_fieldsets
 
         info_fields = (
@@ -116,7 +115,6 @@ class UnionAdmin(admin.ModelAdmin):
         )
 
         if not request.user.has_perm("members.showledgeraccount"):
-            print("no perm")
             info_fields = (
                 "bank_main_org",
                 "bank_account",
@@ -124,8 +122,6 @@ class UnionAdmin(admin.ModelAdmin):
                 "founded_at",
                 "closed_at",
             )
-
-        print(f"info:{info_fields}")
 
         return [
             (

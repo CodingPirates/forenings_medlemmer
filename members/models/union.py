@@ -12,7 +12,7 @@ class Union(models.Model):
         ordering = ["name"]
         permissions = (
             ("view_all_unions", "Can view all Foreninger"),
-            ("showledgeraccount", "Show General Ledger Account"),
+            ("show_ledger_account", "Show General Ledger Account"),
         )
 
     help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
