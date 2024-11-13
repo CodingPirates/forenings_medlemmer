@@ -10,7 +10,10 @@ class Union(models.Model):
         verbose_name_plural = "Foreninger"
         verbose_name = "Forening"
         ordering = ["name"]
-        permissions = (("view_all_unions", "Can view all Foreninger"),)
+        permissions = (
+            ("view_all_unions", "Can view all Foreninger"),
+            ("showledgeraccount", "Show General Ledger Account"),
+        )
 
     help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
     name = models.CharField("Foreningens navn", max_length=200, help_text=help_union)
@@ -93,6 +96,12 @@ class Union(models.Model):
         max_length=4,
         blank=True,
         help_text="Kontonummer i formatet 1234",
+        validators=[
+            RegexValidator(
+                regex="^[0-9]{4}",
+                message="Indtast kontonummer i det rigtige format.",
+            )
+        ],
     )
 
     def __str__(self):
