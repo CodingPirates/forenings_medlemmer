@@ -113,7 +113,9 @@ class UnionAdmin(admin.ModelAdmin):
             "closed_at",
         )
 
-        if request.user.is_superuser or request.user.has_perm("members.show_ledger_account"):
+        if request.user.is_superuser or request.user.has_perm(
+            "members.show_ledger_account"
+        ):
             info_fields = (
                 "bank_main_org",
                 "bank_account",
