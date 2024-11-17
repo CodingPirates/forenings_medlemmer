@@ -71,11 +71,28 @@ class Activity(models.Model):
     member_justified = models.BooleanField(
         "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
     )
+    address = models.ForeignKey(
+        "Address", on_delete=models.PROTECT, verbose_name="Adresse", null=False
+    )
+    visible_from = models.DateTimeField(
+        "Aktiviteten er synlig fra", null=False, blank=False, default=timezone.now
+    )
+    visible = models.BooleanField(
+        "Vises denne aktivitet",
+        null=False,
+        blank=False,
+        default=True,
+        help_text="Vises i denne aktivtet. Kan bruges sammen med feltet 'Aktiviteten er synlig fra'",
+    )
 
     def is_historic(self):
         return self.end_date < timezone.now()
 
     is_historic.short_description = "Historisk?"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs
 
     def __str__(self):
         return self.department.name + ", " + self.name
@@ -97,16 +114,22 @@ class Activity(models.Model):
     def participants(self):
         return self.activityparticipant_set.count()
 
+    def invitations(self):
+        return self.activityinvite_set.count()
+
     participants.short_description = "Deltagere"
 
     def get_min_amount(self, activitytype):
         min_amount = self.NO_MINIMUM_AMOUNT
 
-        if activitytype == "FORENINGSMEDLEMSKAB":
-            min_amount = self.MEMBERSHIP_MIN_AMOUNT
+        # Issue 1058: If activity is in the past then skip this check
+        # During activity creation, the end_date could have been left empty
+        if self.end_date and self.end_date > timezone.now().date():
+            if activitytype == "FORENINGSMEDLEMSKAB":
+                min_amount = self.MEMBERSHIP_MIN_AMOUNT
 
-        if activitytype == "FORLØB":
-            min_amount = self.ACTIVITY_MIN_AMOUNT
+            if activitytype == "FORLØB":
+                min_amount = self.ACTIVITY_MIN_AMOUNT
 
         return min_amount
 
@@ -119,5 +142,37 @@ class Activity(models.Model):
                 f"Prisen er for lav. Denne type aktivitet skal koste mindst {min_amount} kr."
             )
 
+        if self.start_date is None:
+            errors["start_date"] = "Der skal angives en startdato for aktiviteten"
+
+        if self.end_date is None:
+            errors["end_date"] = "Der skal angives en slutdato for aktiviteten"
+
+        if self.signup_closing is None:
+            errors["signup_closing"] = "Der skal angives en dato for tilmeldingsfrist"
+
+        if (
+            (self.start_date is not None)
+            and (self.end_date is not None)
+            and (self.start_date > self.end_date)
+        ):
+            errors["signup_closing"] = "Startdato skal være før aktivitetens slutdato"
+
+        if (
+            (self.signup_closing is not None)
+            and (self.end_date is not None)
+            and (self.signup_closing > self.end_date)
+        ):
+            errors["signup_closing"] = (
+                "Tilmeldingsfristen skal være før aktiviteten slutter"
+            )
+
         if errors:
             raise ValidationError(errors)
+
+    def delete(self, *args, **kwargs):
+        if self.invitations() > 0 or self.participants() > 0:
+            raise ValidationError(
+                f'Aktivitet "{self.name}" kan ikke slettes, da der er tilmeldte eller inviterede personer. Muligvis vil systemet skrive at aktiviteten er slettet, men det er den ikke.'
+            )
+        super().delete(*args, **kwargs)

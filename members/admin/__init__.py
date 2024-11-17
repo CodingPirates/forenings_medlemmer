@@ -11,12 +11,14 @@ from members.models import (
     EmailTemplate,
     Equipment,
     Family,
+    Municipality,
     Payment,
     Person,
     Union,
     VolunteerRequest,
     VolunteerRequestDepartment,
     WaitingList,
+    EmailItem,
 )
 
 from .activity_admin import ActivityAdmin
@@ -26,6 +28,7 @@ from .address_admin import AddressAdmin
 from .department_admin import DepartmentAdmin
 from .equipment_admin import EquipmentAdmin
 from .family_admin import FamilyAdmin
+from .municipality_admin import MunicipalityAdmin
 from .payment_admin import PaymentAdmin
 from .person_admin import PersonAdmin
 from .union_admin import UnionAdmin
@@ -33,6 +36,7 @@ from .user_admin import UserAdmin
 from .volunteerrequest_admin import VolunteerRequestAdmin
 from .volunteerrequestdepartment_admin import VolunteerRequestDepartmentAdmin
 from .waitinglist_admin import WaitingListAdmin
+from .emailitem_admin import EmailItemAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
@@ -45,12 +49,14 @@ admin.site.register(Department, DepartmentAdmin)
 admin.site.register(EmailTemplate)
 admin.site.register(Equipment, EquipmentAdmin)
 admin.site.register(Family, FamilyAdmin)
+admin.site.register(Municipality, MunicipalityAdmin)
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Union, UnionAdmin)
 admin.site.register(WaitingList, WaitingListAdmin)
 admin.site.register(VolunteerRequest, VolunteerRequestAdmin)
 admin.site.register(VolunteerRequestDepartment, VolunteerRequestDepartmentAdmin)
+admin.site.register(EmailItem, EmailItemAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 # admin.site.register(AdminUserInformation, AdminUserInformationAdmin)

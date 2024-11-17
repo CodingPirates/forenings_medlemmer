@@ -10,7 +10,10 @@ class Union(models.Model):
         verbose_name_plural = "Foreninger"
         verbose_name = "Forening"
         ordering = ["name"]
-        permissions = (("view_all_unions", "Can view all Foreninger"),)
+        permissions = (
+            ("view_all_unions", "Can view all Foreninger"),
+            ("show_ledger_account", "Show General Ledger Account"),
+        )
 
     help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
     name = models.CharField("Foreningens navn", max_length=200, help_text=help_union)
@@ -55,7 +58,7 @@ class Union(models.Model):
     )
     secretary_old = models.CharField("Sekretær", max_length=200, blank=True)
     secretary_email_old = models.EmailField("Sekretærens email", blank=True)
-    union_email = models.EmailField("Foreningens email", blank=True)
+    email = models.EmailField("Foreningens email", blank=True)
     statues = models.URLField("Link til gældende vedtægter", blank=True)
     founded_at = models.DateField("Stiftet", blank=True, null=True)
     closed_at = models.DateField(
@@ -84,6 +87,18 @@ class Union(models.Model):
         validators=[
             RegexValidator(
                 regex="^[0-9]{4} *?-? *?[0-9]{6,10} *?$",
+                message="Indtast kontonummer i det rigtige format.",
+            )
+        ],
+    )
+    gl_account = models.CharField(
+        "Finanskonto:",
+        max_length=4,
+        blank=True,
+        help_text="Kontonummer i formatet 1234",
+        validators=[
+            RegexValidator(
+                regex="^[0-9]{4}",
                 message="Indtast kontonummer i det rigtige format.",
             )
         ],

@@ -1,13 +1,20 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.html import escape
+from django.utils.html import escape, format_html
 
 from members.models import (
     ActivityParticipant,
     AdminUserInformation,
     Department,
     Union,
+    Address,
+)
+
+from .inlines import (
+    EmailItemInline,
 )
 
 from members.admin.admin_actions import AdminActions
@@ -86,8 +93,6 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "union_link",
-        "department_link",
         "activitytype",
         "start_end",
         "open_invite",
@@ -96,6 +101,8 @@ class ActivityAdmin(admin.ModelAdmin):
         "seats_used",
         "seats_free",
         "age",
+        "union_link",
+        "department_link",
     )
 
     date_hierarchy = "start_date"
@@ -105,7 +112,12 @@ class ActivityAdmin(admin.ModelAdmin):
         "department__name",
         "description",
     )
-    readonly_fields = ("seats_left", "participants")
+    readonly_fields = (
+        "seats_left",
+        "participants",
+        "activity_link",
+        "addressregion",
+    )
     list_per_page = 20
     raw_id_fields = (
         "union",
@@ -116,16 +128,24 @@ class ActivityAdmin(admin.ModelAdmin):
         ActivityDepartmentListFilter,
         "open_invite",
         "activitytype",
+        "address__region",
+    )
+    autocomplete_fields = (
+        "address",
+        "department",
     )
     actions = [
         AdminActions.export_participants_csv,
     ]
     save_as = True
 
+    ordering = ("-start_date", "department__name", "name")
+
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+        js = ("members/js/copy_to_clipboard.js",)
 
-    inlines = [ActivityParticipantInline]
+    inlines = [ActivityParticipantInline, EmailItemInline]
 
     def start_end(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
@@ -171,6 +191,11 @@ class ActivityAdmin(admin.ModelAdmin):
 
     seats_free.short_description = "Ubesat"
 
+    def addressregion(self, obj):
+        return str(obj.address.region)
+
+    addressregion.short_description = "Region"
+
     def activity_membership_union_link(self, obj):
         if obj.activitytype_id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]:
             url = reverse("admin:members_union_change", args=[obj.union_id])
@@ -180,6 +205,25 @@ class ActivityAdmin(admin.ModelAdmin):
             return ""
 
     activity_membership_union_link.short_description = "Forening for medlemskab"
+
+    def activity_link(self, obj):
+        if obj.id is None:
+            return ""
+
+        full_url = (
+            f"{settings.BASE_URL}{reverse('activity_view_family', args=[obj.id])}"
+        )
+        link = format_html(
+            '<a href="{}" target="_blank">{}</a> '
+            '<button type="button" class="copy-btn" data-url="{}">Copy to clipboard</button>',
+            full_url,
+            full_url,
+            full_url,
+        )
+
+        return mark_safe(link)
+
+    activity_link.short_description = "Link til aktivitet"
 
     # Only view activities on own department
     def get_queryset(self, request):
@@ -191,8 +235,10 @@ class ActivityAdmin(admin.ModelAdmin):
         departments = Department.objects.filter(adminuserinformation__user=request.user)
         return qs.filter(department__in=departments)
 
-    # Only show own departments when creating new activity
+    # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
+    # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Only show own departments when creating new activity
         if (
             db_field.name == "department"
             and not request.user.is_superuser
@@ -201,26 +247,45 @@ class ActivityAdmin(admin.ModelAdmin):
             kwargs["queryset"] = Department.objects.filter(
                 adminuserinformation__user=request.user
             )
-        return super(ActivityAdmin, self).formfield_for_foreignkey(
-            db_field, request, **kwargs
-        )
+        if db_field.name == "address":
+            kwargs["queryset"] = Address.get_user_addresses(request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def delete_queryset(self, request, queryset):
+        for activity in queryset:
+            print(activity)
+            self.delete_model(request, activity)
+
+    def delete_model(self, request, activity):
+        try:
+            activity.delete()
+            messages.success(request, f'Aktivitet "{activity.name}" slettet.')
+        except ValidationError as e:
+            messages.error(request, e.message)
+
+        except Exception as e:
+            messages.error(request, f"Fejl: {str(e)}")
 
     fieldsets = [
         (
             "Afdeling",
             {
-                "description": "<p>Du kan ændre afdeling for aktiviteten ved at skrive afdelings-id, eller tryk på søg-ikonet og i det nye vindue skal du finde afdelingen, for derefter at trykke på ID i første kolonne.</p>",
+                "description": "<p>Du kan ændre afdeling for aktiviteten ved at vælge en afdeling i listen, evt bruge søgefunktionen.</p>",
                 "fields": ("department",),
             },
         ),
         (
             "Aktivitet",
             {
-                "description": "<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt. F.eks. <em>Forårssæson 2018</em>.</p><p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>",
+                "description": """<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt.
+                F.eks. <em>Forårssæson 2018</em>.</p>
+                <p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>
+                <p>Startdato er første dag for aktiviteten, og slutdato er sidste for aktiviteten</p>""",
                 "fields": (
                     (
                         "name",
                         "activitytype",
+                        "activity_link",
                     ),
                     "open_hours",
                     "description",
@@ -229,36 +294,38 @@ class ActivityAdmin(admin.ModelAdmin):
                         "end_date",
                     ),
                     "member_justified",
+                    "visible",
+                    "visible_from",
                 ),
             },
         ),
         (
             "Lokation og ansvarlig",
             {
-                "description": "<p>Adresse samt ansvarlig kan adskille sig fra afdelingens informationer (f.eks. et gamejam der foregår et andet sted).</p>",
+                "description": """<p>Adresse samt ansvarlig kan adskille sig fra afdelingens
+                informationer (f.eks. et gamejam der kan foregå et andet sted).</p>""",
                 "fields": (
-                    (
-                        "responsible_name",
-                        "responsible_contact",
-                    ),
-                    (
-                        "streetname",
-                        "housenumber",
-                        "floor",
-                        "door",
-                    ),
-                    (
-                        "zipcode",
-                        "city",
-                        "placename",
-                    ),
+                    "address",
+                    "addressregion",
+                    "responsible_name",
+                    "responsible_contact",
                 ),
             },
         ),
         (
             "Tilmeldingsdetaljer",
             {
-                "description": '<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på betalingsformularen på tilmeldingssiden. Den skal bruges til at stille spørgsmål, som den, der tilmelder sig, kan besvare ved tilmelding.</p><p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne aktivitet - efter "først til mølle"-princippet. Dette er kun til aktiviteter og klubaften-forløb/sæsoner i områder, hvor der ikke er nogen venteliste. </p><p>Alle aktiviteter med fri tilmelding kommer til at stå med en stor "tilmeld" knap på medlemssiden. <b>Vi bruger typisk ikke fri tilmelding - spørg i Slack hvis du er i tvivl!</b></p>',
+                "description": """<p>Tilmeldingsinstruktioner er tekst der kommer til at stå på
+                betalingsformularen på tilmeldingssiden.</p>
+                <p>Den skal bruges til at stille spørgsmål, som den, der tilmelder sig,
+                kan besvare ved tilmelding.</p>
+                <p>Fri tilmelding betyder, at alle, når som helst kan tilmelde sig denne
+                aktivitet - efter "først til mølle"-princippet.
+                Dette er kun til aktiviteter og klubaften-forløb/sæsoner i områder,
+                hvor der ikke er nogen venteliste. </p>
+                <p>Alle aktiviteter med fri tilmelding kommer til at stå med en stor "tilmeld"
+                knap på medlemssiden. <b>Afdelinger med venteliste bruger typisk ikke fri
+                tilmelding - spørg i Slack hvis du er i tvivl!</b></p>""",
                 "fields": (
                     "instructions",
                     (

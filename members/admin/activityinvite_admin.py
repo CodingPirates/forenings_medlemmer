@@ -1,14 +1,23 @@
+import codecs
+from datetime import timedelta
 from django import forms
 from django.contrib import admin
+from django.contrib import messages
+from django.contrib.admin.widgets import AdminDateWidget
+from django.db import transaction
 from django.db.models.functions import Lower
+from django.http import HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
+from django.db.models import Exists, OuterRef
 
 from members.models import (
     Activity,
     ActivityInvite,
+    ActivityParticipant,
     AdminUserInformation,
     Department,
     Person,
@@ -156,11 +165,22 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     search_help_text = mark_safe(
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
+
+    actions = ["export_csv_invitation_info", "extend_invitations"]
+
     form = ActivityInviteAdminForm
 
     # Only show invitation to own activities
     def get_queryset(self, request):
-        qs = super(ActivityInviteAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
+        qs = queryset.annotate(
+            is_participating=Exists(
+                ActivityParticipant.objects.filter(
+                    person=OuterRef("person"), activity=OuterRef("activity")
+                )
+            )
+        )
+
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_departments"
         ):
@@ -206,11 +226,13 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         return item.person.age_years()
 
     person_age_years.short_description = "Alder"
+    person_age_years.admin_order_field = "person__birthday"
 
     def person_zipcode(self, item):
         return item.person.zipcode
 
     person_zipcode.short_description = "Postnummer"
+    person_zipcode.admin_order_field = "person__zipcode"
 
     def activity_department_union_link(self, item):
         url = reverse(
@@ -254,9 +276,124 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     person_link.admin_order_field = "person__name"
 
     def participating(self, item):
-        return item.person.activityparticipant_set.filter(
-            activity=item.activity
-        ).exists()
+        return item.is_participating
 
     participating.short_description = "Deltager"
     participating.boolean = True
+    participating.admin_order_field = "is_participating"
+
+    def export_csv_invitation_info(self, request, queryset):
+        result_string = """"Forening"; "Afdeling"; "Aktivitet"; "Deltager";\
+            "Deltager-email"; "Familie-email"; "Pris"; "Pris note"; "Ekstra email info" ;\
+            "Deltager i aktiviteten"; "Invitationsdato"; "Udløbsdato"; "Afslåetdato"\n"""
+
+        for invitation in queryset:
+            participate = (
+                "Ja"
+                if invitation.person.activityparticipant_set.filter(
+                    activity=invitation.activity
+                ).exists()
+                else "Nej"
+            )
+            expire_date = (
+                ""
+                if invitation.expire_dtm is None
+                else invitation.expire_dtm.strftime("%Y-%m-%d")
+            )
+            rejected_date = (
+                ""
+                if invitation.rejected_at is None
+                else invitation.rejected_at.strftime("%Y-%m-%d")
+            )
+
+            result_string += (
+                f"{invitation.activity.department.union.name};"
+                f"{invitation.activity.department.name};"
+                f"{invitation.activity.name};"
+                f"{invitation.person.name};"
+                f"{invitation.person.email};"
+                f"{invitation.person.family.email};"
+                f"{str(invitation.price_in_dkk)};"
+                '"' + invitation.price_note.replace('"', '""') + '";'
+                '"' + invitation.extra_email_info.replace('"', '""') + '";'
+                f"{participate};"
+                f'{invitation.invite_dtm.strftime("%Y-%m-%d")};'
+                f"{expire_date};"
+                f"{rejected_date}\n"
+            )
+        response = HttpResponse(
+            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = (
+            'attachment; filename="invitationsoversigt.csv"'
+        )
+        return response
+
+    export_csv_invitation_info.short_description = "Exporter Invitationsinformationer"
+
+    def extend_invitations(modelAdmin, request, queryset):
+        class ExtendInvitationsForm(forms.Form):
+            expires = forms.DateField(
+                label="Udløber",
+                widget=AdminDateWidget(),
+                initial=timezone.now() + timedelta(days=14),
+            )
+
+        invitations = queryset
+
+        context = admin.site.each_context(request)
+        context["invitations"] = invitations
+        context["queryset"] = queryset
+
+        expires = timezone.now() + timedelta(days=14)
+        context["expires"] = expires
+
+        if request.method == "POST" and "expires" in request.POST:
+            extend_invitations_form = ExtendInvitationsForm(request.POST)
+            context["extend_invitations_form"] = extend_invitations_form
+
+            if extend_invitations_form.is_valid():
+                expires = extend_invitations_form.cleaned_data["expires"]
+
+                if expires < timezone.now().date():
+                    messages.error(
+                        request,
+                        "Fejl - den angivne udløbsdato er før dags dato.",
+                    )
+                    return
+
+                updated_invitations = 0
+                skipped_invitations = 0
+                try:
+                    with transaction.atomic():
+                        for invitation in invitations:
+                            if invitation.expire_dtm > expires:
+                                skipped_invitations += 1
+                                continue
+
+                            invitation.expire_dtm = expires
+                            invitation.save()
+                            updated_invitations += 1
+                except Exception as E:
+                    messages.error(
+                        request,
+                        f"Fejl - ingen invitationer blev forlænget! Følgende fejl opstod: {E=}",
+                    )
+                    return
+
+                status_text = f"{updated_invitations} invitationer blev forlænget til {formats.date_format(expires, 'DATE_FORMAT')}."
+                if skipped_invitations > 0:
+                    status_text += f"<br/>{skipped_invitations} invitationer blev sprunget over, da de allerede havde en senere udløbsdato."
+                messages.success(
+                    request,
+                    mark_safe(status_text),
+                )
+
+                return
+        else:
+            context["extend_invitations_form"] = ExtendInvitationsForm()
+
+        return render(request, "admin/extend_invitations.html", context)
+
+    extend_invitations.short_description = "Forlæng invitationer"

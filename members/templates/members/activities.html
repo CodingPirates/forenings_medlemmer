@@ -61,20 +61,23 @@
                     </a>
                   </td>
                   <td>
-                    {% if invite.activity.placename %}
-                      {{ invite.activity.placename }}<br>
+                    {% if invite.activity.address.placename %}
+                      {{ invite.activity.address.placename }}<br>
                     {% endif %}
-                    {{ invite.activity.streetname }}
-                    {{ invite.activity.housenumber }}
-                    {% if invite.activity.floor %}
-                      {{ invite.activity.floor }}
+                    {{ invite.activity.address.streetname }}
+                    {{ invite.activity.address.housenumber }}
+                    {% if invite.activity.address.floor %}
+                      {{ invite.activity.address.floor }}
                     {% endif %}
-                    {% if invite.activity.door %}
-                      {{ invite.activity.door }}
+                    {% if invite.activity.address.door %}
+                      {{ invite.activity.address.door }}
                     {% endif %}
                     <br>
-                    {{ invite.activity.zipcode }}
-                    {{ invite.activity.city }}
+                    {% if invite.activity.address.placename %}
+                      {{ invite.activity.address.placename }}<br>
+                    {% endif %}
+                    {{ invite.activity.address.zipcode }}
+                    {{ invite.activity.address.city }}
                   </td>
                   <td>
                     {{ invite.activity.min_age }} - {{ invite.activity.max_age }}
@@ -115,7 +118,7 @@
     <section id="current-activities">
       {% if current_activities %}
         <h2>Nuværende og kommende aktiviteter</h2>
-        {% regroup current_activities by department.address.region as departments_region %}
+        {% regroup current_activities by address.region as departments_region %}
         <p>Denne liste indeholder igangværende og kommende aktiviteter.<br>
           For aktiviteter med fri tilmelding, kan I tilmelde Jer direkte, og ellers
           kan I opskrive Jer på venteliste til afdelingen.
@@ -161,20 +164,23 @@
                       </td>
                       <td>{{ activity.name }}</td>
                       <td>
-                        {% if activity.placename %}
-                          {{ activity.placename }}<br>
+                        {% if activity.address.descriptiontext %}
+                          {{ activity.address.descriptiontext }}<br>
                         {% endif %}
-                        {{ activity.streetname }}
-                        {{ activity.housenumber }}
-                        {% if activity.floor %}
-                          {{ activity.floor }}
+                        {{ activity.address.streetname }}
+                        {{ activity.address.housenumber }}
+                        {% if activity.address.floor %}
+                          {{ activity.address.floor }}
                         {% endif %}
-                        {% if activity.door %}
-                          {{ activity.door }}
+                        {% if activity.address.door %}
+                          {{ activity.address.door }}
                         {% endif %}
                         <br>
-                        {{ activity.zipcode }}
-                        {{ activity.city }}
+                        {% if activity.address.placename %}
+                          {{ activity.address.placename }}<br>
+                        {% endif %}
+                        {{ activity.address.zipcode }}
+                        {{ activity.address.city }}
                       </td>
                       <td>{{ activity.min_age }} - {{ activity.max_age }}</td>
                       <td>
@@ -204,6 +210,12 @@
                               {{ activity.department.name }} opretter en ny aktivitet.
                             </p>
                           {% endif %}
+                          {% if not activity.department.has_waiting_list %}
+                            <div>
+                              Afdelingen bruger ikke venteliste, men aktiviteten er ikke åben for tilmeldinger (endnu)
+                            </div>
+                          {% endif %}
+
                           {% for person in persons %}
                             {% if activity.open_invite %}
                               {% if activity.id in person.participating_activities %}
@@ -211,6 +223,11 @@
                                   {{ person.person.firstname }} er tilmeldt
                                 </div>
                               {% else %}
+                                {% if activity.seats_left == 0 %}
+                                  <div class="info-box">
+                                    Udsolgt - kan ikke tilmelde {{ person.person.firstname }}
+                                  </div>
+                                {% else %}
                                   {% if person.person in activity.persons %}
                                     <a
                                       class="button-success"
@@ -219,6 +236,7 @@
                                       Tilmeld {{ person.person.firstname }}
                                     </a>
                                   {% endif %}
+                                {% endif %}
                               {% endif %}
                             {% else %}
                               {% if activity.department in person.departments_is_waiting %}
@@ -226,12 +244,14 @@
                                   {{ person.person.firstname }} er opskrevet
                                 </div>
                               {% else %}
-                                <a
-                                  class="button-success"
-                                  href="{% url 'waiting_list_subscription' person.person.id activity.department.id 'subscribe' %}"
-                                >
-                                  Opskriv {{ person.person.firstname }} på venteliste
-                                </a>
+                                {% if activity.department.has_waitinglist %}
+                                  <a
+                                    class="button-success"
+                                    href="{% url 'waiting_list_subscription' person.person.id activity.department.id 'subscribe' %}"
+                                  >
+                                    Opskriv {{ person.person.firstname }} på venteliste
+                                  </a>
+                                {% endif %}
                               {% endif %}
                             {% endif %}
                           {% endfor %}

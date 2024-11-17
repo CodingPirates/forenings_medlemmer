@@ -1,6 +1,5 @@
 import codecs
 from datetime import timedelta
-from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib import admin
 from django.contrib import messages
@@ -15,6 +14,8 @@ from django.utils.html import escape
 from django.shortcuts import render
 import members.models.emailtemplate
 import members.models.waitinglist
+from members.utils.age_check import check_is_person_too_young
+from members.utils.age_check import check_is_person_too_old
 
 from members.models import (
     Activity,
@@ -36,10 +37,12 @@ class AdminActions(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_departments"
         ):
-            department_list_query = Department.objects.all().order_by("name")
+            department_list_query = Department.objects.filter(
+                closed_dtm__isnull=True
+            ).order_by("name")
         else:
             department_list_query = Department.objects.filter(
-                adminuserinformation__user=request.user
+                adminuserinformation__user=request.user, closed_dtm__isnull=True
             ).order_by("name")
         department_list = [("-", "-")]
         for department in department_list_query:
@@ -205,25 +208,13 @@ class AdminActions(admin.ModelAdmin):
                                         )
 
                                     # Check for age constraint: too young ?
-                                    # Since it's a "negative-list" of people who won't be invited, we use AND operator
-                                    # to add to list if person is too young at activity start AND today
-                                    elif (
-                                        current_person.birthday
-                                        > activity.start_date
-                                        - relativedelta(years=activity.min_age)
-                                    ) and (
-                                        current_person.birthday
-                                        > timezone.now().date()
-                                        - relativedelta(years=activity.min_age)
+                                    elif check_is_person_too_young(
+                                        activity, current_person
                                     ):
                                         persons_too_young.append(current_person.name)
                                     # Check for age constraint: too old ?
-                                    elif (
-                                        current_person.birthday
-                                        < activity.start_date
-                                        - relativedelta(
-                                            years=activity.max_age + 1, days=-1
-                                        )
+                                    elif check_is_person_too_old(
+                                        activity, current_person
                                     ):
                                         persons_too_old.append(current_person.name)
                                     # Otherwise - person can be invited

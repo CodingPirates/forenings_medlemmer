@@ -15,6 +15,7 @@ import members.models.emailtemplate
 import members.models.equipment
 import members.models.equipmentloan
 import members.models.family
+import members.models.municipality
 import members.models.notification
 import members.models.payment
 import members.models.person
@@ -43,6 +44,7 @@ from .emailtemplate import EmailTemplate
 from .equipment import Equipment
 from .equipmentloan import EquipmentLoan
 from .family import Family
+from .municipality import Municipality
 from .notification import Notification
 from .payment import Payment
 from .person import Person
@@ -73,6 +75,7 @@ __all__ = [
     EquipmentLoan,
     Family,
     gatherDayliStatistics,
+    Municipality,
     Notification,
     Payment,
     Person,

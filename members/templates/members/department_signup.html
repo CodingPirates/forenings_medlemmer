@@ -40,7 +40,7 @@
   <div class="tabs" id="menu-tabs">
     <ul>
       <li id="menu-alle-ventelister">Alle ventelister</li>
-      <li id="menu-timeldte-ventelister">Tilmeldte ventelister</li>
+      <li id="menu-tilmeldte-ventelister">Tilmeldte ventelister</li>
       <li id="menu-kort-over-afdelinger">Kort over afdelinger</li>
     </ul>
     <section id="alle-ventelister">
@@ -98,20 +98,30 @@
                   <td>{{ department.address }}</td>
                   <td>{{ department.open_hours }}</td>
                   <td>
-                    {% for child in children %}
-                      <div>
-                        {% if department in child.departments_is_waiting %}
-                          {{ child.person.firstname }} er opskrevet
-                        {% else %}
-                          <a
+                    {% if department.has_waiting_list %}
+                      {% for child in children %}
+                        <div>
+                          {% if department in child.departments_is_waiting %}
+                            {% for waitinglist_department, waitinglist_place in child.waitinglists %}
+                              {% if waitinglist_department == department %}
+                                {{ child.person.firstname }} er opskrevet (Nr {{ waitinglist_place }} på ventelisten)
+                              {% endif %}
+                            {% endfor %}
+                          {% else %}
+                            <a
                               class="button"
                               href="{% url 'waiting_list_subscription' child.person.id department.id 'subscribe' %}"
-                          >
-                            Opskriv: {{ child.person.firstname }}
-                          </a>
-                        {% endif %}
+                            >
+                              Opskriv: {{ child.person.firstname }}
+                            </a>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    {% else %}
+                      <div>
+                        Ingen venteliste, se afdelingens aktiviteter under <b>Aktiviteter</b>
                       </div>
-                    {% endfor %}
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}
