@@ -4,14 +4,31 @@ from django.urls import reverse
 from django.contrib import messages
 from members.forms import VolunteerRequestForm
 from members.models.volunteerrequestdepartment import VolunteerRequestDepartment
+from members.models.volunteerrequest import VolunteerRequest
 
 
 def volunteer_request_view(request):
     if request.method == "POST":
-        volunteer_request_form = VolunteerRequestForm(request.POST)
+        volunteer_request_form = VolunteerRequestForm(request.POST, user=request.user)
 
         if volunteer_request_form.is_valid():
-            vol_req_obj = volunteer_request_form.save()
+            family_member = volunteer_request_form.cleaned_data.get("family_member")
+            if family_member:
+                vol_req_obj = VolunteerRequest.objects.create(
+                    person=family_member,
+                    name="",
+                    email="",
+                    phone="",
+                    age=None,
+                    zip="",
+                    info_reference=volunteer_request_form.cleaned_data[
+                        "info_reference"
+                    ],
+                    info_whishes=volunteer_request_form.cleaned_data["info_whishes"],
+                )
+            else:
+                vol_req_obj = volunteer_request_form.save()
+
             departments = volunteer_request_form.cleaned_data["department_list"]
             for department in departments:
                 VolunteerRequestDepartment.objects.create(
@@ -31,7 +48,7 @@ def volunteer_request_view(request):
                 },
             )
     else:
-        volunteer_request_form = VolunteerRequestForm()
+        volunteer_request_form = VolunteerRequestForm(user=request.user)
 
     return render(
         request,

@@ -5,6 +5,7 @@ from crispy_forms.layout import Layout, Fieldset, Hidden, Div, Field, Submit
 from members.models.volunteerrequest import VolunteerRequest
 
 from members.models.department import Department
+from members.models.person import Person
 
 from django.forms.widgets import CheckboxSelectMultiple
 from django.utils.html import format_html
@@ -48,9 +49,16 @@ class VolunteerRequestForm(forms.ModelForm):
         label="Vælg Afdeling(er)x",
     )
 
+    family_member = forms.ModelChoiceField(
+        queryset=Person.objects.none(),
+        required=False,
+        label="Vælg person fra familien",
+    )
+
     class Meta:
         model = VolunteerRequest
         fields = [
+            "family_member",
             "name",
             "email",
             "phone",
@@ -62,9 +70,24 @@ class VolunteerRequestForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        print("INIT")
-        super(VolunteerRequestForm, self).__init__(*args, **kwargs)
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
         self.fields["department_list"].label_from_instance = self.label_from_instance
+
+        if user and user.is_authenticated:
+            family = user.person.family
+            self.fields["family_member"].queryset = family.person_set.all()
+            self.fields["name"].initial = user.person.name
+            self.fields["email"].initial = user.email
+            self.fields["phone"].initial = user.person.phone
+            self.fields["age"].initial = user.person.age_years()
+            self.fields["zip"].initial = user.person.zipcode
+            self.fields["name"].widget = forms.HiddenInput()
+            self.fields["email"].widget = forms.HiddenInput()
+            self.fields["phone"].widget = forms.HiddenInput()
+            self.fields["age"].widget = forms.HiddenInput()
+            self.fields["zip"].widget = forms.HiddenInput()
+
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.layout = Layout(
@@ -72,6 +95,7 @@ class VolunteerRequestForm(forms.ModelForm):
             Fieldset(
                 "Frivilliges oplysninger",
                 Div(
+                    Div(Field("family_member"), css_class="col-md-12"),
                     Div(Field("name"), css_class="col-md-12"),
                     Div(Field("email"), css_class="col-md-12"),
                     Div(Field("phone"), css_class="col-md-4"),

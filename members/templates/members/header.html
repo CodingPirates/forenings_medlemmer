@@ -14,6 +14,7 @@
             <a href="{% url "admin:index" %}">ADMIN</a>
         {% endif %}
         <a href="{% url "family_detail" %}">Familie</a>
+        <a href="{% url "volunteer_request" %}">Bliv frivillig</a>
         <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
     {% else %}
         <a href="{% url "account_create" %}">Tilmeld barn</a>
