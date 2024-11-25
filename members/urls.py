@@ -1,4 +1,6 @@
 from django.urls import re_path
+from django.views.generic import TemplateView
+
 from members.views import (
     AccountCreate,
     Activities,
@@ -14,13 +16,12 @@ from members.views import (
     PersonUpdate,
     QuickpayCallback,
     SupportMembership,
-    VolunteerRequestNew,
+    volunteer_request_view,
     WaitingListSetSubscription,
     departmentView,
     paymentGatewayErrorView,
     userCreated,
     volunteerSignup,
-    VolunteerRequestNew,
 )
 from django.contrib.auth import views as auth_views
 from graphene_django.views import GraphQLView
@@ -76,10 +77,12 @@ urlpatterns = [
     re_path(r"^membership/$", Membership, name="membership"),
     re_path(r"^support_membership/$", SupportMembership, name="support_membership"),
     re_path(r"^volunteer$", volunteerSignup, name="volunteer_signup"),
-    #    re_path(r"^volunteer_request_new/$", VolunteerRequestNew, name="volunteer_request_new"),
+    re_path(r"^volunteer_request/$", volunteer_request_view, name="volunteer_request"),
     re_path(
-        r"^new_vr/$", VolunteerRequestNew, name="volunteer_request_new_form"
-    ),  # name="volunteer_request_new"),
+        r"^volunteer_request_created/$",
+        TemplateView.as_view(template_name="members/volunteer_request_created.html"),
+        name="volunteer_request_created",
+    ),
     re_path(r"^user_created/$", userCreated, name="user_created"),
     re_path(r"^admin_signup/$", AdminSignup, name="admin_signup"),
     re_path(r"^family/$", FamilyDetails, name="family_detail"),
