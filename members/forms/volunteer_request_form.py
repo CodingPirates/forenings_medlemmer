@@ -87,6 +87,8 @@ class VolunteerRequestForm(forms.ModelForm):
             self.fields["phone"].widget = forms.HiddenInput()
             self.fields["age"].widget = forms.HiddenInput()
             self.fields["zip"].widget = forms.HiddenInput()
+        else:
+            self.fields["family_member"].widget = forms.HiddenInput()
 
         self.helper = FormHelper()
         self.helper.form_method = "post"

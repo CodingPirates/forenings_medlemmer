@@ -51,6 +51,4 @@ class VolunteerRequestDepartment(models.Model):
         return f"{self.department}: {self.volunteer_request}"
 
     def save(self, *args, **kwargs):
-        print("VolunteerRequestDepartment.Save")
-        print(f" V.req:{self.volunteer_request}. Dep:{self.department}")
         super().save(*args, **kwargs)
