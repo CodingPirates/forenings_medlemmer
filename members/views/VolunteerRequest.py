@@ -5,6 +5,7 @@ from django.contrib import messages
 from members.forms import VolunteerRequestForm
 from members.models.volunteerrequestdepartment import VolunteerRequestDepartment
 from members.models.volunteerrequest import VolunteerRequest
+from members.models.emailtemplate import EmailTemplate
 
 
 def volunteer_request_view(request):
@@ -34,6 +35,15 @@ def volunteer_request_view(request):
                 VolunteerRequestDepartment.objects.create(
                     volunteer_request=vol_req_obj, department=department
                 )
+
+                # Send email to each department
+                email_template = EmailTemplate.objects.get(idname="NEW_VOLUNTEER")
+                context = {
+                    "volunteer_request": vol_req_obj,
+                    "department": department,
+                }
+                email_template.makeEmail(department, context)
+
 
             messages.success(
                 request, "Your volunteer request has been submitted successfully!"
