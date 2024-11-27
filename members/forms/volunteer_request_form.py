@@ -42,9 +42,9 @@ class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
 class VolunteerRequestForm(forms.ModelForm):
     department_list = forms.ModelMultipleChoiceField(
         queryset=Department.objects.filter(closed_dtm__isnull=True)
-        .order_by("id")
+        .order_by("name")
         .distinct(),
-        widget=CustomCheckboxSelectMultiple(),
+        widget=CheckboxSelectMultiple(),
         required=True,
         label="Vælg Afdeling(er)x",
     )
@@ -53,6 +53,13 @@ class VolunteerRequestForm(forms.ModelForm):
         queryset=Person.objects.none(),
         required=False,
         label="Vælg person fra familien",
+    )
+
+    email_token = forms.CharField(
+        required=False,
+        label="Indtast den 6-cifrede kode sendt til din email",
+        max_length=6,
+        widget=forms.HiddenInput() # Initially hidden
     )
 
     class Meta:
@@ -67,6 +74,7 @@ class VolunteerRequestForm(forms.ModelForm):
             "info_reference",
             "info_whishes",
             "department_list",
+            "email_token",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -87,6 +95,7 @@ class VolunteerRequestForm(forms.ModelForm):
             self.fields["phone"].widget = forms.HiddenInput()
             self.fields["age"].widget = forms.HiddenInput()
             self.fields["zip"].widget = forms.HiddenInput()
+            self.fields["email_token"].widget = forms.HiddenInput()
         else:
             self.fields["family_member"].widget = forms.HiddenInput()
 
@@ -106,6 +115,7 @@ class VolunteerRequestForm(forms.ModelForm):
                     Div(Field("info_reference"), css_class="col-md-12"),
                     Div(Field("info_whishes"), css_class="col-md-12"),
                     Div(Field("department_list"), css_class="col-md-12"),
+                    Div(Field("email_token"), css_class="col-md-12", id="email-token-field"),
                     css_class="row",
                 ),
             ),

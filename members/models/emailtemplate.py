@@ -56,9 +56,10 @@ class EmailTemplate(models.Model):
                 members.models.person.Person,
                 members.models.family.Family,
                 members.models.department.Department,
+                str,
             ):
                 raise Exception(
-                    "Receiver must be of type Person or Family not "
+                    "Receiver must be of type Person, Family, Department or email address string not "
                     + str(type(receiver))
                 )
 
@@ -66,6 +67,9 @@ class EmailTemplate(models.Model):
             if type(receiver) is str:
                 # check if family blacklisted. (TODO)
                 destination_address = receiver
+                person = None
+                family = None
+                department = None
             elif type(receiver) is members.models.person.Person:
                 # skip if family does not want email
                 if receiver.family.dont_send_mails:

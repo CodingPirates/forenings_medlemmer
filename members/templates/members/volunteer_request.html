@@ -20,11 +20,64 @@
                 {% endfor %}
             {% endif %}
 
-            <form method="post">
+            <form method="post" id="volunteer-request-form">
                 {% csrf_token %}
                 {{ volunteer_request_form|crispy }}
-                <button type="submit" class="btn btn-primary">Submit</button>
+                {% if not user.is_authenticated %}
+                    <button type="button" class="btn btn-secondary" id="generate-code-button">Generate Code and Send to Email</button>
+                    <div id="email-token-field" style="display: none;">
+                        <label for="id_email_token">Indtast den 6-cifrede kode sendt til din email</label>
+                        <!--input type="text" id="id_email_token2" name="email_token" maxlength="6" class="form-control"-->
+                    </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary" id="submit-button" {% if not user.is_authenticated %}style="display: none;" disabled{% endif %}>Submit</button>
             </form>
         </div>
     </div>
+
+    {% if not user.is_authenticated %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateCodeButton = document.getElementById('generate-code-button');
+            const submitButton = document.getElementById('submit-button');
+            const emailTokenField = document.getElementById('id_email_token');
+            const emailTokenFieldContainer = document.getElementById('email-token-field');
+
+            generateCodeButton.addEventListener('click', function() {
+                // Make an AJAX request to generate the code and send it to the email
+                fetch("{% url 'generate_code' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById('id_email').value
+                    })
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        alert('A 6-digit code has been sent to your email.');
+                        generateCodeButton.style.display = 'none';
+                        emailTokenFieldContainer.style.display = 'block';
+                        emailTokenField.type = 'text';  // Make the field visible
+                        submitButton.style.display = 'inline-block';
+                    } else {
+                        alert('Failed to send the code. Please try again.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to send the code. Please try again.');
+                });
+            });
+
+            emailTokenField.addEventListener('input', function() {
+                if (emailTokenField.value.length === 6) {
+                    submitButton.disabled = false;
+                } else {
+                    submitButton.disabled = true;
+                }
+            });
+        });
+    </script>
+    {% endif %}
 {% endblock %}

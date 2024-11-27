@@ -49,11 +49,3 @@ class VolunteerRequest(models.Model):
         else:
             return f"{self.person} ({self.created.strftime('%Y-%m-%d %H:%M:%S')})"
 
-    """
-    def save(self, *args, **kwargs):
-        print("VolunteerRequest.Save()")
-        print(f" pk:{self.pk} person:{self.person} name:{self.name}")
-        print(f" email:{self.email}. phone:{self.phone}")
-        super().save(*args, **kwargs)
-        print(" saved")
-    """

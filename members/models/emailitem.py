@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.db import transaction
 import uuid
 
 
@@ -122,23 +123,30 @@ class EmailItem(models.Model):
     # send this email. Notice no checking of race condition, so this should be called by
     # cronscript and made sure the same mail is not sent multiple times in parallel
     def send(self):
-        self.sent_dtm = timezone.now()
-        self.save()
-        try:
-            send_mail(
-                self.subject,
-                self.body_text,
-                settings.SITE_CONTACT,
-                (self.receiver,),
-                html_message=self.body_html,
-            )
-        except Exception as e:
-            self.send_error = str(type(e))
-            self.send_error = self.send_error + str(e)
-            self.save()
-            raise e  # forward exception to job control
+        with transaction.atomic():
+            # Lock the email item to avoid race conditions
+            email_item = EmailItem.objects.select_for_update().get(pk=self.pk)
+            if email_item.sent_dtm is not None:
+                # Email has already been sent, so skip sending it again
+                return
 
-        self.save()
+            self.sent_dtm = timezone.now()
+            self.save()
+            try:
+                send_mail(
+                    self.subject,
+                    self.body_text,
+                    settings.SITE_CONTACT,
+                    (self.receiver,),
+                    html_message=self.body_html,
+                )
+            except Exception as e:
+                self.send_error = str(type(e))
+                self.send_error = self.send_error + str(e)
+                self.save()
+                raise e  # forward exception to job control
+
+            self.save()
 
     def __str__(self):
         return str(self.receiver) + " '" + self.subject + "'"

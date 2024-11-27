@@ -1,6 +1,8 @@
 from django.urls import re_path
 from django.views.generic import TemplateView
 
+from members.views import volunteer_request_view, generate_code
+
 from members.views import (
     AccountCreate,
     Activities,
@@ -23,6 +25,7 @@ from members.views import (
     userCreated,
     volunteerSignup,
 )
+
 from django.contrib.auth import views as auth_views
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
@@ -77,7 +80,9 @@ urlpatterns = [
     re_path(r"^membership/$", Membership, name="membership"),
     re_path(r"^support_membership/$", SupportMembership, name="support_membership"),
     re_path(r"^volunteer$", volunteerSignup, name="volunteer_signup"),
-    re_path(r"^volunteer_request/$", volunteer_request_view, name="volunteer_request"),
+    re_path(
+        r"^volunteer_request/$", volunteer_request_view, name="volunteer_request"),
+    re_path(r"^generate_code/$", generate_code, name="generate_code"),
     re_path(
         r"^volunteer_request_created/$",
         TemplateView.as_view(template_name="members/volunteer_request_created.html"),
