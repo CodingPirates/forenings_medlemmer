@@ -93,6 +93,10 @@ class AdminActions(admin.ModelAdmin):
         elif queryset.model is ActivityParticipant:
             q = [pa.person.pk for pa in queryset]
             persons = Person.objects.filter(pk__in=q)
+        elif queryset.model is ActivityInvite:
+            persons = Person.objects.filter(
+                pk__in=queryset.values_list("person_id", flat=True)
+            )
         else:
             persons = queryset
 
