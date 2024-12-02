@@ -16,9 +16,11 @@ class CodingPiratesProvider(BaseProvider):
         """Formatter for generating random activity types"""
         return random.choice(self.activity_types)
 
-    def activity(self):
-        """Formatter for generating random Coding Pirates activities"""
-        pattern = "{{activity_type}} {{year}}"
+    def activity(self, year=None):
+        """Formatter for generating random Coding Pirates activities. You can specify year, or leave it to be random"""
+        if year is None:
+            year = "{{year}}"
+        pattern = "{{activity_type}} " + str(year)
         return self.generator.parse(pattern)
 
     payment_types = ["CA", "BA", "CC", "RE", "OT"]
