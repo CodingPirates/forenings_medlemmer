@@ -17,6 +17,29 @@
 
 .inline-group .tabular .hideheader tr.has_original td {
     padding-top:0px;
-    
+}
+
+#id_search_address {
+    width: 100%;
+}
+
+.readonly-field {
+    background-color: #e9ecef; /* Light gray background */
+    opacity: 0.6; /* Slightly transparent */
+    cursor: not-allowed; /* Change cursor to indicate non-editable */
+}
+
+#id_streetname.readonly-field,
+#id_housenumber.readonly-field,
+#id_floor.readonly-field,
+#id_door.readonly-field,
+#id_placename.readonly-field,
+#id_zipcode.readonly-field,
+#id_city.readonly-field,
+#id_municipality.readonly-field,
+#id_region.readonly-field {
+    background-color: #e9ecef; /* Light gray background */
+    opacity: 0.6; /* Slightly transparent */
+    cursor: not-allowed; /* Change cursor to indicate non-editable */
 }
 

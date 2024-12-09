@@ -1,12 +1,12 @@
 import requests
-
+from django import forms
 from django.db import models
 from django.conf import settings
 
 from .department import Department
 from .union import Union
 from .activity import Activity
-
+# from .address import Address
 
 class Address(models.Model):
     class Meta:
@@ -104,6 +104,7 @@ class Address(models.Model):
         self.longitude = dawa_data["wgs84koordinat_længde"]
         self.latitude = dawa_data["wgs84koordinat_bredde"]
         self.region = dawa_data["regionsnavn"]
+        print(f"data_date:{dawa_data}")
         return True
 
     @staticmethod
@@ -179,3 +180,4 @@ class Address(models.Model):
             + activity_address_id
         )
         return Address.objects.filter(pk__in=address_ids)
+

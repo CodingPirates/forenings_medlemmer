@@ -1,5 +1,6 @@
 from django.contrib import admin
 from members.models import Address
+from members.forms.address_form import AddressForm
 
 from members.models import (
     Union,
@@ -102,9 +103,12 @@ class AddressRegionListFilter(admin.SimpleListFilter):
 
 
 class AddressAdmin(admin.ModelAdmin):
+    form = AddressForm
+    
     readonly_fields = (
         "created_at",
         "created_by",
+        "dawa_id",
     )
 
     search_fields = (
@@ -136,28 +140,81 @@ class AddressAdmin(admin.ModelAdmin):
         "dawa_category",
     )
 
+    '''fields = (
+        "search_address",
+        "manual_entry",
+        "streetname",
+        "housenumber",
+        "floor",
+        "door",
+        "placename",
+        "zipcode",
+        "city",
+        "dawa_id",
+    )'''
+
+    # readonly_fields = ("dawa_id",)
+
     class Media:
+        js = (
+            "https://code.jquery.com/jquery-3.6.0.min.js",
+            "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js",  # Include jQuery UI
+            "members/js/dawa-form-fill.js",  # This will contain the initialization code
+            "members/js/dawa-autocomplete.js",
+            "members/js/expand-dawa-info.js",
+        )
+
         # Remove title for each record
         # see : https://stackoverflow.com/questions/41376406/remove-title-from-tabularinline-in-admin
-        css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
+        css = {
+            "all": (
+                "https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css",  # Include jQuery UI CSS
+                "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css",  # Include Bootstrap CSS
+
+                "members/css/custom_admin.css", # Include extra css to remove title for each record
+            )
+        }
+
 
     inlines = [AddressUnionInline, AddressDepartmentInline, AddressActivityInline]
 
     list_filter = (AddressRegionListFilter,)
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields["search_address"].widget.attrs.update({
+            "id": "id_search_address",
+            # "class": "textinput textInput ui-autocomplete-input",
+            "class": "textinput textInput form-control ui-autocomplete-input"
+        })
+        form.base_fields["manual_entry"].widget.attrs.update({
+            "id": "id_manual_entry",
+            "class": "form-check-input", # manual-entry-checbox",
+        })
+        '''
+        form.base_fields['housenumber'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['floor'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['door'].widget.attrs['style'] = 'width: 5em;'
+        form.base_fields['zipcode'].widget.attrs['style'] = 'width: 5em;'
+        '''
+        return form
     def get_queryset(self, request):
         return Address.get_user_addresses(request.user)
-
+    
     fieldsets = [
         (
             "Adresse",
             {
                 "fields": (
                     (
-                        "streetname",
-                        "housenumber",
+                        "search_address",
                     ),
                     (
+                        "manual_entry",
+                    ),
+                    (
+                        "streetname",
+                        "housenumber",
                         "floor",
                         "door",
                     ),
@@ -191,7 +248,7 @@ class AddressAdmin(admin.ModelAdmin):
                         "latitude",
                     ),
                 ),
-                "classes": ("collapse",),
+            #    "classes": ("collapse",),
             },
         ),
         (
@@ -199,7 +256,7 @@ class AddressAdmin(admin.ModelAdmin):
             {
                 "fields": ("created_at", "created_by"),
                 "description": "Hvornår er denne adresse oprettet og af hvem ?",
-                "classes": ("collapse",),
+            #    "classes": ("collapse",),
             },
         ),
     ]
