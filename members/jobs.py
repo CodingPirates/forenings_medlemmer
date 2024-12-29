@@ -66,7 +66,7 @@ class UpdateDawaData(CronJobBase):
     code = "members.update_dawa_data"
 
     def do(self):
-        persons = (
+        persons = (  # noqa: F841,E261
             Person.objects.filter(municipality__isnull=True)
             .exclude(streetname__exact="")
             .exclude(address_invalid__exact=True)[:50]
