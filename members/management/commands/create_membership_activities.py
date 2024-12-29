@@ -13,16 +13,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         mainDepartment = Department.objects.get(pk=30)
 
-        for curUnion in Union.objects.all():
+        for curUnion in Union.objects.filter(closed_at__isnull=True):
             if curUnion.id == 1:
                 print("springer over %s" % (curUnion.name))
                 continue  # skip main union
 
             self.stdout.write("foreningen %s " % (curUnion.name))
             department = mainDepartment
-            name = "Foreningsmedlemsskab 2024: %s" % (curUnion.name)
+            name = "Foreningsmedlemsskab 2025: %s" % (curUnion.name)
             open_hours = "-"
-            dawa_id = ""
 
             localDepartments = str.join(
                 ", ",
@@ -55,9 +54,9 @@ class Command(BaseCommand):
                 localDepartments,
             )
             instructions = ""
-            start_date = datetime.date(year=2024, month=1, day=1)
-            end_date = datetime.date(year=2024, month=12, day=31)
-            signup_closing = datetime.date(year=2024, month=12, day=31)
+            start_date = datetime.date(year=2025, month=1, day=1)
+            end_date = datetime.date(year=2025, month=12, day=31)
+            signup_closing = datetime.date(year=2025, month=12, day=31)
             open_invite = True
             price_in_dkk = 75
             max_participants = 9999
@@ -71,16 +70,17 @@ class Command(BaseCommand):
                 union=curUnion,
                 name=name,
                 open_hours=open_hours,
-                responsible_name=curUnion.chairman_old,
-                responsible_contact=curUnion.chairman_email_old,
-                placename=curUnion.address.placename,
-                zipcode=curUnion.address.zipcode,
-                city=curUnion.address.city,
-                streetname=curUnion.address.streetname,
-                housenumber=curUnion.address.housenumber,
-                floor=curUnion.address.floor,
-                door=curUnion.address.door,
-                dawa_id=dawa_id,
+                responsible_name=(
+                    curUnion.chairman.name
+                    if curUnion.chairman is not None
+                    else curUnion.chairman_old
+                ),
+                responsible_contact=(
+                    curUnion.chairman.email
+                    if curUnion.chairman is not None
+                    else curUnion.chairman_email_old
+                ),
+                address=curUnion.address,
                 description=description,
                 instructions=instructions,
                 start_date=start_date,
