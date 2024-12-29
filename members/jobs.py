@@ -73,7 +73,7 @@ class UpdateDawaData(CronJobBase):
         )
 
         # Temporarily disable while fixing script
-        #for person in persons:
+        # for person in persons:
         #    person.update_dawa_data()
 
 
