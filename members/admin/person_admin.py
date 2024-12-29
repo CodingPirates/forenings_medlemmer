@@ -53,6 +53,7 @@ class PersonAdmin(admin.ModelAdmin):
         PersonParticipantLastYearListFilter,
     )
     search_fields = ("name", "family__email", "notes")
+    autocomplete_fields = ["municipality"]
     actions = [
         AdminActions.invite_many_to_activity_action,
         "export_emaillist",
