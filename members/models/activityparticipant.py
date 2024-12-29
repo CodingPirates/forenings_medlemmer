@@ -37,9 +37,6 @@ class ActivityParticipant(models.Model):
         choices=PHOTO_PERMISSION_CHOICES,
         default=PHOTO_NOTOK,
     )
-    contact_visible = models.BooleanField(
-        "Kontaktoplysninger synlige for andre holddeltagere", default=False
-    )
 
     def __str__(self):
         return (
