@@ -12,6 +12,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Iterate over all items in Person model
         for person in Person.objects.all():
+            # First reset municipality before migrating data
+            person.municipality = None
+            person.save()
+
             # Call the API to get municipality id
             url = f"https://api.dataforsyningen.dk/adresser?id={person.dawa_id}"
             response = requests.get(url)
