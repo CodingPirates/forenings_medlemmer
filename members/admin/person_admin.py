@@ -17,6 +17,7 @@ from .person_admin_filters import (
     PersonParticipantListFilter,
     PersonWaitinglistListFilter,
     VolunteerListFilter,
+    MunicipalityFilter,
 )
 
 from .inlines import (
@@ -45,6 +46,7 @@ class PersonAdmin(admin.ModelAdmin):
         "membertype",
         "gender",
         VolunteerListFilter,
+        MunicipalityFilter,
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
         PersonParticipantListFilter,
@@ -53,6 +55,7 @@ class PersonAdmin(admin.ModelAdmin):
         PersonParticipantLastYearListFilter,
     )
     search_fields = ("name", "family__email", "notes")
+    autocomplete_fields = ["municipality"]
     actions = [
         AdminActions.invite_many_to_activity_action,
         "export_emaillist",
@@ -95,6 +98,7 @@ class PersonAdmin(admin.ModelAdmin):
                 "city",
                 "zipcode",
                 "placename",
+                "municipality",
                 "email",
                 "phone",
                 "family",
@@ -137,6 +141,7 @@ class PersonAdmin(admin.ModelAdmin):
                 "city",
                 "zipcode",
                 "placename",
+                "municipality",
                 "email",
                 "phone",
                 "family",

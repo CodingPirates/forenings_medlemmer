@@ -20,7 +20,10 @@ import json
 def Membership(request):
     current_activities = Activity.objects.filter(
         signup_closing__gte=timezone.now(),
+        end_date__gte=timezone.now(),
         activitytype__in=["FORENINGSMEDLEMSKAB"],
+        visible=True,
+        visible_from__lte=timezone.now(),
     ).order_by("address__region", "name", "start_date")
 
     family = None
