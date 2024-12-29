@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
             self.stdout.write("foreningen %s " % (curUnion.name))
             department = mainDepartment
-            name = "Foreningsmedlemsskab 2024: %s" % (curUnion.name)
+            name = "Foreningsmedlemsskab 2025: %s" % (curUnion.name)
             open_hours = "-"
             dawa_id = ""
 
@@ -55,9 +55,9 @@ class Command(BaseCommand):
                 localDepartments,
             )
             instructions = ""
-            start_date = datetime.date(year=2024, month=1, day=1)
-            end_date = datetime.date(year=2024, month=12, day=31)
-            signup_closing = datetime.date(year=2024, month=12, day=31)
+            start_date = datetime.date(year=2025, month=1, day=1)
+            end_date = datetime.date(year=2025, month=12, day=31)
+            signup_closing = datetime.date(year=2025, month=12, day=31)
             open_invite = True
             price_in_dkk = 75
             max_participants = 9999
