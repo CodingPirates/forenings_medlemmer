@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from members.models.municipality import Municipality
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
@@ -60,7 +61,13 @@ class Person(models.Model):
     floor = models.CharField("Etage", max_length=10, blank=True)
     door = models.CharField("Dør", max_length=5, blank=True)
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
-    municipality = models.CharField("Kommune", max_length=100, blank=True, null=True)
+    municipality = municipality = models.ForeignKey(
+        Municipality,
+        on_delete=models.RESTRICT,
+        blank=True,
+        null=True,  # allow blank/null values since we don't have addresses for all persons
+        default="",
+    )
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
     )

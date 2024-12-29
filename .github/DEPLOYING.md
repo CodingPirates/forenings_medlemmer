@@ -14,6 +14,7 @@ You can develop and test locally as described in the [CONTRIBUTING guide](CONTRI
 1. In the screenshot above, PR `#699` has already been deployed. Click the `Open app` button to open the running site, in this case <https://medlemssystem-pr-699.herokuapp.com/> (will be a unique url for each pull request)
 1. In order to get data populated, we need to populate the database, so open `More -> Run console`
   ![Heroku pull request](images/heroku-pull-request.png)
+1. Run `./manage.py import_municipalities members/management/commands/municipalities.csv` to import municipalities
 1. Run `./manage.py get_live_data` to get the public live data populated
 1. Run `./manage.py shell` to create members in the system. When the shell prompt is ready, type in
 
