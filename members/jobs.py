@@ -70,9 +70,8 @@ class UpdateDawaData(CronJobBase):
             Person.objects.filter(municipality__isnull=True)
             .exclude(streetname__exact="")
             .exclude(address_invalid__exact=True)[:50]
-        )
+        ) # noqa: F841
 
-        # noqa: F841
         # Temporarily disable while fixing script
         # for person in persons:
         #    person.update_dawa_data()
