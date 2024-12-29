@@ -1,8 +1,5 @@
 from django.core.management.base import BaseCommand
-from members.models.union import Union
 from members.models.activity import Activity
-from members.models.activitytype import ActivityType
-from members.models.department import Department
 import datetime
 
 
