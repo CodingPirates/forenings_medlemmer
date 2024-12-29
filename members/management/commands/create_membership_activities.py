@@ -71,8 +71,16 @@ class Command(BaseCommand):
                 union=curUnion,
                 name=name,
                 open_hours=open_hours,
-                responsible_name=curUnion.chairman.name if curUnion.chairman is not None else curUnion.chairman_old,
-                responsible_contact=curUnion.chairman.email if curUnion.chairman is not None else curUnion.chairman_email_old,
+                responsible_name=(
+                    curUnion.chairman.name
+                    if curUnion.chairman is not None
+                    else curUnion.chairman_old
+                ),
+                responsible_contact=(
+                    curUnion.chairman.email
+                    if curUnion.chairman is not None
+                    else curUnion.chairman_email_old
+                ),
                 address=curUnion.address,
                 description=description,
                 instructions=instructions,
