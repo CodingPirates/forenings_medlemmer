@@ -23,6 +23,8 @@ from members.models import (
     Person,
 )
 
+from members.admin.admin_actions import AdminActions
+
 
 class ActivityInviteAdminForm(forms.ModelForm):
     class Meta:
@@ -166,7 +168,11 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
 
-    actions = ["export_csv_invitation_info", "extend_invitations"]
+    actions = [
+        "export_csv_invitation_info",
+        "extend_invitations",
+        AdminActions.invite_many_to_activity_action,
+    ]
 
     form = ActivityInviteAdminForm
 
