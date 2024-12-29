@@ -99,6 +99,77 @@ class UnionAdmin(admin.ModelAdmin):
 
     actions = ["export_csv_union_info"]
 
+    def get_fieldsets(self, request, obj=None):
+        # 20241113: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
+
+        if not obj:
+            return self.add_fieldsets
+
+        info_fields = (
+            "bank_main_org",
+            "bank_account",
+            "statues",
+            "founded_at",
+            "closed_at",
+            "gl_account",
+        )
+
+        if not request.user.has_perm("members.showledgeraccount"):
+            info_fields = (
+                "bank_main_org",
+                "bank_account",
+                "statues",
+                "founded_at",
+                "closed_at",
+            )
+
+        return [
+            (
+                "Navn og Adresse",
+                {
+                    "fields": ("name", "email", "address"),
+                    "description": "<p>Udfyld navnet på foreningen (f.eks København, \
+                        vestjylland) og adressen<p>",
+                },
+            ),
+            (
+                "Bestyrelsen nye felter",
+                {
+                    "fields": (
+                        "chairman",
+                        "second_chair",
+                        "cashier",
+                        "secretary",
+                        "board_members",
+                    )
+                },
+            ),
+            (
+                "Bestyrelsen gamle felter",
+                {
+                    "fields": (
+                        "chairman_old",
+                        "chairman_email_old",
+                        "second_chair_old",
+                        "second_chair_email_old",
+                        "cashier_old",
+                        "cashier_email_old",
+                        "secretary_old",
+                        "secretary_email_old",
+                        "board_members_old",
+                    )
+                },
+            ),
+            (
+                "Info",
+                {
+                    "fields": info_fields,
+                    "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
+                    generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
+                },
+            ),
+        ]
+
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -120,59 +191,6 @@ class UnionAdmin(admin.ModelAdmin):
         ):
             return qs
         return qs.filter(adminuserinformation__user=request.user)
-
-    fieldsets = [
-        (
-            "Navn og Adresse",
-            {
-                "fields": ("name", "email", "address"),
-                "description": "<p>Udfyld navnet på foreningen (f.eks København, \
-            vestjylland) og adressen<p>",
-            },
-        ),
-        (
-            "Bestyrelsen nye felter",
-            {
-                "fields": (
-                    "chairman",
-                    "second_chair",
-                    "cashier",
-                    "secretary",
-                    "board_members",
-                )
-            },
-        ),
-        (
-            "Bestyrelsen gamle felter",
-            {
-                "fields": (
-                    "chairman_old",
-                    "chairman_email_old",
-                    "second_chair_old",
-                    "second_chair_email_old",
-                    "cashier_old",
-                    "cashier_email_old",
-                    "secretary_old",
-                    "secretary_email_old",
-                    "board_members_old",
-                )
-            },
-        ),
-        (
-            "Info",
-            {
-                "fields": (
-                    "bank_main_org",
-                    "bank_account",
-                    "statues",
-                    "founded_at",
-                    "closed_at",
-                ),
-                "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
-                generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
-            },
-        ),
-    ]
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
