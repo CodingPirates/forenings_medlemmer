@@ -1,4 +1,3 @@
-import csv
 from django.core.management.base import BaseCommand
 import requests
 from members.models import Municipality, Person
