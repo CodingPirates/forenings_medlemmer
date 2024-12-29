@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         mainDepartment = Department.objects.get(pk=30)
 
-        for curUnion in Union.objects.all():
+        for curUnion in Union.objects.filter(closed_at__isnull=True):
             if curUnion.id == 1:
                 print("springer over %s" % (curUnion.name))
                 continue  # skip main union
