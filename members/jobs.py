@@ -72,8 +72,9 @@ class UpdateDawaData(CronJobBase):
             .exclude(address_invalid__exact=True)[:50]
         )
 
-        for person in persons:
-            person.update_dawa_data()
+        # Temporarily disable while fixing script
+        #for person in persons:
+        #    person.update_dawa_data()
 
 
 # If it's the first day of the year, make sure to capture all payments that year
