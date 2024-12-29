@@ -22,7 +22,6 @@ class Command(BaseCommand):
             department = mainDepartment
             name = "Foreningsmedlemsskab 2025: %s" % (curUnion.name)
             open_hours = "-"
-            dawa_id = ""
 
             localDepartments = str.join(
                 ", ",
