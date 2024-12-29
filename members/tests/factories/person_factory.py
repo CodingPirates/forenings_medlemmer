@@ -2,6 +2,7 @@ import factory
 from factory import Faker, SubFactory, SelfAttribute
 from factory.django import DjangoModelFactory
 from members.tests.factories.factory_helpers import TIMEZONE, LOCALE
+from members.tests.factories.municipality_factory import MunicipalityFactory
 from members.tests.factories.providers import DanishProvider
 from factory.fuzzy import FuzzyChoice
 from members.models import Person
@@ -26,7 +27,7 @@ class PersonFactory(DjangoModelFactory):
     floor = Faker("floor")
     door = Faker("door")
     dawa_id = Faker("uuid4")
-    municipality = Faker("municipality")
+    municipality = SubFactory(MunicipalityFactory)
     longitude = Faker("longitude")
     latitude = Faker("latitude")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
