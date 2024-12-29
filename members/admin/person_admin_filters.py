@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 
 from members.models import Activity, AdminUserInformation
+from members.models.municipality import Municipality
 
 
 class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
@@ -184,4 +185,27 @@ class VolunteerListFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(
                 volunteer__department__pk=self.value(), volunteer__removed__isnull=True
+            )
+
+class MunicipalityFilter(admin.SimpleListFilter):
+    title = "Kommune"
+    parameter_name = "municipality"
+
+    def lookups(self, request, model_admin):
+        municipalities = [("none", "Ingen kommune")]
+        for municipality in Municipality.objects.all().order_by("name"):
+            municipalities.append((str(municipality.pk), municipality.name))
+
+        return municipalities
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return (
+                queryset.filter(municipality__isnull=True).distinct()
+            )
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(
+                municipality_id=self.value()
             )

@@ -17,6 +17,7 @@ from .person_admin_filters import (
     PersonParticipantListFilter,
     PersonWaitinglistListFilter,
     VolunteerListFilter,
+    MunicipalityFilter,
 )
 
 from .inlines import (
@@ -45,6 +46,7 @@ class PersonAdmin(admin.ModelAdmin):
         "membertype",
         "gender",
         VolunteerListFilter,
+        MunicipalityFilter,
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
         PersonParticipantListFilter,
