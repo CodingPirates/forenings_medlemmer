@@ -66,14 +66,15 @@ class UpdateDawaData(CronJobBase):
     code = "members.update_dawa_data"
 
     def do(self):
-        persons = (
+        persons = (  # noqa: F841,E261
             Person.objects.filter(municipality__isnull=True)
             .exclude(streetname__exact="")
             .exclude(address_invalid__exact=True)[:50]
-        )
+        )  # noqa: F841
 
-        for person in persons:
-            person.update_dawa_data()
+        # Temporarily disable while fixing script
+        # for person in persons:
+        #    person.update_dawa_data()
 
 
 # If it's the first day of the year, make sure to capture all payments that year
