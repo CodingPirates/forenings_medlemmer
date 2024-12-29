@@ -187,6 +187,7 @@ class VolunteerListFilter(admin.SimpleListFilter):
                 volunteer__department__pk=self.value(), volunteer__removed__isnull=True
             )
 
+
 class MunicipalityFilter(admin.SimpleListFilter):
     title = "Kommune"
     parameter_name = "municipality"
@@ -200,12 +201,8 @@ class MunicipalityFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "none":
-            return (
-                queryset.filter(municipality__isnull=True).distinct()
-            )
+            return queryset.filter(municipality__isnull=True).distinct()
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(
-                municipality_id=self.value()
-            )
+            return queryset.filter(municipality_id=self.value())
