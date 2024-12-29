@@ -108,16 +108,18 @@ class UnionAdmin(admin.ModelAdmin):
             "statues",
             "founded_at",
             "closed_at",
-            "gl_account",
         )
 
-        if not request.user.has_perm("members.showledgeraccount"):
+        if request.user.is_superuser or request.user.has_perm(
+            "members.show_ledger_account"
+        ):
             info_fields = (
                 "bank_main_org",
                 "bank_account",
                 "statues",
                 "founded_at",
                 "closed_at",
+                "gl_account",
             )
 
         return [
