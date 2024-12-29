@@ -22,7 +22,7 @@ class ActivityInvite(models.Model):
         unique_together = ("activity", "person")
 
     activity = models.ForeignKey(
-        "Activity", on_delete=models.CASCADE, verbose_name="Aktivitet"
+        "Activity", on_delete=models.DO_NOTHING, verbose_name="Aktivitet"
     )
     person = models.ForeignKey("Person", on_delete=models.CASCADE)
     invite_dtm = models.DateField("Inviteret", default=timezone.now)
