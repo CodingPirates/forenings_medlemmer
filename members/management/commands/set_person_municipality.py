@@ -22,7 +22,9 @@ class Command(BaseCommand):
 
                 if not data:
                     self.stdout.write(
-                        self.style.ERROR(f"No DAWA data found for person: {person.name} - {url}")
+                        self.style.ERROR(
+                            f"No DAWA data found for person: {person.name} - {url}"
+                        )
                     )
                     continue
 
@@ -35,7 +37,9 @@ class Command(BaseCommand):
                         # Set the municipality for the person
                         person.municipality = municipality
                         person.save()
-                        self.stdout.write(f"Set municipality for person: {person.name} to {municipality.name}")
+                        self.stdout.write(
+                            f"Set municipality for person: {person.name} to {municipality.name}"
+                        )
                     except Municipality.DoesNotExist:
                         self.stdout.write(
                             self.style.ERROR(
@@ -44,7 +48,9 @@ class Command(BaseCommand):
                         )
             else:
                 self.stdout.write(
-                    self.style.ERROR(f"Failed to fetch data for person: {person.name} - {url}")
+                    self.style.ERROR(
+                        f"Failed to fetch data for person: {person.name} - {url}"
+                    )
                 )
 
         self.stdout.write(
