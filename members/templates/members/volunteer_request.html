@@ -1,38 +1,44 @@
 {% extends 'members/base.html' %}
-{% load crispy_forms_tags %}
+<!--{% load crispy_forms_tags %}-->
+{% crispy form %}
 {% block content %}
     <div class="alert alert-secondary">
+      {% if not user.is_authenticated %}
         <h1>Ønsker du at være frivillig - og ikke allerede oprettet i medlemssystemet ?</h1>
         <p>Hvis du har børn der er tilmeldt i systemet og allerede er oprettet som familie, 
-          så log blot på jeres familie side med den email du opskrev dig med, da du tilmeldte dig<br>
-          Her kan du også tilføje flere personer, hvis det f.eks. er din partner der har tilmeldt børnene men du nu selv vil være med som frivillig.</p>
+           så log blot på jeres familie side med den email du opskrev dig med, da du tilmeldte dig<br>
+           Her kan du også tilføje flere personer, hvis det f.eks. er din partner der har tilmeldt børnene men du nu selv vil være med som frivillig.</p>
         <p>
-            Denne formular er tænkt til frivillige, der ikke har børn der er medlemmer i Coding Pirates.
+           Denne formular er tænkt til frivillige, der ikke har børn der er medlemmer i Coding Pirates.
         </p>
-      </div>
-      <div class="card">
-        <div class="card-body">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+      {% else %}
+        <h1>Ønsker du (eller en fra din familie) at være frivillig ? </h1>
+      {% endif %}
+    </div>
+    <div class="card">
+      <div class="card-body">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
 
-            <form method="post" id="volunteer-request-form">
-                {% csrf_token %}
-                {{ volunteer_request_form|crispy }}
-                {% if not user.is_authenticated %}
-                    <button type="button" class="btn btn-secondary" id="generate-code-button">Generate Code and Send to Email</button>
-                    <div id="email-token-field" style="display: none;">
-                        <label for="id_email_token">Indtast den 6-cifrede kode sendt til din email</label>
-                        <!--input type="text" id="id_email_token2" name="email_token" maxlength="6" class="form-control"-->
-                    </div>
-                {% endif %}
-                <button type="submit" class="btn btn-primary" id="submit-button" {% if not user.is_authenticated %}style="display: none;" disabled{% endif %}>Submit</button>
-            </form>
-        </div>
+        <form method="post" id="volunteer-request-form">
+          {% csrf_token %}
+          {{ volunteer_request_form | crispy }} <!-- using crispy is making radio buttons after check box-->
+          <!-- 20241230 PLEASE READ: https://forum.djangoproject.com/t/crispy-tailwind-rendering-checkbox-multiple-as-radios/20774/2  -->
+          {% if not user.is_authenticated %}
+            <button type="button" class="btn btn-secondary" id="generate-code-button">Generate Code and Send to Email</button>
+            <div id="email-token-field" style="display: none;">
+              <label for="id_email_token">Indtast den 6-cifrede kode sendt til din email</label>
+              <!--input type="text" id="id_email_token2" name="email_token" maxlength="6" class="form-control"-->
+            </div>
+          {% endif %}
+          <button type="submit" class="btn btn-primary" id="submit-button" {% if not user.is_authenticated %}style="display: none;" disabled{% endif %}>Submit</button>
+        </form>
+      </div>
     </div>
 
     {% if not user.is_authenticated %}

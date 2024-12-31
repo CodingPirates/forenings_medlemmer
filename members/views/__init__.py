@@ -19,4 +19,8 @@ from members.views.departmentView import departmentView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.userCreated import userCreated
 from members.views.volunteerSignup import volunteerSignup
-from members.views.VolunteerRequest import volunteer_request_view, generate_code
+from members.views.VolunteerRequest import (
+    volunteer_request_view,
+    generate_code,
+    create_user_view,
+)

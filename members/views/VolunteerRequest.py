@@ -1,13 +1,48 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.models import User
 from members.forms import VolunteerRequestForm
 from members.models.volunteerrequestdepartment import VolunteerRequestDepartment
 from members.models.volunteerrequest import VolunteerRequest
 from members.models.emailtemplate import EmailTemplate
+from members.forms.signup_form import signupForm
+from django.contrib.auth.decorators import login_required
+from members.utils.user import user_to_person
 import random
 import json
+
+
+def create_user_view(request, token):
+    volunteer_request = get_object_or_404(VolunteerRequest, token=token)
+
+    if request.method == "POST":
+        form = signupForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=volunteer_request.email,
+                email=volunteer_request.email,
+                password=form.cleaned_data["password1"],
+            )
+            person = form.save(commit=False)
+            person.user = user
+            person.save()
+            volunteer_request.person = person
+            volunteer_request.save()
+            return redirect("user_created")
+    else:
+        form = signupForm(
+            initial={
+                "parent_name": volunteer_request.name,
+                "parent_email": volunteer_request.email,
+                "parent_phone": volunteer_request.phone,
+                "zipcode": volunteer_request.zip,
+            }
+        )
+
+    return render(request, "members/create_user.html", {"form": form})
+
 
 def generate_code(request):
     if request.method == "POST":
@@ -32,7 +67,16 @@ def generate_code(request):
     else:
         return JsonResponse({"success": False, "error": "Invalid request method."})
 
+
+# @login_required
 def volunteer_request_view(request):
+    if request.user.is_authenticated:
+        person = user_to_person(request.user)
+        if not person:
+            return redirect(
+                "family_detail"
+            )  # Redirect to the "Familie" page if no person record
+
     if request.method == "POST":
         volunteer_request_form = VolunteerRequestForm(request.POST, user=request.user)
 
@@ -96,10 +140,27 @@ def volunteer_request_view(request):
                 vol_req_obj = volunteer_request_form.save()
 
             departments = volunteer_request_form.cleaned_data["department_list"]
+            activities = volunteer_request_form.cleaned_data["activity_list"]
+
+            department_list = []
             for department in departments:
                 VolunteerRequestDepartment.objects.create(
                     volunteer_request=vol_req_obj, department=department
                 )
+                department_list.append(department)
+
+            for activity in activities:
+                VolunteerRequestDepartment.objects.create(
+                    VolunteerRequest=vol_req_obj,
+                    activity=activity,
+                    department=department,
+                )
+                if (
+                    department not in department_list
+                ):  # If the department is not already in the list
+                    department_list.append(department)
+
+            for department in department_list:
 
                 # Send email to each department
                 email_template = EmailTemplate.objects.get(idname="NEW_VOLUNTEER")
@@ -120,9 +181,11 @@ def volunteer_request_view(request):
             )
 
             if request.user.is_authenticated:
-                messages.success(request, "Your volunteer request has been submitted successfully!")
+                messages.success(
+                    request, "Your volunteer request has been submitted successfully!"
+                )
                 return redirect("entry_page")
-            
+
             return HttpResponseRedirect(reverse("volunteer_request_created"))
         else:
             return render(

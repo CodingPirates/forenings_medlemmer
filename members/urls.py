@@ -1,8 +1,6 @@
 from django.urls import re_path
 from django.views.generic import TemplateView
 
-from members.views import volunteer_request_view, generate_code
-
 from members.views import (
     AccountCreate,
     Activities,
@@ -24,7 +22,10 @@ from members.views import (
     paymentGatewayErrorView,
     userCreated,
     volunteerSignup,
+    create_user_view,
+    generate_code,
 )
+from .views.activity import activity_by_department
 
 from django.contrib.auth import views as auth_views
 from graphene_django.views import GraphQLView
@@ -80,8 +81,7 @@ urlpatterns = [
     re_path(r"^membership/$", Membership, name="membership"),
     re_path(r"^support_membership/$", SupportMembership, name="support_membership"),
     re_path(r"^volunteer$", volunteerSignup, name="volunteer_signup"),
-    re_path(
-        r"^volunteer_request/$", volunteer_request_view, name="volunteer_request"),
+    re_path(r"^volunteer_request/$", volunteer_request_view, name="volunteer_request"),
     re_path(r"^generate_code/$", generate_code, name="generate_code"),
     re_path(
         r"^volunteer_request_created/$",
@@ -132,4 +132,14 @@ urlpatterns = [
     re_path(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     re_path(r"^department_signup$", DepartmentSignup, name="department_signup"),
     re_path(r"^departments$", departmentView, name="department_view"),
+    re_path(
+        r"^create_user/(?P<token>[0-9a-f-]+)/$", create_user_view, name="create_user"
+    ),
+    # re_path(r'^admin/members/activity_by_department/(?P<department_id>\d+)/$', activity_by_department, name='activity_by_department'),
+    # re_path(r'^admin_members_activity_by_department/(?P<department_id>\d+)/$', activity_by_department, name='activity_by_department'),
+    re_path(
+        r"^admin_members_activity_by_department/(?P<department_id>\d+)/$",
+        activity_by_department,
+        name="activity_by_department",
+    ),
 ]

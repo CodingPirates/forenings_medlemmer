@@ -1,92 +1,60 @@
 from django import forms
+from django.utils import timezone
+from django.conf import settings
+from django.db.models.functions import Lower
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Hidden, Div, Field, Submit
+from crispy_forms.layout import Layout, Fieldset, Div, Field, Submit, Hidden, Div
 
 from members.models.volunteerrequest import VolunteerRequest
 
-from members.models.department import Department
+# from members.models.department import Department
+# from members.models.person import Person
+from members.models import Person, Department, Activity  # , Union
 from members.models.person import Person
 
-from django.forms.widgets import CheckboxSelectMultiple
-from django.utils.html import format_html
+from django.forms.widgets import CheckboxSelectMultiple, CheckboxInput
 
 
-class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
-    def render(self, name, value, attrs=None, choices=()):
-        output = []
-        for option in self.choices:
-            obj = option[1]
-            address = f"{obj.name} ("
-            if obj.address.descriptiontext:
-                address += f"{obj.address.descriptiontext} "
-            if obj.address.streetname:
-                address += f"{obj.address.streetname} "
-            if obj.address.housenumber:
-                address += f"{obj.address.housenumber}, "
-            if obj.address.zipcode:
-                address += f"{obj.address.zipcode} "
-            if obj.address.city:
-                address += f"{obj.address.city}"
-            address += ")"
-            output.append(
-                format_html(
-                    '<label><input type="checkbox" name="{}" value="{}"> {}</label>',
-                    name,
-                    option[0],
-                    address,
-                )
-            )
-        return format_html("<div>{}</div>", format_html("".join(output)))
+class VolunteerRequestForm(forms.Form):
+    def get_act_dynamic():
+        x = [(obj.id, obj.name) for obj in Activity.objects.filter(
+            end_date__gte=timezone.now(), activitytype__in=["FORLØB", "ARRANGEMENT"]
+        ).order_by("name")]
+        print(f"get_act_dyn:{x}")
+        return x
 
-
-class VolunteerRequestForm(forms.ModelForm):
+    family_member = forms.ModelChoiceField(queryset=Person.objects.none(), required=False, label="Vælg person")
+    name = forms.CharField(label="Navn", max_length=200)
+    email = forms.EmailField(label="Email", required=True)
+    phone = forms.CharField(label="Telefon", max_length=50)
+    age = forms.IntegerField(label="Alder")
+    zip = forms.CharField(label="Postnummer", max_length=4)
+    info_reference = forms.CharField(label="Reference", widget=forms.Textarea(attrs={"rows":3}), required=False)
+    info_whishes = forms.CharField(label="Ønsker", widget=forms.Textarea(attrs={"rows":3}), required=False)
+    email_token = forms.CharField(widget=forms.HiddenInput(), required=False)
     department_list = forms.ModelMultipleChoiceField(
-        queryset=Department.objects.filter(closed_dtm__isnull=True)
-        .order_by("name")
-        .distinct(),
-        widget=CheckboxSelectMultiple(),
+        queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
+        widget=CheckboxSelectMultiple,
         required=True,
-        label="Vælg Afdeling(er)x",
     )
-
-    family_member = forms.ModelChoiceField(
-        queryset=Person.objects.none(),
-        required=False,
-        label="Vælg person fra familien",
-    )
-
-    email_token = forms.CharField(
-        required=False,
-        label="Indtast den 6-cifrede kode sendt til din email",
-        max_length=6,
-        widget=forms.HiddenInput() # Initially hidden
-    )
-
-    class Meta:
-        model = VolunteerRequest
-        fields = [
-            "family_member",
-            "name",
-            "email",
-            "phone",
-            "age",
-            "zip",
-            "info_reference",
-            "info_whishes",
-            "department_list",
-            "email_token",
-        ]
+    activity_list = forms.MultipleChoiceField(
+        choices=get_act_dynamic,
+        widget=CheckboxSelectMultiple, 
+        required=False, 
+        )
+    #activity_list = forms.ChoiceField(choices=get_act_dynamic, widget=forms.RadioSelectMultiple , required=False)
+    
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
-        super().__init__(*args, **kwargs)
-        self.fields["department_list"].label_from_instance = self.label_from_instance
-
+        super(VolunteerRequestForm, self).__init__(*args, **kwargs)
+        self.fields["department_list"].queryset = Department.objects.filter(
+            closed_dtm__isnull=True
+        ).order_by("name")
         if user and user.is_authenticated:
             family = user.person.family
-            self.fields["family_member"].queryset = family.person_set.all()
+            self.fields["family_member"].queryset = family.person_set.all().order_by(Lower('name'))
             self.fields["name"].initial = user.person.name
-            self.fields["email"].initial = user.email
             self.fields["phone"].initial = user.person.phone
             self.fields["age"].initial = user.person.age_years()
             self.fields["zip"].initial = user.person.zipcode
@@ -101,8 +69,9 @@ class VolunteerRequestForm(forms.ModelForm):
 
         self.helper = FormHelper()
         self.helper.form_method = "post"
+        
         self.helper.layout = Layout(
-            Hidden("form_id", "volunteer_requestForm", id="id_form_id"),
+            Hidden("form_id", "volunteer_request", id="id_form_id"),
             Fieldset(
                 "Frivilliges oplysninger",
                 Div(
@@ -115,25 +84,14 @@ class VolunteerRequestForm(forms.ModelForm):
                     Div(Field("info_reference"), css_class="col-md-12"),
                     Div(Field("info_whishes"), css_class="col-md-12"),
                     Div(Field("department_list"), css_class="col-md-12"),
+                    Div(Field("activity_list"), css_class="col-md-12"),
+                        #css_class="col-md-12",
+                        #css_type="checkbox",
+                        #type="checkbox",
+                        #),
                     Div(Field("email_token"), css_class="col-md-12", id="email-token-field"),
                     css_class="row",
                 ),
             ),
             Submit("submit", "Opret", css_class="btn-success"),
         )
-
-    def label_from_instance(self, obj):
-        address = f"{obj.name} [{obj.id}]("
-        if obj.address.descriptiontext is not None:
-            address += f"{obj.address.descriptiontext} "
-        if obj.address.streetname is not None:
-            address += f"{obj.address.streetname} "
-        if obj.address.housenumber is not None:
-            address += f"{obj.address.housenumber}, "
-        if obj.address.zipcode is not None:
-            address += f"{obj.address.zipcode} "
-        if obj.address.city is not None:
-            address += f"{obj.address.city}"
-        if address is not None:
-            address = f"({address})"
-        return f"{obj.name} {address}"
