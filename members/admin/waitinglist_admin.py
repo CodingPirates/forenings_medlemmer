@@ -9,11 +9,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 
-from members.models import (
-    Union,
-    Department,
-    AdminUserInformation,
-)
+from members.models import Union, Department, AdminUserInformation, Municipality
 
 import members.models.emailtemplate
 
@@ -69,6 +65,33 @@ class person_waitinglist_department_filter(admin.SimpleListFilter):
             return queryset.filter(department__id=self.value())
 
 
+class person_waitinglist_municipality_filter(admin.SimpleListFilter):
+    title = "Kommune"
+    parameter_name = "person__municipality"
+
+    def lookups(self, request, model_admin):
+        # loop through the persons in waitinglist, and get the municipality values for the filter
+        municipalities = [("any", "(Med kommune)"), ("none", "(Uden kommune)")]
+        municipality_ids = model_admin.model.objects.values_list(
+            "person__municipality__id", flat=True
+        ).distinct()
+        for municipality in Municipality.objects.filter(
+            id__in=municipality_ids
+        ).order_by("name"):
+            municipalities.append((str(municipality.pk), municipality.name))
+        return municipalities
+
+    def queryset(self, request, queryset):
+        if self.value() == "any":
+            return queryset.exclude(person__municipality__isnull=True)
+        elif self.value() == "none":
+            return queryset.filter(person__municipality__isnull=True)
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(person__municipality__id=self.value())
+
+
 class WaitingListAdmin(admin.ModelAdmin):
     class Meta:
         verbose_name = "Venteliste"
@@ -94,6 +117,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     list_filter = (
         person_waitinglist_union_filter,
         person_waitinglist_department_filter,
+        person_waitinglist_municipality_filter,
         "person__gender",
     )
 
@@ -102,7 +126,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__union__name",
         "person__name",
         "person__zipcode",
-        "person__municipality",
+        "person__municipality__name",
     ]
     search_help_text = mark_safe(
         """Du kan søge på forening (navn), afdeling (navn) eller person (navn, postnummer eller kommune).<br>
@@ -342,7 +366,9 @@ class WaitingListAdmin(admin.ModelAdmin):
     zipcode.admin_order_field = "person__zipcode"
 
     def municipality(self, item):
-        return item.person.municipality
+        if item.person.municipality is None:
+            return ""
+        return item.person.municipality.name
 
     municipality.short_description = "Kommune"
-    municipality.admin_order_field = "person__municipality"
+    municipality.admin_order_field = "person__municipality__name"
