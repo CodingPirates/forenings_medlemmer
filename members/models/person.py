@@ -6,7 +6,6 @@ from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -142,48 +141,54 @@ class Person(models.Model):
             or self.longitude is None
             or self.municipality is None
         ):
-            addressID = 0
-            dist = 0
-            req = "https://dawa.aws.dk/datavask/adresser?betegnelse="
-            req += quote_plus(self.addressWithZip())
             try:
-                washed = json.loads(requests.get(req).text)
-                addressID = washed["resultater"][0]["adresse"]["id"]
-                dist = washed["resultater"][0]["vaskeresultat"]["afstand"]
-            except Exception as error:
-                logger.error("Couldn't find addressID for " + self.name)
-                logger.error("Error " + str(error))
-            if addressID != 0 and dist < 10:
-                try:
-                    req = (
-                        "https://dawa.aws.dk/adresser/" + addressID + "?format=geojson"
+                url = f"https://api.dataforsyningen.dk/adresser?q={quote_plus(self.addressWithZip())}"
+                response = requests.get(url)
+                if response.status_code != 200:
+                    logger.error(
+                        f"Failed to look up address for {self.name} ({response.status_code})"
                     )
-                    address = json.loads(requests.get(req).text)
-                    if address["properties"]["etage"] is None:
-                        address["properties"]["etage"] = ""
-                    if address["properties"]["dør"] is None:
-                        address["properties"]["dør"] = ""
-                    if address["properties"]["supplerendebynavn"] is None:
-                        address["properties"]["supplerendebynavn"] = ""
-                    self.zipcode = address["properties"]["postnr"]
-                    self.city = address["properties"]["postnrnavn"]
-                    self.streetname = address["properties"]["vejnavn"]
-                    self.housenumber = address["properties"]["husnr"]
-                    self.floor = address["properties"]["etage"]
-                    self.door = address["properties"]["dør"]
-                    self.placename = address["properties"]["supplerendebynavn"]
-                    self.latitude = address["geometry"]["coordinates"][1]
-                    self.longitude = address["geometry"]["coordinates"][0]
-                    self.municipality = address["properties"]["kommunenavn"]
-                    self.dawa_id = address["properties"]["id"]
                     self.save()
-                except Exception as error:
-                    logger.error("Couldn't find coordinates for " + self.name)
-                    logger.error("Error " + str(error))
+                    return None
+
+                data = response.json()
+                if not data:
+                    logger.error(f"DAWA returned empty address result for {self.name}")
                     self.address_invalid = True
                     self.save()
                     return None
-            else:
+
+                # DAWA returns result with address and "adgangsadresse". Address has fields "etage" and "dør",
+                # whereas "adgangsadresse" has all the shared address fields (e.g. for an apartment building)
+                address = data[0]
+                access_address = address["adgangsadresse"]
+
+                if address["etage"] is None:
+                    address["etage"] = ""
+                if address["dør"] is None:
+                    address["dør"] = ""
+                if access_address["supplerendebynavn"] is None:
+                    access_address["supplerendebynavn"] = ""
+
+                self.zipcode = access_address["postnummer"]["nr"]
+                self.city = access_address["postnummer"]["navn"]
+                self.streetname = access_address["vejstykke"]["navn"]
+                self.housenumber = access_address["husnr"]
+                self.floor = address["etage"]
+                self.door = address["dør"]
+                self.placename = access_address["supplerendebynavn"]
+                self.latitude = access_address["vejpunkt"]["koordinater"][1]
+                self.longitude = access_address["vejpunkt"]["koordinater"][0]
+                self.municipality = Municipality.objects.get(
+                    dawa_id=access_address["kommune"]["kode"]
+                )
+                self.dawa_id = address["id"]
+                self.save()
+                logger.info(f"Updated address for {self.name}")
+
+            except Exception as error:
+                logger.error(f"Exception when looking up address for {self.name}")
+                logger.error(f"Error {error}")
                 self.address_invalid = True
                 self.save()
 
