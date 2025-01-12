@@ -143,7 +143,7 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
             if (
                 department.closed_dtm is None
                 and department.union.closed_at is None
-                and department.has_waiting_list == True
+                and department.has_waiting_list is True
                 and department.waitinglist_count() > 0
             ):
                 departments.append((str(department.pk), department.name))
