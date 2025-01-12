@@ -85,3 +85,21 @@ class TestModelFamily(TestCase):
     # def test_get_abosolute_url(self):
     #     family = FamilyFactory()
     #     self.assertEqual("family_form", family.get_absolute_url())
+
+    def test_anonymize_family_with_no_members(self):
+        family = FamilyFactory(dont_send_mails=False)
+
+        family.anonymize()
+
+        self.assertEquals(family.email, f"anonym-{family.id}@codingpirates.dk")
+        self.assertTrue(family.dont_send_mails)
+        self.assertTrue(family.anonymized)
+
+    def test_cannot_anonymize_family_with_non_anonymized_members(self):
+        family = FamilyFactory()
+        person = PersonFactory(family=family)
+
+        with self.assertRaises(
+                    Exception,
+                    msg="Cannot anonymize family with non-anonymized persons."):
+            family.anonymize()

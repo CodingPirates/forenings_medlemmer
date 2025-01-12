@@ -60,6 +60,12 @@ class Family(models.Model):
         return super(Family, self).save(*args, **kwargs)
 
     def anonymize(self):
+        non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
+        if non_anonymized_persons_in_family.count() != 0:
+            raise Exception(
+                "Cannot anonymize family with non-anonymized persons."
+            )
+
         self.email = f"anonym-{self.id}@codingpirates.dk"
         self.dont_send_mails = True
         self.anonymized = True

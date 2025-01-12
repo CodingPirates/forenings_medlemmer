@@ -78,3 +78,57 @@ class TestModelPerson(TestCase):
     def test_defaults_to_no_certificate(self):
         person = PersonFactory()
         self.assertEqual(person.has_certificate, None)
+
+    def test_anonymize_person_in_single_member_family(self):
+        person = PersonFactory()
+        birthday = person.birthday
+        municipality = person.municipality
+
+        person.anonymize()
+
+        self.assertTrue(person.anonymized)
+        self.assertEqual(person.name, "Anonymiseret")
+        self.assertEqual(person.zipcode, "")
+        self.assertEqual(person.municipality, municipality) # should not be changed
+
+        self.assertIsNotNone(person.birthday)
+
+        # only day changes, not month or year
+        self.assertEqual(person.birthday.year, birthday.year)
+        self.assertEqual(person.birthday.month, birthday.month)
+        self.assertNotEqual(person.birthday.day, birthday.day)
+
+        # given only one member of family, family should also be anonymized
+        self.assertTrue(person.family.anonymized)
+
+    def test_anonymize_single_person_in_multi_member_family(self):
+        person_1 = PersonFactory()
+        person_2 = PersonFactory(family=person_1.family)
+
+        # sanity check that they are in the same family
+        self.assertEquals(person_1.family, person_2.family)
+
+        person_1.anonymize()
+
+        self.assertTrue(person_1.anonymized)
+        self.assertFalse(person_2.anonymized)
+
+        # given more than one member of family, family should not be anonymized
+        self.assertFalse(person_1.family.anonymized)
+
+    def test_anonymize_all_persons_in_multi_member_family(self):
+        person_1 = PersonFactory()
+        person_2 = PersonFactory(family=person_1.family)
+
+        # sanity check that are are pointing to same family object
+        self.assertEquals(person_1.family, person_2.family)
+
+        person_1.anonymize()
+
+        self.assertTrue(person_1.anonymized)
+        self.assertFalse(person_1.family.anonymized) # not yet anonymized
+
+        person_2.anonymize()
+
+        self.assertTrue(person_2.anonymized)
+        self.assertTrue(person_2.family.anonymized)

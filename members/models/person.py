@@ -202,7 +202,6 @@ class Person(models.Model):
         self.floor = ""
         self.door = ""
         self.dawa_id = ""
-        self.municipality = None
         self.longitude = None
         self.latitude = None
         self.placename = ""
