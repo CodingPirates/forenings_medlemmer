@@ -142,6 +142,7 @@
               <th>Medlemskab</th>
               <th>Forening</th>
               <th>Dato</th>
+              <th>Pris</th>
             </tr>
             </thead>
             <tbody>
@@ -165,6 +166,9 @@
                   {% else %}
                     {{ member.member_since }} <br> - {{ member.member_until }}
                   {% endif %}
+                </td>
+                <td>
+                  {{ member.price_in_dkk }} kr.
                 </td>
               </tr>
             {% endfor %}
