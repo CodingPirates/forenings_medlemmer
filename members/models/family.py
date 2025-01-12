@@ -24,6 +24,7 @@ class Family(models.Model):
     confirmed_at = models.DateTimeField("Bekræftet", null=True, blank=True)
     last_visit_dtm = models.DateTimeField("Sidst besøgt", null=True, blank=True)
     deleted_dtm = models.DateTimeField("Slettet", null=True, blank=True)
+    anonymized = models.BooleanField("Anonymiseret", default=False)
 
     def get_abosolute_url(self):
         return reverse("family_form")
@@ -57,3 +58,14 @@ class Family(models.Model):
     def save(self, *args, **kwargs):
         self.email = self.email.lower()
         return super(Family, self).save(*args, **kwargs)
+
+    def anonymize(self):
+        self.email = f"anonym-{self.id}@codingpirates.dk"
+        self.dont_send_mails = True
+        self.anonymized = True
+        self.save()
+
+    def anonymize_if_all_persons_anonymized(self):
+        non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
+        if non_anonymized_persons_in_family.count() == 0:
+            self.anonymize()

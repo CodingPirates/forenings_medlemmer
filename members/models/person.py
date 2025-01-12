@@ -1,3 +1,4 @@
+import random
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -60,7 +61,7 @@ class Person(models.Model):
     floor = models.CharField("Etage", max_length=10, blank=True)
     door = models.CharField("Dør", max_length=5, blank=True)
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
-    municipality = municipality = models.ForeignKey(
+    municipality = models.ForeignKey(
         Municipality,
         on_delete=models.RESTRICT,
         blank=True,
@@ -94,6 +95,7 @@ class Person(models.Model):
         default=None,
     )
     address_invalid = models.BooleanField("Ugyldig adresse", default=False)
+    anonymized = models.BooleanField("Anonymiseret", default=False)
 
     def __str__(self):
         return self.name
@@ -188,6 +190,39 @@ class Person(models.Model):
                 self.save()
 
     # TODO: Move to dawa_data in utils
+
+    def anonymize(self):
+        logger.info(f"Anonymizing person {self.name}")
+
+        self.name = "Anonymiseret"
+        self.zipcode = ""
+        self.city = ""
+        self.streetname = ""
+        self.housenumber = ""
+        self.floor = ""
+        self.door = ""
+        self.dawa_id = ""
+        self.municipality = None
+        self.longitude = None
+        self.latitude = None
+        self.placename = ""
+        self.email = ""
+        self.phone = ""
+
+        if self.birthday:
+            original_birthday = self.birthday
+
+            # Make sure we don't end up with the same birthday
+            while self.birthday == original_birthday:
+                self.birthday = self.birthday.replace(day=random.randint(1, 28))
+
+        self.notes = ""
+        self.address_invalid = True # don't try to update address for anonymized persons
+        self.anonymized = True
+        self.save()
+
+        self.family.anonymize_if_all_persons_anonymized()
+
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"

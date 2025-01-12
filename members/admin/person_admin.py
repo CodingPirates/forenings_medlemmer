@@ -1,7 +1,10 @@
 import codecs
+from django import forms
 from django.contrib import admin
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import path
 from django.utils.html import format_html
 
 from members.models import (
@@ -60,6 +63,7 @@ class PersonAdmin(admin.ModelAdmin):
         AdminActions.invite_many_to_activity_action,
         "export_emaillist",
         "export_csv",
+        "anonymize_persons",
     ]
     raw_id_fields = ("family", "user")
 
@@ -222,6 +226,41 @@ class PersonAdmin(admin.ModelAdmin):
         return response
 
     export_csv.short_description = "CSV Export"
+
+    def anonymize_persons(self, request, queryset):
+        class MassConfirmForm(forms.Form):
+            confirmation = forms.BooleanField(
+                label="Jeg godkender at ovenstående personer anonymiseres",
+                required=True,
+                widget=forms.CheckboxInput(attrs={'style': 'color: blue; width: unset;'})
+            )
+
+        persons = queryset
+
+        context = admin.site.each_context(request)
+        context["persons"] = persons
+        context["queryset"] = queryset
+
+        if request.method == "POST" and "confirmation" in request.POST:
+            form = MassConfirmForm(request.POST)
+
+            if form.is_valid():
+                context["mass_confirmation_form"] = form
+                for person in queryset:
+                    person.anonymize()
+
+                self.message_user(request, "Valgte personer er blevet anonymiseret.")
+                return HttpResponseRedirect(request.get_full_path())
+
+        context["mass_confirmation_form"] = MassConfirmForm()
+
+        return render(
+            request,
+            "admin/anonymize_persons.html",
+            context,
+        )
+
+    anonymize_persons.short_description = "Anonymisér valgte personer"
 
     # Only view persons related to users department (all family, via participant, waitinglist & invites)
     def get_queryset(self, request):
