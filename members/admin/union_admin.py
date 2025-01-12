@@ -8,6 +8,8 @@ from django.utils.html import escape
 
 from members.models import Address, Person, Department, AdminUserInformation
 
+from django.db.models import Count
+
 
 class AdminUserUnionInline(admin.TabularInline):
     model = AdminUserInformation.unions.through
@@ -93,10 +95,81 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
     )
+    search_fields = ("name",)
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
     actions = ["export_csv_union_info"]
+
+    def get_fieldsets(self, request, obj=None):
+        # 20241113: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
+
+        info_fields = (
+            "bank_main_org",
+            "bank_account",
+            "statues",
+            "founded_at",
+            "closed_at",
+        )
+
+        if request.user.is_superuser or request.user.has_perm(
+            "members.show_ledger_account"
+        ):
+            info_fields = (
+                "bank_main_org",
+                "bank_account",
+                "statues",
+                "founded_at",
+                "closed_at",
+                "gl_account",
+            )
+
+        return [
+            (
+                "Navn og Adresse",
+                {
+                    "fields": ("name", "email", "address"),
+                    "description": "<p>Udfyld navnet på foreningen (f.eks København, \
+                        vestjylland) og adressen<p>",
+                },
+            ),
+            (
+                "Bestyrelsen nye felter",
+                {
+                    "fields": (
+                        "chairman",
+                        "second_chair",
+                        "cashier",
+                        "secretary",
+                        "board_members",
+                    )
+                },
+            ),
+            (
+                "Bestyrelsen gamle felter",
+                {
+                    "fields": (
+                        "chairman_old",
+                        "chairman_email_old",
+                        "second_chair_old",
+                        "second_chair_email_old",
+                        "cashier_old",
+                        "cashier_email_old",
+                        "secretary_old",
+                        "secretary_email_old",
+                        "board_members_old",
+                    )
+                },
+            ),
+            (
+                "Info",
+                {
+                    "fields": info_fields,
+                    "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
+                    generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
+                },
+            ),
+        ]
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
@@ -114,66 +187,12 @@ class UnionAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(UnionAdmin, self).get_queryset(request)
+        qs = qs.annotate(waitinglist_count=Count("department__waitinglist"))
         if request.user.is_superuser or request.user.has_perm(
             "members.view_all_unions"
         ):
             return qs
         return qs.filter(adminuserinformation__user=request.user)
-
-    fieldsets = [
-        (
-            "Navn og Adresse",
-            {
-                "fields": ("name", "email", "address"),
-                "description": "<p>Udfyld navnet på foreningen (f.eks København, \
-            vestjylland) og adressen<p>",
-            },
-        ),
-        (
-            "Bestyrelsen nye felter",
-            {
-                "fields": (
-                    "chairman",
-                    "second_chair",
-                    "cashier",
-                    "secretary",
-                    "board_members",
-                )
-            },
-        ),
-        (
-            "Bestyrelsen gamle felter",
-            {
-                "fields": (
-                    "chairman_old",
-                    "chairman_email_old",
-                    "second_chair_old",
-                    "second_chair_email_old",
-                    "cashier_old",
-                    "cashier_email_old",
-                    "secretary_old",
-                    "secretary_email_old",
-                    "board_members_old",
-                )
-            },
-        ),
-        (
-            "Info",
-            {
-                "fields": (
-                    "bank_main_org",
-                    "bank_account",
-                    "statues",
-                    "membership_price_in_dkk",
-                    "founded_at",
-                    "closed_at",
-                    "memberships_allowed_at",
-                ),
-                "description": "Indsæt et link til jeres vedtægter, hvornår I er stiftet (har holdt stiftende \
-                generalforsamling) og jeres bankkonto hvis I har sådan en til foreningen.",
-            },
-        ),
-    ]
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
@@ -196,6 +215,7 @@ class UnionAdmin(admin.ModelAdmin):
         return mark_safe(link)
 
     waitinglist_count_link.short_description = "Venteliste"
+    waitinglist_count_link.admin_order_field = "waitinglist_count"
 
     def export_csv_union_info(self, request, queryset):
         result_string = "Forening;Oprettelsdato;Lukkedato;"

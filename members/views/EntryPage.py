@@ -1,9 +1,8 @@
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.shortcuts import render
-from django.utils import timezone
 
-from members.models.activityinvite import ActivityInvite
 from members.utils.user import user_to_person
+from members.views.UnacceptedInvitations import get_unaccepted_invitations_for_family
 
 
 @xframe_options_exempt
@@ -15,12 +14,9 @@ def EntryPage(request):
             context = {}
         else:
             family = user.family
-            invites = ActivityInvite.objects.filter(
-                person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
-            )
-
+            unaccepted_invitations = get_unaccepted_invitations_for_family(family)
             context = {
-                "invites": invites,
+                "invites": unaccepted_invitations,
             }
     else:
         context = {}
