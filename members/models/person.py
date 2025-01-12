@@ -145,15 +145,12 @@ class Person(models.Model):
                 url = f"https://api.dataforsyningen.dk/adresser?q={quote_plus(self.addressWithZip())}"
                 response = requests.get(url)
                 if response.status_code != 200:
-                    logger.error(
-                        f"Failed to look up address for {self.name} ({response.status_code})"
-                    )
+                    self.address_invalid = True
                     self.save()
                     return None
 
                 data = response.json()
                 if not data:
-                    logger.error(f"DAWA returned empty address result for {self.name}")
                     self.address_invalid = True
                     self.save()
                     return None
@@ -186,9 +183,7 @@ class Person(models.Model):
                 self.save()
                 logger.info(f"Updated address for {self.name}")
 
-            except Exception as error:
-                logger.error(f"Exception when looking up address for {self.name}")
-                logger.error(f"Error {error}")
+            except Exception:
                 self.address_invalid = True
                 self.save()
 
