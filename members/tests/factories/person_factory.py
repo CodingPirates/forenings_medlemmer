@@ -36,7 +36,7 @@ class PersonFactory(DjangoModelFactory):
     )  # Faker("email")
     phone = Faker("phone_number")
     gender = FuzzyChoice([code for (code, name) in Person.MEMBER_GENDER_CHOICES])
-    birthday = Faker("date")
+    birthday = Faker("date_of_birth", minimum_age=0, maximum_age=100)
     # has_certificate = Faker("date")
     family = SubFactory(FamilyFactory, email=email)
     notes = Faker("text")
