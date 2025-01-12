@@ -22,7 +22,27 @@ class ActivitySignupForm(forms.Form):
                             HTML(
                                 """
                     <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
-                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
+                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster følgende at være med:</p>
+                    <table border="4px">
+                      <tr>
+                        <th>Beskrivelse</th>
+                        <th>Pris</th>
+                      </tr>
+                      <tr>
+                        <td>{{ activity.name }}</td>
+                        <td>{{ price | floatformat:2 }} kr.</td>
+                      </tr>
+                      {% if activity.is_eligable_for_membership %}
+                        <tr>
+                          <td>Medlemskab af Coding Pirates {{ union.name }}</td>
+                          <td>{% if membership %}Er allerede medlem{% else %}{{ union.membership_price_in_dkk | floatformat:2 }} kr.{% endif %}</td>
+                        </tr>
+                      {% endif %}
+                      <tr>
+                        <td><strong>I alt</strong></td>
+                        <td><strong>{{ total_price }} kr.</strong></td>
+                      </tr>
+                    </table>
                     <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
                     """
                             ),
@@ -82,7 +102,7 @@ class ActivitySignupForm(forms.Form):
             (ActivityParticipant.PHOTO_OK, "Ja, det er OK"),
             (
                 ActivityParticipant.PHOTO_NOTOK,
-                "Nej, vi vil ikke have I fotograferer mit barn",
+                "Nej, I må ikke fotografere mit barn",
             ),
         ),
     )
@@ -92,3 +112,18 @@ class ActivitySignupForm(forms.Form):
         required=True,
         choices=(("YES", "Ja"), ("NO", "Nej")),
     )
+
+    def clean(self):
+        read_conditions = self.cleaned_data.get("read_conditions")
+        photo_permission = self.cleaned_data.get("photo_permission")
+
+        if read_conditions == "NO":
+            self.add_error(
+                "read_conditions",
+                "For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser.",
+            )
+
+        if photo_permission == "Choose":
+            self.add_error(
+                "photo_permission", "Du skal vælge om vi må tage billeder eller ej."
+            )

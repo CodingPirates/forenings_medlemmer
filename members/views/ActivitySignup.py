@@ -1,4 +1,6 @@
+from datetime import date
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -8,6 +10,7 @@ from members.forms import ActivitySignupForm
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
+from members.models.member import Member
 from members.models.payment import Payment
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
@@ -24,8 +27,10 @@ def ActivitySignup(request, activity_id, person_id=None):
         view_only_mode = False
 
     activity = get_object_or_404(Activity, pk=activity_id)
+    union = activity.department.union
 
     participating = False
+    membership = False
 
     if request.resolver_match.url_name == "activity_view_person":
         view_only_mode = True
@@ -38,6 +43,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
     family_participants = []  # participants from current family
     family_subscriptions = []  # waiting list subscriptions for current family
+    family_invites = []  # Invites for current family
     if family:
         family_participants = [
             (act.person.id)
@@ -46,19 +52,16 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
         ]
 
-        for child in family.get_children():
-            subscriptions = WaitingList.objects.filter(
-                department=activity.department, person=child
-            )
-            if len(subscriptions) > 0:
-                family_subscriptions.append(child.id)
-
         for person in family.get_persons():
-            subscriptions = WaitingList.objects.filter(
+            if WaitingList.objects.filter(
                 department=activity.department, person=person
-            )
-            if len(subscriptions) > 0:
+            ).exists():
                 family_subscriptions.append(person.id)
+
+            if ActivityInvite.objects.filter(
+                activity=activity, person=person, expire_dtm__gte=timezone.now()
+            ).exists():
+                family_invites.append(person.id)
 
     if family and person_id:
         try:
@@ -74,6 +77,18 @@ def ActivitySignup(request, activity_id, person_id=None):
                 view_only_mode = True
             except ActivityParticipant.DoesNotExist:
                 participating = False  # this was expected - if not signed up yet
+
+            # Check if person is member of the union
+            try:
+                member = Member.objects.get(
+                    union=union,
+                    person=person,
+                    member_since__gte=date(date.today().year, 1, 1),
+                    member_until__lte=date(date.today().year, 12, 31),
+                )
+                membership = True
+            except Member.DoesNotExist:
+                membership = False
 
         except Person.DoesNotExist:
             raise Http404("Person not found on family")
@@ -95,8 +110,8 @@ def ActivitySignup(request, activity_id, person_id=None):
     # signup_closed should default to False
     signup_closed = False
 
-    # if activity is closed for signup, only invited persons can still join
-    if activity.signup_closing < timezone.now().date() and invitation is None:
+    # if activity is closed for signup, you should not be able to sign up
+    if activity.signup_closing < timezone.now().date():
         view_only_mode = True  # Activivty closed for signup
         signup_closed = True
 
@@ -109,6 +124,12 @@ def ActivitySignup(request, activity_id, person_id=None):
         price = invitation.price_in_dkk
     else:
         price = activity.price_in_dkk
+
+    # total price if the person is already member or membership is not required
+    total_price = price
+
+    if not membership and activity.is_eligable_for_membership():
+        total_price = price + union.membership_price_in_dkk
 
     if request.method == "POST":
         if view_only_mode:
@@ -129,13 +150,13 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
 
         if (
-            Person.objects.filter(family=family)
+            not Person.objects.filter(family=family)
             .exclude(membertype=Person.CHILD)
-            .count()
-            <= 0
+            .exists()
         ):
-            return HttpResponse(
-                "Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder."
+            raise ValidationError(
+                "Barnet skal have en forælder eller værge. Gå tilbage og tilføj en før du tilmelder.",
+                code="no_parent_guardian",
             )
 
         signup_form = ActivitySignupForm(request.POST)
@@ -148,13 +169,19 @@ def ActivitySignup(request, activity_id, person_id=None):
                 person=person,
                 activity=activity,
                 note=signup_form.cleaned_data["note"],
+                price_in_dkk=activity.price_in_dkk,
             )
 
-            # If conditions not accepted, make error
-            if signup_form.cleaned_data["read_conditions"] == "NO":
-                return HttpResponse(
-                    "For at gå til en Coding Pirates aktivitet skal du acceptere vores betingelser."
+            # Make a new member if it's a member activity
+            member = None
+
+            if activity.is_eligable_for_membership():
+                member = Member(
+                    union=union,
+                    person=person,
+                    price_in_dkk=union.membership_price_in_dkk,
                 )
+                member.save()
 
             # Make sure people have selected yes or no in photo permission and update photo permission
             if signup_form.cleaned_data["photo_permission"] == "Choose":
@@ -173,12 +200,13 @@ def ActivitySignup(request, activity_id, person_id=None):
                     activityparticipant=participant,
                     person=person,
                     family=family,
+                    member=member,
                     body_text=timezone.now().strftime("%Y-%m-%d")
                     + " Betaling for "
                     + activity.name
                     + " på "
                     + activity.department.name,
-                    amount_ore=int(price * 100),
+                    amount_ore=int(total_price * 100),
                 )
                 payment.save()
 
@@ -207,21 +235,22 @@ def ActivitySignup(request, activity_id, person_id=None):
     else:
         signup_form = ActivitySignupForm()
 
-    union = activity.department.union
-
     context = {
-        "family": family,
         "activity": activity,
-        "person": person,
+        "family": family,
+        "family_invites": family_invites,
+        "family_participants": family_participants,
+        "family_subscriptions": family_subscriptions,
         "invitation": invitation,
+        "membership": membership,
+        "participating": participating,
+        "person": person,
         "price": price,
         "seats_left": activity.seats_left(),
         "signupform": signup_form,
         "signup_closed": signup_closed,
-        "view_only_mode": view_only_mode,
-        "participating": participating,
-        "family_participants": family_participants,
-        "family_subscriptions": family_subscriptions,
+        "total_price": total_price,
         "union": union,
+        "view_only_mode": view_only_mode,
     }
     return render(request, "members/activity_signup.html", context)
