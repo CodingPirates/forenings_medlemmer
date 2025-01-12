@@ -6,7 +6,6 @@ from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 
