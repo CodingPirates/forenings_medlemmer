@@ -48,9 +48,9 @@ def MembershipSignup(request, union_id, person_id=None):
 
             # Check not already signed up
             try:
-                end_date = datetime.now().date().replace(month=12, day=31)
+                member_until = datetime.now().date().replace(month=12, day=31)
                 member = Member.objects.get(
-                    union=union, person=person, member_until=end_date
+                    union=union, person=person, member_until=member_until
                 )
                 # found - we can only allow one - switch to view mode
                 is_member = True

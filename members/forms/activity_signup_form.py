@@ -22,7 +22,27 @@ class ActivitySignupForm(forms.Form):
                             HTML(
                                 """
                     <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
-                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
+                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster følgende at være med:</p>
+                    <table border="4px">
+                      <tr>
+                        <th>Beskrivelse</th>
+                        <th>Pris</th>
+                      </tr>
+                      <tr>
+                        <td>{{ activity.name }}</td>
+                        <td>{{ price | floatformat:2 }} kr.</td>
+                      </tr>
+                      {% if activity.is_eligable_for_membership %}
+                        <tr>
+                          <td>Medlemskab af Coding Pirates {{ union.name }}</td>
+                          <td>{% if membership %}Er allerede medlem{% else %}{{ union.membership_price_in_dkk | floatformat:2 }} kr.{% endif %}</td>
+                        </tr>
+                      {% endif %}
+                      <tr>
+                        <td><strong>I alt</strong></td>
+                        <td><strong>{{ total_price }} kr.</strong></td>
+                      </tr>
+                    </table>
                     <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
                     """
                             ),

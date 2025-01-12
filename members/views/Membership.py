@@ -50,8 +50,8 @@ def Membership(request):
                         "persons": applicablePersons,
                         "address": union.address,
                         "membership_price_in_dkk": union.membership_price_in_dkk,
-                        "start_date": date(date.today().year, 1, 1),
-                        "end_date": date(date.today().year, 12, 31),
+                        "member_since": date(date.today().year, 1, 1),
+                        "member_until": date(date.today().year, 12, 31),
                     }
 
                     if union.address.region == user_region:

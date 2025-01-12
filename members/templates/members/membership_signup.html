@@ -69,9 +69,13 @@
             <hr/>
           {% else %}
             {% for person in family.get_persons %}
-              <a class="button" href="{% url 'membership_signup' union.id person.id %}">
-                Tilmeld {{ person.firstname }}
-              </a>
+              {% if person.pk in family_members %}
+                {{ person.firstname }} er allerede medlem.
+              {% else %}
+                <a class="button" href="{% url 'membership_signup' union.id person.id %}">
+                  Tilmeld {{ person.firstname }}
+                </a>
+              {% endif %}
             {% endfor %}
           {% endif %}
         {% endif %}
