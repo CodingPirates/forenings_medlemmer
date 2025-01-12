@@ -4,7 +4,6 @@ from django.contrib import admin
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import path
 from django.utils.html import format_html
 
 from members.models import (
@@ -232,7 +231,9 @@ class PersonAdmin(admin.ModelAdmin):
             confirmation = forms.BooleanField(
                 label="Jeg godkender at ovenstående personer anonymiseres",
                 required=True,
-                widget=forms.CheckboxInput(attrs={'style': 'color: blue; width: unset;'})
+                widget=forms.CheckboxInput(
+                    attrs={"style": "color: blue; width: unset;"}
+                ),
             )
 
         persons = queryset

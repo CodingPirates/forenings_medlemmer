@@ -216,12 +216,13 @@ class Person(models.Model):
                 self.birthday = self.birthday.replace(day=random.randint(1, 28))
 
         self.notes = ""
-        self.address_invalid = True # don't try to update address for anonymized persons
+        self.address_invalid = (
+            True  # don't try to update address for anonymized persons
+        )
         self.anonymized = True
         self.save()
 
         self.family.anonymize_if_all_persons_anonymized()
-
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"

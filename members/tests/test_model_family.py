@@ -100,6 +100,6 @@ class TestModelFamily(TestCase):
         person = PersonFactory(family=family)
 
         with self.assertRaises(
-                    Exception,
-                    msg="Cannot anonymize family with non-anonymized persons."):
+            Exception, msg="Cannot anonymize family with non-anonymized persons."
+        ):
             family.anonymize()

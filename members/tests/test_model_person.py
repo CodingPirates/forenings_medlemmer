@@ -89,7 +89,7 @@ class TestModelPerson(TestCase):
         self.assertTrue(person.anonymized)
         self.assertEqual(person.name, "Anonymiseret")
         self.assertEqual(person.zipcode, "")
-        self.assertEqual(person.municipality, municipality) # should not be changed
+        self.assertEqual(person.municipality, municipality)  # should not be changed
 
         self.assertIsNotNone(person.birthday)
 
@@ -126,7 +126,7 @@ class TestModelPerson(TestCase):
         person_1.anonymize()
 
         self.assertTrue(person_1.anonymized)
-        self.assertFalse(person_1.family.anonymized) # not yet anonymized
+        self.assertFalse(person_1.family.anonymized)  # not yet anonymized
 
         person_2.anonymize()
 
