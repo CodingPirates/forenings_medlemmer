@@ -183,7 +183,7 @@ class Person(models.Model):
                 self.save()
                 logger.info(f"Updated address for {self.name}")
 
-            except Exception as error:
+            except Exception:
                 self.address_invalid = True
                 self.save()
 
