@@ -43,7 +43,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
     family_participants = []  # participants from current family
     family_subscriptions = []  # waiting list subscriptions for current family
-    family_invites = [] # Invites for current family
+    family_invites = []  # Invites for current family
     if family:
         family_participants = [
             (act.person.id)
@@ -81,7 +81,10 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Check if person is member of the union
             try:
                 member = Member.objects.get(
-                    union=union, person=person, member_since__gte=date(date.today().year, 1, 1), member_until__lte=date(date.today().year, 12, 31)
+                    union=union,
+                    person=person,
+                    member_since__gte=date(date.today().year, 1, 1),
+                    member_until__lte=date(date.today().year, 12, 31),
                 )
                 membership = True
             except Member.DoesNotExist:
