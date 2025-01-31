@@ -111,7 +111,7 @@ class TestModelFamily(TestCase):
 
     def test_cannot_anonymize_family_with_non_anonymized_members(self):
         family = FamilyFactory()
-        person = PersonFactory(family=family)
+        PersonFactory(family=family)
 
         with self.assertRaises(
             Exception, msg="Cannot anonymize family with non-anonymized persons."

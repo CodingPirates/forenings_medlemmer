@@ -4,9 +4,7 @@ from members.models.person import Person
 from datetime import datetime
 from freezegun import freeze_time
 
-from members.models.waitinglist import WaitingList
 from members.tests.factories import PersonFactory
-from members.tests.factories.activity_factory import ActivityFactory
 from members.tests.factories.department_factory import DepartmentFactory
 from members.tests.factories.factory_helpers import TIMEZONE
 from members.tests.factories.waitinglist_factory import WaitingListFactory

@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.conf import settings
 from members.models.municipality import Municipality
 from django.core.exceptions import PermissionDenied
-from members.models.waitinglist import WaitingList
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests

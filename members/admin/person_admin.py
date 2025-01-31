@@ -5,7 +5,6 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.html import format_html
-from requests import request
 
 from members.models import (
     Department,
