@@ -93,6 +93,14 @@ class TestModelPerson(TestCase):
         with self.assertRaises(PermissionDenied):
             person.anonymize(request)
 
+    def test_anonymize_person_in_single_member_family_already_anonymized(self):
+        person = PersonFactory(
+            anonymized=True,
+        )
+
+        request = self.create_request_with_permission("members.anoymize_persons")
+        with self.assertRaises(PermissionDenied):
+            person.anonymize(request)
 
     def test_anonymize_person_in_single_member_family(self):
         person = PersonFactory()
