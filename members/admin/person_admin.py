@@ -79,7 +79,9 @@ class PersonAdmin(admin.ModelAdmin):
 
         if request.user.has_perm("members.anonymize_persons"):
             actions["anonymize_persons"] = (
-                lambda modeladmin, request, queryset: self.anonymize_persons(request, queryset),
+                lambda modeladmin, request, queryset: self.anonymize_persons(
+                    request, queryset
+                ),
                 "anonymize_persons",
                 self.anonymize_persons.short_description,
             )
@@ -249,16 +251,24 @@ class PersonAdmin(admin.ModelAdmin):
             )
 
         if not request.user.has_perm("members.anonymize_persons"):
-            self.message_user(request, "Du har ikke tilladelse til at anonymisere personer.")
+            self.message_user(
+                request, "Du har ikke tilladelse til at anonymisere personer."
+            )
             return HttpResponseRedirect(request.get_full_path())
 
         if queryset.count() > 1:
-            self.message_user(request, "Kun én person kan anonymiseres ad gangen.", level="error")
+            self.message_user(
+                request, "Kun én person kan anonymiseres ad gangen.", level="error"
+            )
             return HttpResponseRedirect(request.get_full_path())
 
         for person in queryset:
             if person.anonymized:
-                self.message_user(request, "Den valgte person er allerede anonymiseret.", level="error")
+                self.message_user(
+                    request,
+                    "Den valgte person er allerede anonymiseret.",
+                    level="error",
+                )
                 return HttpResponseRedirect(request.get_full_path())
 
         persons = queryset

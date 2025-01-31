@@ -62,7 +62,9 @@ class Family(models.Model):
 
     def anonymize(self, request):
         if not request.user.has_perm("members.anonymize_persons"):
-            raise PermissionDenied("Du har ikke tilladelse til at anonymisere personer eller familier.")
+            raise PermissionDenied(
+                "Du har ikke tilladelse til at anonymisere personer eller familier."
+            )
 
         non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
         if non_anonymized_persons_in_family.count() != 0:
@@ -75,7 +77,9 @@ class Family(models.Model):
 
     def anonymize_if_all_persons_anonymized(self, request):
         if not request.user.has_perm("members.anonymize_persons"):
-            raise PermissionDenied("Du har ikke tilladelse til at anonymisere personer eller familier.")
+            raise PermissionDenied(
+                "Du har ikke tilladelse til at anonymisere personer eller familier."
+            )
 
         non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
         if non_anonymized_persons_in_family.count() == 0:

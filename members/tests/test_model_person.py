@@ -84,11 +84,17 @@ class TestModelPerson(TestCase):
         self.assertEqual(person.has_certificate, None)
 
     def create_request_with_permission(self, permission):
-        return type('Request', (object,), {
-            'user': type('User', (object,), {
-            'has_perm': lambda self, perm: perm == permission
-            })()
-        })()
+        return type(
+            "Request",
+            (object,),
+            {
+                "user": type(
+                    "User",
+                    (object,),
+                    {"has_perm": lambda self, perm: perm == permission},
+                )()
+            },
+        )()
 
     def test_anonymize_person_in_single_member_family_no_permission(self):
         person = PersonFactory()

@@ -202,7 +202,9 @@ class Person(models.Model):
 
     def anonymize(self, request):
         if not request.user.has_perm("members.anonymize_persons"):
-            raise PermissionDenied("Du har ikke tilladelse til at anonymisere personer.")
+            raise PermissionDenied(
+                "Du har ikke tilladelse til at anonymisere personer."
+            )
 
         if self.anonymized:
             raise PermissionDenied("Personen er allerede anonymiseret.")
