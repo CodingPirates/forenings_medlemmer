@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.conf import settings
 from members.models.municipality import Municipality
 from django.core.exceptions import PermissionDenied
+from members.models.waitinglist import WaitingList
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
@@ -235,6 +236,10 @@ class Person(models.Model):
         )
         self.anonymized = True
         self.save()
+
+        # Remove person from all waiting lists
+        for waiting_list in self.waitinglist_set.all():
+            waiting_list.delete()
 
         self.family.anonymize_if_all_persons_anonymized(request)
 

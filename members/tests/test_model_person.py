@@ -4,8 +4,12 @@ from members.models.person import Person
 from datetime import datetime
 from freezegun import freeze_time
 
+from members.models.waitinglist import WaitingList
 from members.tests.factories import PersonFactory
+from members.tests.factories.activity_factory import ActivityFactory
+from members.tests.factories.department_factory import DepartmentFactory
 from members.tests.factories.factory_helpers import TIMEZONE
+from members.tests.factories.waitinglist_factory import WaitingListFactory
 
 
 class TestModelPerson(TestCase):
@@ -107,6 +111,12 @@ class TestModelPerson(TestCase):
         birthday = person.birthday
         municipality = person.municipality
 
+        # create waiting list for person
+        department = DepartmentFactory()
+        WaitingListFactory(person=person, department=department)
+
+        self.assertEqual(person.waitinglist_set.count(), 1)
+
         request = self.create_request_with_permission("members.anonymize_persons")
         person.anonymize(request)
 
@@ -122,12 +132,22 @@ class TestModelPerson(TestCase):
         self.assertEqual(person.birthday.month, birthday.month)
         self.assertNotEqual(person.birthday.day, birthday.day)
 
+        # verify that person is removed from all waiting lists
+        self.assertEqual(person.waitinglist_set.count(), 0)
+
         # given only one member of family, family should also be anonymized
         self.assertTrue(person.family.anonymized)
 
     def test_anonymize_single_person_in_multi_member_family(self):
         person_1 = PersonFactory()
         person_2 = PersonFactory(family=person_1.family)
+
+        # create waiting list entries for both person
+        department = DepartmentFactory()
+        WaitingListFactory(person=person_1, department=department)
+        WaitingListFactory(person=person_2, department=department)
+
+        self.assertEqual(department.waitinglist_set.count(), 2)
 
         # sanity check that they are in the same family
         self.assertEquals(person_1.family, person_2.family)
@@ -137,6 +157,11 @@ class TestModelPerson(TestCase):
 
         self.assertTrue(person_1.anonymized)
         self.assertFalse(person_2.anonymized)
+
+        # verify that person_1 is removed from waiting list
+        self.assertEqual(department.waitinglist_set.count(), 1)
+        self.assertEqual(person_1.waitinglist_set.count(), 0)
+        self.assertEqual(person_2.waitinglist_set.count(), 1)
 
         # given more than one member of family, family should not be anonymized
         self.assertFalse(person_1.family.anonymized)
