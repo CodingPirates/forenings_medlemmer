@@ -52,6 +52,7 @@ def Membership(request):
             participating = ActivityParticipant.objects.filter(
                 person__family=family,
                 activity__activitytype__in=["FORENINGSMEDLEMSKAB"],
+                person__anonymized=False,
             ).order_by("-activity__start_date")
 
             membership_activities_with_persons = []
