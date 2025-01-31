@@ -252,6 +252,15 @@ class PersonAdmin(admin.ModelAdmin):
             self.message_user(request, "Du har ikke tilladelse til at anonymisere personer.")
             return HttpResponseRedirect(request.get_full_path())
 
+        if queryset.count() > 1:
+            self.message_user(request, "Kun én person kan anonymiseres ad gangen.", level="error")
+            return HttpResponseRedirect(request.get_full_path())
+
+        for person in queryset:
+            if person.anonymized:
+                self.message_user(request, "Den valgte person er allerede anonymiseret.", level="error")
+                return HttpResponseRedirect(request.get_full_path())
+
         persons = queryset
 
         context = admin.site.each_context(request)
