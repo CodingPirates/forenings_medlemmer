@@ -86,10 +86,18 @@ class TestModelFamily(TestCase):
     #     family = FamilyFactory()
     #     self.assertEqual("family_form", family.get_absolute_url())
 
+    def create_request_with_permission(self, permission):
+        return type('Request', (object,), {
+            'user': type('User', (object,), {
+            'has_perm': lambda self, perm: perm == permission
+            })()
+        })()
+
     def test_anonymize_family_with_no_members(self):
         family = FamilyFactory(dont_send_mails=False)
 
-        family.anonymize()
+        request = self.create_request_with_permission("members.anonymize_persons")
+        family.anonymize(request)
 
         self.assertEquals(family.email, f"anonym-{family.id}@codingpirates.dk")
         self.assertTrue(family.dont_send_mails)

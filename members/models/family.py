@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.urls import reverse
+from django.core.exceptions import PermissionDenied
 
 from .person import Person
 import members.models.emailtemplate
@@ -59,7 +60,10 @@ class Family(models.Model):
         self.email = self.email.lower()
         return super(Family, self).save(*args, **kwargs)
 
-    def anonymize(self):
+    def anonymize(self, request):
+        if not request.user.has_perm("members.anonymize_persons"):
+            raise PermissionDenied("Du har ikke tilladelse til at anonymisere personer eller familier.")
+
         non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
         if non_anonymized_persons_in_family.count() != 0:
             raise Exception("Cannot anonymize family with non-anonymized persons.")
@@ -69,7 +73,10 @@ class Family(models.Model):
         self.anonymized = True
         self.save()
 
-    def anonymize_if_all_persons_anonymized(self):
+    def anonymize_if_all_persons_anonymized(self, request):
+        if not request.user.has_perm("members.anonymize_persons"):
+            raise PermissionDenied("Du har ikke tilladelse til at anonymisere personer eller familier.")
+
         non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
         if non_anonymized_persons_in_family.count() == 0:
-            self.anonymize()
+            self.anonymize(request)

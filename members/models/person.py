@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from members.models.municipality import Municipality
+from django.core.exceptions import PermissionDenied
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
@@ -21,7 +22,14 @@ class Person(models.Model):
                 "view_full_address",
                 "Can view persons full address + phonenumber + email",
             ),
-            ("view_all_persons", "Can view persons not related to department"),
+            (
+                "view_all_persons",
+                "Can view persons not related to department",
+            ),
+            (
+                "anonymize_persons",
+                "Can anonymize persons",
+            ),
         )
 
     PARENT = "PA"
@@ -191,7 +199,10 @@ class Person(models.Model):
 
     # TODO: Move to dawa_data in utils
 
-    def anonymize(self):
+    def anonymize(self, request):
+        if not request.user.has_perm("members.anonymize_persons"):
+            raise PermissionDenied("Du har ikke tilladelse til at anonymisere personer.")
+
         logger.info(f"Anonymizing person {self.name}")
 
         self.name = "Anonymiseret"
@@ -222,7 +233,7 @@ class Person(models.Model):
         self.anonymized = True
         self.save()
 
-        self.family.anonymize_if_all_persons_anonymized()
+        self.family.anonymize_if_all_persons_anonymized(request)
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"

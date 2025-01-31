@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from members.models.person import Person
 from datetime import datetime
 from freezegun import freeze_time
@@ -79,12 +79,28 @@ class TestModelPerson(TestCase):
         person = PersonFactory()
         self.assertEqual(person.has_certificate, None)
 
+    def create_request_with_permission(self, permission):
+        return type('Request', (object,), {
+            'user': type('User', (object,), {
+            'has_perm': lambda self, perm: perm == permission
+            })()
+        })()
+
+    def test_anonymize_person_in_single_member_family_no_permission(self):
+        person = PersonFactory()
+
+        request = self.create_request_with_permission("members.non_existing_permission")
+        with self.assertRaises(PermissionDenied):
+            person.anonymize(request)
+
+
     def test_anonymize_person_in_single_member_family(self):
         person = PersonFactory()
         birthday = person.birthday
         municipality = person.municipality
 
-        person.anonymize()
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person.anonymize(request)
 
         self.assertTrue(person.anonymized)
         self.assertEqual(person.name, "Anonymiseret")
@@ -108,7 +124,8 @@ class TestModelPerson(TestCase):
         # sanity check that they are in the same family
         self.assertEquals(person_1.family, person_2.family)
 
-        person_1.anonymize()
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person_1.anonymize(request)
 
         self.assertTrue(person_1.anonymized)
         self.assertFalse(person_2.anonymized)
@@ -119,16 +136,17 @@ class TestModelPerson(TestCase):
     def test_anonymize_all_persons_in_multi_member_family(self):
         person_1 = PersonFactory()
         person_2 = PersonFactory(family=person_1.family)
+        request = self.create_request_with_permission("members.anonymize_persons")
 
         # sanity check that are are pointing to same family object
         self.assertEquals(person_1.family, person_2.family)
 
-        person_1.anonymize()
+        person_1.anonymize(request)
 
         self.assertTrue(person_1.anonymized)
         self.assertFalse(person_1.family.anonymized)  # not yet anonymized
 
-        person_2.anonymize()
+        person_2.anonymize(request)
 
         self.assertTrue(person_2.anonymized)
         self.assertTrue(person_2.family.anonymized)
