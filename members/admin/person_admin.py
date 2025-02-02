@@ -284,7 +284,7 @@ class PersonAdmin(admin.ModelAdmin):
                 for person in queryset:
                     person.anonymize(request)
 
-                self.message_user(request, "Valgte personer er blevet anonymiseret.")
+                self.message_user(request, "Personen er blevet anonymiseret.")
                 return HttpResponseRedirect(request.get_full_path())
 
         context["mass_confirmation_form"] = MassConfirmForm()
@@ -295,7 +295,7 @@ class PersonAdmin(admin.ModelAdmin):
             context,
         )
 
-    anonymize_persons.short_description = "Anonymisér valgte personer"
+    anonymize_persons.short_description = "Anonymisér person"
 
     # Only view persons related to users department (all family, via participant, waitinglist & invites)
     def get_queryset(self, request):
