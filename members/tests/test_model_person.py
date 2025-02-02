@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError, PermissionDenied
+from django.contrib.auth.models import User
 from members.models.person import Person
 from datetime import datetime
 from freezegun import freeze_time
@@ -187,3 +188,24 @@ class TestModelPerson(TestCase):
 
         self.assertTrue(person_2.anonymized)
         self.assertTrue(person_2.family.anonymized)
+
+    def test_anonymize_person_with_user(self):
+        person = PersonFactory()
+        user = User.objects.create_user(
+            username=person.name, email=person.email, password="password"
+        )
+        self.assertTrue(user.is_active)
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person.anonymize(request)
+
+        self.assertTrue(person.anonymized)
+
+        # retrive updated user from database, and verify that user is no longer active
+        user = User.objects.get(pk=user.pk)
+
+        self.assertEqual(user.first_name, "Anonymiseret")
+        self.assertNotEqual(user.email, person.email)  # email should be anonymized
+        self.assertFalse(user.is_superuser)
+        self.assertFalse(user.is_staff)
+        self.assertFalse(user.is_active)

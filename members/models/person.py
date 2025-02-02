@@ -1,9 +1,10 @@
 import random
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from members.models.municipality import Municipality
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
@@ -206,9 +207,11 @@ class Person(models.Model):
             )
 
         if self.anonymized:
-            raise PermissionDenied("Personen er allerede anonymiseret.")
+            raise ValidationError("Personen er allerede anonymiseret.")
 
         logger.info(f"Anonymizing person {self.name}")
+
+        orig_email = self.email
 
         self.name = "Anonymiseret"
         self.zipcode = ""
@@ -243,6 +246,21 @@ class Person(models.Model):
             waiting_list.delete()
 
         self.family.anonymize_if_all_persons_anonymized(request)
+
+        # anonymize user if it exists, there might be multiple users with the same email address
+        users = User.objects.filter(email__exact=orig_email)
+        if users.exists():
+            for user in users:
+                user.username = f"anonymized-{user.id}"
+                user.first_name = "Anonymiseret"
+                user.last_name = ""
+                user.email = f"{user.username}@localhost"
+                user.is_superuser = False
+                user.is_staff = False
+                user.is_active = False
+                user.save()
+        else:
+            pass  # no user accounts found for this person
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"
