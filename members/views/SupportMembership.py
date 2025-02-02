@@ -27,6 +27,7 @@ def SupportMembership(request):
         participating = ActivityParticipant.objects.filter(
             person__family=family,
             activity__activitytype__in=["STØTTEMEDLEMSKAB"],
+            person__anonymized=False,
         ).order_by("-activity__start_date")
 
         activities_with_persons = []
