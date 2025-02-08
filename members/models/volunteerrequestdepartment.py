@@ -40,7 +40,7 @@ class VolunteerRequestDepartment(models.Model):
         (1, "Ny anmodning"),
         (2, "Afvist af afdeling"),
         (3, "Person er ikke interesseret"),
-        (4, "Aktiv"),
+        (4, "Venter på at personen oprettes i systemet")(5, "Aktiv"),
     )
 
     status = models.IntegerField("Status", choices=STATUS_CHOICES, default=1)
