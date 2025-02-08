@@ -8,7 +8,6 @@ from members.models.volunteerrequestdepartment import VolunteerRequestDepartment
 from members.models.volunteerrequest import VolunteerRequest
 from members.models.emailtemplate import EmailTemplate
 from members.forms.signup_form import signupForm
-from django.contrib.auth.decorators import login_required
 from members.utils.user import user_to_person
 import random
 import json
@@ -68,7 +67,6 @@ def generate_code(request):
         return JsonResponse({"success": False, "error": "Invalid request method."})
 
 
-# @login_required
 def volunteer_request_view(request):
     if request.user.is_authenticated:
         person = user_to_person(request.user)
@@ -121,6 +119,21 @@ def volunteer_request_view(request):
                         },
                     )
 
+            departments = volunteer_request_form.cleaned_data["department_list"]
+            activities = volunteer_request_form.cleaned_data["activity_list"]
+
+            if not departments and not activities:
+                messages.error(
+                    request, "Du skal vælge mindst én afdeling eller aktivitet."
+                )
+                return render(
+                    request,
+                    "members/volunteer_request.html",
+                    {
+                        "volunteer_request_form": volunteer_request_form,
+                    },
+                )
+
             family_member = volunteer_request_form.cleaned_data.get("family_member")
             if family_member:
                 vol_req_obj = VolunteerRequest.objects.create(
@@ -139,9 +152,6 @@ def volunteer_request_view(request):
             else:
                 vol_req_obj = volunteer_request_form.save()
 
-            departments = volunteer_request_form.cleaned_data["department_list"]
-            activities = volunteer_request_form.cleaned_data["activity_list"]
-
             department_list = []
             for department in departments:
                 VolunteerRequestDepartment.objects.create(
@@ -151,14 +161,14 @@ def volunteer_request_view(request):
 
             for activity in activities:
                 VolunteerRequestDepartment.objects.create(
-                    VolunteerRequest=vol_req_obj,
+                    volunteer_request=vol_req_obj,
                     activity=activity,
-                    department=department,
+                    department=activity.department,
                 )
                 if (
-                    department not in department_list
+                    activity.department not in department_list
                 ):  # If the department is not already in the list
-                    department_list.append(department)
+                    department_list.append(activity.department)
 
             for department in department_list:
 

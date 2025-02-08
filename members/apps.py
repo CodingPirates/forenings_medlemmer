@@ -34,6 +34,21 @@ class MembersConfig(AppConfig):
                     body_text="Din sikkerhedskode er: {{ token }}",
                 )
 
+            if not EmailTemplate.objects.filter(idname="CREATE_USER").exists():
+                EmailTemplate.objects.create(
+                    idname="CREATE_USER",
+                    name="Create User",
+                    description="Email to create a user account",
+                    from_address="kontakt@codingpirates.dk",
+                    subject="Create your user account",
+                    body_html="""
+                        <p>Please create a user by clicking the following link: <a href="{{ create_user_url }}">Create User</a></p>
+                    """,
+                    body_text="""
+                        Please create a user by clicking the following link: {{ create_user_url }}
+                    """,
+                )
+
         except OperationalError:
             # Handle the case where the database is not ready yet
             pass

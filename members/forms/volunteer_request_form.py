@@ -1,49 +1,58 @@
 from django import forms
 from django.utils import timezone
-from django.conf import settings
 from django.db.models.functions import Lower
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Div, Field, Submit, Hidden, Div
+from crispy_forms.layout import Layout, Fieldset, Div, Field, Submit, Hidden
 
 from members.models.volunteerrequest import VolunteerRequest
 
-# from members.models.department import Department
-# from members.models.person import Person
-from members.models import Person, Department, Activity  # , Union
-from members.models.person import Person
+from members.models import Person, Department, Activity
 
-from django.forms.widgets import CheckboxSelectMultiple, CheckboxInput
+from django.forms.widgets import CheckboxSelectMultiple
 
 
-class VolunteerRequestForm(forms.Form):
-    def get_act_dynamic():
-        x = [(obj.id, obj.name) for obj in Activity.objects.filter(
-            end_date__gte=timezone.now(), activitytype__in=["FORLØB", "ARRANGEMENT"]
-        ).order_by("name")]
-        print(f"get_act_dyn:{x}")
-        return x
-
-    family_member = forms.ModelChoiceField(queryset=Person.objects.none(), required=False, label="Vælg person")
+class VolunteerRequestForm(forms.ModelForm):
+    family_member = forms.ModelChoiceField(
+        queryset=Person.objects.none(), required=False, label="Vælg person"
+    )
     name = forms.CharField(label="Navn", max_length=200)
-    email = forms.EmailField(label="Email", required=True)
+    email = forms.EmailField(label="Email", max_length=200)
     phone = forms.CharField(label="Telefon", max_length=50)
-    age = forms.IntegerField(label="Alder")
+    age = forms.IntegerField(label="Alder", min_value=7, max_value=99)
     zip = forms.CharField(label="Postnummer", max_length=4)
-    info_reference = forms.CharField(label="Reference", widget=forms.Textarea(attrs={"rows":3}), required=False)
-    info_whishes = forms.CharField(label="Ønsker", widget=forms.Textarea(attrs={"rows":3}), required=False)
+    info_reference = forms.CharField(
+        label="Reference", widget=forms.Textarea(attrs={"rows": 3}), required=False
+    )
+    info_whishes = forms.CharField(
+        label="Ønsker", widget=forms.Textarea(attrs={"rows": 3}), required=False
+    )
     email_token = forms.CharField(widget=forms.HiddenInput(), required=False)
     department_list = forms.ModelMultipleChoiceField(
         queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
         widget=CheckboxSelectMultiple,
-        required=True,
+        required=False,
+        label="Afdelinger",
     )
-    activity_list = forms.MultipleChoiceField(
-        choices=get_act_dynamic,
-        widget=CheckboxSelectMultiple, 
-        required=False, 
-        )
-    #activity_list = forms.ChoiceField(choices=get_act_dynamic, widget=forms.RadioSelectMultiple , required=False)
-    
+    activity_list = forms.ModelMultipleChoiceField(
+        queryset=Activity.objects.filter(
+            end_date__gte=timezone.now(), activitytype__in=["FORLØB", "ARRANGEMENT"]
+        ).order_by("name"),
+        widget=CheckboxSelectMultiple,
+        required=False,
+        label="Aktiviteter",
+    )
+
+    class Meta:
+        model = VolunteerRequest
+        fields = [
+            "name",
+            "email",
+            "phone",
+            "age",
+            "zip",
+            "info_reference",
+            "info_whishes",
+        ]
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
@@ -51,13 +60,19 @@ class VolunteerRequestForm(forms.Form):
         self.fields["department_list"].queryset = Department.objects.filter(
             closed_dtm__isnull=True
         ).order_by("name")
+        self.fields["activity_list"].queryset = Activity.objects.filter(
+            end_date__gte=timezone.now(), activitytype__in=["FORLØB", "ARRANGEMENT"]
+        ).order_by("name")
         if user and user.is_authenticated:
             family = user.person.family
-            self.fields["family_member"].queryset = family.person_set.all().order_by(Lower('name'))
+            self.fields["family_member"].queryset = family.person_set.all().order_by(
+                Lower("name")
+            )
             self.fields["name"].initial = user.person.name
             self.fields["phone"].initial = user.person.phone
             self.fields["age"].initial = user.person.age_years()
             self.fields["zip"].initial = user.person.zipcode
+            self.fields["email"].initial = user.person.email
             self.fields["name"].widget = forms.HiddenInput()
             self.fields["email"].widget = forms.HiddenInput()
             self.fields["phone"].widget = forms.HiddenInput()
@@ -69,7 +84,7 @@ class VolunteerRequestForm(forms.Form):
 
         self.helper = FormHelper()
         self.helper.form_method = "post"
-        
+
         self.helper.layout = Layout(
             Hidden("form_id", "volunteer_request", id="id_form_id"),
             Fieldset(
@@ -85,13 +100,24 @@ class VolunteerRequestForm(forms.Form):
                     Div(Field("info_whishes"), css_class="col-md-12"),
                     Div(Field("department_list"), css_class="col-md-12"),
                     Div(Field("activity_list"), css_class="col-md-12"),
-                        #css_class="col-md-12",
-                        #css_type="checkbox",
-                        #type="checkbox",
-                        #),
-                    Div(Field("email_token"), css_class="col-md-12", id="email-token-field"),
+                    Div(
+                        Field("email_token"),
+                        css_class="col-md-12",
+                        id="email-token-field",
+                    ),
                     css_class="row",
                 ),
             ),
             Submit("submit", "Opret", css_class="btn-success"),
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        family_member = cleaned_data.get("family_member")
+        if family_member:
+            cleaned_data["name"] = family_member.name
+            cleaned_data["email"] = family_member.email
+            cleaned_data["phone"] = family_member.phone
+            cleaned_data["age"] = family_member.age_years()
+            cleaned_data["zip"] = family_member.zipcode
+        return cleaned_data

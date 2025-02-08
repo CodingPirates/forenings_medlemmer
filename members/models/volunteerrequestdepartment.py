@@ -16,7 +16,6 @@ class VolunteerRequestDepartment(models.Model):
         "Department", verbose_name="Afdeling", on_delete=models.PROTECT
     )
     activity = models.ForeignKey(
-        # activity = models.ManyToManyField(
         "Activity",
         verbose_name="Aktivitet",
         blank=True,

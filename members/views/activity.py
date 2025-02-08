@@ -10,7 +10,7 @@ def activity_by_department(request, department_id):
         "activities": [
             {
                 "id": activity.id,
-                "name": activity.name # f"[{activity.start_date} - {activity.end_date}] {activity.name}",
+                "name": activity.name,  # f"[{activity.start_date} - {activity.end_date}] {activity.name}",
             }
             for activity in activities
         ]

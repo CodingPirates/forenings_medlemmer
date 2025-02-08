@@ -1,6 +1,5 @@
 {% extends 'members/base.html' %}
-<!--{% load crispy_forms_tags %}-->
-{% crispy form %}
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="alert alert-secondary">
       {% if not user.is_authenticated %}
@@ -27,13 +26,12 @@
 
         <form method="post" id="volunteer-request-form">
           {% csrf_token %}
-          {{ volunteer_request_form | crispy }} <!-- using crispy is making radio buttons after check box-->
-          <!-- 20241230 PLEASE READ: https://forum.djangoproject.com/t/crispy-tailwind-rendering-checkbox-multiple-as-radios/20774/2  -->
+          {{ volunteer_request_form | crispy }} 
           {% if not user.is_authenticated %}
             <button type="button" class="btn btn-secondary" id="generate-code-button">Generate Code and Send to Email</button>
             <div id="email-token-field" style="display: none;">
               <label for="id_email_token">Indtast den 6-cifrede kode sendt til din email</label>
-              <!--input type="text" id="id_email_token2" name="email_token" maxlength="6" class="form-control"-->
+              <input type="text" id="id_email_token" name="email_token" maxlength="6" class="form-control">
             </div>
           {% endif %}
           <button type="submit" class="btn btn-primary" id="submit-button" {% if not user.is_authenticated %}style="display: none;" disabled{% endif %}>Submit</button>
@@ -60,19 +58,20 @@
                     body: JSON.stringify({
                         email: document.getElementById('id_email').value
                     })
-                }).then(response => response.json()).then(data => {
+                })
+                .then(response => response.json())
+                .then(data => {
                     if (data.success) {
-                        alert('A 6-digit code has been sent to your email.');
-                        generateCodeButton.style.display = 'none';
                         emailTokenFieldContainer.style.display = 'block';
-                        emailTokenField.type = 'text';  // Make the field visible
-                        submitButton.style.display = 'inline-block';
+                        submitButton.style.display = 'block';
+                        submitButton.disabled = false;
                     } else {
-                        alert('Failed to send the code. Please try again.');
+                        alert('Failed to generate code. Please try again.');
                     }
-                }).catch(error => {
+                })
+                .catch(error => {
                     console.error('Error:', error);
-                    alert('Failed to send the code. Please try again.');
+                    alert('An error occurred. Please try again.');
                 });
             });
 

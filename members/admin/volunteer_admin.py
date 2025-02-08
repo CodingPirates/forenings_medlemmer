@@ -3,13 +3,7 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django import forms
 from django.db.models import Q
-
-from members.models import (
-    Volunteer,
-    Department,
-    AdminUserInformation,
-    Activity,
-)
+from members.models import Volunteer, Department, Activity, AdminUserInformation
 
 
 class VolunteerDepartmentListFilter(admin.SimpleListFilter):
@@ -70,7 +64,6 @@ class VolunteerAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if "department" in self.data:
-            print(f"*1")
             try:
                 department_id = int(self.data.get("department"))
                 self.fields["activity"].queryset = Activity.objects.filter(
@@ -81,18 +74,13 @@ class VolunteerAdminForm(forms.ModelForm):
             except (ValueError, TypeError):
                 pass  # invalid input from the client; ignore and fallback to empty Activity queryset
         elif self.instance.pk:
-            print(f"*2")
             self.fields["activity"].queryset = (
                 self.instance.department.activity_set.filter(
                     activitytype__id__in=["FORLØB", "ARRANGEMENT"]
                 ).order_by("name")
             )
-            print(f' activity: {self.fields["activity"].queryset}')
-            print(f" initial: {self.instance.activity}")
-            # self.fields["activity"].label_from_instance = self.label_from_instance
             self.fields["activity"].initial = self.instance.activity
         else:
-            print(f"*3")
             self.fields["activity"].queryset = (
                 Activity.objects.none()
             )  # Set to empty queryset initially
@@ -108,7 +96,7 @@ class VolunteerAdmin(admin.ModelAdmin):
         "get_person_name",
         "get_person_email",
         "department",
-        "activity",
+        "get_activity_name",
         "start_date",
         "end_date",
     )
@@ -126,7 +114,10 @@ class VolunteerAdmin(admin.ModelAdmin):
     )
 
     autocomplete_fields = [
-        "person", "department", "activity", ]
+        "person",
+        "department",
+        "activity",
+    ]
 
     actions = [
         "export_volunteer_info_csv",
@@ -184,15 +175,19 @@ class VolunteerAdmin(admin.ModelAdmin):
         else:
             departments = AdminUserInformation.get_departments_admin(request.user)
             return qs.filter(department__in=departments)
-    
+
     def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
-        queryset = queryset.filter(activity__activitytype_id__in=["FORLØB", "ARRANGEMENT"])
+        queryset, use_distinct = super().get_search_results(
+            request, queryset, search_term
+        )
+        queryset = queryset.filter(
+            Q(activity__activitytype_id__in=["FORLØB", "ARRANGEMENT"])
+            | Q(activity__isnull=True)
+        )
         return queryset, use_distinct
-    
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        '''
+        """
         # Only show departments that user can access
         if db_field.name == "department":
             if request.user.is_superuser or request.user.has_perm(
@@ -204,13 +199,13 @@ class VolunteerAdmin(admin.ModelAdmin):
                     adminuserinformation__user=request.user
                 )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-        '''
+        """
         if db_field.name == "activity":
             if "department" in request.GET:
                 department_id = request.GET.get("department")
                 kwargs["queryset"] = Activity.objects.filter(
                     department_id=department_id,
-                    activity__activitytype_id__in=["FORLØB", "ARRANGEMENT"]
+                    activity__activitytype_id__in=["FORLØB", "ARRANGEMENT"],
                 ).order_by("name")
             else:
                 kwargs["queryset"] = Activity.objects.none()
@@ -229,8 +224,10 @@ class VolunteerAdmin(admin.ModelAdmin):
     get_person_email.admin_order_field = "person__email"
 
     def get_activity_name(self, obj):
-        return obj.activity.name
-    
+        if obj.activity is not None:
+            return obj.activity.name
+        return ""
+
     get_activity_name.short_description = "Aktivitet"
     get_activity_name.admin_order_field = "activity__name"
 
