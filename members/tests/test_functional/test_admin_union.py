@@ -154,6 +154,7 @@ class UnionAdminTest(StaticLiveServerTestCase):
         prefs = {"download.default_directory": self.download_dir}
         chrome_options.add_experimental_option("prefs", prefs)
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--headless")
 
         self.browser = webdriver.Remote(
             command_executor="http://selenium:4444/wd/hub",
