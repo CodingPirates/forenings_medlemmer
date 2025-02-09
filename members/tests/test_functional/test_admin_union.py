@@ -262,7 +262,9 @@ class UnionAdminTest(StaticLiveServerTestCase):
             timeout -= 1
 
         # Verify the CSV content
-        self.assertTrue(os.path.exists(csv_file_path), f"'{csv_file_path}' file was not downloaded")
+        self.assertTrue(
+            os.path.exists(csv_file_path), f"'{csv_file_path}' file was not downloaded"
+        )
 
         with open(csv_file_path, newline="", encoding="utf-8-sig") as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=";")
