@@ -240,7 +240,9 @@ class UnionAdminTest(StaticLiveServerTestCase):
         if os.path.exists(csv_file_path):
             os.remove(csv_file_path)
 
-        self.assertFalse(os.path.exists(csv_file_path), "CSV file should have been removed")
+        self.assertFalse(
+            os.path.exists(csv_file_path), "CSV file should have been removed"
+        )
 
         # Test the "Exporter Foreningsinformationer" action
         # Select all unions
