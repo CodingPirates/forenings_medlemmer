@@ -240,6 +240,8 @@ class UnionAdminTest(StaticLiveServerTestCase):
         if os.path.exists(csv_file_path):
             os.remove(csv_file_path)
 
+        self.assertFalse(os.path.exists(csv_file_path), "CSV file should have been removed")
+
         # Test the "Exporter Foreningsinformationer" action
         # Select all unions
         self.browser.find_element(By.ID, "action-toggle").click()
@@ -249,7 +251,12 @@ class UnionAdminTest(StaticLiveServerTestCase):
         self.save_screenshot_and_html("export_union_info")
 
         # Wait for the file to be downloaded
-        time.sleep(5)
+        timeout = 20
+        while timeout > 0:
+            if os.path.exists(csv_file_path):
+                break
+            time.sleep(1)
+            timeout -= 1
 
         # Verify the CSV content
         self.assertTrue(os.path.exists(csv_file_path), "CSV file was not downloaded")
