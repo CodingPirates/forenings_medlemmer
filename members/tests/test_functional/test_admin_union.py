@@ -146,15 +146,18 @@ class UnionAdminTest(StaticLiveServerTestCase):
         self.union1.save()
 
         self.download_dir = os.path.join(os.getcwd(), "test-files")
-        print(f"Download dir: {self.download_dir}")
         if not os.path.exists(self.download_dir):
             os.mkdir(self.download_dir)
 
         chrome_options = webdriver.ChromeOptions()
-        prefs = {"download.default_directory": self.download_dir}
+        prefs = {
+            "download.default_directory": self.download_dir,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": True,
+        }
         chrome_options.add_experimental_option("prefs", prefs)
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--headless")
 
         self.browser = webdriver.Remote(
             command_executor="http://selenium:4444/wd/hub",
