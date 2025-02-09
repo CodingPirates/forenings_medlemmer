@@ -95,7 +95,17 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
     )
-    search_fields = ("name",)
+    search_fields = (
+        "name",
+        "email",
+        "address__streetname",
+        "address__housenumber",
+        "address__placename",
+        "address__zipcode",
+        "address__city",
+    )
+    search_help_text = "Du kan søge på forening (navn, adresse, email)"
+
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
@@ -218,7 +228,7 @@ class UnionAdmin(admin.ModelAdmin):
     waitinglist_count_link.admin_order_field = "waitinglist_count"
 
     def export_csv_union_info(self, request, queryset):
-        result_string = "Forening;Oprettelsdato;Lukkedato;"
+        result_string = "Forening;Email;Oprettelsdato;Lukkedato;"
         result_string += "formand-navn;formand-email;formand-tlf;"
         result_string += "næstformand-navn;næstformand-email;næstformand-tlf;"
         result_string += "kasserer-navn;kasserer-email;kasserer-tlf;"
@@ -226,6 +236,8 @@ class UnionAdmin(admin.ModelAdmin):
 
         for union in queryset:
             result_string += union.name
+            result_string += ";"
+            result_string += union.email
             result_string += ";"
             if union.founded_at is not None:
                 result_string += union.founded_at.strftime("%Y-%m-%d")
