@@ -145,7 +145,8 @@ class UnionAdminTest(StaticLiveServerTestCase):
         self.union1.secretary = self.person4
         self.union1.save()
 
-        self.download_dir = "/app/test-files"
+        self.download_dir = os.path.join(os.getcwd(), "test-files")
+        print(f"Download dir: {self.download_dir}")
         if not os.path.exists(self.download_dir):
             os.mkdir(self.download_dir)
 
@@ -253,7 +254,7 @@ class UnionAdminTest(StaticLiveServerTestCase):
         self.save_screenshot_and_html("export_union_info")
 
         # Wait for the file to be downloaded
-        timeout = 20
+        timeout = 5
         while timeout > 0:
             if os.path.exists(csv_file_path):
                 break
@@ -261,7 +262,7 @@ class UnionAdminTest(StaticLiveServerTestCase):
             timeout -= 1
 
         # Verify the CSV content
-        self.assertTrue(os.path.exists(csv_file_path), "CSV file was not downloaded")
+        self.assertTrue(os.path.exists(csv_file_path), f"'{csv_file_path}' file was not downloaded")
 
         with open(csv_file_path, newline="", encoding="utf-8-sig") as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=";")
