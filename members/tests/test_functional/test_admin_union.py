@@ -158,6 +158,7 @@ class UnionAdminTest(StaticLiveServerTestCase):
         }
         chrome_options.add_experimental_option("prefs", prefs)
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
 
         self.browser = webdriver.Remote(
             command_executor="http://selenium:4444/wd/hub",
