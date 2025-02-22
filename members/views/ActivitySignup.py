@@ -90,18 +90,6 @@ def ActivitySignup(request, activity_id, person_id=None):
     else:
         person = None
 
-    if not activity.open_invite:
-        """Make sure valid not expired invitation to event exists"""
-        try:
-            invitation = ActivityInvite.objects.get(
-                activity=activity, person=person, expire_dtm__gte=timezone.now()
-            )
-        except ActivityInvite.DoesNotExist:
-            view_only_mode = True  # not invited - switch to view mode
-            invitation = None
-    else:
-        invitation = None
-
     # signup_closed should default to False
     signup_closed = False
 
