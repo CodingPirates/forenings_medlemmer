@@ -38,7 +38,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
     family_participants = []  # participants from current family
     family_subscriptions = []  # waiting list subscriptions for current family
-    family_invites = [] # invites from current family
+    family_invites = []  # invites from current family
     if family:
         family_participants = [
             (act.person.id)
