@@ -2,6 +2,7 @@ from datetime import timedelta
 from django.db import models
 import members.models.emailtemplate
 from members.models.activity import Activity
+from members.models.waitinglist import WaitingList
 from django.utils import timezone
 
 
@@ -58,13 +59,11 @@ class Department(models.Model):
         on_delete=models.PROTECT,
     )
 
-    def no_members(self):
-        return self.member_set.count()
-
-    no_members.short_description = "Antal medlemmer"
-
     def __str__(self):
         return self.name
+
+    def waitinglist_count(self):
+        return WaitingList.objects.filter(department=self).count()
 
     def new_volunteer_email(self, volunteer_name):
         # First fetch department leaders email
