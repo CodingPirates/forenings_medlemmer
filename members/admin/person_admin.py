@@ -244,7 +244,7 @@ class PersonAdmin(admin.ModelAdmin):
     def anonymize_persons(self, request, queryset):
         class MassConfirmForm(forms.Form):
             confirmation = forms.BooleanField(
-                label="Jeg godkender at ovenstående personer anonymiseres",
+                label="Jeg godkender at ovenstående person anonymiseres",
                 required=True,
                 widget=forms.CheckboxInput(
                     attrs={"style": "color: blue; width: unset;"}
