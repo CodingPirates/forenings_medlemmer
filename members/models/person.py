@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.core.validators import RegexValidator
 from members.models.municipality import Municipality
 from members.utils.address import format_address
 from urllib.parse import quote_plus
@@ -52,7 +53,16 @@ class Person(models.Model):
     membertype = models.CharField(
         "Type", max_length=2, choices=MEMBER_TYPE_CHOICES, default=PARENT
     )
-    name = models.CharField("Navn", max_length=200)
+    name = models.CharField(
+        "Navn",
+        max_length=200,
+        validators=[
+            RegexValidator(
+                "(^[A-Za-zÆØÅæøå]{3,16})([ ]{0,1})([A-Za-zÆØÅæøå]{3,16})?([ ]{0,1})?([A-Za-zÆØÅæøå]{3,16})?([ ]{0,1})?([A-Za-zÆØÅæøå]{3,16})([ ]{0,1})?([A-Za-zÆØÅæøå]{3,16})$",
+                message="Indtast et gyldigt navn bestående af fornavn og minimum et efternavn.",
+            )
+        ],
+    )
     zipcode = models.CharField("Postnummer", max_length=4, blank=True)
     city = models.CharField("By", max_length=200, blank=True)
     streetname = models.CharField("Vejnavn", max_length=200, blank=True)
