@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from members.forms import ActivivtyInviteDeclineForm
 from members.models.activityinvite import ActivityInvite
+from members.models.activityparticipant import ActivityParticipant
 
 
 def DeclineInvitation(request, unique, invitation_id):
@@ -20,8 +21,15 @@ def DeclineInvitation(request, unique, invitation_id):
     if request.method == "POST":
         form = ActivivtyInviteDeclineForm(request.POST)
         if form.is_valid():
-            activity_invite.rejected_at = timezone.now()
-            activity_invite.save()
+            if ActivityParticipant.objects.filter(
+                activity=activity_invite.activity, person=activity_invite.person
+            ).exists():
+                return HttpResponseBadRequest(
+                    f"'{activity_invite.person}' deltager allerede i '{activity_invite.activity}' og kan ikke afvise invitationen."
+                )
+            else:
+                activity_invite.rejected_at = timezone.now()
+                activity_invite.save()
             return HttpResponseRedirect(reverse("activities"))
     else:
         form = ActivivtyInviteDeclineForm()
