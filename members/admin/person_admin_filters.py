@@ -213,6 +213,7 @@ class MunicipalityFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(municipality_id=self.value())
 
+
 class AnonymizedFilter(admin.SimpleListFilter):
     title = "Anonymiseret"
     parameter_name = "anonymized"
