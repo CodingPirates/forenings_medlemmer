@@ -72,9 +72,11 @@
           <td data-label="email">{{person.email}}</td>
           <td data-label="telefon">{{person.phone}}</td>
           <td data-label="Handling">
+            {% if not person.anonymized %}
               <a href="{% url 'person_update' person.id %}" class="button">
                 Redigér
               </a>
+            {% endif %}
           </td>
         </tr>
         {% endfor %}

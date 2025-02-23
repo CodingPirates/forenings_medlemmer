@@ -69,7 +69,6 @@ class ActivityInviteInline(admin.TabularInline):
     def get_readonly_fields(self, request, obj=None):
         if not request.user.is_superuser:
             return [
-                "activity",
                 "invite_dtm",
             ]
         else:
@@ -161,6 +160,11 @@ class VolunteerInline(admin.TabularInline):
 
 class WaitingListInline(admin.TabularInline):
     model = WaitingList
-    fields = ["on_waiting_list_since", "department", "number_on_waiting_list"]
+    fields = [
+        "on_waiting_list_since",
+        "department",
+        "number_on_waiting_list",
+        "added_at",
+    ]
     readonly_fields = fields
     extra = 0

@@ -90,22 +90,20 @@ def ActivitySignup(request, activity_id, person_id=None):
             except Member.DoesNotExist:
                 membership = False
 
+            """If invitation exists, fetch it"""
+            try:
+                invitation = ActivityInvite.objects.get(
+                    activity=activity, person=person, expire_dtm__gte=timezone.now()
+                )
+            except ActivityInvite.DoesNotExist:
+                invitation = None
+                if not activity.open_invite:
+                    view_only_mode = True  # not invited - switch to view mode
+
         except Person.DoesNotExist:
             raise Http404("Person not found on family")
     else:
         person = None
-
-    if not activity.open_invite:
-        """Make sure valid not expired invitation to event exists"""
-        try:
-            invitation = ActivityInvite.objects.get(
-                activity=activity, person=person, expire_dtm__gte=timezone.now()
-            )
-        except ActivityInvite.DoesNotExist:
-            view_only_mode = True  # not invited - switch to view mode
-            invitation = None
-    else:
-        invitation = None
 
     # signup_closed should default to False
     signup_closed = False
@@ -250,6 +248,8 @@ def ActivitySignup(request, activity_id, person_id=None):
         "signupform": signup_form,
         "signup_closed": signup_closed,
         "total_price": total_price,
+        "view_only_mode": view_only_mode,
+        "participating": participating,
         "union": union,
         "view_only_mode": view_only_mode,
     }
