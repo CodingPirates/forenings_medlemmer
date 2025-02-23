@@ -60,6 +60,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             if len(invitations) > 0:
                 family_invites.append(person.id)
 
+    invitation = None
     if family and person_id:
         try:
             person = family.person_set.get(pk=person_id)
@@ -81,7 +82,6 @@ def ActivitySignup(request, activity_id, person_id=None):
                     activity=activity, person=person, expire_dtm__gte=timezone.now()
                 )
             except ActivityInvite.DoesNotExist:
-                invitation = None
                 if not activity.open_invite:
                     view_only_mode = True  # not invited - switch to view mode
 
