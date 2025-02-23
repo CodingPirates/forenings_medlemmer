@@ -114,6 +114,7 @@ class TestModelFamily(TestCase):
         PersonFactory(family=family)
 
         with self.assertRaises(
-            Exception, msg="Alle personer i en familie skal være anonymiseret, for at familien kan anonymiseres."
+            Exception,
+            msg="Alle personer i en familie skal være anonymiseret, for at familien kan anonymiseres.",
         ):
             family.anonymize()
