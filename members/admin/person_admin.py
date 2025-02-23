@@ -1,7 +1,9 @@
 import codecs
+from django import forms
 from django.contrib import admin
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
 from django.utils.html import format_html
 
 from members.models import (
@@ -18,6 +20,7 @@ from .person_admin_filters import (
     PersonWaitinglistListFilter,
     VolunteerListFilter,
     MunicipalityFilter,
+    AnonymizedFilter,
 )
 
 from .inlines import (
@@ -53,6 +56,7 @@ class PersonAdmin(admin.ModelAdmin):
         PersonParticipantActiveListFilter,
         PersonParticipantCurrentYearListFilter,
         PersonParticipantLastYearListFilter,
+        AnonymizedFilter,
     )
     search_fields = ("name", "family__email", "notes")
     autocomplete_fields = ["municipality"]
@@ -70,6 +74,20 @@ class PersonAdmin(admin.ModelAdmin):
         WaitingListInline,
         EmailItemInline,
     ]
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+
+        if request.user.has_perm("members.anonymize_persons"):
+            actions["anonymize_persons"] = (
+                lambda modeladmin, request, queryset: self.anonymize_persons(
+                    request, queryset
+                ),
+                "anonymize_persons",
+                self.anonymize_persons.short_description,
+            )
+
+        return actions
 
     def family_url(self, item):
         return format_html(
@@ -222,6 +240,64 @@ class PersonAdmin(admin.ModelAdmin):
         return response
 
     export_csv.short_description = "CSV Export"
+
+    def anonymize_persons(self, request, queryset):
+        class MassConfirmForm(forms.Form):
+            confirmation = forms.BooleanField(
+                label="Jeg godkender at ovenstående person anonymiseres",
+                required=True,
+                widget=forms.CheckboxInput(
+                    attrs={"style": "color: blue; width: unset;"}
+                ),
+            )
+
+        if not request.user.has_perm("members.anonymize_persons"):
+            self.message_user(
+                request, "Du har ikke tilladelse til at anonymisere personer."
+            )
+            return HttpResponseRedirect(request.get_full_path())
+
+        if queryset.count() > 1:
+            self.message_user(
+                request, "Kun én person kan anonymiseres ad gangen.", level="error"
+            )
+            return HttpResponseRedirect(request.get_full_path())
+
+        for person in queryset:
+            if person.anonymized:
+                self.message_user(
+                    request,
+                    "Den valgte person er allerede anonymiseret.",
+                    level="error",
+                )
+                return HttpResponseRedirect(request.get_full_path())
+
+        persons = queryset
+
+        context = admin.site.each_context(request)
+        context["persons"] = persons
+        context["queryset"] = queryset
+
+        if request.method == "POST" and "confirmation" in request.POST:
+            form = MassConfirmForm(request.POST)
+
+            if form.is_valid():
+                context["mass_confirmation_form"] = form
+                for person in queryset:
+                    person.anonymize(request)
+
+                self.message_user(request, "Personen er blevet anonymiseret.")
+                return HttpResponseRedirect(request.get_full_path())
+
+        context["mass_confirmation_form"] = MassConfirmForm()
+
+        return render(
+            request,
+            "admin/anonymize_persons.html",
+            context,
+        )
+
+    anonymize_persons.short_description = "Anonymisér person"
 
     # Only view persons related to users department (all family, via participant, waitinglist & invites)
     def get_queryset(self, request):

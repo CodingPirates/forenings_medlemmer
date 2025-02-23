@@ -20,7 +20,7 @@ def DepartmentSignup(request):
         family = user_to_family(request.user)
         children = [
             {"person": child, "waitinglists": WaitingList.get_by_child(child)}
-            for child in family.get_children()
+            for child in family.get_children().filter(anonymized=False)
         ]
         for child in children:
             child["departments_is_waiting"] = [
