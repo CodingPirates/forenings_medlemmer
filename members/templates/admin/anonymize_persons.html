@@ -1,0 +1,82 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+{{mass_confirmation_form.media}}
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<script type="text/javascript" src="{% static "admin/js/core.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/js/vendor/jquery/jquery.min.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/js/jquery.init.js" %}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' 'members' %}">Members</a>
+&rsaquo; <a href="">Personer</a>
+</div>
+{% endblock %}
+
+{% block content_title %}<h1>Anonymisér person</h1>{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <form action="" method="post">
+    <div>
+      <fieldset class="module aligned">
+        <h2>VIGTIGT!</h2>
+        <div class="description">
+          <p><b>Du er ved at anonymisere én person.</b></p>
+          <p>Dette betyder at de fleste informationer om personen slettes, primært bevares information
+            om vedkommendes kommune, således at der stadig vil kunne trækkes statistik ud senere.</p>
+        </div>
+
+        {% csrf_token %}
+        <input type="hidden" name="action" value="anonymize_persons">
+        <input type="hidden" name="select_across" value="0">
+        <input type="hidden" name="index" value="0">
+        {% for obj in queryset %}
+          <input type="hidden" name="_selected_action" value="{{ obj.pk }}" />
+        {% endfor %}
+
+        <h2>Bekræft person</h2>
+        <div class="description">
+          <p>Følgende ({{persons.count}}) person vil blive anonymiseret:</p>
+          <p>
+            <ul>
+              {% for person in persons %}
+              <li>{{person.name}}</li>
+              {% endfor %}
+            </ul>
+          </p>
+          <p style="color: red; font-weight: bold; font-size: large;">Dette kan ikke fortrydes!</p>
+        </div>
+
+        <div class="submit-row">
+          <input type="checkbox" id="id_confirmation" name="confirmation" value="1" required>
+            <label name="confirmation" for="id_confirmation" style="width: unset">Jeg godkender at ovenstående person anonymiseres</label>
+          </input>
+        </div>
+
+        <div class="submit-row">
+          <p class="deletelink-box"><a href="#" id="abort" style="background-color: rgb(199, 183, 0); color: black; float: right;"class="deletelink">Fortryd</a></p>
+          <p><input class="default" style="background-color: red; color: white; float: right;" type="submit" value="Anonymisér"></p>
+        </div>
+      </fieldset>
+    </div>
+  </form>
+
+</div>
+
+<script type="text/javascript">
+    document.getElementById("abort").addEventListener("click", () => {
+        history.back();
+    });
+</script>
+
+{% endblock %}
