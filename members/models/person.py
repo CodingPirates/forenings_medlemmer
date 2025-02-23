@@ -192,7 +192,6 @@ class Person(models.Model):
                 )
                 self.dawa_id = address["id"]
                 self.save()
-                logger.info(f"Updated address for {self.name}")
 
             except Exception:
                 self.address_invalid = True
@@ -208,8 +207,6 @@ class Person(models.Model):
 
         if self.anonymized:
             raise ValidationError("Personen er allerede anonymiseret.")
-
-        logger.info(f"Anonymizing person {self.name}")
 
         orig_email = self.email
 
