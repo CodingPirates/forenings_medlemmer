@@ -85,3 +85,36 @@ class TestModelFamily(TestCase):
     # def test_get_abosolute_url(self):
     #     family = FamilyFactory()
     #     self.assertEqual("family_form", family.get_absolute_url())
+
+    def create_request_with_permission(self, permission):
+        return type(
+            "Request",
+            (object,),
+            {
+                "user": type(
+                    "User",
+                    (object,),
+                    {"has_perm": lambda self, perm: perm == permission},
+                )()
+            },
+        )()
+
+    def test_anonymize_family_with_no_members(self):
+        family = FamilyFactory(dont_send_mails=False)
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        family.anonymize(request)
+
+        self.assertEquals(family.email, f"anonym-{family.id}@codingpirates.dk")
+        self.assertTrue(family.dont_send_mails)
+        self.assertTrue(family.anonymized)
+
+    def test_cannot_anonymize_family_with_non_anonymized_members(self):
+        family = FamilyFactory()
+        PersonFactory(family=family)
+
+        with self.assertRaises(
+            Exception,
+            msg="Alle personer i en familie skal være anonymiseret, for at familien kan anonymiseres.",
+        ):
+            family.anonymize()
