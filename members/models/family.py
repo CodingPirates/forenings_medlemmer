@@ -68,7 +68,7 @@ class Family(models.Model):
 
         non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
         if non_anonymized_persons_in_family.count() != 0:
-            raise Exception("Cannot anonymize family with non-anonymized persons.")
+            raise Exception("Alle personer i en familie skal være anonymiseret, for at familien kan anonymiseres.")
 
         self.email = f"anonym-{self.id}@codingpirates.dk"
         self.dont_send_mails = True
