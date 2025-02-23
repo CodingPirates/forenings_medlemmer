@@ -18,6 +18,10 @@ def DeclineInvitation(request, unique, invitation_id):
         ActivityInvite, pk=invitation_id, person__family__unique=unique
     )
 
+    is_participating = ActivityParticipant.objects.filter(
+        activity=activity_invite.activity, person=activity_invite.person
+    ).exists()
+
     if request.method == "POST":
         form = ActivivtyInviteDeclineForm(request.POST)
         if form.is_valid():
@@ -34,5 +38,9 @@ def DeclineInvitation(request, unique, invitation_id):
     else:
         form = ActivivtyInviteDeclineForm()
 
-    context = {"activity_invite": activity_invite, "form": form}
+    context = {
+        "activity_invite": activity_invite,
+        "form": form,
+        "is_participating": is_participating,
+    }
     return render(request, "members/decline_activivty_invite.html", context)
