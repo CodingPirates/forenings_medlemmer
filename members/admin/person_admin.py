@@ -20,6 +20,7 @@ from .person_admin_filters import (
     PersonWaitinglistListFilter,
     VolunteerListFilter,
     MunicipalityFilter,
+    AnonymizedFilter,
 )
 
 from .inlines import (
@@ -55,6 +56,7 @@ class PersonAdmin(admin.ModelAdmin):
         PersonParticipantActiveListFilter,
         PersonParticipantCurrentYearListFilter,
         PersonParticipantLastYearListFilter,
+        AnonymizedFilter,
     )
     search_fields = ("name", "family__email", "notes")
     autocomplete_fields = ["municipality"]
