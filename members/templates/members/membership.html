@@ -112,12 +112,14 @@
                     </td>
                     <td>
                       {% for person in activity.persons %}
-                        <a
-                            class="button-success"
-                            href="{% url 'activity_signup' activity.id person.id %}"
-                        >
-                          Tilmeld {{ person.firstname }}
-                        </a>
+                        {% if not person.anonymized %}
+                          <a
+                              class="button-success"
+                              href="{% url 'activity_signup' activity.id person.id %}"
+                          >
+                            Tilmeld {{ person.firstname }}
+                          </a>
+                        {% endif %}
                       {% endfor %}
                     </td>
                   </tr>
