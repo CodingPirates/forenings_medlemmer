@@ -116,12 +116,20 @@
               {% endfor %}
             {% else %}
               {% for child in family.get_children %}
-                {% if child.id in family_subscriptions %}
+                {% if child.id in family_invites and child.id not in family_participants %}
+                  <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
+                    Tilmeld {{ child.firstname }}
+                  </a>
+                {% elif child.id in family_subscriptions %}
                   {{ child.firstname }} er opskrevet&nbsp;&nbsp;
                 {% else %}
-                  <a class="button" href="{% url 'waiting_list_subscription' child.id activity.department.id 'subscribe' %}">
-                    Opskriv {{ child.firstname }} på venteliste
-                  </a>
+                  {% if child.id not in family_participants %}
+                    <a class="button" href="{% url 'waiting_list_subscription' child.id activity.department.id 'subscribe' %}">
+                      Opskriv {{ child.firstname }} på venteliste
+                    </a>
+                  {% else %}
+                    {{ child.firstname }} er tilmeldt
+                  {% endif %}
                 {% endif %}
               {% endfor %}
             {% endif %}

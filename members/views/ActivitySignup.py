@@ -38,6 +38,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
     family_participants = []  # participants from current family
     family_subscriptions = []  # waiting list subscriptions for current family
+    family_invites = []  # invites from current family
     if family:
         family_participants = [
             (act.person.id)
@@ -46,19 +47,18 @@ def ActivitySignup(request, activity_id, person_id=None):
             )
         ]
 
-        for child in family.get_children():
-            subscriptions = WaitingList.objects.filter(
-                department=activity.department, person=child
-            )
-            if len(subscriptions) > 0:
-                family_subscriptions.append(child.id)
-
         for person in family.get_persons():
             subscriptions = WaitingList.objects.filter(
                 department=activity.department, person=person
             )
             if len(subscriptions) > 0:
                 family_subscriptions.append(person.id)
+
+            invitations = ActivityInvite.objects.filter(
+                activity=activity, person=person
+            )
+            if len(invitations) > 0:
+                family_invites.append(person.id)
 
     if family and person_id:
         try:
@@ -75,22 +75,20 @@ def ActivitySignup(request, activity_id, person_id=None):
             except ActivityParticipant.DoesNotExist:
                 participating = False  # this was expected - if not signed up yet
 
+            """If invitation exists, fetch it"""
+            try:
+                invitation = ActivityInvite.objects.get(
+                    activity=activity, person=person, expire_dtm__gte=timezone.now()
+                )
+            except ActivityInvite.DoesNotExist:
+                invitation = None
+                if not activity.open_invite:
+                    view_only_mode = True  # not invited - switch to view mode
+
         except Person.DoesNotExist:
             raise Http404("Person not found on family")
     else:
         person = None
-
-    if not activity.open_invite:
-        """Make sure valid not expired invitation to event exists"""
-        try:
-            invitation = ActivityInvite.objects.get(
-                activity=activity, person=person, expire_dtm__gte=timezone.now()
-            )
-        except ActivityInvite.DoesNotExist:
-            view_only_mode = True  # not invited - switch to view mode
-            invitation = None
-    else:
-        invitation = None
 
     # signup_closed should default to False
     signup_closed = False
@@ -222,6 +220,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         "participating": participating,
         "family_participants": family_participants,
         "family_subscriptions": family_subscriptions,
+        "family_invites": family_invites,
         "union": union,
     }
     return render(request, "members/activity_signup.html", context)
