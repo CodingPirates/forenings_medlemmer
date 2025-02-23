@@ -244,7 +244,16 @@ class Person(models.Model):
 
         self.family.anonymize_if_all_persons_anonymized(request)
 
-        # anonymize user if it exists, there might be multiple users with the same email address
+        # anonymize sent emails
+        email_items = self.emailitem_set.all()
+        for email_item in email_items:
+            email_item.subject = "Anonymiseret"
+            email_item.body_text = ""
+            email_item.body_html = ""
+            email_item.receiver = ""
+            email_item.save()
+
+        # anonymize Django user if exists, there might be multiple users with the same email address
         users = User.objects.filter(email__exact=orig_email)
         if users.exists():
             for user in users:

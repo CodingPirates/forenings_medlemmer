@@ -209,3 +209,21 @@ class TestModelPerson(TestCase):
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_active)
+
+    def test_anonymize_person_with_sent_emails(self):
+        person = PersonFactory()
+        email = person.emailitem_set.create(
+            receiver=person.email, subject="Test email", body_text="Test email body"
+        )
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person.anonymize(request)
+
+        self.assertTrue(person.anonymized)
+
+        # retrieve updated email from database, and verify that email is anonymized
+        email = person.emailitem_set.get(pk=email.pk)
+
+        self.assertEqual(email.subject, "Anonymiseret")
+        self.assertEqual(email.body_text, "")
+        self.assertEqual(email.receiver, "")
