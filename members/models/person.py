@@ -1,7 +1,10 @@
+import random
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from members.models.municipality import Municipality
+from django.core.exceptions import PermissionDenied, ValidationError
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
@@ -20,7 +23,14 @@ class Person(models.Model):
                 "view_full_address",
                 "Can view persons full address + phonenumber + email",
             ),
-            ("view_all_persons", "Can view persons not related to department"),
+            (
+                "view_all_persons",
+                "Can view persons not related to department",
+            ),
+            (
+                "anonymize_persons",
+                "Can anonymize persons",
+            ),
         )
 
     PARENT = "PA"
@@ -60,7 +70,7 @@ class Person(models.Model):
     floor = models.CharField("Etage", max_length=10, blank=True)
     door = models.CharField("Dør", max_length=5, blank=True)
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
-    municipality = municipality = models.ForeignKey(
+    municipality = models.ForeignKey(
         Municipality,
         on_delete=models.RESTRICT,
         blank=True,
@@ -94,6 +104,7 @@ class Person(models.Model):
         default=None,
     )
     address_invalid = models.BooleanField("Ugyldig adresse", default=False)
+    anonymized = models.BooleanField("Anonymiseret", default=False)
 
     def __str__(self):
         return self.name
@@ -181,13 +192,81 @@ class Person(models.Model):
                 )
                 self.dawa_id = address["id"]
                 self.save()
-                logger.info(f"Updated address for {self.name}")
 
             except Exception:
                 self.address_invalid = True
                 self.save()
 
     # TODO: Move to dawa_data in utils
+
+    def anonymize(self, request):
+        if not request.user.has_perm("members.anonymize_persons"):
+            raise PermissionDenied(
+                "Du har ikke tilladelse til at anonymisere personer."
+            )
+
+        if self.anonymized:
+            raise ValidationError("Personen er allerede anonymiseret.")
+
+        orig_email = self.email
+
+        self.name = "Anonymiseret"
+        self.zipcode = ""
+        self.city = ""
+        self.streetname = ""
+        self.housenumber = ""
+        self.floor = ""
+        self.door = ""
+        self.dawa_id = ""
+        self.longitude = None
+        self.latitude = None
+        self.placename = ""
+        self.email = ""
+        self.phone = ""
+
+        if self.birthday:
+            original_birthday = self.birthday
+
+            # Make sure we don't end up with the same birthday
+            while self.birthday == original_birthday:
+                self.birthday = self.birthday.replace(day=random.randint(1, 28))
+
+        self.notes = ""
+        self.address_invalid = (
+            True  # don't try to update address for anonymized persons
+        )
+        self.anonymized = True
+        self.save()
+
+        # Remove person from all waiting lists
+        for waiting_list in self.waitinglist_set.all():
+            waiting_list.delete()
+
+        self.family.anonymize_if_all_persons_anonymized(request)
+
+        # anonymize sent emails
+        email_items = self.emailitem_set.all()
+        for email_item in email_items:
+            email_item.subject = "Anonymiseret"
+            email_item.body_text = ""
+            email_item.body_html = ""
+            email_item.receiver = ""
+            email_item.save()
+
+        # anonymize Django user if exists, there might be multiple users with the same email address
+        users = User.objects.filter(email__exact=orig_email)
+        if users.exists():
+            for user in users:
+                user.username = f"anonymized-{user.id}"
+                user.first_name = "Anonymiseret"
+                user.last_name = ""
+                user.email = f"{user.username}@localhost"
+                user.is_superuser = False
+                user.is_staff = False
+                user.is_active = False
+                user.save()
+        else:
+            pass  # no user accounts found for this person
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"
