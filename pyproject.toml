@@ -6,6 +6,7 @@ target-version = ['py310', 'py311']
 omit = ["*/tests/*", "members/migrations"]
 
 [tool.poetry]
+package-mode = false
 name = "forenings_medlemmer"
 version = "1.2"
 description = "Forenings system for Coding Pirates"
