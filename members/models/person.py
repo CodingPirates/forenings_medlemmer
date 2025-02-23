@@ -58,7 +58,7 @@ class Person(models.Model):
         max_length=200,
         validators=[
             RegexValidator(
-                "(^[A-Za-zÆØÅæøå]{3,16})([ ]{0,1})([A-Za-zÆØÅæøå]{3,16})?([ ]{0,1})?([A-Za-zÆØÅæøå]{3,16})?([ ]{0,1})?([A-Za-zÆØÅæøå]{3,16})([ ]{0,1})?([A-Za-zÆØÅæøå]{3,16})$",
+                '^(?!.*[:;,"[\]{}*&^%$#@!_+=\/\\\\<>|])\S+\s+\S+.*$',
                 message="Indtast et gyldigt navn bestående af fornavn og minimum et efternavn.",
             )
         ],
