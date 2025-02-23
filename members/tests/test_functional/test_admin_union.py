@@ -1,7 +1,5 @@
 import os
 import socket
-import time
-import csv
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import Client
