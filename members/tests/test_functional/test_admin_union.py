@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from members.models import Union, Address, Person, Family
+from members.admin.union_admin import generate_union_csv
 
 
 def get_select_element_by_onchange(browser, index):
@@ -250,90 +251,23 @@ class UnionAdminTest(StaticLiveServerTestCase):
             os.path.exists(csv_file_path), "CSV file should have been removed"
         )
 
-        # Test the "Exporter Foreningsinformationer" action
-        # Select all unions
-        self.browser.find_element(By.ID, "action-toggle").click()
-        action_select = Select(self.browser.find_element(By.NAME, "action"))
-        action_select.select_by_visible_text("Exporter Foreningsinformationer")
-        self.browser.find_element(By.NAME, "index").click()
-        self.save_screenshot_and_html("export_union_info")
-
-        # Wait for the file to be downloaded
-        timeout = 5
-        while timeout > 0:
-            if os.path.exists(csv_file_path):
-                break
-            time.sleep(1)
-            timeout -= 1
-
-        # Verify the CSV content
-        self.assertTrue(
-            os.path.exists(csv_file_path), f"'{csv_file_path}' file was not downloaded"
+    def test_generate_union_csv(self):
+        # test the "Exporter Foreningsinformationer" action
+        queryset = Union.objects.all()
+        result_string = generate_union_csv(queryset)
+        expected_csv_content = (
+            "Forening;Email;Oprettelsdato;Lukkedato;"
+            "formand-navn;formand-email;formand-tlf;"
+            "næstformand-navn;næstformand-email;næstformand-tlf;"
+            "kasserer-navn;kasserer-email;kasserer-tlf;"
+            "sekretær-navn;sekretær-email;sekretær-tlf\n"
+            "Union1;union1@example.com;2023-01-01;2023-12-31;"
+            "person1;person1@example.com;12345678;"
+            "person2;person2@example.com;87654321;"
+            "person3;person3@example.com;11223344;"
+            "person4;person4@example.com;44332211\n"
+            "Union2;union2@example.com;2023-02-01;2023-11-30;"
+            ";;;;;;;;;;;\n"
         )
 
-        with open(csv_file_path, newline="", encoding="utf-8-sig") as csvfile:
-            csv_reader = csv.reader(csvfile, delimiter=";")
-            rows = list(csv_reader)
-            self.assertEqual(
-                rows[0],
-                [
-                    "Forening",
-                    "Email",
-                    "Oprettelsdato",
-                    "Lukkedato",
-                    "formand-navn",
-                    "formand-email",
-                    "formand-tlf",
-                    "næstformand-navn",
-                    "næstformand-email",
-                    "næstformand-tlf",
-                    "kasserer-navn",
-                    "kasserer-email",
-                    "kasserer-tlf",
-                    "sekretær-navn",
-                    "sekretær-email",
-                    "sekretær-tlf",
-                ],
-            )
-            self.assertEqual(
-                rows[1],
-                [
-                    "Union1",
-                    "union1@example.com",
-                    "2023-01-01",
-                    "2023-12-31",
-                    "person1",
-                    "person1@example.com",
-                    "12345678",
-                    "person2",
-                    "person2@example.com",
-                    "87654321",
-                    "person3",
-                    "person3@example.com",
-                    "11223344",
-                    "person4",
-                    "person4@example.com",
-                    "44332211",
-                ],
-            )
-            self.assertEqual(
-                rows[2],
-                [
-                    "Union2",
-                    "union2@example.com",
-                    "2023-02-01",
-                    "2023-11-30",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                ],
-            )
+        self.assertEqual(result_string, expected_csv_content)
