@@ -23,18 +23,6 @@ class ActivityInviteInline(admin.TabularInline):
     extra = 0
     can_delete = False
     raw_id_fields = ("activity",)
-    # The max_num attribute in Django's TabularInline or StackedInline classes
-    # is used to specify the maximum number of inline forms that can be
-    # displayed or added for a related model.
-    # Here is a detailed explanation of the max_num attribute:
-    # Purpose: It limits the number of inline forms that can be added for a
-    # related model in the Django admin interface.
-    # Usage: When set to 0, it effectively prevents the addition of new inline
-    # forms. This is useful when you want to display existing related objects but
-    # do not want to allow the creation of new ones through the inline interface.
-    # Default Behavior: If not specified, Django allows adding as many inline forms as needed.
-
-    max_num = 0
 
     fieldsets = (
         (
@@ -81,7 +69,6 @@ class ActivityInviteInline(admin.TabularInline):
     def get_readonly_fields(self, request, obj=None):
         if not request.user.is_superuser:
             return [
-                "activity",
                 "invite_dtm",
             ]
         else:
