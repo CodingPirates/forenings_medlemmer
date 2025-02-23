@@ -161,6 +161,11 @@ class VolunteerInline(admin.TabularInline):
 
 class WaitingListInline(admin.TabularInline):
     model = WaitingList
-    fields = ["on_waiting_list_since", "department", "number_on_waiting_list"]
+    fields = [
+        "on_waiting_list_since",
+        "department",
+        "number_on_waiting_list",
+        "added_at",
+    ]
     readonly_fields = fields
     extra = 0
