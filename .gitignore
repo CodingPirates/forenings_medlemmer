@@ -12,7 +12,6 @@ test-screens
 members.db
 *.bak
 .vs/
-test-files
 
 # MacOS temp file
 .DS_Store

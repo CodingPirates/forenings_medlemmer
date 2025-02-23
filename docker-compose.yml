@@ -4,7 +4,6 @@ services:
     command: "${SERVER_COMMAND} 0.0.0.0:${PORT}"
     volumes:
       - .:/app
-      - ./test-files:/app/test-files
     ports:
       - "${PORT}:${PORT}"
     depends_on:
@@ -61,8 +60,6 @@ services:
       - webnet
     ports:
       - "4444:4444"
-    volumes:
-      - ./test-files:/app/test-files
 
 volumes:
   database:

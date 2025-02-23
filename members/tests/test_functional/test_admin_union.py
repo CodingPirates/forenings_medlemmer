@@ -144,13 +144,8 @@ class UnionAdminTest(StaticLiveServerTestCase):
         self.union1.secretary = self.person4
         self.union1.save()
 
-        self.download_dir = os.path.join(os.getcwd(), "test-files")
-        if not os.path.exists(self.download_dir):
-            os.mkdir(self.download_dir)
-
         chrome_options = webdriver.ChromeOptions()
         prefs = {
-            "download.default_directory": self.download_dir,
             "download.prompt_for_download": False,
             "download.directory_upgrade": True,
             "safebrowsing.enabled": True,
@@ -239,15 +234,6 @@ class UnionAdminTest(StaticLiveServerTestCase):
 
         # Reset filter by navigating back to the main page
         self.browser.find_element(By.LINK_TEXT, "Foreninger").click()
-
-        # Delete the existing CSV file if it exists
-        csv_file_path = os.path.join(self.download_dir, "foreningsoversigt.csv")
-        if os.path.exists(csv_file_path):
-            os.remove(csv_file_path)
-
-        self.assertFalse(
-            os.path.exists(csv_file_path), "CSV file should have been removed"
-        )
 
     def test_generate_union_csv(self):
         # test the "Exporter Foreningsinformationer" action
