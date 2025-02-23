@@ -289,9 +289,15 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     participating.admin_order_field = "is_participating"
 
     def export_csv_invitation_info(self, request, queryset):
-        result_string = """"Forening"; "Afdeling"; "Aktivitet"; "Deltager";\
-            "Deltager-email"; "Familie-email"; "Pris"; "Pris note"; "Ekstra email info" ;\
-            "Deltager i aktiviteten"; "Invitationsdato"; "Udløbsdato"; "Afslåetdato"\n"""
+        def handle_quote(str, sep):
+            return '"' + str.replace('"', '""') + '"' + sep
+
+        result_string = (
+            '"Forening"; "Afdeling"; "Aktivitet"; "Deltager"; '
+            '"Deltager-email"; "Familie-email"; "Pris"; "Pris note"; '
+            '"Ekstra email info" ;"Deltager i aktiviteten"; '
+            '"Invitationsdato"; "Udløbsdato"; "Afslåetdato"\n'
+        )
 
         for invitation in queryset:
             participate = (
@@ -313,19 +319,19 @@ class ActivityInviteAdmin(admin.ModelAdmin):
             )
 
             result_string += (
-                f"{invitation.activity.department.union.name};"
-                f"{invitation.activity.department.name};"
-                f"{invitation.activity.name};"
-                f"{invitation.person.name};"
-                f"{invitation.person.email};"
-                f"{invitation.person.family.email};"
-                f"{str(invitation.price_in_dkk)};"
-                '"' + invitation.price_note.replace('"', '""') + '";'
-                '"' + invitation.extra_email_info.replace('"', '""') + '";'
-                f"{participate};"
-                f'{invitation.invite_dtm.strftime("%Y-%m-%d")};'
-                f"{expire_date};"
-                f"{rejected_date}\n"
+                handle_quote(invitation.activity.department.union.name, ";")
+                + handle_quote(invitation.activity.department.name, ";")
+                + handle_quote(invitation.activity.name, ";")
+                + handle_quote(invitation.person.name, ";")
+                + handle_quote(invitation.person.email, ";")
+                + handle_quote(invitation.person.family.email, ";")
+                + handle_quote(str(invitation.price_in_dkk), ";")
+                + handle_quote(invitation.price_note, ";")
+                + handle_quote(invitation.extra_email_info, ";")
+                + handle_quote(participate, ";")
+                + handle_quote(invitation.invite_dtm.strftime("%Y-%m-%d"), ";")
+                + handle_quote(expire_date, ";")
+                + handle_quote(rejected_date, "\n")
             )
         response = HttpResponse(
             f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
