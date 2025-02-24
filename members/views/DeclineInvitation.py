@@ -31,6 +31,10 @@ def DeclineInvitation(request, unique, invitation_id):
                 return HttpResponseBadRequest(
                     f"'{activity_invite.person}' deltager allerede i '{activity_invite.activity}' og kan ikke afvise invitationen."
                 )
+            elif activity_invite.rejected_at is not None:
+                return HttpResponseBadRequest(
+                    f"Invitationen til  {activity_invite.person} for '{activity_invite.activity}' er allerede afvist."
+                )
             else:
                 activity_invite.rejected_at = timezone.now()
                 activity_invite.save()
