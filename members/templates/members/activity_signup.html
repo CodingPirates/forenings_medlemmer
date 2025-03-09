@@ -1,6 +1,12 @@
 {% extends "members/base.html" %}
 {% load crispy_forms_tags %}
+{% crispy signupform %}}
 {% block content %}
+  <script>
+    function openConsentPopup() {
+      window.open("{% url 'consent_popup' %}", "ConsentPopup", "width=600,height=400,scrollbars=yes");
+    }
+  </script>
     <div class="container-fluid">
           <h1>{{activity.department.name}}: <small>{{activity.name}}</small></h1>
           <p>
@@ -82,6 +88,7 @@
           </p>
         </div>
       </div>
+
       {% if not view_only_mode %}
       <hr>
       {% crispy signupform %}

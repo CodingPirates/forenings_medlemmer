@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coding Pirates Privatlivspolitik</title>
+</head>
+<body>
+    <h1>Coding Pirates Privatlivspolitik</h1>
+    <p>Gyldig fra {{ consent.released_at|date:"Y-m-d H:i:s" }}</p>
+    <hr>
+    <h2>{{ consent.title|safe }}</h2>
+    <hr>
+    <div>{{ consent.text|safe }}</div>
+    <hr>
+</body>
+</html>
