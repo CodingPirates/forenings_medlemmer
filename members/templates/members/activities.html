@@ -309,10 +309,10 @@
                 <th>Aktivitet</th>
                 <th>Afdeling</th>
                 <th>Dato</th>
+                <th>Pris</th>
               </tr>
             </thead>
             <tbody>
-
                 {% for participation in participating %}
                   <tr>
                     <td>{{ participation.person.name }}</td>
@@ -336,6 +336,9 @@
                       {% if participation.activity.start_date != participation.activity.end_date %}
                       - {{ participation.activity.end_date }}
                       {% endif %}
+                    </td>
+                    <td>
+                      {{ participation.price_in_dkk }} kr.
                     </td>
                   </tr>
                 {% endfor %}

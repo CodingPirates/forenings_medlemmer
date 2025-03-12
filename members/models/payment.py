@@ -33,6 +33,9 @@ class Payment(models.Model):
     activityparticipant = models.ForeignKey(
         "ActivityParticipant", blank=True, null=True, on_delete=models.PROTECT
     )  # unlink if failed and new try is made
+    member = models.ForeignKey(
+        "Member", blank=True, null=True, on_delete=models.PROTECT
+    )
     person = models.ForeignKey(
         "Person", blank=True, null=True, on_delete=models.PROTECT
     )
