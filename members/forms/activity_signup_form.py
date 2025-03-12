@@ -44,6 +44,7 @@ class ActivitySignupForm(forms.Form):
                             Div(
                                 "photo_permission",
                                 "read_conditions",
+                                "consent",
                                 css_class="col-md-6",
                             ),
                             css_class="row",
@@ -74,7 +75,9 @@ class ActivitySignupForm(forms.Form):
         required=False,
     )
     photo_permission = forms.ChoiceField(
-        label="Må Coding Pirates tage og bruge billeder og videoer af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)",
+        label=mark_safe(
+            "Må Coding Pirates tage og bruge billeder og videoer af dit barn på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)"
+        ),
         initial="Choose",
         required=True,
         choices=(
@@ -97,3 +100,20 @@ class ActivitySignupForm(forms.Form):
         required=True,
         choices=(("YES", "Ja"), ("NO", "Nej")),
     )
+
+    consent = forms.BooleanField(
+        label=mark_safe(
+            "Jeg giver samtykke til at Coding Pirates Denmark bruger og behandler mine data som beskrevet i <a href='#' onclick='openConsentPopup()'>Coding Pirates privatlivspolitik</a>"
+        ),
+        required=True,
+    )
+    # consent_id = forms.ModelChoiceField(queryset=Consent.objects.all(), required=True)  # Added consent_id field
+    consent_id = forms.IntegerField(
+        widget=forms.HiddenInput(), required=False
+    )  # To store the consent id
+
+    def clean_consent(self):
+        consent = self.cleaned_data.get("consent")
+        if not consent:
+            raise forms.ValidationError("Du skal give samtykke for at fortsætte.")
+        return consent

@@ -10,6 +10,7 @@ from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 from members.models.person import Person
+from members.models.consent import Consent
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
 
@@ -157,8 +158,36 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Make sure people have selected yes or no in photo permission and update photo permission
             if signup_form.cleaned_data["photo_permission"] == "Choose":
                 return HttpResponse("Du skal vælge om vi må tage billeder eller ej.")
+
+            # Make sure people have accepted the consent
+            if "consent_id" not in signup_form.cleaned_data:
+                return HttpResponse("Consent ID is missing. Please provide consent.")
+
             participant.photo_permission = signup_form.cleaned_data["photo_permission"]
             participant.save()
+
+            # Fetch the latest consent with released_at < now
+            latest_consent = (
+                Consent.objects.filter(released_at__lt=timezone.now())
+                .order_by("-released_at")
+                .first()
+            )
+            if not latest_consent:
+                return HttpResponse("No valid consent found.")
+
+            # Set the consent_id in the form data
+            signup_form.cleaned_data["consent_id"] = latest_consent.id
+
+            # Make sure people have accepted the consent
+            if "consent_id" not in signup_form.cleaned_data:
+                return HttpResponse("Consent ID is missing. Please provide consent.")
+
+            consent_id = signup_form.cleaned_data["consent_id"]
+            consent = Consent.objects.get(id=consent_id)
+            person.consent_id = consent
+            person.consent_by = request.user
+            person.consent_at = timezone.now()
+            person.save()
 
             # return user to list of activities where they are participating
             return_link_url = f'{reverse("activities")}#tilmeldte-aktiviteter'
@@ -201,8 +230,15 @@ def ActivitySignup(request, activity_id, person_id=None):
                         invite.save()
 
             return HttpResponseRedirect(return_link_url)
-        # fall through else
+
     else:
+        latest_consent = (
+            Consent.objects.filter(
+                released_at__isnull=False, released_at__lte=timezone.now()
+            )
+            .order_by("-released_at")
+            .first()
+        )
         signup_form = ActivitySignupForm()
 
     union = activity.department.union

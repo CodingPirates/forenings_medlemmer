@@ -22,6 +22,7 @@ class PersonInline(admin.StackedInline):
     model = Person
     fields = ("name",)
     readonly_fields = ("name",)
+    fk_name = "user"
 
 
 class AdminUserGroupListFilter(admin.SimpleListFilter):
