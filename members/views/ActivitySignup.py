@@ -184,7 +184,7 @@ def ActivitySignup(request, activity_id, person_id=None):
 
             consent_id = signup_form.cleaned_data["consent_id"]
             consent = Consent.objects.get(id=consent_id)
-            person.consent_id = consent
+            person.consent = consent
             person.consent_by = request.user
             person.consent_at = timezone.now()
             person.save()

@@ -5,6 +5,7 @@ from members.views import (
     ActivitySignup,
     AdminSignup,
     ConfirmFamily,
+    consent_page,
     consent_popup,
     consent_preview,
     DeclineInvitation,
@@ -125,5 +126,10 @@ urlpatterns = [
         r"^consent/preview/(?P<consent_id>\d+)/$",
         consent_preview,
         name="consent_preview",
+    ),
+    re_path(
+        r"^consent/$",
+        consent_page,
+        name="consent_page",
     ),
 ]

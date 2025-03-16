@@ -1,0 +1,23 @@
+{% extends 'members/base.html' %}
+{% block content %}
+    {% if has_consented %}  
+        <p>Du har accepteret vores privatlivspolitik d {{ consent_at }}</p>
+    {% elif viewonly %}
+
+    {% else %}
+        <h1>Vi har lavet en ny privatlivspolitik</h1>
+        <b style="color:red">Det er nødvendigt at du accepterer denne for at kunne fortsætte og benytte vores tjenester.</b>
+    {% endif %}
+    <p><strong>Gyldig fra:</strong> {{ consent_released_at }}</p>
+    <h2>{{ consent_title }}</h2>
+    <p>{{ consent_text }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if has_consented or viewonly %}
+            <button type="button" onclick="window.history.back();">Tilbage</button>
+        {% else %}
+            <button type="submit">Jeg giver samtykke</button>
+        {% endif %}
+    </form>
+{% endblock %}

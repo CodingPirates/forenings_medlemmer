@@ -21,3 +21,4 @@ from members.views.userCreated import userCreated
 from members.views.volunteerSignup import volunteerSignup
 from members.views.ConsentPopup import consent_popup
 from members.views.ConsentPreview import consent_preview
+from members.views.ConsentPage import consent_page
