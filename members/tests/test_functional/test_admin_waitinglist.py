@@ -318,6 +318,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         select = Select(select_element)
         select.select_by_visible_text("Alle")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
+        self.save_screenshot_and_html("admin_waitinglist_reset_age_filters_2")
 
         # Test the search field for "person1"
         search_input = self.browser.find_element(By.NAME, "q")
