@@ -37,6 +37,9 @@ class ActivityParticipant(models.Model):
         choices=PHOTO_PERMISSION_CHOICES,
         default=PHOTO_NOTOK,
     )
+    price_in_dkk = models.DecimalField(
+        "Pris", max_digits=10, decimal_places=2, default=425
+    )
 
     def __str__(self):
         return (
@@ -135,7 +138,7 @@ class ActivityParticipant(models.Model):
 
     def get_payment_link(self):
         payment = members.models.payment.Payment.objects.get(
-            activityparticipant=self, confirmed_at=None
+            activityparticipant=self, accepted_at=None
         )
         if payment.payment_type == members.models.payment.Payment.CREDITCARD:
             return payment.get_quickpaytransaction().get_link_url()
