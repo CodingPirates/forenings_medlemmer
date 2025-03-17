@@ -1,4 +1,5 @@
 from datetime import date
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -29,7 +30,10 @@ class Member(models.Model):
         null=True,
     )
     price_in_dkk = models.DecimalField(
-        "Pris", max_digits=10, decimal_places=2, default=75
+        "Pris",
+        max_digits=10,
+        decimal_places=2,
+        default=settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK,
     )
     paid_at = models.DateTimeField("Betalt", blank=True, null=True)
 
@@ -38,7 +42,7 @@ class Member(models.Model):
 
     def clean(self):
         errors = {}
-        min_amount = 75
+        min_amount = settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK
 
         if self.price_in_dkk < min_amount:
             errors["price_in_dkk"] = (

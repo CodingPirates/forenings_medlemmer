@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -83,12 +84,12 @@ class Union(models.Model):
         "Person", blank=True, verbose_name="Menige medlemmer"
     )
     board_members_old = models.TextField("Menige medlemmer", blank=True)
-    help_text = """Medlemskabet skal koste minimum 75 kr. pga. Dansk Ungdoms Fællesråds medlemsdefinition."""
+    help_text = f"Medlemskabet skal koste minimum {settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK} kr. pga. Dansk Ungdoms Fællesråds medlemsdefinition."
     membership_price_in_dkk = models.DecimalField(
         "Pris for medlemskab",
         max_digits=10,
         decimal_places=2,
-        default=75,
+        default=settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK,
         help_text=help_text,
     )
     bank_main_org = models.BooleanField(
@@ -125,7 +126,7 @@ class Union(models.Model):
 
     def clean(self):
         errors = {}
-        min_amount = 75
+        min_amount = settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK
 
         if self.membership_price_in_dkk < min_amount:
             errors["membership_price_in_dkk"] = (

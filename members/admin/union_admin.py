@@ -186,6 +186,8 @@ class UnionAdmin(admin.ModelAdmin):
                 "founded_at",
                 "closed_at",
                 "gl_account",
+                "memberships_allowed_at",
+                "membership_price_in_dkk",
             )
 
         return [

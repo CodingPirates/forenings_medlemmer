@@ -1,4 +1,5 @@
 from datetime import date
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
@@ -50,6 +51,7 @@ class Command(BaseCommand):
 
             if activityparticipant.activity.activitytype == "FORLØB":
                 activityparticipant.price_in_dkk = (
-                    activityparticipant.activity.price_in_dkk - 75
+                    activityparticipant.activity.price_in_dkk
+                    - settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK
                 )
                 activityparticipant.save()
