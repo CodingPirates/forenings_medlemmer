@@ -26,7 +26,7 @@ from members.admin.admin_actions import AdminActions
 
 
 class WaitingListActivityFilter(admin.SimpleListFilter):
-    title = _("Mulige deltagere til en aktivitet")
+    title = _("Alder baseret på aktivitet")
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
@@ -184,10 +184,10 @@ class WaitingListAdmin(admin.ModelAdmin):
         person_waitinglist_union_filter,
         person_waitinglist_department_filter,
         person_waitinglist_municipality_filter,
-        WaitingListActivityFilter,  # Add the activity filter
-        WaitingListMinAgeFilter,  # Add the minimum age filter
-        WaitingListMaxAgeFilter,  # Add the maximum age filter
         "person__gender",
+        WaitingListActivityFilter,
+        WaitingListMinAgeFilter,
+        WaitingListMaxAgeFilter,
     )
 
     search_fields = [
