@@ -4,20 +4,21 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from members.models.activity import Activity
 from members.models.activitytype import ActivityType
+from members.tests.factories.activity_factory import ActivityFactory
+from members.tests.factories.address_factory import AddressFactory
+from members.tests.factories.department_factory import DepartmentFactory
+from members.tests.factories.family_factory import FamilyFactory
+from members.tests.factories.municipality_factory import MunicipalityFactory
+from members.tests.factories.person_factory import PersonFactory
+from members.tests.factories.union_factory import UnionFactory
+from members.tests.factories.waitinglist_factory import WaitingListFactory
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from members.models import (
-    WaitingList,
-    Municipality,
     Person,
-    Department,
-    Union,
-    Address,
-    Family,
 )
 
 
@@ -34,28 +35,32 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
     serialized_rollback = True
 
     def setUp(self):
+        # TODO: Find out why/if we need to create a superuser here
         self.admin_user = User.objects.create_superuser(
             username="admin", password="password", email="admin@example.com"
         )
-        self.address = Address.objects.create(
+        self.address = AddressFactory(
             streetname="Street 1", city="City 1", zipcode="1234"
         )
-        self.union = Union.objects.create(name="Union1", address=self.address)
-        self.department = Department.objects.create(
+        self.union = UnionFactory(name="Union1", address=self.address)
+        self.department = DepartmentFactory(
             name="Department1", union=self.union, address=self.address
         )
-        self.family = Family.objects.create()
-        self.municipality1 = Municipality.objects.create(
+        self.family = FamilyFactory()
+
+        self.municipality1 = MunicipalityFactory(
             name="Municipality1", address="Address 1", zipcode="1234", city="City 1"
         )
-        self.municipality2 = Municipality.objects.create(
+
+        self.municipality2 = MunicipalityFactory(
             name="Municipality2", address="Address 2", zipcode="6789", city="City 2"
         )
+
         self.activity_type, _ = ActivityType.objects.get_or_create(
             id="FORLØB",
             defaults={"display_name": "Forløb", "description": "Forløb description"},
         )
-        self.activity = Activity.objects.create(
+        self.activity = ActivityFactory(
             name="Activity1",
             department=self.department,
             union=self.union,
@@ -66,7 +71,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
             min_age=11,
             max_age=17,
         )
-        self.person1 = Person.objects.create(
+        self.person1 = PersonFactory(
             name="person1",
             municipality=self.municipality1,
             department=self.department,
@@ -75,7 +80,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
             gender=Person.MALE,
             birthday=datetime.now() - relativedelta(years=8),
         )
-        self.person2 = Person.objects.create(
+        self.person2 = PersonFactory(
             name="person2",
             municipality=self.municipality2,
             department=self.department,
@@ -84,7 +89,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
             gender=Person.FEMALE,
             birthday=datetime.now() - relativedelta(years=10),
         )
-        self.person3 = Person.objects.create(
+        self.person3 = PersonFactory(
             name="person3",
             municipality=None,
             department=self.department,
@@ -92,13 +97,13 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
             gender=Person.OTHER_GENDER,
             birthday=datetime.now() - relativedelta(years=12),
         )
-        self.waiting_list1 = WaitingList.objects.create(
+        self.waiting_list1 = WaitingListFactory(
             person=self.person1, department=self.department
         )
-        self.waiting_list2 = WaitingList.objects.create(
+        self.waiting_list2 = WaitingListFactory(
             person=self.person2, department=self.department
         )
-        self.waiting_list3 = WaitingList.objects.create(
+        self.waiting_list3 = WaitingListFactory(
             person=self.person3, department=self.department
         )
 
