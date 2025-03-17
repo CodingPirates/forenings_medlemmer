@@ -26,7 +26,7 @@ from members.admin.admin_actions import AdminActions
 
 
 class WaitingListActivityFilter(admin.SimpleListFilter):
-    title = _("Alder baseret på aktivitet")
+    title = _("Alder ved aktivitet start")
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
