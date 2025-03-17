@@ -287,13 +287,11 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertEqual(len(rows), 1)
         self.assertIn("person2", rows[0].text)
 
-        # Reset the minimum age filter to "Alle"
+        # Reset the min and max age filters
         select_element = get_select_element_by_onchange(self.browser, 5)
         select = Select(select_element)
         select.select_by_visible_text("Alle")
-        self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
 
-        # Reset the maximum age filter to "Alle"
         select_element = get_select_element_by_onchange(self.browser, 6)
         select = Select(select_element)
         select.select_by_visible_text("Alle")
