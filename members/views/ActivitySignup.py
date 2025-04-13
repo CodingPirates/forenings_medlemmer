@@ -84,7 +84,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                 member = Member.objects.get(
                     union=union,
                     person=person,
-                    member_until__lte=date(date.today().year, 12, 31),
+                    member_until=date(activity.end_date.year, 12, 31),
                 )
                 membership = True
             except Member.DoesNotExist:
