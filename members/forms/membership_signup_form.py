@@ -2,6 +2,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions
+from django.utils.safestring import mark_safe
 
 
 class MembershipSignupForm(forms.Form):
@@ -53,7 +54,9 @@ class MembershipSignupForm(forms.Form):
         )
 
     read_conditions = forms.ChoiceField(
-        label="Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?",
+        label=mark_safe(
+            "Har du <a target='_blank' href=https://codingpirates.dk/medlemsbetingelser/>læst</a> og accepterer du vores handelsbetingelser?"
+        ),
         initial="NO",
         required=True,
         choices=(("YES", "Ja"), ("NO", "Nej")),
