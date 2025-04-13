@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from django.test import TestCase
 
+from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 
 from .factories import (
@@ -13,8 +14,6 @@ from .factories import (
     ActivityParticipantFactory,
     PaymentFactory,
 )
-
-from members.views.NonPaidParticipations import get_missing_payments_for_family
 
 
 class TestMissingPayments(TestCase):
@@ -57,7 +56,7 @@ class TestMissingPayments(TestCase):
         )
 
         # Act
-        missing_payments = get_missing_payments_for_family(family.id)
+        missing_payments = ActivityParticipant.get_missing_payments_for_family(family.id)
 
         # Assert
         self.assertIn(participant_not_paid, missing_payments)

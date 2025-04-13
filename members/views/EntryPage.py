@@ -1,8 +1,8 @@
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.shortcuts import render
 
+from members.models.activityparticipant import ActivityParticipant
 from members.utils.user import user_to_person
-from members.views.NonPaidParticipations import get_missing_payments_for_family
 from members.views.UnacceptedInvitations import get_unaccepted_invitations_for_family
 
 
@@ -16,7 +16,7 @@ def EntryPage(request):
         else:
             family = user.family
             unaccepted_invitations = get_unaccepted_invitations_for_family(family)
-            missing_payments = get_missing_payments_for_family(family)
+            missing_payments = ActivityParticipant.get_missing_payments_for_family(family)
             context = {
                 "missing_payments": missing_payments,
                 "invites": unaccepted_invitations,
