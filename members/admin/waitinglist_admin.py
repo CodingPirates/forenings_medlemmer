@@ -31,10 +31,18 @@ class WaitingListActivityFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         activities = []
+        # Restrict activities to those in departments the user can access
+        accessible_departments = AdminUserInformation.get_departments_admin(
+            request.user
+        )
         for activity in Activity.objects.filter(
-            activitytype__id__in=["FORLØB", "ARRANGEMENT"], end_date__gte=timezone.now()
+            department__in=accessible_departments,
+            activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+            end_date__gte=timezone.now(),
         ).order_by("name"):
-            activities.append((str(activity.pk), activity.name))
+            activities.append(
+                (str(activity.pk), f"{activity.department.name}, {activity.name}")
+            )
         return activities
 
     def queryset(self, request, queryset):
