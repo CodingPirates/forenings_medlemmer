@@ -7,7 +7,12 @@
     <b>Når I har oprettet jer, husk derefter at logge ind i medlemssystemet</b> for at skrive barnet op på nærliggende afdelingers venteliste eller for at tilmelde barnet en aktivitet.<br>
     Det er også herinde I kan tilføje flere børn, forældre eller værger tilknyttet jeres familie.
   </p>
-  <div id="signup-form">
+  <div>
+    <div id="signup-form">
       {% crispy signupform %}
+    </div>
+    <div class="form-group">
+      {{ vol_signupform.consent.errors }}
+    </div>
   </div>
 {% endblock %}

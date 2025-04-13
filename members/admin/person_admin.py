@@ -126,6 +126,20 @@ class PersonAdmin(admin.ModelAdmin):
                 contact_fields = ("name", "city", "zipcode", "family")
             else:
                 contact_fields = ("name", "city", "zipcode", "email", "phone", "family")
+        if request.user.has_perm("members.view_consent_information") or request:
+            consent_fields = (
+                "Samtykke",
+                {
+                    "classes": ("collapse",),
+                    "fields": (
+                        "consent",
+                        "consent_by",
+                        "consent_at",
+                    ),
+                },
+            )
+        else:
+            consent_fields = ()
 
         fieldsets = (
             ("Kontakt Oplysninger", {"fields": contact_fields}),
@@ -146,11 +160,14 @@ class PersonAdmin(admin.ModelAdmin):
             ),
         )
 
+        if consent_fields:
+            fieldsets += (consent_fields,)
+
         return fieldsets
 
     def get_readonly_fields(self, request, obj=None):
         if type(obj) == Person and not request.user.is_superuser:
-            return [
+            readonly_fields = [
                 "name",
                 "streetname",
                 "housenumber",
@@ -169,7 +186,10 @@ class PersonAdmin(admin.ModelAdmin):
                 "added_at",
             ]
         else:
-            return []
+            readonly_fields = []
+        # Add consent fields to readonly
+        readonly_fields += ["consent", "consent_by", "consent_at"]
+        return readonly_fields
 
     def unique(self, item):
         return item.family.unique if item.family is not None else ""

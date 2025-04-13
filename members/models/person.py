@@ -33,6 +33,10 @@ class Person(models.Model):
                 "anonymize_persons",
                 "Can anonymize persons",
             ),
+            (
+                "view_consent_information",
+                "Can view consent information for persons",
+            ),
         )
 
     PARENT = "PA"
