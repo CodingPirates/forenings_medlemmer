@@ -18,5 +18,8 @@
           <div class="card-body">
             {% crispy vol_signupform %}
           </div>
+          <div class="form-group">
+            {{ vol_signupform.consent.errors }}
+          </div>
         </div>
 {% endblock %}
