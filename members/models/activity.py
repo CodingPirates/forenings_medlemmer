@@ -57,7 +57,7 @@ class Activity(models.Model):
     min_age = models.PositiveIntegerField("Minimum Alder", default=7)
     help_text = """Bestemmer om personerne bliver til medlem i forhold til DUF.
         De fleste aktiviteter er forløb/sæsoner og medlemsberettiget. Hvis
-        du er i tvivl, så spørg på Slack i #medlemsssystem-support."""
+        du er i tvivl, så spørg på Slack i #medlemssystem_support."""
     member_justified = models.BooleanField(
         "Aktiviteten gør personen til medlem", default=True, help_text=help_text
     )
