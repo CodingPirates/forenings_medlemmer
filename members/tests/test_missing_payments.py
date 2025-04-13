@@ -1,7 +1,10 @@
 from datetime import datetime
+from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 
 from django.test import TestCase
+
+from members.models.payment import Payment
 
 from .factories import (
     FamilyFactory,
@@ -42,15 +45,20 @@ class TestMissingPayments(TestCase):
             person=person_not_paid,
             activity=activity,
         )
-        payment = PaymentFactory(
+        PaymentFactory(
+            payment_type=Payment.CREDITCARD,
+            activity=activity,
             activityparticipant=participant_paid,
+            person=person_paid,
+            family=family,
             amount_ore=10000,
-            confirmed_at=datetime.now(),
+            accepted_at=timezone.now(),
+            confirmed_at=timezone.now(),
         )
 
         # Act
         missing_payments = get_missing_payments_for_family(family.id)
 
         # Assert
-        self.assertNotIn(participant_paid, missing_payments)
         self.assertIn(participant_not_paid, missing_payments)
+        self.assertNotIn(participant_paid, missing_payments)
