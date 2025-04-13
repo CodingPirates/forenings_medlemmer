@@ -1,19 +1,11 @@
-from random import randint
-
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from django.test import TestCase
-from django.db.utils import IntegrityError
-from django.core import mail
-from members.jobs import EmailSendCronJob
-from members.models.family import Family
 from members.models.person import Person
-from members.models.emailtemplate import EmailTemplate
 
 from .factories import UnionFactory
 from .factories import DepartmentFactory
 from .factories import FamilyFactory
 from .factories import ActivityFactory
-from .factories import ActivityParticipantFactory
 from .factories import MemberFactory
 
 
