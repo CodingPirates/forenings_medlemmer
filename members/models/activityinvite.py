@@ -34,7 +34,7 @@ class ActivityInvite(models.Model):
         "til Coding Pirates Denmark pr. deltager. Denne pris overskriver prisen "
     )
     help_price += "på aktiviteten. Angiv kun en pris hvis denne deltager skal have en "
-    help_price += f"anden pris end angivet i aktiviteten. Hvis der angives en anden "
+    help_price += "anden pris end angivet i aktiviteten. Hvis der angives en anden "
     help_price += (
         "pris, skal noten udfyldes med en begrundelse for denne prisoverskrivelse. "
     )
