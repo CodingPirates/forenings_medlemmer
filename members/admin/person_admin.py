@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.html import format_html
+from django.urls import reverse
 
 from members.models import (
     Department,
@@ -132,7 +133,7 @@ class PersonAdmin(admin.ModelAdmin):
                 {
                     "classes": ("collapse",),
                     "fields": (
-                        "consent",
+                        "consent_preview_link",
                         "consent_by",
                         "consent_at",
                     ),
@@ -165,6 +166,16 @@ class PersonAdmin(admin.ModelAdmin):
 
         return fieldsets
 
+    def consent_preview_link(self, obj):
+        if obj.consent:
+            full_url = reverse("consent_preview", args=[obj.consent.id])
+            return format_html(
+                f'<a href="{full_url}" target="_blank">Privatlivspolitik, ID: {obj.consent.id}</a>',
+            )
+        return "No consent available"
+
+    consent_preview_link.short_description = "Privatlivspolitik"
+
     def get_readonly_fields(self, request, obj=None):
         if type(obj) == Person and not request.user.is_superuser:
             readonly_fields = [
@@ -188,7 +199,12 @@ class PersonAdmin(admin.ModelAdmin):
         else:
             readonly_fields = []
         # Add consent fields to readonly
-        readonly_fields += ["consent", "consent_by", "consent_at"]
+        readonly_fields += [
+            "consent",
+            "consent_by",
+            "consent_at",
+            "consent_preview_link",
+        ]
         return readonly_fields
 
     def unique(self, item):

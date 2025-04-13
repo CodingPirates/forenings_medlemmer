@@ -131,6 +131,7 @@ class Person(models.Model):
         null=True,
         default=None,
         related_name="person_consent_by",
+        verbose_name="Samtykke givet af",
     )
     consent_at = models.DateTimeField("Samtykke dato", null=True, blank=True)
 

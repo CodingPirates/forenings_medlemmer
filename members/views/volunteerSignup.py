@@ -15,7 +15,6 @@ from django.contrib.auth.models import User
 
 @xframe_options_exempt
 def volunteerSignup(request):
-    # consent_url = reverse("consent_page")  # Generate the URL for the consent page
     if request.method == "POST":
         # figure out which form was filled out.
         if request.POST["form_id"] == "vol_signup":

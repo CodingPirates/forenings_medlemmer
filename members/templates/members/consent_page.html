@@ -9,8 +9,8 @@
         <b style="color:red">Det er nødvendigt at du accepterer denne for at kunne fortsætte og benytte vores tjenester.</b>
     {% endif %}
     <p><strong>Gyldig fra:</strong> {{ consent_released_at }}</p>
-    <h2>{{ consent_title }}</h2>
-    <p>{{ consent_text }}</p>
+    <h2>{{ consent_title | safe }}</h2>
+    <p>{{ consent_text| safe }}</p>
 
     <form method="post">
         {% csrf_token %}

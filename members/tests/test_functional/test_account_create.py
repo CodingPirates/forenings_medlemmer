@@ -115,6 +115,10 @@ class AccountCreateTest(StaticLiveServerTestCase):
         )
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
+        # click on consent checkbox
+        field = self.browser.find_element(By.NAME, "consent")
+        field.click()
+
         # Submit form
         field.send_keys(Keys.TAB)
         field.send_keys(Keys.ENTER)
