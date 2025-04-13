@@ -172,7 +172,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Make a new member if it's a member activity
             member = None
 
-            if activity.is_eligable_for_membership():
+            if not membership and activity.is_eligable_for_membership():
                 member = Member(
                     union=union,
                     person=person,
