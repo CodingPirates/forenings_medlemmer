@@ -282,6 +282,12 @@ class Person(models.Model):
             email_item.receiver = ""
             email_item.save()
 
+        # anonymize activity participation notes
+        activity_items = self.activityparticipant_set.all()
+        for activity_item in activity_items:
+            activity_item.note = ""
+            activity_item.save()
+
         # anonymize Django user if exists, there might be multiple users with the same email address
         users = User.objects.filter(email__exact=orig_email)
         if users.exists():

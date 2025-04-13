@@ -16,15 +16,23 @@ You are more than welcome to contribute to the system. This guide documents how 
 - Run `docker compose up` to start your local system.  
   (If on Apple Silicon machine, run `docker compose -f docker-compose.yml -f docker-compose.arm64.yml up --build`)
 
-- Run `docker compose run web ./manage.py get_live_data` to download public
-    data and insert it into your local database.
+- Optional, run `docker compose run web ./manage.py get_live_data` to download public data and insert it into your local database.
 
-- To get some dummy members, families, etc. you can use the [factories][factories] to create them.
+- Optional, to get some dummy members, families, etc. you can use the [factories][factories] to create them.
 
     ```bash
-        docker compose run web ./manage.py shell
-        from members.tests.factories import MemberFactory
-        MemberFactory.create_batch(20)
+    docker compose run web ./manage.py shell
+    
+    (InteractiveConsole)
+    >>> from members.tests.factories import PersonFactory, ActivityFactory
+
+    >>> PersonFactory.create_batch(20)
+    [<Person: Frederick Robinson>, <Person: James Hays>, ...]
+
+    >>> ActivityFactory.create_batch(10)
+    [<Activity: Michaelsværk, Børne IT-konference 1998>, <Activity: Karenborg, Hackathon 1976>, ...]
+
+    >>> exit()
     ```
 
     Creates 20 members with associated families, departments, etc.
