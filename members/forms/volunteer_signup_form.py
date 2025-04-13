@@ -157,9 +157,6 @@ class vol_signupForm(forms.Form):
     )
     consent = forms.BooleanField(
         label="Jeg accepterer privatlivspolitikken",
-        # label=mark_safe(
-        #    'Jeg accepterer <a href="{% url \'consent_page\' %}" target="_blank">Privatlivspolitikken</a>'
-        # ),
         required=True,
         error_messages={
             "required": "Du skal acceptere privatlivspolitikken for at fortsætte."
