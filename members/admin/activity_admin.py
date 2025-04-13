@@ -293,7 +293,6 @@ class ActivityAdmin(admin.ModelAdmin):
                         "start_date",
                         "end_date",
                     ),
-                    "member_justified",
                     "visible",
                     "visible_from",
                 ),

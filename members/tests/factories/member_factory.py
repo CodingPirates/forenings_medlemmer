@@ -5,6 +5,7 @@ from members.tests.factories.factory_helpers import TIMEZONE
 from members.tests.factories.person_factory import PersonFactory
 from members.tests.factories.union_factory import UnionFactory
 
+
 class MemberFactory(DjangoModelFactory):
     class Meta:
         model = Member

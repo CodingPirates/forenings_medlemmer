@@ -37,4 +37,4 @@ class TestModelMember(TestCase):
         self.person.save()
 
     def test_can_create_member(self):
-        MemberFactory() # no errors should be thrown
+        MemberFactory()  # no errors should be thrown
