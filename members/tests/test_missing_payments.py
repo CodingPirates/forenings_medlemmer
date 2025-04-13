@@ -56,7 +56,9 @@ class TestMissingPayments(TestCase):
         )
 
         # Act
-        missing_payments = ActivityParticipant.get_missing_payments_for_family(family.id)
+        missing_payments = ActivityParticipant.get_missing_payments_for_family(
+            family.id
+        )
 
         # Assert
         self.assertIn(participant_not_paid, missing_payments)

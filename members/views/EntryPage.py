@@ -16,7 +16,9 @@ def EntryPage(request):
         else:
             family = user.family
             unaccepted_invitations = get_unaccepted_invitations_for_family(family)
-            missing_payments = ActivityParticipant.get_missing_payments_for_family(family)
+            missing_payments = ActivityParticipant.get_missing_payments_for_family(
+                family
+            )
             context = {
                 "missing_payments": missing_payments,
                 "invites": unaccepted_invitations,
