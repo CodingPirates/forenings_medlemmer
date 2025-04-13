@@ -306,7 +306,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         # Test activity age filter - only for age 11-17 => one person found
         select_element = get_select_element_by_onchange(self.browser, 4)
         select = Select(select_element)
-        select.select_by_visible_text("Activity1")
+        select.select_by_visible_text("Department1, Activity1")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
         self.save_screenshot_and_html("admin_waitinglist_filter_activity_age")
         rows = self.browser.find_elements(By.CSS_SELECTOR, "#result_list tbody tr")
