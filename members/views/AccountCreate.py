@@ -30,11 +30,6 @@ def AccountCreate(request):
                         request, "members/account_create.html", {"signupform": signup}
                     )
 
-                    # return render(
-                    #     request,
-                    #    "members/volunteer_signup.html",
-                    #    {"vol_signupform": signup},
-                    # )
                 # Ensure consent is given
                 if not signup.cleaned_data["consent"]:
                     signup.add_error(
