@@ -8,13 +8,79 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
+from datetime import date
+from django.utils.translation import gettext_lazy as _
 
-from members.models import Union, Department, AdminUserInformation, Municipality
+from members.models import (
+    Union,
+    Department,
+    AdminUserInformation,
+    Municipality,
+    Activity,
+)
 
 import members.models.emailtemplate
 
 # import members.admin.admin_actions
 from members.admin.admin_actions import AdminActions
+
+
+class WaitingListActivityFilter(admin.SimpleListFilter):
+    title = _("Alder ved aktivitet start")
+    parameter_name = "activity"
+
+    def lookups(self, request, model_admin):
+        activities = []
+        for activity in Activity.objects.filter(
+            activitytype__id__in=["FORLØB", "ARRANGEMENT"], end_date__gte=timezone.now()
+        ).order_by("name"):
+            activities.append((str(activity.pk), activity.name))
+        return activities
+
+    def queryset(self, request, queryset):
+        if self.value():
+            activity = Activity.objects.get(pk=self.value())
+            min_birth_date = activity.start_date.replace(
+                year=activity.start_date.year - activity.min_age
+            )
+            max_birth_date = activity.start_date.replace(
+                year=activity.start_date.year - activity.max_age - 1
+            )
+            return queryset.filter(
+                person__birthday__lte=min_birth_date,
+                person__birthday__gte=max_birth_date,
+            )
+        return queryset
+
+
+class WaitingListMinAgeFilter(admin.SimpleListFilter):
+    title = _("Minimum alder")
+    parameter_name = "min_age"
+
+    def lookups(self, request, model_admin):
+        return [(str(age), str(age)) for age in range(0, 101)]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            min_age = int(self.value())
+            min_birth_date = date.today().replace(year=date.today().year - min_age)
+            return queryset.filter(person__birthday__lte=min_birth_date)
+        return queryset
+
+
+class WaitingListMaxAgeFilter(admin.SimpleListFilter):
+    title = _("Maksimum alder")
+    parameter_name = "max_age"
+
+    def lookups(self, request, model_admin):
+        return [(str(age), str(age)) for age in range(0, 101)]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            max_age = int(self.value())
+            max_birth_date = date.today().replace(year=date.today().year - max_age - 1)
+            return queryset.filter(person__birthday__gte=max_birth_date)
+        return queryset
 
 
 class person_waitinglist_union_filter(admin.SimpleListFilter):
@@ -119,6 +185,9 @@ class WaitingListAdmin(admin.ModelAdmin):
         person_waitinglist_department_filter,
         person_waitinglist_municipality_filter,
         "person__gender",
+        WaitingListActivityFilter,
+        WaitingListMinAgeFilter,
+        WaitingListMaxAgeFilter,
     )
 
     search_fields = [
