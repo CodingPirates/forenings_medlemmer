@@ -172,14 +172,16 @@ class Person(models.Model):
                 response = requests.get(url)
                 if response.status_code != 200:
                     self.address_invalid = True
-                    self.save()
-                    return None
+                    if save:
+                        self.save()
+                    return self
 
                 data = response.json()
                 if not data:
                     self.address_invalid = True
-                    self.save()
-                    return None
+                    if save:
+                        self.save()
+                    return self
 
                 # DAWA returns result with address and "adgangsadresse". Address has fields "etage" and "dør",
                 # whereas "adgangsadresse" has all the shared address fields (e.g. for an apartment building)
