@@ -9,6 +9,7 @@ from members.views.DepartmentSignup import DepartmentSignup
 from members.views.EntryPage import EntryPage
 from members.views.FamilyDetails import FamilyDetails
 from members.views.Membership import Membership
+from members.views.MembershipSignup import MembershipSignup
 from members.views.PersonCreate import PersonCreate
 from members.views.PersonUpdate import PersonUpdate
 from members.views.QuickpayCallback import QuickpayCallback

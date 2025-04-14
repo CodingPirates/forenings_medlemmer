@@ -12,7 +12,7 @@ from members.models import (
     Person,
 )
 
-from .person_admin_filters import (
+from .filters.person_admin_filters import (
     PersonInvitedListFilter,
     PersonParticipantActiveListFilter,
     PersonParticipantCurrentYearListFilter,
