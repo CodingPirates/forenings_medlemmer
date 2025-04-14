@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.utils import timezone
-from datetime import date, datetime
 
 from members.models import AdminUserInformation, Union
 
@@ -22,11 +21,16 @@ class MemberCurrentYearListFilter(admin.SimpleListFilter):
         if self.value() == "none":
             return queryset.filter(union__isnull=True)
         elif self.value() == "any":
-            return queryset.exclude(union__isnull=True).filter(member_since__year=timezone.now().year)
+            return queryset.exclude(union__isnull=True).filter(
+                member_since__year=timezone.now().year
+            )
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(union=self.value()).filter(member_since__year=timezone.now().year)
+            return queryset.filter(union=self.value()).filter(
+                member_since__year=timezone.now().year
+            )
+
 
 class MemberLastYearListFilter(admin.SimpleListFilter):
     title = "Medlem i år " + str(timezone.now().year - 1)
@@ -45,11 +49,16 @@ class MemberLastYearListFilter(admin.SimpleListFilter):
         if self.value() == "none":
             return queryset.filter(union__isnull=True)
         elif self.value() == "any":
-            return queryset.exclude(union__isnull=True).filter(member_since__year=timezone.now().year - 1)
+            return queryset.exclude(union__isnull=True).filter(
+                member_since__year=timezone.now().year - 1
+            )
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(union=self.value()).filter(member_since__year=timezone.now().year - 1)
+            return queryset.filter(union=self.value()).filter(
+                member_since__year=timezone.now().year - 1
+            )
+
 
 class MemberAdminListFilter(admin.SimpleListFilter):
     title = "Medlem"

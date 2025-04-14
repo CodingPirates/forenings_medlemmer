@@ -6,9 +6,6 @@ from members.models import (
 
 from rangefilter.filters import (
     DateRangeFilterBuilder,
-    DateTimeRangeFilterBuilder,
-    NumericRangeFilterBuilder,
-    DateRangeQuickSelectListFilterBuilder,
 )
 
 from .filters.member_admin_filters import (
@@ -16,6 +13,7 @@ from .filters.member_admin_filters import (
     MemberLastYearListFilter,
     MemberAdminListFilter,
 )
+
 
 class MemberAdmin(admin.ModelAdmin):
     list_display = [
@@ -50,6 +48,4 @@ class MemberAdmin(admin.ModelAdmin):
             unions = Union.objects.filter(
                 adminuserinformation__user=request.user
             ).values("id")
-            return qs.filter(
-                union__in=unions
-            )
+            return qs.filter(union__in=unions)
