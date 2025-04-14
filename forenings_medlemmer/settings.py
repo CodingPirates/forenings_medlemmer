@@ -94,6 +94,7 @@ INSTALLED_APPS = (
     "django.contrib.admin",
     "graphene_django",
     "django_extensions",
+    "rangefilter",
 )
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
