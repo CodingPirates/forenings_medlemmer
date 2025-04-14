@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.utils.safestring import mark_safe
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 
@@ -11,7 +12,11 @@ from django.contrib.auth.password_validation import validate_password
 
 class vol_signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        consent_url = kwargs.pop("consent_url", "/consent/")
         super(vol_signupForm, self).__init__(*args, **kwargs)
+        self.fields["consent"].label = mark_safe(
+            f'Jeg accepterer <a href="{consent_url}" target="_blank">Privatlivspolitikken</a>'
+        )
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.form_action = "volunteer_signup"
@@ -86,6 +91,7 @@ class vol_signupForm(forms.Form):
                         ),
                         css_class="col-md-5",
                     ),
+                    Div(Field("consent"), css_class="col-md-12"),
                     Hidden("dawa_id", "", id="id_dawa_id"),
                     css_class="row",
                 ),
@@ -148,4 +154,11 @@ class vol_signupForm(forms.Form):
         widget=forms.CheckboxInput,
         required=False,
         choices=((True, "True"), (False, "False")),
+    )
+    consent = forms.BooleanField(
+        label="Jeg accepterer privatlivspolitikken",
+        required=True,
+        error_messages={
+            "required": "Du skal acceptere privatlivspolitikken for at fortsætte."
+        },
     )

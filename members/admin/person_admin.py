@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.html import format_html
+from django.urls import reverse
 
 from members.models import (
     Department,
@@ -126,6 +127,20 @@ class PersonAdmin(admin.ModelAdmin):
                 contact_fields = ("name", "city", "zipcode", "family")
             else:
                 contact_fields = ("name", "city", "zipcode", "email", "phone", "family")
+        if request.user.has_perm("members.view_consent_information") or request:
+            consent_fields = (
+                "Samtykke",
+                {
+                    "classes": ("collapse",),
+                    "fields": (
+                        "consent_preview_link",
+                        "consent_by",
+                        "consent_at",
+                    ),
+                },
+            )
+        else:
+            consent_fields = ()
 
         fieldsets = (
             ("Kontakt Oplysninger", {"fields": contact_fields}),
@@ -146,11 +161,24 @@ class PersonAdmin(admin.ModelAdmin):
             ),
         )
 
+        if consent_fields:
+            fieldsets += (consent_fields,)
+
         return fieldsets
+
+    def consent_preview_link(self, obj):
+        if obj.consent:
+            full_url = reverse("consent_preview", args=[obj.consent.id])
+            return format_html(
+                f'<a href="{full_url}" target="_blank">Privatlivspolitik, ID: {obj.consent.id}</a>',
+            )
+        return "No consent available"
+
+    consent_preview_link.short_description = "Privatlivspolitik"
 
     def get_readonly_fields(self, request, obj=None):
         if type(obj) == Person and not request.user.is_superuser:
-            return [
+            readonly_fields = [
                 "name",
                 "streetname",
                 "housenumber",
@@ -169,7 +197,15 @@ class PersonAdmin(admin.ModelAdmin):
                 "added_at",
             ]
         else:
-            return []
+            readonly_fields = []
+        # Add consent fields to readonly
+        readonly_fields += [
+            "consent",
+            "consent_by",
+            "consent_at",
+            "consent_preview_link",
+        ]
+        return readonly_fields
 
     def unique(self, item):
         return item.family.unique if item.family is not None else ""

@@ -145,6 +145,15 @@ class ActivityParticipant(models.Model):
         else:
             return 'javascript:alert("Kan ikke betales her:  Kontakt Coding Pirates for hjælp");'
 
+    @staticmethod
+    def get_missing_payments_for_family(family_id):
+        missing_payments = ActivityParticipant.objects.filter(
+            person__family_id=family_id,
+            activity__end_date__gt=timezone.now(),
+            payment__accepted_at=None,
+        )
+        return missing_payments
+
     def save(self, *args, **kwargs):
         """On creation if seasonal - clear all waiting lists"""
         if not self.id:

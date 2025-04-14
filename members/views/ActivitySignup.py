@@ -183,6 +183,7 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Make sure people have selected yes or no in photo permission and update photo permission
             if signup_form.cleaned_data["photo_permission"] == "Choose":
                 return HttpResponse("Du skal vælge om vi må tage billeder eller ej.")
+
             participant.photo_permission = signup_form.cleaned_data["photo_permission"]
             participant.save()
 
@@ -228,7 +229,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                         invite.save()
 
             return HttpResponseRedirect(return_link_url)
-        # fall through else
+
     else:
         signup_form = ActivitySignupForm()
 
