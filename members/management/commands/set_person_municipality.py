@@ -12,7 +12,7 @@ class Command(BaseCommand):
         # Iterate over all items in Person model
         for person in Person.objects.all():
             self.stdout.write("Updating record for " + str(person))
-            person.update_dawa_data(True)
+            person.update_dawa_data(force=True)
 
         self.stdout.write(
             self.style.SUCCESS("Successfully updated municipality for all persons")
