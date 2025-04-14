@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
-import requests
-from members.models import Municipality, Person
+from members.models import Person
 
 # run locally:
 # docker compose run web ./manage.py set_person_municipality
