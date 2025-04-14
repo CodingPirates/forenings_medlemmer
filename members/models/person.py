@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.validators import RegexValidator
 from members.models.municipality import Municipality
+from members.models.consent import Consent
 from django.core.exceptions import PermissionDenied, ValidationError
 from members.utils.address import format_address
 from urllib.parse import quote_plus
@@ -31,6 +32,10 @@ class Person(models.Model):
             (
                 "anonymize_persons",
                 "Can anonymize persons",
+            ),
+            (
+                "view_consent_information",
+                "Can view consent information for persons",
             ),
         )
 
@@ -112,9 +117,23 @@ class Person(models.Model):
         blank=True,
         null=True,
         default=None,
+        related_name="person_user",
     )
     address_invalid = models.BooleanField("Ugyldig adresse", default=False)
     anonymized = models.BooleanField("Anonymiseret", default=False)
+    consent = models.ForeignKey(
+        Consent, null=True, blank=True, on_delete=models.PROTECT
+    )
+    consent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_DEFAULT,
+        blank=True,
+        null=True,
+        default=None,
+        related_name="person_consent_by",
+        verbose_name="Samtykke givet af",
+    )
+    consent_at = models.DateTimeField("Samtykke dato", null=True, blank=True)
 
     def __str__(self):
         return self.name

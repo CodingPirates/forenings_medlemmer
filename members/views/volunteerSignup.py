@@ -9,6 +9,7 @@ from members.models.department import Department
 from members.models.family import Family
 from members.models.person import Person
 from members.models.volunteer import Volunteer
+from members.models import Consent
 from django.contrib.auth.models import User
 
 
@@ -27,6 +28,17 @@ def volunteerSignup(request):
                 ):
                     # Passwords dosent match throw an error
                     vol_signup.add_error("password2", "Adgangskoder er ikke ens")
+                    return render(
+                        request,
+                        "members/volunteer_signup.html",
+                        {"vol_signupform": vol_signup},
+                    )
+                # Ensure consent is given
+                if not vol_signup.cleaned_data["consent"]:
+                    vol_signup.add_error(
+                        "consent",
+                        "Du skal acceptere privatlivspolitikken for at fortsætte.",
+                    )
                     return render(
                         request,
                         "members/volunteer_signup.html",
@@ -67,6 +79,15 @@ def volunteerSignup(request):
                 user.set_password(password)
                 user.save()
 
+                # Get the latest consent
+                latest_consent = (
+                    Consent.objects.filter(
+                        released_at__isnull=False, released_at__lte=timezone.now()
+                    )
+                    .order_by("-released_at")
+                    .first()
+                )
+
                 # create volunteer
                 volunteer = Person.objects.create(
                     membertype=Person.PARENT,
@@ -85,6 +106,9 @@ def volunteerSignup(request):
                     gender=vol_signup.cleaned_data["volunteer_gender"],
                     family=family,
                     user=user,
+                    consent=latest_consent,  # Set the consent
+                    consent_by=user,  # Set the user who gave consent
+                    consent_at=timezone.now(),  # Set the timestamp for consent
                 )
                 volunteer.save()
 

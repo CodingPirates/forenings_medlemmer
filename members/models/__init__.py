@@ -8,7 +8,7 @@ import members.models.activitytype
 import members.models.activityinvite
 import members.models.activityparticipant
 
-
+import members.models.consent
 import members.models.department
 import members.models.emailitem
 import members.models.emailtemplate
@@ -33,6 +33,7 @@ from .activityinvite import ActivityInvite
 from .activityparticipant import ActivityParticipant
 from .address import Address
 from .admin_user_information import AdminUserInformation
+from .consent import Consent
 from .dailystatisticsgeneral import DailyStatisticsGeneral
 from .dailystatisticsregion import DailyStatisticsRegion
 from .dailystatisticsunion import DailyStatisticsUnion
@@ -61,6 +62,7 @@ __all__ = [
     ActivityParticipant,
     Address,
     AdminUserInformation,
+    Consent,
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
     DailyStatisticsUnion,
