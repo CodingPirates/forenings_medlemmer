@@ -5,6 +5,9 @@ from members.views import (
     ActivitySignup,
     AdminSignup,
     ConfirmFamily,
+    consent_page,
+    consent_popup,
+    consent_preview,
     DeclineInvitation,
     DepartmentSignup,
     EntryPage,
@@ -118,4 +121,15 @@ urlpatterns = [
     re_path(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     re_path(r"^department_signup$", DepartmentSignup, name="department_signup"),
     re_path(r"^departments$", departmentView, name="department_view"),
+    re_path(r"^consent_popup/$", consent_popup, name="consent_popup"),
+    re_path(
+        r"^consent/preview/(?P<consent_id>\d+)/$",
+        consent_preview,
+        name="consent_preview",
+    ),
+    re_path(
+        r"^consent/$",
+        consent_page,
+        name="consent_page",
+    ),
 ]
