@@ -48,7 +48,7 @@ def volunteerSignup(request):
                 # check if family already exists
                 try:
                     family = Family.objects.get(
-                        email__iexact=request.POST["volunteer_email"]
+                        email__iexact=request.POST["volunteer_email"],
                     )
                     # family was already created - we can't create this family again
                     vol_signup.add_error(
@@ -65,7 +65,8 @@ def volunteerSignup(request):
                     pass
                 # create new family.
                 family = Family.objects.create(
-                    email=vol_signup.cleaned_data["volunteer_email"]
+                    email=vol_signup.cleaned_data["volunteer_email"],
+                    referer=vol_signup.cleaned_data["referer"],
                 )
                 family.confirmed_at = timezone.now()
                 family.save()

@@ -20,6 +20,9 @@ class Family(models.Model):
 
     unique = models.UUIDField(default=uuid.uuid4, unique=True)
     email = models.EmailField(unique=True)
+    referer = models.CharField(
+        "Hvor hørte du om Coding Pirates?", max_length=255, blank=True, null=True
+    )
     dont_send_mails = models.BooleanField("Vil ikke kontaktes", default=False)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     confirmed_at = models.DateTimeField("Bekræftet", null=True, blank=True)

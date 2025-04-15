@@ -110,6 +110,12 @@ class signupForm(forms.Form):
                         ),
                         css_class="col-md-5",
                     ),
+                    Div(
+                        Div(
+                            Field("referer", id="referer"),
+                            css_class="col-md-6",
+                        )
+                    ),
                     Div(Field("consent"), css_class="col-md-12"),
                     Hidden("dawa_id", "", id="id_dawa_id"),
                     css_class="row",
@@ -189,4 +195,7 @@ class signupForm(forms.Form):
         error_messages={
             "required": "Du skal acceptere privatlivspolitikken for at fortsætte."
         },
+    )
+    referer = forms.CharField(
+        label="Hvor hørte du om Coding Pirates?", required=False, max_length=255
     )
