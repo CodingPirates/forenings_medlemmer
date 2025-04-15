@@ -318,13 +318,20 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                 else invitation.rejected_at.strftime("%Y-%m-%d")
             )
 
+            if invitation.person.family.dont_send_mails:
+                family_email = ""
+                person_email = ""
+            else:
+                family_email = invitation.person.family.email
+                person_email = invitation.person.email
+
             result_string += (
                 handle_quote(invitation.activity.department.union.name, ";")
                 + handle_quote(invitation.activity.department.name, ";")
                 + handle_quote(invitation.activity.name, ";")
                 + handle_quote(invitation.person.name, ";")
-                + handle_quote(invitation.person.email, ";")
-                + handle_quote(invitation.person.family.email, ";")
+                + handle_quote(person_email, ";")
+                + handle_quote(family_email, ";")
                 + handle_quote(str(invitation.price_in_dkk), ";")
                 + handle_quote(invitation.price_note, ";")
                 + handle_quote(invitation.extra_email_info, ";")

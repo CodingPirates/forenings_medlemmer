@@ -168,6 +168,7 @@ class AdminActions(admin.ModelAdmin):
                         persons_already_invited = []
                         persons_already_participant = []
                         persons_invited = []
+                        persons_dont_send_mails = []
 
                         # get list of already created invitations on selected persons
                         already_invited = Person.objects.filter(
@@ -221,6 +222,11 @@ class AdminActions(admin.ModelAdmin):
                                         activity, current_person
                                     ):
                                         persons_too_old.append(current_person.name)
+                                    # Check for the DontSendMails flag
+                                    elif current_person.family.dont_send_mails:
+                                        persons_dont_send_mails.append(
+                                            current_person.name
+                                        )
                                     # Otherwise - person can be invited
                                     else:
                                         invited_counter = invited_counter + 1
@@ -312,6 +318,17 @@ class AdminActions(admin.ModelAdmin):
                                 + escape(", ".join(persons_too_old))
                             )
 
+                        # Message about persons that have the dont_send_mails flag set
+                        persons_dont_send_mails_text = ""
+                        if len(persons_dont_send_mails) > 0:
+                            persons_dont_send_mails_text = (
+                                "<br><u>"
+                                + str(len(persons_dont_send_mails))
+                                + " har valgt ikke at modtage mails:</u><br> "
+                                + escape(", ".join(persons_dont_send_mails))
+                            )
+
+                        # Show message to user
                         messages.success(
                             request,
                             mark_safe(
@@ -319,7 +336,8 @@ class AdminActions(admin.ModelAdmin):
                                 + already_participating_text
                                 + already_invited_text
                                 + persons_too_young_text
-                                + persons_too_old_text,
+                                + persons_too_old_text
+                                + persons_dont_send_mails_text,
                             ),
                         )
                         return
