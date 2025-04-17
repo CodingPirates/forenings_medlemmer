@@ -22,10 +22,19 @@ class ActivitySignupForm(forms.Form):
                         Div(
                             HTML(
                                 """
-                    <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
-                    Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.</p>
-                    <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
-                    """
+                                    <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong>
+                                        til aktiviteten <strong>{{activity.name}}</strong>
+                                        hos Coding Pirates <strong>{{activity.department.name}}</strong>.<br>
+                                        Aktiviteten finder sted
+                                        {% if activity.start_date == activity.end_date %}
+                                            den {{ activity.start_date|date:"j. F Y" }}
+                                        {% else %}
+                                            fra {{ activity.start_date|date:"j. F Y"}} til {{ activity.end_date|date:"j. F Y"}}
+                                        {% endif %}
+                                        og det koster <strong>{{ price | floatformat:2}} kr</strong> at være med.
+                                    </p>
+                                    <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
+                                """
                             ),
                             css_class="col-md-12",
                         ),
