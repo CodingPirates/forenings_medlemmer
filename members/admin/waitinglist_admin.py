@@ -166,6 +166,29 @@ class person_waitinglist_municipality_filter(admin.SimpleListFilter):
             return queryset.filter(person__municipality__id=self.value())
 
 
+class person_waitinglist_region_filter(admin.SimpleListFilter):
+    title = "Region"
+    parameter_name = "person__region"
+
+    def lookups(self, request, model_admin):
+        regions = [("none", "(Ingen region)")]
+        region_ids = model_admin.model.objects.values_list(
+            "person__region", flat=True
+        ).distinct()
+        for region in region_ids:
+            if region:
+                regions.append((region, region))
+        return list(set(regions))  # Ensure unique values in the dropdown
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return queryset.filter(person__region__isnull=True)
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(person__region=self.value())
+
+
 class WaitingListAdmin(admin.ModelAdmin):
     class Meta:
         verbose_name = "Venteliste"
@@ -192,6 +215,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         person_waitinglist_union_filter,
         person_waitinglist_department_filter,
         person_waitinglist_municipality_filter,
+        person_waitinglist_region_filter,
         "person__gender",
         WaitingListActivityFilter,
         WaitingListMinAgeFilter,
