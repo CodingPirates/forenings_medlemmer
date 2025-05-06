@@ -60,7 +60,8 @@ def AccountCreate(request):
                 # TODO: rewrite this! <<<<
                 # create new family.
                 family = Family.objects.create(
-                    email=signup.cleaned_data["parent_email"]
+                    email=signup.cleaned_data["parent_email"],
+                    referer=signup.cleaned_data["referer"],
                 )
                 family.confirmed_at = timezone.now()
                 family.save()

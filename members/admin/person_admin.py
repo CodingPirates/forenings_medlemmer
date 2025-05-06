@@ -45,6 +45,7 @@ class PersonAdmin(admin.ModelAdmin):
         "age_years",
         "zipcode",
         "added_at",
+        "family_referer",
         "notes",
     )
     list_filter = (
@@ -99,6 +100,12 @@ class PersonAdmin(admin.ModelAdmin):
 
     family_url.allow_tags = True
     family_url.short_description = "Familie"
+
+    def family_referer(self, item):
+        return item.family.referer
+
+    family_referer.allow_tags = True
+    family_referer.short_description = "Hvor hørte de om os?"
     list_per_page = 20
 
     def gender_text(self, item):
