@@ -66,7 +66,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         )
 
         self.browser.execute_script("arguments[0].scrollIntoView(true);", region_tab)
-        time.sleep(0.5)  # TODO: we should avoid sleeps like this!
+        time.sleep(0.5)  # give browser a bit of time to scroll
 
         self.browser.save_screenshot("test-screens/department_signup_3.png")
         region_tab.click()
