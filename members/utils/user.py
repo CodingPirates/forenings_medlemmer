@@ -33,9 +33,6 @@ def is_not_logged_in_and_has_person(user):
         return True
     # Return True if has a person else return false
     try:
-        if has_user(user):
-            return True
-        else:
-            return False
+        return has_user(user)
     except Exception:
         return False

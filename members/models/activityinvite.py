@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.db import models
 import members.models.emailtemplate
 import members.models.waitinglist
@@ -28,22 +29,12 @@ class ActivityInvite(models.Model):
     invite_dtm = models.DateField("Inviteret", default=timezone.now)
     expire_dtm = models.DateField("Udløber", default=_defaultInviteExpiretime)
     rejected_at = models.DateField("Afslået", blank=True, null=True)
-    help_price = (
-        "Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr. "
-    )
+    help_price = f"Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk {settings.MINIMUM_SEASON_PRICE_IN_DKK} kr. "
     help_price += (
         "til Coding Pirates Denmark pr. deltager. Denne pris overskriver prisen "
     )
     help_price += "på aktiviteten. Angiv kun en pris hvis denne deltager skal have en "
-    help_price += (
-        "anden pris end angivet i aktiviteten. Hvis prisen er under 100 kr. for "
-    )
-    help_price += (
-        "et forløb / en sæsonaktivitet bliver barnet ikke medlem af foreningen "
-    )
-    help_price += (
-        "og har ikke stemmeret til generalforsamlingen. Hvis der angives en anden "
-    )
+    help_price += "anden pris end angivet i aktiviteten. Hvis der angives en anden "
     help_price += (
         "pris, skal noten udfyldes med en begrundelse for denne prisoverskrivelse. "
     )
