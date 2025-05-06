@@ -318,10 +318,10 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                 else invitation.rejected_at.strftime("%Y-%m-%d")
             )
 
-            if invitation.person.family.dont_send_mails:
-                family_email = ""
-                person_email = ""
-            else:
+            family_email = ""
+            person_email = ""
+
+            if not invitation.person.family.dont_send_mails:
                 family_email = invitation.person.family.email
                 person_email = invitation.person.email
 

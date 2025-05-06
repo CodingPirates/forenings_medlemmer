@@ -200,6 +200,7 @@ class AdminActions(admin.ModelAdmin):
                             with transaction.atomic():
                                 # for current_person in queryset:
                                 for current_person in persons:
+                                    # TODO: refactor this (according to Kristoffer)
                                     # Check for the DontSendMails flag
                                     if current_person.family.dont_send_mails:
                                         persons_dont_send_mails.append(
