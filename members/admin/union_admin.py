@@ -67,6 +67,7 @@ def generate_union_csv(queryset):
 
 class AdminUserUnionInline(admin.TabularInline):
     model = AdminUserInformation.unions.through
+    list_per_page = 50
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css

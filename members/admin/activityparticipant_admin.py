@@ -181,6 +181,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
+    list_per_page = 50
     list_display = [
         "activity_link",
         "added_at",

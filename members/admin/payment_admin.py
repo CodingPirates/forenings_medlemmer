@@ -2,6 +2,7 @@ from django.contrib import admin
 
 
 class PaymentAdmin(admin.ModelAdmin):
+    list_per_page = 50
     list_display = [
         "pk",
         "added_at",

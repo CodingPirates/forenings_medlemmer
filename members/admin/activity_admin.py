@@ -118,7 +118,7 @@ class ActivityAdmin(admin.ModelAdmin):
         "activity_link",
         "addressregion",
     )
-    list_per_page = 20
+    list_per_page = 50
     raw_id_fields = (
         "union",
         "department",

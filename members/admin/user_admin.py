@@ -102,6 +102,7 @@ class AdminUserDepartmentListFilter(admin.SimpleListFilter):
 
 
 class UserAdmin(UserAdmin):
+    list_per_page = 50
     inlines = (AdminUserInformationInline, PersonInline)
 
     list_display = (
