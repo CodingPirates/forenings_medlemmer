@@ -230,8 +230,7 @@ class Person(models.Model):
                 self.dawa_id = address["id"]
                 if save:
                     self.save()
-                else:
-                    return self
+                return self
 
             except Exception:
                 self.address_invalid = True
