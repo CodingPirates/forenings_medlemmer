@@ -1,5 +1,6 @@
 import socket
 import os
+import time
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -117,6 +118,9 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
         # click on consent checkbox
         field = self.browser.find_element(By.NAME, "consent")
+        self.browser.execute_script("arguments[0].scrollIntoView(true);", field)
+        time.sleep(0.5)  # give browser a bit of time to scroll
+
         field.click()
 
         # Submit form

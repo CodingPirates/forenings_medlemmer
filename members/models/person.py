@@ -138,6 +138,11 @@ class Person(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not settings.TESTING:
+            self = self.update_dawa_data(force=True, save=False)
+        return super(Person, self).save(*args, **kwargs)
+
     def address(self):
         return format_address(self.streetname, self.housenumber, self.floor, self.door)
 
@@ -172,28 +177,31 @@ class Person(models.Model):
         else:
             return "N/A"
 
-    def update_dawa_data(self):
-        if self.address_invalid:
+    def update_dawa_data(self, force=False, save=True):
+        if self.address_invalid and not force:
             return None
         if (
             self.dawa_id is None
             or self.latitude is None
             or self.longitude is None
             or self.municipality is None
+            or force
         ):
             try:
                 url = f"https://api.dataforsyningen.dk/adresser?q={quote_plus(self.addressWithZip())}"
                 response = requests.get(url)
                 if response.status_code != 200:
                     self.address_invalid = True
-                    self.save()
-                    return None
+                    if save:
+                        self.save()
+                    return self
 
                 data = response.json()
                 if not data:
                     self.address_invalid = True
-                    self.save()
-                    return None
+                    if save:
+                        self.save()
+                    return self
 
                 # DAWA returns result with address and "adgangsadresse". Address has fields "etage" and "dør",
                 # whereas "adgangsadresse" has all the shared address fields (e.g. for an apartment building)
@@ -220,11 +228,14 @@ class Person(models.Model):
                     dawa_id=access_address["kommune"]["kode"]
                 )
                 self.dawa_id = address["id"]
-                self.save()
+                if save:
+                    self.save()
+                return self
 
             except Exception:
                 self.address_invalid = True
-                self.save()
+                if save:
+                    self.save()
 
     # TODO: Move to dawa_data in utils
 
