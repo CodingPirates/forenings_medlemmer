@@ -200,8 +200,13 @@ class AdminActions(admin.ModelAdmin):
                             with transaction.atomic():
                                 # for current_person in queryset:
                                 for current_person in persons:
+                                    # Check for the DontSendMails flag
+                                    if current_person.family.dont_send_mails:
+                                        persons_dont_send_mails.append(
+                                            current_person.name
+                                        )
                                     # check for already participant
-                                    if current_person.id in already_participant_ids:
+                                    elif current_person.id in already_participant_ids:
                                         persons_already_participant.append(
                                             current_person.name
                                         )
@@ -222,11 +227,6 @@ class AdminActions(admin.ModelAdmin):
                                         activity, current_person
                                     ):
                                         persons_too_old.append(current_person.name)
-                                    # Check for the DontSendMails flag
-                                    elif current_person.family.dont_send_mails:
-                                        persons_dont_send_mails.append(
-                                            current_person.name
-                                        )
                                     # Otherwise - person can be invited
                                     else:
                                         invited_counter = invited_counter + 1
