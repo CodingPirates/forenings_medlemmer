@@ -27,6 +27,7 @@ def consent_page(request):
         if request.method == "POST" and not has_consented:
             person.consent = latest_consent
             person.consent_at = timezone.now()
+            person.consent_by_id = request.user.id
             person.save()
             # Redirect to the original URL if it exists
             original_url = request.session.pop("original_url", None)
