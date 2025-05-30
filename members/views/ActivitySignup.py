@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -177,6 +177,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                     union=union,
                     person=person,
                     price_in_dkk=union.membership_price_in_dkk,
+                    member_since=datetime.now() if activity.start_date.year == datetime.now().year else date(activity.end_date.year, 1, 1)
                 )
                 member.save()
 
