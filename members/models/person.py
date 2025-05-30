@@ -140,7 +140,9 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         if not settings.TESTING:
-            self = self.update_dawa_data(force=True, save=False)
+            updated = self.update_dawa_data(force=True, save=False)
+            if updated is not None:
+                self = updated
         return super().save(*args, **kwargs)
 
     def address(self):
