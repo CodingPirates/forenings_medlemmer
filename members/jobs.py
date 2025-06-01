@@ -148,9 +148,11 @@ class DeleteNoteFieldCronJob(CronJobBase):
     code = "members.delete_note_field"
 
     def do(self):
-        participants = ActivityParticipant.objects.filter(note__isnull=False).exclude(
-            note__exact=""
-        ).filter(activity__end_date__lt=timezone.now() - timedelta(days=14))
+        participants = (
+            ActivityParticipant.objects.filter(note__isnull=False)
+            .exclude(note__exact="")
+            .filter(activity__end_date__lt=timezone.now() - timedelta(days=14))
+        )
 
         for participant in participants:
             participant.note = ""
