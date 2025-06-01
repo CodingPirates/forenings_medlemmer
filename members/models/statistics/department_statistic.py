@@ -62,7 +62,7 @@ class DepartmentStatistics(models.Model):
             ]
         )
         activities_members = [
-            activity for activity in activities if activity.member_justified
+            activity for activity in activities if activity.is_eligable_for_membership()
         ]
         self.members = sum(
             [

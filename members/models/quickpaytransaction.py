@@ -83,7 +83,8 @@ class QuickpayTransaction(models.Model):
                         "continueurl": return_url,
                         "cancelurl": return_url,
                         "customer_email": self.payment.family.email,
-                        "autocapture": self.payment.activity.start_date.year
+                        "autocapture": self.payment.activity
+                        and self.payment.activity.start_date.year
                         <= timezone.now().year,
                     },
                 )

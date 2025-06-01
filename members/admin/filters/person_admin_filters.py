@@ -10,14 +10,15 @@ class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
     parameter_name = "participant_list_current_year"
 
     def lookups(self, request, _model_admin):
-        return [
-            (str(a.pk), str(a))
-            for a in Activity.objects.filter(
-                department__in=AdminUserInformation.get_departments_admin(request.user),
-                activitytype__id__in=["FORLØB", "ARRANGEMENT"],
-                start_date__year=timezone.now().year,
-            ).order_by("department__name", "-start_date")
-        ]
+        activities = [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+            start_date__year=timezone.now().year,
+        ).order_by("department__name", "-start_date"):
+            activities.append((str(activity.pk), str(activity)))
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() == "none":
@@ -35,14 +36,15 @@ class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
     parameter_name = "participant_list_last_year"
 
     def lookups(self, request, _model_admin):
-        return [
-            (str(a.pk), str(a))
-            for a in Activity.objects.filter(
-                department__in=AdminUserInformation.get_departments_admin(request.user),
-                activitytype__id__in=["FORLØB", "ARRANGEMENT"],
-                start_date__year=timezone.now().year - 1,
-            ).order_by("department__name", "-start_date")
-        ]
+        activities = [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+            start_date__year=timezone.now().year - 1,
+        ).order_by("department__name", "-start_date"):
+            activities.append((str(activity.pk), str(activity)))
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() == "none":
@@ -60,14 +62,15 @@ class PersonParticipantActiveListFilter(admin.SimpleListFilter):
     parameter_name = "participant_list_active"
 
     def lookups(self, request, _model_admin):
-        return [
-            (str(a.pk), str(a))
-            for a in Activity.objects.filter(
-                department__in=AdminUserInformation.get_departments_admin(request.user),
-                activitytype__id__in=["FORLØB", "ARRANGEMENT"],
-                end_date__gte=timezone.now(),
-            ).order_by("department__name", "-start_date")
-        ]
+        activities = [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
+        for activity in Activity.objects.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user),
+            activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+            end_date__gte=timezone.now(),
+        ).order_by("department__name", "-start_date"):
+            activities.append((str(activity.pk), str(activity)))
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() == "none":
@@ -85,13 +88,13 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
     parameter_name = "participant_list"
 
     def lookups(self, request, model_admin):
-        activitys = [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
+        activities = [("none", "Deltager ikke"), ("any", "Alle deltagere samlet")]
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user)
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(activity.pk), str(activity)))
+            activities.append((str(activity.pk), str(activity)))
 
-        return activitys
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() == "none":
@@ -109,13 +112,13 @@ class PersonInvitedListFilter(admin.SimpleListFilter):
     parameter_name = "activity_invited_list"
 
     def lookups(self, request, model_admin):
-        activitys = [("none", "Ikke inviteret til noget"), ("any", "Alle inviterede")]
+        activities = [("none", "Ikke inviteret til noget"), ("any", "Alle inviterede")]
         for activity in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user)
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(activity.pk), str(activity)))
+            activities.append((str(activity.pk), str(activity)))
 
-        return activitys
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() == "none":
