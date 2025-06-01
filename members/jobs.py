@@ -143,7 +143,7 @@ class PollQuickpayPaymentsCronJob(CronJobBase):
 
 
 class DeleteNoteFieldCronJob(CronJobBase):
-    RUN_AT_TIMES = ["3:00", "13:18"]
+    RUN_AT_TIMES = ["3:00"]
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = "members.delete_note_field"
 
