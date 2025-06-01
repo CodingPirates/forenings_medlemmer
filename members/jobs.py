@@ -1,5 +1,6 @@
 import datetime
 
+from datetime import timedelta
 from django.conf import settings
 from django_cron import CronJobBase, Schedule
 from django.utils import timezone
@@ -19,7 +20,6 @@ from members.models import (
 # Send confirmations to Activity signups, which do not have failed payments
 class SendActivitySignupConfirmationsCronJob(CronJobBase):
     RUN_EVERY_MINS = 5  # every minute
-
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = "members.send_activity_signup_confirmation_cronjob"  # a unique code
 
@@ -50,7 +50,6 @@ class SendActivitySignupConfirmationsCronJob(CronJobBase):
 # Send out all queued emails
 class EmailSendCronJob(CronJobBase):
     RUN_EVERY_MINS = 1  # every minute
-
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = "members.email_send_cronjob"  # a unique code
 
@@ -61,7 +60,6 @@ class EmailSendCronJob(CronJobBase):
 
 class UpdateDawaData(CronJobBase):
     RUN_EVERY_MINS = 1
-
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = "members.update_dawa_data"
 
@@ -79,9 +77,7 @@ class UpdateDawaData(CronJobBase):
 # If it's the first day of the year, make sure to capture all payments that year
 class CaptureOutstandingPayments(CronJobBase):
     RUN_AT_TIMES = ["01:00"]
-
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
-
     code = "members.capture_oustanding_payments"
 
     def do(self):
@@ -93,9 +89,7 @@ class CaptureOutstandingPayments(CronJobBase):
 # Find families, which needs to update their information
 class RequestConfirmationCronJob(CronJobBase):
     RUN_AT_TIMES = ["15:00"]
-
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
-
     code = "members.request_confirmation_cronjob"  # a unique code
 
     def do(self):
@@ -130,7 +124,6 @@ class RequestConfirmationCronJob(CronJobBase):
 # Poll payments which did not recieve callback
 class PollQuickpayPaymentsCronJob(CronJobBase):
     RUN_EVERY_MINS = 60  # every minute
-
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = "members.poll_quickpayPayments_cronjob"  # a unique code
 
@@ -147,6 +140,21 @@ class PollQuickpayPaymentsCronJob(CronJobBase):
 
         for payment in payments:
             payment.get_quickpaytransaction().update_status()
+
+
+class DeleteNoteFieldCronJob(CronJobBase):
+    RUN_AT_TIMES = ["3:00", "13:18"]
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = "members.delete_note_field"
+
+    def do(self):
+        participants = ActivityParticipant.objects.filter(note__isnull=False).exclude(
+            note__exact=""
+        ).filter(activity__end_date__lt=timezone.now() - timedelta(days=14))
+
+        for participant in participants:
+            participant.note = ""
+            participant.save()
 
 
 # Send email to family if payment initiated but not accepted after 3 days
