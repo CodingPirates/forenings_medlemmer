@@ -102,6 +102,7 @@ class AddressRegionListFilter(admin.SimpleListFilter):
 
 
 class AddressAdmin(admin.ModelAdmin):
+    list_per_page = 50
     readonly_fields = (
         "created_at",
         "created_by",
