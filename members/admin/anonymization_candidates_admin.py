@@ -19,28 +19,28 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
     # Custom list display with requested columns
     list_display = (
-        'name',
-        'membertype',
-        'gender_text',
-        'family_url',
-        'age_years',
-        'last_active',
-        'latest_activity',
-        'last_login',
-        'created_date',
+        "name",
+        "membertype",
+        "gender_text",
+        "family_url",
+        "age_years",
+        "last_active",
+        "latest_activity",
+        "last_login",
+        "created_date",
     )
 
     # Keep existing filters but add focus on non-anonymized
     list_filter = (
-        'membertype',
-        'gender',
-        'family__confirmed_at',  # To help identify old/inactive families
+        "membertype",
+        "gender",
+        "family__confirmed_at",  # To help identify old/inactive families
     )
 
     # Custom actions for this view
     actions = [
-        'export_anonymization_candidates_csv',
-        'anonymize_persons',  # Reuse existing anonymization action
+        "export_anonymization_candidates_csv",
+        "anonymize_persons",  # Reuse existing anonymization action
     ]
 
     # Override title and description
@@ -54,8 +54,8 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         Remove the delete action from available actions.
         """
         actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
         return actions
 
     def get_queryset(self, request):
@@ -79,9 +79,12 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             dates.append(obj.added_at.date())
 
         # Add latest activity end date
-        latest_participation = ActivityParticipant.objects.filter(
-            person=obj
-        ).select_related('activity').order_by('-activity__end_date').first()
+        latest_participation = (
+            ActivityParticipant.objects.filter(person=obj)
+            .select_related("activity")
+            .order_by("-activity__end_date")
+            .first()
+        )
 
         if latest_participation and latest_participation.activity.end_date:
             dates.append(latest_participation.activity.end_date)
@@ -91,64 +94,61 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             dates.append(obj.user.last_login.date())
 
         if not dates:
-            date_str = 'Aldrig'
+            date_str = "Aldrig"
         else:
             most_recent_date = max(dates)
-            date_str = most_recent_date.strftime('%Y-%m-%d')
+            date_str = most_recent_date.strftime("%Y-%m-%d")
 
         # Color based on anonymization candidate status
         is_candidate = obj.is_anonymization_candidate()
-        color = 'red' if is_candidate else 'green'
+        color = "red" if is_candidate else "green"
 
-        return format_html(
-            '<span style="color: {}">{}</span>',
-            color,
-            date_str
-        )
+        return format_html('<span style="color: {}">{}</span>', color, date_str)
 
-    last_active.short_description = 'Sidst aktiv'
-    last_active.admin_order_field = 'added_at'
+    last_active.short_description = "Sidst aktiv"
+    last_active.admin_order_field = "added_at"
 
     def created_date(self, obj):
         """
         Return the date when the person was created in the system.
         """
-        return obj.added_at.strftime('%Y-%m-%d') if obj.added_at else 'Ukendt'
+        return obj.added_at.strftime("%Y-%m-%d") if obj.added_at else "Ukendt"
 
-    created_date.short_description = 'Oprettet'
-    created_date.admin_order_field = 'added_at'
+    created_date.short_description = "Oprettet"
+    created_date.admin_order_field = "added_at"
 
     def latest_activity(self, obj):
         """
         Get the latest activity participation for this person.
         """
-        latest_participation = ActivityParticipant.objects.filter(
-            person=obj
-        ).select_related('activity').order_by('-activity__end_date').first()
+        latest_participation = (
+            ActivityParticipant.objects.filter(person=obj)
+            .select_related("activity")
+            .order_by("-activity__end_date")
+            .first()
+        )
 
         if latest_participation:
             activity = latest_participation.activity
             activity_text = f"{activity.name} ({activity.end_date.strftime('%Y-%m-%d') if activity.end_date else 'Ingen slutdato'})"
             return format_html(
-                '<a href="../activity/{}">{}</a>',
-                activity.id,
-                activity_text
+                '<a href="../activity/{}">{}</a>', activity.id, activity_text
             )
-        return 'Ingen'
+        return "Ingen"
 
-    latest_activity.short_description = 'Senest tilmeldt'
-    latest_activity.admin_order_field = 'activityparticipant__activity__end_date'
+    latest_activity.short_description = "Senest tilmeldt"
+    latest_activity.admin_order_field = "activityparticipant__activity__end_date"
 
     def last_login(self, obj):
         """
         Get the last login date for this person's associated user account.
         """
         if obj.user and obj.user.last_login:
-            return obj.user.last_login.strftime('%Y-%m-%d')
-        return 'Aldrig'
+            return obj.user.last_login.strftime("%Y-%m-%d")
+        return "Aldrig"
 
-    last_login.short_description = 'Seneste login'
-    last_login.admin_order_field = 'user__last_login'
+    last_login.short_description = "Seneste login"
+    last_login.admin_order_field = "user__last_login"
 
     def export_anonymization_candidates_csv(self, request, queryset):
         """
@@ -158,9 +158,12 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
         for person in queryset:
             # Get latest activity info
-            latest_participation = ActivityParticipant.objects.filter(
-                person=person
-            ).select_related('activity').order_by('-activity__end_date').first()
+            latest_participation = (
+                ActivityParticipant.objects.filter(person=person)
+                .select_related("activity")
+                .order_by("-activity__end_date")
+                .first()
+            )
 
             if latest_participation:
                 latest_activity_str = f"{latest_participation.activity.name} ({latest_participation.activity.end_date.strftime('%Y-%m-%d') if latest_participation.activity.end_date else 'No end date'})"
@@ -169,7 +172,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
             # Get last login info
             if person.user and person.user.last_login:
-                last_login_str = person.user.last_login.strftime('%Y-%m-%d')
+                last_login_str = person.user.last_login.strftime("%Y-%m-%d")
             else:
                 last_login_str = "Aldrig"
 
@@ -185,13 +188,15 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
                 dates.append(person.user.last_login.date())
 
             if not dates:
-                last_active_str = 'Aldrig'
+                last_active_str = "Aldrig"
             else:
                 most_recent_date = max(dates)
-                last_active_str = most_recent_date.strftime('%Y-%m-%d')
+                last_active_str = most_recent_date.strftime("%Y-%m-%d")
 
             # Get created date
-            created_date_str = person.added_at.strftime('%Y-%m-%d') if person.added_at else 'Ukendt'
+            created_date_str = (
+                person.added_at.strftime("%Y-%m-%d") if person.added_at else "Ukendt"
+            )
 
             # Get membertype display
             membertype_display = person.get_membertype_display()
@@ -218,7 +223,9 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
             content_type="text/csv; charset=utf-8",
         )
-        response["Content-Disposition"] = 'attachment; filename="anonymiserings_kandidater.csv"'
+        response["Content-Disposition"] = (
+            'attachment; filename="anonymiserings_kandidater.csv"'
+        )
         return response
 
     export_anonymization_candidates_csv.short_description = "Eksporter til CSV"

@@ -183,7 +183,7 @@ class Person(models.Model):
         Determine if person is a candidate for anonymization.
         Returns False if created_date, latest_activity or last_login is less than 5 years ago.
         """
-        five_years_ago = timezone.now() - timedelta(days=5*365)
+        five_years_ago = timezone.now() - timedelta(days=5 * 365)
 
         # Check if person was created less than 5 years ago
         if self.added_at > five_years_ago:
@@ -196,9 +196,13 @@ class Person(models.Model):
         # Check if person has participated in activities within the last 5 years
         # Import here to avoid circular imports
         from .activityparticipant import ActivityParticipant
-        latest_participation = ActivityParticipant.objects.filter(
-            person=self
-        ).select_related('activity').order_by('-activity__end_date').first()
+
+        latest_participation = (
+            ActivityParticipant.objects.filter(person=self)
+            .select_related("activity")
+            .order_by("-activity__end_date")
+            .first()
+        )
 
         if latest_participation and latest_participation.activity.end_date:
             if latest_participation.activity.end_date > five_years_ago.date():
