@@ -77,10 +77,10 @@ class ActivityTypeListFilter(admin.SimpleListFilter):
         if request.user.is_superuser:
             activitytypes = ActivityType.objects.all()
         else:
-            for activitytype in ActivityType.objects.exclude(
-                id="FORENINGSMEDLEMSKAB"
-            ):
-                activitytypes.append((str(activitytype.pk), str(activitytype.display_name)))
+            for activitytype in ActivityType.objects.exclude(id="FORENINGSMEDLEMSKAB"):
+                activitytypes.append(
+                    (str(activitytype.pk), str(activitytype.display_name))
+                )
 
         return activitytypes
 
@@ -259,7 +259,9 @@ class ActivityAdmin(admin.ModelAdmin):
         ):
             return qs
         departments = Department.objects.filter(adminuserinformation__user=request.user)
-        return qs.filter(department__in=departments).exclude(activitytype_id="FORENINGSMEDLEMSKAB")
+        return qs.filter(department__in=departments).exclude(
+            activitytype_id="FORENINGSMEDLEMSKAB"
+        )
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
@@ -277,10 +279,7 @@ class ActivityAdmin(admin.ModelAdmin):
         if db_field.name == "address":
             kwargs["queryset"] = Address.get_user_addresses(request.user)
 
-        if (
-            db_field.name == "activitytype"
-            and not request.user.is_superuser
-        ):
+        if db_field.name == "activitytype" and not request.user.is_superuser:
             kwargs["queryset"] = ActivityType.objects.exclude(id="FORENINGSMEDLEMSKAB")
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
