@@ -126,6 +126,18 @@ class Union(models.Model):
             )
         ],
     )
+    cvr = models.CharField(
+        "CVR-nummer",
+        max_length=8,
+        blank=True,
+        help_text="CVR-nummer i formatet 12345678",
+        validators=[
+            RegexValidator(
+                regex="^[0-9]{8}$",
+                message="Indtast CVR-nummer i det rigtige format.",
+            )
+        ],
+    )
 
     def __str__(self):
         return self.name
