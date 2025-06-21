@@ -25,9 +25,9 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         'family_url',
         'age_years',
         'is_candidate',
-        'created_date',
         'latest_activity',
         'last_login',
+        'created_date',
     )
 
     # Keep existing filters but add focus on non-anonymized
@@ -95,10 +95,11 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
         if latest_participation:
             activity = latest_participation.activity
+            activity_text = f"{activity.name} ({activity.end_date.strftime('%Y-%m-%d') if activity.end_date else 'Ingen slutdato'})"
             return format_html(
-                '{} ({})',
-                activity.name,
-                activity.end_date.strftime('%Y-%m-%d') if activity.end_date else 'Ingen slutdato'
+                '<a href="../activity/{}">{}</a>',
+                activity.id,
+                activity_text
             )
         return 'Ingen'
 
@@ -120,7 +121,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         """
         Export the selected anonymization candidates to CSV.
         """
-        result_string = "Name;Type;Køn;Familie;Alder;Kan anonymiseres?;Oprettet;Seneste aktivitet;Seneste login\n"
+        result_string = "Name;Type;Køn;Familie;Alder;Kan anonymiseres?;Seneste aktivitet;Seneste login;Oprettet\n"
 
         for person in queryset:
             # Get latest activity info
@@ -160,9 +161,9 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
                 f'"{family_email_escaped}";'
                 f'"{person.age_years()}";'
                 f'"{is_candidate_str}";'
-                f'"{created_date_str}";'
                 f'"{latest_activity_escaped}";'
-                f'"{last_login_str}"\n'
+                f'"{last_login_str}";'
+                f'"{created_date_str}"\n'
             )
 
         response = HttpResponse(
