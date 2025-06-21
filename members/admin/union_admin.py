@@ -4,6 +4,7 @@ from django.db.models.functions import Upper
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
 from django.utils.html import escape
 
 from members.models import Address, Person, Department, AdminUserInformation
@@ -183,6 +184,11 @@ class UnionAdmin(admin.ModelAdmin):
         ):
             info_fields.append("gl_account")
 
+        if request.user.is_superuser or request.user.has_perm(
+            "members.show_new_membership_model"
+        ):
+            info_fields.append("new_membership_model_activated_at")
+
         return [
             (
                 "Navn og Adresse",
@@ -229,6 +235,18 @@ class UnionAdmin(admin.ModelAdmin):
                 },
             ),
         ]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and (
+            (request.user.is_superuser
+            or request.user.has_perm("members.show_new_membership_model"))
+            and (obj.new_membership_model_activated_at is not None
+            and obj.new_membership_model_activated_at <= now())
+        ):
+            return [
+                "new_membership_model_activated_at",
+            ]
+        return []
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey

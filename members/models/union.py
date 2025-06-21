@@ -92,6 +92,12 @@ class Union(models.Model):
         default=settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK,
         help_text=help_text,
     )
+    new_membership_model_activated_at = models.DateTimeField(
+        "Ny medlemskabsmodel aktiveret",
+        blank=True,
+        null=True,
+        help_text="Bemærk: Aktiverer du den nye medlemstabel for en forening kan det ikke ændres tilbage! Det har betydning for flere ting, og vi låser derfor feltet. Står der ikke en dato i feltet, er den nye model ikke aktiv. Står der en dato i fremtiden er den heller ikke aktiv endnu, og kan ændres. Står der en dato i fortiden er den aktiv fra og med den dato.",
+    )
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",
         default=True,
