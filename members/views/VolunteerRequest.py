@@ -119,8 +119,8 @@ def volunteer_request_view(request):
                         },
                     )
 
-            departments = volunteer_request_form.cleaned_data["department_list"]
             activities = volunteer_request_form.cleaned_data["activity_list"]
+            departments = volunteer_request_form.cleaned_data["department_list"]
 
             if not departments and not activities:
                 messages.error(

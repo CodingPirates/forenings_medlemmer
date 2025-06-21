@@ -2,7 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.db.models.functions import Lower
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Div, Field, Submit, Hidden
+from crispy_forms.layout import Layout, Fieldset, Div, Field, Submit, Hidden, HTML
 
 from members.models.volunteerrequest import VolunteerRequest
 
@@ -60,9 +60,29 @@ class VolunteerRequestForm(forms.ModelForm):
         self.fields["department_list"].queryset = Department.objects.filter(
             closed_dtm__isnull=True
         ).order_by("name")
+
+        # Dynamically update labels for department_list to include address information
+        self.fields["department_list"].choices = [
+            (
+                department.id,
+                f"Coding Pirates {department.name} ({department.address.streetname} {department.address.housenumber}, {department.address.zipcode} {department.address.city})"
+            )
+            for department in self.fields["department_list"].queryset
+        ]
+    
         self.fields["activity_list"].queryset = Activity.objects.filter(
             end_date__gte=timezone.now(), activitytype__in=["FORLØB", "ARRANGEMENT"]
         ).order_by("name")
+
+        # Dynamically update labels for activity_list to include department information and address for activities
+        self.fields["activity_list"].choices = [
+            (   
+                activity.id,
+                f"{activity.name} hos Coding Pirates {activity.department.name} ({activity.address.streetname} {activity.address.housenumber}, {activity.address.zipcode} {activity.address.city})"
+            )
+            for activity in self.fields["activity_list"].queryset
+        ]
+
         if user and user.is_authenticated:
             family = user.person.family
             self.fields["family_member"].queryset = family.person_set.all().order_by(
@@ -91,13 +111,21 @@ class VolunteerRequestForm(forms.ModelForm):
                 "Frivilliges oplysninger",
                 Div(
                     Div(Field("family_member"), css_class="col-md-12"),
-                    Div(Field("name"), css_class="col-md-12"),
-                    Div(Field("email"), css_class="col-md-12"),
+                    Div(Field("name"), css_class="col-md-6"),
+                    Div(Field("email"), css_class="col-md-6"),
                     Div(Field("phone"), css_class="col-md-4"),
                     Div(Field("age"), css_class="col-md-4"),
                     Div(Field("zip"), css_class="col-md-4"),
                     Div(Field("info_reference"), css_class="col-md-12"),
                     Div(Field("info_whishes"), css_class="col-md-12"),
+                    Div(
+                        HTML(
+                            '<input type="text" id="input-search-text" '
+                            'onkeyup="filter_label(\'input-search-text\', \'form-check-label\')" '
+                            'placeholder="Søg efter afdelinger eller aktiviteter..." class="form-control">'
+                        ),
+                        css_class="col-md-12",
+                    ),
                     Div(Field("department_list"), css_class="col-md-12"),
                     Div(Field("activity_list"), css_class="col-md-12"),
                     Div(

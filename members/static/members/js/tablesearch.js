@@ -31,3 +31,20 @@ function filter_rows_in_table(textbox_name, section_class, table_class ) {
     }
   }
 }
+
+function filter_label(textbox_name, label_class) {
+  // This function will find labels with class label_class
+  // and hide/show them based on the input text box with name textbox_name
+  var input = document.getElementById(textbox_name);
+  var filter = input.value.toUpperCase();
+  var labels = document.getElementsByClassName(label_class);
+  for (var i = 0; i < labels.length; i++) {
+    var label = labels[i];
+    var parent = label.closest("div"); // Adjust this selector to match the parent container of the checkbox and label
+    if (label.textContent.toUpperCase().indexOf(filter) > -1) {
+      parent.style.display = ""; // Show the parent container
+    } else {
+      parent.style.display = "none"; // Hide the parent container
+    }
+  }
+}

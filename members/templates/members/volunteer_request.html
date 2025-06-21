@@ -1,5 +1,8 @@
 {% extends 'members/base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
+<script src="{% static 'members/js/tablesearch.js' %}"></script>
+
 {% block content %}
     <div class="alert alert-secondary">
       {% if not user.is_authenticated %}
@@ -23,10 +26,58 @@
             </div>
           {% endfor %}
         {% endif %}
-
         <form method="post" id="volunteer-request-form">
           {% csrf_token %}
-          {{ volunteer_request_form | crispy }} 
+
+          <div class="form-group">
+            {{ volunteer_request_form.name|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ volunteer_request_form.email|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ volunteer_request_form.phone|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ volunteer_request_form.age|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ volunteer_request_form.zip|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ volunteer_request_form.info_reference|as_crispy_field }}
+          </div>
+          <div class="form-group">
+            {{ volunteer_request_form.info_whishes|as_crispy_field }}
+          </div>
+          <hr>
+          <div class="form-group">
+              <h3>
+              Du skal vælge mindst én afdeling eller én aktivitet for at kunne indsende formularen.
+              </h3>
+            <input
+              type="text"
+              id="input-search-text"
+              class="form-control"
+              placeholder="Søg efter afdelinger eller aktiviteter..."
+              onkeyup="filter_label('input-search-text', 'form-check-label')"
+            />
+          </div>
+          <div class="form-group">
+            <small class="form-text text-muted">
+              Vælg de afdelinger, hvor du ønsker at være frivillig. Du kan vælge flere afdelinger.
+            </small>
+            {{ volunteer_request_form.department_list|as_crispy_field }}
+            
+          </div>
+          <hr>
+          <div class="form-group">
+            <small class="form-text text-muted">
+              Vælg de aktiviteter, du ønsker at deltage i som frivillig. Du kan vælge flere aktiviteter.
+            </small>
+            {{ volunteer_request_form.activity_list|as_crispy_field }}
+          </div>
+
           {% if not user.is_authenticated %}
             <button type="button" class="btn btn-secondary" id="generate-code-button">Generate Code and Send to Email</button>
             <div id="email-token-field" style="display: none;">
