@@ -9,27 +9,27 @@ from .person_admin import PersonAdmin
 
 
 class IsAnonymizationCandidateFilter(admin.SimpleListFilter):
-    title = 'Aktiv mere end 5 år siden'
-    parameter_name = 'is_candidate'
+    title = "Aktiv mere end 5 år siden"
+    parameter_name = "is_candidate"
 
     def lookups(self, request, model_admin):
         return (
-            ('yes', 'Ja'),
-            ('no', 'Nej'),
+            ("yes", "Ja"),
+            ("no", "Nej"),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'yes':
+        if self.value() == "yes":
             # Filter to show only candidates
             person_ids = [
-                person.id for person in queryset
-                if person.is_anonymization_candidate()
+                person.id for person in queryset if person.is_anonymization_candidate()
             ]
             return queryset.filter(id__in=person_ids)
-        elif self.value() == 'no':
+        elif self.value() == "no":
             # Filter to show only non-candidates
             person_ids = [
-                person.id for person in queryset
+                person.id
+                for person in queryset
                 if not person.is_anonymization_candidate()
             ]
             return queryset.filter(id__in=person_ids)
