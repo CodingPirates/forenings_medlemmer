@@ -18,7 +18,7 @@ def Membership(request):
     unions = Union.objects.filter(
         closed_at=None,
         founded_at__lte=timezone.now(),
-        membership_allowed_at__lte=timezone.now(),
+        memberships_allowed_at__lte=timezone.now(),
     ).order_by("address__region", "-name", "founded_at")
 
     family = None
