@@ -1,10 +1,39 @@
 import codecs
+from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.html import format_html
 
 from members.models import ActivityParticipant
 
 from .person_admin import PersonAdmin
+
+
+class IsAnonymizationCandidateFilter(admin.SimpleListFilter):
+    title = 'Aktiv mere end 5 år siden'
+    parameter_name = 'is_candidate'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Ja'),
+            ('no', 'Nej'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            # Filter to show only candidates
+            person_ids = [
+                person.id for person in queryset
+                if person.is_anonymization_candidate()
+            ]
+            return queryset.filter(id__in=person_ids)
+        elif self.value() == 'no':
+            # Filter to show only non-candidates
+            person_ids = [
+                person.id for person in queryset
+                if not person.is_anonymization_candidate()
+            ]
+            return queryset.filter(id__in=person_ids)
+        return queryset
 
 
 class AnonymizationCandidatesAdmin(PersonAdmin):
@@ -26,11 +55,10 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         "created_date",
     )
 
-    # Keep existing filters but add focus on non-anonymized
+    # Filters for the anonymization candidates view
     list_filter = (
-        "membertype",
-        "gender",
-        "family__confirmed_at",  # To help identify old/inactive families
+        "membertype",  # Type
+        IsAnonymizationCandidateFilter,  # person.is_candidate
     )
 
     # Custom actions for this view
