@@ -1,5 +1,4 @@
 from datetime import date
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
