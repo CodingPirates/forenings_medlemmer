@@ -70,20 +70,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
     # Override title and description
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        # extra_context['title'] = 'Anonymiserings kandidater'
         return super().changelist_view(request, extra_context)
-
-    def has_view_permission(self, request, obj=None):
-        """
-        Only allow access to users with anonymize_persons permission.
-        """
-        return request.user.has_perm("members.anonymize_persons")
-
-    def has_module_permission(self, request):
-        """
-        Only show this admin in the admin index if user has anonymize_persons permission.
-        """
-        return request.user.has_perm("members.anonymize_persons")
 
     def get_actions(self, request):
         """
