@@ -1,0 +1,84 @@
+{% extends "members/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container-fluid">
+        <h1>{{union.name}}: <small>Foreningsmedlemskab</small></h1>
+          <p>
+            {{ activity.description|linebreaksbr }}
+          </p>
+      <div class="row">
+        {% if union.name == "Denmark" %}
+          <p>Dette medlemskab gør dig til medlem af Coding Pirates Denmark i indeværende kalenderår.</p>
+          <p>Medlemskab giver hverken dig eller evt. dit barn ret til at deltage i aktiviteter i foreningen - det skal der tilmeldes og betales særskilt for. Ligeledes giver medlemskab af Coding Pirates Denmark dig ikke rettigheder i andre Coding Pirates foreninger.</p>
+        {% else %}
+          <p>Dette medlemskab gør dig til medlem af Coding Pirates {{ union.name }} og Coding Pirates Denmark i indeværende kalenderår.</p>
+            <p>Medlemskab giver hverken dig eller evt. dit barn ret til at deltage i aktiviteter i foreningerne - det skal der tilmeldes og betales særskilt for. Ligeledes giver medlemskab af Coding Pirates {{ union.name }} og Coding Pirates Denmark dig ikke rettigheder i andre Coding Pirates foreninger.</p>
+        {% endif %}
+        <div class="col-lg-6">
+          <p>
+            <strong>Lokalforening:</strong><br>
+            {{ union.name }}
+          </p>
+        </div>
+        <div class="col-lg-6">
+          <strong>Foreningsadresse:</strong><br>
+            <address>
+              {{union.address.streetname}} {{union.address.housenumber}}{%if union.address.floor or union.address.door%}, {%endif%}
+              {%if union.address.floor %}{{union.address.floor}}.{%endif%}
+              {%if union.address.door%}{{union.address.door}}{%endif%}
+              <br>
+              {%if union.address.placename%}{{union.address.placename}}<br>{%endif%}
+              {{union.address.zipcode}} {{union.address.city}}<br>
+              {{union.address.placenave}}<br>
+            </address>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <p>
+          <strong>Kontakt:</strong><br>
+            <a href="mailto:{{ union.email }}" value="Kontakt foreningen">{{ union.email }}</a><br>
+          </p>
+        </div>
+        <div class="col-lg-6">
+          <p>
+          <strong>Pris:</strong><br>
+          {{ price | floatformat:2}} kr<br>
+          </p>
+        </div>
+      </div>
+      {% if not view_only_mode %}
+      <hr>
+      {% crispy signupform %}
+
+      {% else %}
+        {% if not family %}
+          <hr>
+          <a href="{% url 'person_login' %}">Log ind</a>,
+          <a href="{% url 'account_create' %}">opret en konto til en voksen og børn</a>
+          eller
+          <a href="{% url 'volunteer_signup' %}">opret en konto til en voksen</a>
+          for at blive medlem.
+        {% else %}
+          {% if signup_closed %}
+          <!--and not participating % -->
+            <hr>
+              <div class="alert alert-primary">
+                <p>Medlemskab af foreningen er desværre ikke muligt på nuværende tidspunkt. Dette kan for eksempel skyldes, at foreningen ikke er åben.</p>
+              </div>
+            <hr/>
+          {% else %}
+            {% for person in family.get_persons %}
+              {% if person.pk in family_members %}
+                {{ person.firstname }} er allerede medlem.
+              {% else %}
+                <a class="button" href="{% url 'membership_signup' union.id person.id %}">
+                  Tilmeld {{ person.firstname }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    </div>
+{% endblock %}

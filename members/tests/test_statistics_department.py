@@ -58,7 +58,9 @@ class TestDepartmentStatistics(TestCase):
                 if testDepartment["isActive"][activityIndex]:
                     testDepartment["nr_active_participants"] += 1
 
-                if testDepartment["activities"][activityIndex].member_justified:
+                if testDepartment["activities"][
+                    activityIndex
+                ].is_eligable_for_membership():
                     testDepartment["nr_members"] += 1
 
             testDepartment["nr_waitinglist"] = randint(1, 100)

@@ -57,5 +57,4 @@ class ActivityFactory(DjangoModelFactory):
     max_age = LazyAttribute(
         lambda a: a.min_age + Faker("random_int", min=10, max=80).generate({})
     )
-    member_justified = Faker("boolean")
     address = SubFactory(AddressFactory)
