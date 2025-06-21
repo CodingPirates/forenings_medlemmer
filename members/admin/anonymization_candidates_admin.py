@@ -24,7 +24,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         'gender_text',
         'family_url',
         'age_years',
-        'is_candidate',
+        'last_active',
         'latest_activity',
         'last_login',
         'created_date',
@@ -67,14 +67,47 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         # Show only non-anonymized persons
         return qs.filter(anonymized=False)
 
-    def is_candidate(self, obj):
+    def last_active(self, obj):
         """
-        Wrapper method to call the model's is_anonymization_candidate method.
+        Show the most recent date among created_date, latest_activity, and last_login.
+        Color it red if person is candidate for anonymization, green otherwise.
         """
-        return obj.is_anonymization_candidate()
+        dates = []
 
-    is_candidate.boolean = True
-    is_candidate.short_description = 'Kan anonymiseres?'
+        # Add created date
+        if obj.added_at:
+            dates.append(obj.added_at.date())
+
+        # Add latest activity end date
+        latest_participation = ActivityParticipant.objects.filter(
+            person=obj
+        ).select_related('activity').order_by('-activity__end_date').first()
+
+        if latest_participation and latest_participation.activity.end_date:
+            dates.append(latest_participation.activity.end_date)
+
+        # Add last login date
+        if obj.user and obj.user.last_login:
+            dates.append(obj.user.last_login.date())
+
+        if not dates:
+            date_str = 'Aldrig'
+        else:
+            most_recent_date = max(dates)
+            date_str = most_recent_date.strftime('%Y-%m-%d')
+
+        # Color based on anonymization candidate status
+        is_candidate = obj.is_anonymization_candidate()
+        color = 'red' if is_candidate else 'green'
+
+        return format_html(
+            '<span style="color: {}">{}</span>',
+            color,
+            date_str
+        )
+
+    last_active.short_description = 'Sidst aktiv'
+    last_active.admin_order_field = 'added_at'
 
     def created_date(self, obj):
         """
@@ -103,7 +136,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             )
         return 'Ingen'
 
-    latest_activity.short_description = 'Seneste aktivitet'
+    latest_activity.short_description = 'Senest tilmeldt'
     latest_activity.admin_order_field = 'activityparticipant__activity__end_date'
 
     def last_login(self, obj):
@@ -111,7 +144,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         Get the last login date for this person's associated user account.
         """
         if obj.user and obj.user.last_login:
-            return obj.user.last_login.strftime('%Y-%m-%d %H:%M')
+            return obj.user.last_login.strftime('%Y-%m-%d')
         return 'Aldrig'
 
     last_login.short_description = 'Seneste login'
@@ -121,7 +154,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         """
         Export the selected anonymization candidates to CSV.
         """
-        result_string = "Name;Type;Køn;Familie;Alder;Kan anonymiseres?;Seneste aktivitet;Seneste login;Oprettet\n"
+        result_string = "Name;Type;Køn;Familie;Alder;Kan anonymiseres?;Sidst aktiv;Seneste aktivitet;Seneste login;Oprettet\n"
 
         for person in queryset:
             # Get latest activity info
@@ -136,12 +169,26 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
             # Get last login info
             if person.user and person.user.last_login:
-                last_login_str = person.user.last_login.strftime('%Y-%m-%d %H:%M')
+                last_login_str = person.user.last_login.strftime('%Y-%m-%d')
             else:
                 last_login_str = "Aldrig"
 
-            # Use model method for is_candidate
             is_candidate_str = "Ja" if person.is_anonymization_candidate() else "Nej"
+
+            # Calculate last active date (same logic as in last_active method)
+            dates = []
+            if person.added_at:
+                dates.append(person.added_at.date())
+            if latest_participation and latest_participation.activity.end_date:
+                dates.append(latest_participation.activity.end_date)
+            if person.user and person.user.last_login:
+                dates.append(person.user.last_login.date())
+
+            if not dates:
+                last_active_str = 'Aldrig'
+            else:
+                most_recent_date = max(dates)
+                last_active_str = most_recent_date.strftime('%Y-%m-%d')
 
             # Get created date
             created_date_str = person.added_at.strftime('%Y-%m-%d') if person.added_at else 'Ukendt'
@@ -161,6 +208,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
                 f'"{family_email_escaped}";'
                 f'"{person.age_years()}";'
                 f'"{is_candidate_str}";'
+                f'"{last_active_str}";'
                 f'"{latest_activity_escaped}";'
                 f'"{last_login_str}";'
                 f'"{created_date_str}"\n'
