@@ -33,7 +33,7 @@ class ActivitySignupForm(forms.Form):
                         <td>{{ activity.name }}</td>
                         <td>{{ price | floatformat:2 }} kr.</td>
                       </tr>
-                      {% if activity.is_eligable_for_membership %}
+                      {% if activity.is_eligable_for_membership and union.new_membership_model_activated_at is not None and union.new_membership_model_activated_at.date <= activity.start_date %}
                         <tr>
                           <td>Medlemskab af Coding Pirates {{ union.name }}</td>
                           <td>{% if membership %}Er allerede medlem{% else %}{{ union.membership_price_in_dkk | floatformat:2 }} kr.{% endif %}</td>

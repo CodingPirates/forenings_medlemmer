@@ -125,7 +125,12 @@ def ActivitySignup(request, activity_id, person_id=None):
     # total price if the person is already member or membership is not required
     total_price = price
 
-    if not membership and activity.is_eligable_for_membership():
+    if (
+        not membership
+        and activity.is_eligable_for_membership()
+        and union.new_membership_model_activated_at is not None
+        and union.new_membership_model_activated_at.date() <= activity.start_date
+    ):
         total_price = price + union.membership_price_in_dkk
 
     if request.method == "POST":
@@ -173,10 +178,18 @@ def ActivitySignup(request, activity_id, person_id=None):
             member = None
 
             if not membership and activity.is_eligable_for_membership():
+                payment = union.membership_price_in_dkk
+                if (
+                    union.new_membership_model_activated_at is None
+                    or union.new_membership_model_activated_at.date()
+                    <= activity.start_date
+                ):
+                    payment = 0
+
                 member = Member(
                     union=union,
                     person=person,
-                    price_in_dkk=union.membership_price_in_dkk,
+                    price_in_dkk=payment,
                     member_since=(
                         datetime.now()
                         if activity.start_date.year == datetime.now().year
