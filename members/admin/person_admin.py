@@ -300,12 +300,6 @@ class PersonAdmin(admin.ModelAdmin):
             )
             return HttpResponseRedirect(request.get_full_path())
 
-        if queryset.count() > 1:
-            self.message_user(
-                request, "Kun én person kan anonymiseres ad gangen.", level="error"
-            )
-            return HttpResponseRedirect(request.get_full_path())
-
         for person in queryset:
             if person.anonymized:
                 self.message_user(
@@ -340,7 +334,7 @@ class PersonAdmin(admin.ModelAdmin):
             context,
         )
 
-    anonymize_persons.short_description = "Anonymisér person"
+    anonymize_persons.short_description = "Anonymisér"
 
     # Only view persons related to users department (all family, via participant, waitinglist & invites)
     def get_queryset(self, request):

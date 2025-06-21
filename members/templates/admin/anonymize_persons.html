@@ -22,7 +22,7 @@
 </div>
 {% endblock %}
 
-{% block content_title %}<h1>Anonymisér person</h1>{% endblock %}
+{% block content_title %}<h1>Anonymisér</h1>{% endblock %}
 
 {% block content %}
 <div id="content-main">
@@ -31,9 +31,9 @@
       <fieldset class="module aligned">
         <h2>VIGTIGT!</h2>
         <div class="description">
-          <p><b>Du er ved at anonymisere én person.</b></p>
-          <p>Dette betyder at de fleste informationer om personen slettes, primært bevares information
-            om vedkommendes kommune, således at der stadig vil kunne trækkes statistik ud senere.</p>
+          <p><b>Du er ved at anonymisere én eller flere personer.</b></p>
+          <p>Dette betyder at de fleste informationer om de valgte personer slettes, primært bevares information
+            om kommune, således at der stadig vil kunne trækkes statistik ud senere.</p>
         </div>
 
         {% csrf_token %}
@@ -46,7 +46,7 @@
 
         <h2>Bekræft person</h2>
         <div class="description">
-          <p>Følgende ({{persons.count}}) person vil blive anonymiseret:</p>
+          <p>Følgende {{persons.count}} person{{persons.count|pluralize:"er"}} vil blive anonymiseret:</p>
           <p>
             <ul>
               {% for person in persons %}
