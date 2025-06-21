@@ -13,8 +13,8 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # Move members from activities
         membership_activities = Activity.objects.filter(
-            activitytype="FORENINGSMEDLEMSKAB"
-        ) | Activity.objects.filter(activitytype="FORLØB")
+            activitytype__in=["FORENINGSMEDLEMSKAB", "FORLØB"]
+        )
 
         for activity in membership_activities:
             activityparticipants = ActivityParticipant.objects.filter(activity=activity)
