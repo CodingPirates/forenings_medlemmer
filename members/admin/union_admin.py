@@ -1,68 +1,66 @@
 import codecs
+import csv
 from django.contrib import admin
 from django.db.models.functions import Upper
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
-
+from io import StringIO
 from members.models import Address, Person, Department, AdminUserInformation
 
 from django.db.models import Count
 
 
 def generate_union_csv(queryset):
-    result_string = "Forening;Email;Oprettelsdato;Lukkedato;"
-    result_string += "formand-navn;formand-email;formand-tlf;"
-    result_string += "næstformand-navn;næstformand-email;næstformand-tlf;"
-    result_string += "kasserer-navn;kasserer-email;kasserer-tlf;"
-    result_string += "sekretær-navn;sekretær-email;sekretær-tlf\n"
+    output = StringIO()
+    writer = csv.writer(output, delimiter=";", lineterminator="\n")
+
+    header = [
+        "Forening",
+        "Email",
+        "Oprettelsdato",
+        "Lukkedato",
+        "CVR",
+        "formand-navn",
+        "formand-email",
+        "formand-tlf",
+        "næstformand-navn",
+        "næstformand-email",
+        "næstformand-tlf",
+        "kasserer-navn",
+        "kasserer-email",
+        "kasserer-tlf",
+        "sekretær-navn",
+        "sekretær-email",
+        "sekretær-tlf",
+    ]
+    writer.writerow(header)
+
+    def person_fields(person):
+        if person is None:
+            return ["", "", ""]
+        return [
+            getattr(person, "name", ""),
+            getattr(person, "email", ""),
+            getattr(person, "phone", ""),
+        ]
 
     for union in queryset:
-        result_string += union.name
-        result_string += ";"
-        result_string += union.email
-        result_string += ";"
-        if union.founded_at is not None:
-            result_string += union.founded_at.strftime("%Y-%m-%d")
-        result_string += ";"
-        if union.closed_at is not None:
-            result_string += union.closed_at.strftime("%Y-%m-%d")
-        if union.chairman is None:
-            result_string += ";;;"
-        else:
-            result_string += (
-                f";{union.chairman.name}"
-                f";{union.chairman.email}"
-                f";{union.chairman.phone}"
-            )
-        if union.second_chair is None:
-            result_string += ";;;"
-        else:
-            result_string += (
-                f";{union.second_chair.name}"
-                f";{union.second_chair.email}"
-                f";{union.second_chair.phone}"
-            )
-        if union.cashier is None:
-            result_string += ";;;"
-        else:
-            result_string += (
-                f";{union.cashier.name}"
-                f";{union.cashier.email}"
-                f";{union.cashier.phone}"
-            )
-        if union.secretary is None:
-            result_string += ";;;"
-        else:
-            result_string += (
-                f";{union.secretary.name}"
-                f";{union.secretary.email}"
-                f";{union.secretary.phone}"
-            )
+        row = [
+            union.name,
+            union.email,
+            union.founded_at.strftime("%Y-%m-%d") if union.founded_at else "",
+            union.closed_at.strftime("%Y-%m-%d") if union.closed_at else "",
+            union.cvr.strip() if union.cvr else "",
+            *person_fields(getattr(union, "chairman", None)),
+            *person_fields(getattr(union, "second_chair", None)),
+            *person_fields(getattr(union, "cashier", None)),
+            *person_fields(getattr(union, "secretary", None)),
+        ]
+        writer.writerow(row)
 
-        result_string += "\n"
-    return result_string
+    return output.getvalue()
 
 
 class AdminUserUnionInline(admin.TabularInline):
@@ -143,6 +141,7 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
         "waitinglist_count_link",
+        "has_cvr_number",
     )
     list_filter = (
         "address__region",
@@ -192,7 +191,7 @@ class UnionAdmin(admin.ModelAdmin):
             (
                 "Navn og Adresse",
                 {
-                    "fields": ("name", "email", "address"),
+                    "fields": ("name", "cvr", "email", "address"),
                     "description": "<p>Udfyld navnet på foreningen (f.eks København, \
                         vestjylland) og adressen<p>",
                 },
@@ -291,3 +290,10 @@ class UnionAdmin(admin.ModelAdmin):
         return response
 
     export_csv_union_info.short_description = "Exporter Foreningsinformationer"
+
+    def has_cvr_number(self, obj):
+        return bool(obj.cvr and obj.cvr.strip())
+
+    has_cvr_number.boolean = True
+    has_cvr_number.short_description = "CVR"
+    has_cvr_number.admin_order_field = "cvr"
