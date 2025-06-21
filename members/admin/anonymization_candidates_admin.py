@@ -1,12 +1,8 @@
 import codecs
-from datetime import timedelta
-from django.contrib import admin
-from django.db.models import Max, Q
 from django.http import HttpResponse
-from django.utils import timezone
 from django.utils.html import format_html
 
-from members.models import AnonymizationCandidate, ActivityParticipant
+from members.models import ActivityParticipant
 
 from .person_admin import PersonAdmin
 
@@ -48,6 +44,18 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         extra_context = extra_context or {}
         # extra_context['title'] = 'Anonymiserings kandidater'
         return super().changelist_view(request, extra_context)
+
+    def has_view_permission(self, request, obj=None):
+        """
+        Only allow access to users with anonymize_persons permission.
+        """
+        return request.user.has_perm("members.anonymize_persons")
+
+    def has_module_permission(self, request):
+        """
+        Only show this admin in the admin index if user has anonymize_persons permission.
+        """
+        return request.user.has_perm("members.anonymize_persons")
 
     def get_actions(self, request):
         """
