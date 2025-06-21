@@ -20,6 +20,7 @@ import members.models.member
 import members.models.notification
 import members.models.payment
 import members.models.person
+import members.models.anonymization_candidate
 import members.models.quickpaytransaction
 import members.models.union
 import members.models.volunteer
@@ -49,6 +50,7 @@ from .member import Member
 from .notification import Notification
 from .payment import Payment
 from .person import Person
+from .anonymization_candidate import AnonymizationCandidate
 from .union import Union
 from .volunteer import Volunteer
 from .waitinglist import WaitingList
@@ -64,6 +66,7 @@ __all__ = [
     ActivityParticipant,
     Address,
     AdminUserInformation,
+    AnonymizationCandidate,
     Consent,
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
