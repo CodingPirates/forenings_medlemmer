@@ -48,6 +48,7 @@ class UnionAdminTest(StaticLiveServerTestCase):
             email="union1@example.com",
             founded_at="2023-01-01",
             closed_at="2023-12-31",
+            cvr="11223344",
         )
         self.union2 = Union.objects.create(
             name="Union2",
@@ -240,17 +241,17 @@ class UnionAdminTest(StaticLiveServerTestCase):
         queryset = Union.objects.all()
         result_string = generate_union_csv(queryset)
         expected_csv_content = (
-            "Forening;Email;Oprettelsdato;Lukkedato;"
+            "Forening;Email;Oprettelsdato;Lukkedato;CVR;"
             "formand-navn;formand-email;formand-tlf;"
             "næstformand-navn;næstformand-email;næstformand-tlf;"
             "kasserer-navn;kasserer-email;kasserer-tlf;"
             "sekretær-navn;sekretær-email;sekretær-tlf\n"
-            "Union1;union1@example.com;2023-01-01;2023-12-31;"
+            "Union1;union1@example.com;2023-01-01;2023-12-31;11223344;"
             "person1;person1@example.com;12345678;"
             "person2;person2@example.com;87654321;"
             "person3;person3@example.com;11223344;"
             "person4;person4@example.com;44332211\n"
-            "Union2;union2@example.com;2023-02-01;2023-11-30;"
+            "Union2;union2@example.com;2023-02-01;2023-11-30;;"
             ";;;;;;;;;;;\n"
         )
 
