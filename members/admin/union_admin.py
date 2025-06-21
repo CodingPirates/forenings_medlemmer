@@ -238,10 +238,14 @@ class UnionAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj and (
-            (request.user.is_superuser
-            or request.user.has_perm("members.show_new_membership_model"))
-            and (obj.new_membership_model_activated_at is not None
-            and obj.new_membership_model_activated_at <= now())
+            (
+                request.user.is_superuser
+                or request.user.has_perm("members.show_new_membership_model")
+            )
+            and (
+                obj.new_membership_model_activated_at is not None
+                and obj.new_membership_model_activated_at <= now()
+            )
         ):
             return [
                 "new_membership_model_activated_at",
