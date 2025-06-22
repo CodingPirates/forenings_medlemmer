@@ -1,5 +1,4 @@
 from datetime import date
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
@@ -23,8 +22,15 @@ class Command(BaseCommand):
                 self.create_membership_if_not_exists(activityparticipant)
 
     def create_membership_if_not_exists(self, activityparticipant):
+        if activityparticipant.activity.activitytype_id == "FORLØB":
+            union = activityparticipant.activity.department.union
+            amount = 0
+        else:
+            union = activityparticipant.activity.union
+            amount = activityparticipant.activity.union.membership_price_in_dkk
+
         if not Member.objects.filter(
-            union=activityparticipant.activity.union,
+            union=union,
             person=activityparticipant.person,
             member_since__year=activityparticipant.added_at.year,
         ).exists():
@@ -37,21 +43,13 @@ class Command(BaseCommand):
                 amount = payment.first().amount_ore / 100
                 paid_at = payment.first().confirmed_at
             else:
-                amount = activityparticipant.activity.price_in_dkk
                 paid_at = None
 
             Member.objects.create(
-                union=activityparticipant.activity.union,
+                union=union,
                 person=activityparticipant.person,
                 member_since=activityparticipant.added_at,
                 member_until=date(activityparticipant.added_at.year, 12, 31),
                 price_in_dkk=amount,
                 paid_at=paid_at,
             )
-
-            if activityparticipant.activity.activitytype == "FORLØB":
-                activityparticipant.price_in_dkk = (
-                    activityparticipant.activity.price_in_dkk
-                    - settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK
-                )
-                activityparticipant.save()

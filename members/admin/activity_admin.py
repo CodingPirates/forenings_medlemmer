@@ -75,7 +75,10 @@ class ActivityTypeListFilter(admin.SimpleListFilter):
         activitytypes = []
 
         if request.user.is_superuser:
-            activitytypes = ActivityType.objects.all()
+            for activitytype in ActivityType.objects.all():
+                activitytypes.append(
+                    (str(activitytype.pk), str(activitytype.display_name))
+                )
         else:
             for activitytype in ActivityType.objects.exclude(id="FORENINGSMEDLEMSKAB"):
                 activitytypes.append(
