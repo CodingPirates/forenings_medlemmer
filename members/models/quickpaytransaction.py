@@ -78,10 +78,14 @@ class QuickpayTransaction(models.Model):
                 autocapture = False
 
                 if self.payment.member:
-                    autocapture = self.payment.member.member_since.year <= timezone.now().year
+                    autocapture = (
+                        self.payment.member.member_since.year <= timezone.now().year
+                    )
 
                 if self.payment.activity:
-                    autocapture = self.payment.activity.start_date.year <= timezone.now().year
+                    autocapture = (
+                        self.payment.activity.start_date.year <= timezone.now().year
+                    )
 
                 # Enable auto-capture if the activity starts this year
                 link = client.put(
@@ -92,7 +96,7 @@ class QuickpayTransaction(models.Model):
                         "continueurl": return_url,
                         "cancelurl": return_url,
                         "customer_email": self.payment.family.email,
-                        "autocapture": autocapture
+                        "autocapture": autocapture,
                     },
                 )
 
