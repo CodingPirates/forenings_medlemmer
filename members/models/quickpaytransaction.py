@@ -74,7 +74,7 @@ class QuickpayTransaction(models.Model):
                 if self.transaction_id is None:
                     raise Exception("we did not get a transaction_id")
 
-                # auto capture
+                # We use autocapture to make sure the payment is captured in the correct accounting year
                 autocapture = False
 
                 if self.payment.member:
