@@ -48,8 +48,8 @@ class Command(BaseCommand):
             Member.objects.create(
                 union=union,
                 person=activityparticipant.person,
-                member_since=activityparticipant.added_at,
-                member_until=date(activityparticipant.added_at.year, 12, 31),
+                member_since=activityparticipant.added_at if activityparticipant.activity.start_date.year == activityparticipant.added_at.year else date(activityparticipant.activity.start_date.year, 1, 1),
+                member_until=date(activityparticipant.activity.start_date.year, 12, 31),
                 price_in_dkk=amount,
                 paid_at=paid_at,
             )
