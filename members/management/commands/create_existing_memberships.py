@@ -32,7 +32,7 @@ class Command(BaseCommand):
         if not Member.objects.filter(
             union=union,
             person=activityparticipant.person,
-            member_since__year=activityparticipant.activity.starte_date.year,
+            member_since__year=activityparticipant.activity.start_date.year,
         ).exists():
             payment = Payment.objects.filter(
                 activity=activityparticipant.activity,
