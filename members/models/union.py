@@ -15,6 +15,7 @@ class Union(models.Model):
         permissions = (
             ("view_all_unions", "Can view all Foreninger"),
             ("show_ledger_account", "Show General Ledger Account"),
+            ("show_new_membership_model", "Show New Membership Model"),
         )
 
     help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
