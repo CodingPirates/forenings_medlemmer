@@ -42,11 +42,7 @@ class ActivityFactory(DjangoModelFactory):
         "date_time_between", tzinfo=TIMEZONE, start_date="-100d", end_date="+100d"
     )
     start_date = LazyAttribute(
-        lambda d: (
-            datetime_before(d.now)
-            if d.active
-            else d.fallback_date
-        )
+        lambda d: (datetime_before(d.now) if d.active else d.fallback_date)
     )
     end_date = LazyAttribute(
         lambda d: datetime_after(d.now) if d.active else datetime_before(d.now)
@@ -56,7 +52,5 @@ class ActivityFactory(DjangoModelFactory):
     price_in_dkk = Faker("random_number", digits=4)
     max_participants = Faker("random_number")
     min_age = Faker("random_int", min=5, max=18)
-    max_age = LazyAttribute(
-        lambda a: a.min_age + random.randint(10, 80)
-    )
+    max_age = LazyAttribute(lambda a: a.min_age + random.randint(10, 80))
     address = SubFactory(AddressFactory)
