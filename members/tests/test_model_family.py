@@ -105,7 +105,7 @@ class TestModelFamily(TestCase):
         request = self.create_request_with_permission("members.anonymize_persons")
         family.anonymize(request)
 
-        self.assertEquals(family.email, f"anonym-{family.id}@codingpirates.dk")
+        self.assertEqual(family.email, f"anonym-{family.id}@codingpirates.dk")
         self.assertTrue(family.dont_send_mails)
         self.assertTrue(family.anonymized)
 
