@@ -1,4 +1,5 @@
 import random
+from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -156,8 +157,10 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         if not settings.TESTING:
-            self = self.update_dawa_data(force=True, save=False)
-        return super(Person, self).save(*args, **kwargs)
+            updated = self.update_dawa_data(force=True, save=False)
+            if updated is not None:
+                self = updated
+        return super().save(*args, **kwargs)
 
     def address(self):
         return format_address(self.streetname, self.housenumber, self.floor, self.door)
@@ -192,6 +195,38 @@ class Person(models.Model):
             return "Andet"
         else:
             return "N/A"
+
+    def is_anonymization_candidate(self):
+        """
+        Determine if person is a candidate for anonymization.
+        Returns False if created_date, latest_activity or last_login is less than 5 years ago.
+        """
+        five_years_ago = timezone.now() - timedelta(days=5 * 365)
+
+        # Check if person was created less than 5 years ago
+        if self.added_at > five_years_ago:
+            return False
+
+        # Check if user has logged in within the last 5 years
+        if self.user and self.user.last_login and self.user.last_login > five_years_ago:
+            return False
+
+        # Check if person has participated in activities within the last 5 years
+        # Import here to avoid circular imports
+        from .activityparticipant import ActivityParticipant
+
+        latest_participation = (
+            ActivityParticipant.objects.filter(person=self)
+            .select_related("activity")
+            .order_by("-activity__end_date")
+            .first()
+        )
+
+        if latest_participation and latest_participation.activity.end_date:
+            if latest_participation.activity.end_date > five_years_ago.date():
+                return False
+
+        return True
 
     def update_dawa_data(self, force=False, save=True):
         if self.address_invalid and not force:

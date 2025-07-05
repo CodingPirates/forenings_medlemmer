@@ -218,6 +218,10 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity__name",
     )
 
+    search_help_text = mark_safe(
+        "<b>Noter til aktiviteten slettes automatisk 14 dage efter aktiviteten er afholdt på grund af GDPR.</b>"
+    )
+
     actions = [
         AdminActions.invite_many_to_activity_action,
         AdminActions.export_participants_csv,

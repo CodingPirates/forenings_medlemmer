@@ -16,9 +16,11 @@ import members.models.equipment
 import members.models.equipmentloan
 import members.models.family
 import members.models.municipality
+import members.models.member
 import members.models.notification
 import members.models.payment
 import members.models.person
+import members.models.anonymization_candidate
 import members.models.quickpaytransaction
 import members.models.union
 import members.models.volunteer
@@ -44,9 +46,11 @@ from .equipment import Equipment
 from .equipmentloan import EquipmentLoan
 from .family import Family
 from .municipality import Municipality
+from .member import Member
 from .notification import Notification
 from .payment import Payment
 from .person import Person
+from .anonymization_candidate import AnonymizationCandidate
 from .union import Union
 from .volunteer import Volunteer
 from .waitinglist import WaitingList
@@ -62,6 +66,7 @@ __all__ = [
     ActivityParticipant,
     Address,
     AdminUserInformation,
+    AnonymizationCandidate,
     Consent,
     DailyStatisticsGeneral,
     DailyStatisticsRegion,
@@ -74,6 +79,7 @@ __all__ = [
     Family,
     gatherDayliStatistics,
     Municipality,
+    Member,
     Notification,
     Payment,
     Person,

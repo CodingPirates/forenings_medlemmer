@@ -16,6 +16,9 @@ You are more than welcome to contribute to the system. This guide documents how 
 - Run `docker compose up` to start your local system.  
   (If on Apple Silicon machine, run `docker compose -f docker-compose.yml -f docker-compose.arm64.yml up --build`)
 
+- Start by importing municipalities. This step is important, otherwise you might get issues creating users later
+  `docker compose run  web ./manage.py import_municipalities members/management/commands/municipalities.csv`
+
 - Optional, run `docker compose run web ./manage.py get_live_data` to download public data and insert it into your local database.
 
 - Optional, to get some dummy members, families, etc. you can use the [factories][factories] to create them.
@@ -41,6 +44,7 @@ You are more than welcome to contribute to the system. This guide documents how 
 
 - To create a super user for the admin interface you can run
     `docker compose run web ./manage.py createsuperuser`
+    (on Mac: `docker compose -f docker-compose.yml -f docker-compose.arm64.yml run web ./manage.py createsuperuser`)
 
 - A pgAdmin container is configured as part of Docker Compose, and can be accessed on <http://localhost:5050>.
     Log in with credentials `admin@example.com`/`admin`. Connection to database has been configured in

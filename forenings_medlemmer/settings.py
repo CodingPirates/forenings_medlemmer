@@ -94,6 +94,7 @@ INSTALLED_APPS = (
     "django.contrib.admin",
     "graphene_django",
     "django_extensions",
+    "rangefilter",
 )
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -214,6 +215,7 @@ CRON_CLASSES = [
     "members.jobs.PollQuickpayPaymentsCronJob",
     "members.jobs.UpdateDawaData",
     "members.jobs.CaptureOutstandingPayments",
+    "members.jobs.DeleteNoteFieldCronJob",
 ]
 
 # Dont keep job logs more than 7 days old
@@ -238,3 +240,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 LOGIN_URL = "/account/login/"
 LOGIN_REDIRECT_URL = "/"
+
+MINIMUM_MEMBERSHIP_PRICE_IN_DKK = 75
+MINIMUM_SEASON_PRICE_IN_DKK = 150
+MINIMUM_PRICE_IN_DKK = 0
