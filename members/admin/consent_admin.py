@@ -9,7 +9,6 @@ from members.models import Person
 
 
 class ConsentAdmin(admin.ModelAdmin):
-    list_per_page = 50
     change_form_template = "admin/members/consent/change_form.html"
 
     list_display = (

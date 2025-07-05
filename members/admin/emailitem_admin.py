@@ -120,7 +120,6 @@ class departmentFilter(admin.SimpleListFilter):
 
 
 class EmailItemAdmin(admin.ModelAdmin):
-    list_per_page = 50
     list_display = [
         "created_dtm",
         "receiver",

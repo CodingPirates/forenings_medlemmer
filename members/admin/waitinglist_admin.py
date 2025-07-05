@@ -198,8 +198,6 @@ class WaitingListAdmin(admin.ModelAdmin):
         form = super().get_form(request, obj=obj, change=change, **kwargs)
         return form
 
-    list_per_page = 50
-
     list_display = (
         "department_link",
         "person_link",

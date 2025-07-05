@@ -37,7 +37,6 @@ from members.admin.admin_actions import AdminActions
 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_per_page = 50
     list_display = (
         "name",
         "membertype",
@@ -107,7 +106,8 @@ class PersonAdmin(admin.ModelAdmin):
 
     family_referer.allow_tags = True
     family_referer.short_description = "Hvor hørte de om os?"
-
+    list_per_page = 20
+    
     def gender_text(self, item):
         return item.gender_text()
 

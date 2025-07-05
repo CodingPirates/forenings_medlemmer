@@ -29,7 +29,7 @@ class FamilyAdmin(admin.ModelAdmin):
 
     fields = ("email", "dont_send_mails", "confirmed_at")
     readonly_fields = ("confirmed_at",)
-    list_per_page = 50
+    list_per_page = 20
 
     def create_new_uuid(self, request, queryset):
         for family in queryset:

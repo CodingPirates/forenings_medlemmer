@@ -134,7 +134,6 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         verbose_name = "Invitation"
         verbose_name_plural = "Invitationer"
 
-    list_per_page = 50
     list_display = (
         "pk",
         "person_link",

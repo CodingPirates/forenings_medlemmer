@@ -4,7 +4,6 @@ from .inlines import EquipmentLoanInline
 
 
 class EquipmentAdmin(admin.ModelAdmin):
-    list_per_page = 50
     list_filter = ["department", "union"]
     list_display = ["title", "count", "union", "department"]
     search_fields = ("title", "notes")

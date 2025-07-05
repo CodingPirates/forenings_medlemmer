@@ -17,7 +17,6 @@ from django.db.models import Count
 
 class AdminUserDepartmentInline(admin.TabularInline):
     model = AdminUserInformation.departments.through
-    list_per_page = 50
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
