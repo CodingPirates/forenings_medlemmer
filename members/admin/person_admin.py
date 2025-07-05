@@ -107,7 +107,7 @@ class PersonAdmin(admin.ModelAdmin):
     family_referer.allow_tags = True
     family_referer.short_description = "Hvor hørte de om os?"
     list_per_page = 20
-    
+
     def gender_text(self, item):
         return item.gender_text()
 

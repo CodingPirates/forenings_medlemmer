@@ -9,3 +9,4 @@ class EquipmentAdmin(admin.ModelAdmin):
     search_fields = ("title", "notes")
     raw_id_fields = ("department", "union")
     inlines = (EquipmentLoanInline,)
+    list_per_page = 20
