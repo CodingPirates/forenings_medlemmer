@@ -1,4 +1,5 @@
 import codecs
+from django.conf import settings
 from django.contrib import admin
 from django.db.models.functions import Upper
 from django.urls import reverse
@@ -26,7 +27,7 @@ class AdminUserDepartmentInline(admin.TabularInline):
     extra = 0
     verbose_name = "Admin Bruger"
     verbose_name_plural = "Admin Brugere"
-
+    list_per_page = settings.LIST_PER_PAGE
     fields = (
         "user_username",
         "user_first_name",

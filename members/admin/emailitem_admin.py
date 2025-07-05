@@ -1,4 +1,5 @@
 from typing import Any
+from django.conf import settings
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -120,6 +121,8 @@ class departmentFilter(admin.SimpleListFilter):
 
 
 class EmailItemAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
+
     list_display = [
         "created_dtm",
         "receiver",

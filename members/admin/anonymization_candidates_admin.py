@@ -1,4 +1,5 @@
 import codecs
+from django.conf import settings
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.html import format_html
@@ -41,6 +42,8 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
     Admin view for showing persons who are candidates for being anonymized.
     Inherits from PersonAdmin to reuse existing functionality.
     """
+
+    list_per_page = settings.LIST_PER_PAGE
 
     # Custom list display with requested columns
     list_display = (
