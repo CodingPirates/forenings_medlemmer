@@ -10,24 +10,23 @@ from .person_admin import PersonAdmin
 
 
 class IsAnonymizationCandidateFilter(admin.SimpleListFilter):
-    title = "Aktiv mere end 5 år siden"
+    title = "Aktiv"
     parameter_name = "is_candidate"
 
     def lookups(self, request, model_admin):
         return (
-            ("yes", "Ja"),
-            ("no", "Nej"),
+            ("yes", "Ja, seneste 5 år"),
+            ("no", "Nej, ikke aktiv seneste 5 år"),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == "yes":
-            # Filter to show only candidates
+        if self.value() == "no":
+            # show members that hasn't been active in the last 5 years
             person_ids = [
                 person.id for person in queryset if person.is_anonymization_candidate()
             ]
             return queryset.filter(id__in=person_ids)
-        elif self.value() == "no":
-            # Filter to show only non-candidates
+        elif self.value() == "yes":
             person_ids = [
                 person.id
                 for person in queryset
@@ -92,6 +91,12 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         qs = super().get_queryset(request)
         # Show only non-anonymized persons
         return qs.filter(anonymized=False)
+
+    def has_add_permission(self, request):
+        """
+        Hide add button on admin view page
+        """
+        return False
 
     def last_active(self, obj):
         """
