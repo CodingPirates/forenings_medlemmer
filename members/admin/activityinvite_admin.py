@@ -1,6 +1,7 @@
 import codecs
 from datetime import timedelta
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin.widgets import AdminDateWidget
@@ -134,6 +135,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         verbose_name = "Invitation"
         verbose_name_plural = "Invitationer"
 
+    list_per_page = settings.LIST_PER_PAGE
     list_display = (
         "pk",
         "person_link",
