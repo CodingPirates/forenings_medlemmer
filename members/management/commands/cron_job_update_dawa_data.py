@@ -4,6 +4,7 @@ from members.models import (
     Person,
 )
 
+
 class Command(BaseCommand):
     help = "Updates DAWA data to ensure correct address information"
 

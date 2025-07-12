@@ -6,8 +6,9 @@ from members.models import (
     ActivityParticipant,
 )
 
+
 class Command(BaseCommand):
-    help = 'Delete note field after end of activity due to GDPR.'
+    help = "Delete note field after end of activity due to GDPR."
 
     def handle(self, *args, **options):
         participants = (

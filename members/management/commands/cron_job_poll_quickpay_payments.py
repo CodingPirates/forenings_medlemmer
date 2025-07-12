@@ -9,7 +9,7 @@ from members.models import (
 
 
 class Command(BaseCommand):
-    help = 'Poll Quickpay payments which did not recieve callback'
+    help = "Poll Quickpay payments which did not recieve callback"
 
     def handle(self, *args, **options):
         outdated_dtm = timezone.now() - datetime.timedelta(

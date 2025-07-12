@@ -4,6 +4,7 @@ from members.models import (
     EmailItem,
 )
 
+
 class Command(BaseCommand):
     help = "Send pending emails"
 
