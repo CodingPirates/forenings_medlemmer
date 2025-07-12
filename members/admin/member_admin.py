@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 
 from members.models import (
@@ -16,6 +17,8 @@ from .filters.member_admin_filters import (
 
 
 class MemberAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
+
     list_display = [
         "person",
         "union",
