@@ -135,6 +135,22 @@ class Person(models.Model):
         verbose_name="Samtykke givet af",
     )
     consent_at = models.DateTimeField("Samtykke dato", null=True, blank=True)
+    REGION_CHOICES = (
+        ("Region Syddanmark", "Syddanmark"),
+        ("Region Hovedstaden", "Hovedstaden"),
+        ("Region Nordjylland", "Nordjylland"),
+        ("Region Midtjylland", "Midtjylland"),
+        ("Region Sjælland", "Sjælland"),
+        ("Andet", "Andet"),
+    )
+    region = models.CharField(
+        "Region",
+        choices=REGION_CHOICES,
+        max_length=20,
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     def __str__(self):
         return self.name
@@ -262,6 +278,7 @@ class Person(models.Model):
                 self.municipality = Municipality.objects.get(
                     dawa_id=access_address["kommune"]["kode"]
                 )
+                self.region = access_address["region"]["navn"]
                 self.dawa_id = address["id"]
                 if save:
                     self.save()
