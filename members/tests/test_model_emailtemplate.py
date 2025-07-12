@@ -3,7 +3,7 @@ from members.models.emailtemplate import EmailTemplate
 from members.models.family import Family
 from members.models.person import Person
 from django.core import mail
-from members.jobs import EmailSendCronJob
+from django.core.management import call_command
 
 from .factories import DepartmentFactory, UnionFactory
 
@@ -58,7 +58,7 @@ class TestEmailTemplate(TestCase):
     @override_settings(SITE_CONTACT="TEST <from@example.com>")
     def test_send_email_family(self):
         self.template.makeEmail(self.family, {})
-        EmailSendCronJob().do()
+        call_command("cron_job_email_send")
         self.util_check_email(["family@example.com"])
 
     @override_settings(SITE_CONTACT="TEST <from@example.com>")
@@ -66,7 +66,7 @@ class TestEmailTemplate(TestCase):
         self.family.dont_send_mails = True
         self.family.save()
         self.template.makeEmail(self.family, {})
-        EmailSendCronJob().do()
+        call_command("cron_job_email_send")
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(SITE_CONTACT="TEST <from@example.com>")
@@ -74,7 +74,7 @@ class TestEmailTemplate(TestCase):
         self.person.email = "person@example.com"
         self.person.save()
         self.template.makeEmail(self.person, {})
-        EmailSendCronJob().do()
+        call_command("cron_job_email_send")
         self.util_check_email(["person@example.com"])
 
     @override_settings(SITE_CONTACT="TEST <from@example.com>")
@@ -82,11 +82,11 @@ class TestEmailTemplate(TestCase):
         self.family.dont_send_mails = True
         self.family.save()
         self.template.makeEmail(self.person, {})
-        EmailSendCronJob().do()
+        call_command("cron_job_email_send")
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(SITE_CONTACT="TEST <from@example.com>")
     def test_send_email_department(self):
         self.template.makeEmail(self.department, {})
-        EmailSendCronJob().do()
+        call_command("cron_job_email_send")
         self.util_check_email(["department@example.com"])
