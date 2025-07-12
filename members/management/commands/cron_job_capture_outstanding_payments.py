@@ -6,6 +6,7 @@ from members.models import (
     Payment,
 )
 
+
 class Command(BaseCommand):
     help = "If a person sign up and pay before the end of the year, a payment is created but not captured. Capture all outstanding payments at the beginning of the year."
 
