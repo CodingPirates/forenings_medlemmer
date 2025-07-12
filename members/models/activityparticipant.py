@@ -150,6 +150,8 @@ class ActivityParticipant(models.Model):
         missing_payments = ActivityParticipant.objects.filter(
             person__family_id=family_id,
             activity__end_date__gt=timezone.now(),
+            payment__isnull=False,
+            activity__price_in_dkk__gt=0,
             payment__accepted_at=None,
         )
         return missing_payments
