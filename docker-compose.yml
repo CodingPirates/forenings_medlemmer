@@ -55,7 +55,7 @@ services:
       - ${PWD}/pgadmin4/servers.json:/pgadmin4/servers.json
 
   selenium:
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chromium
     networks:
       - webnet
     ports:
