@@ -14,7 +14,6 @@ You are more than welcome to contribute to the system. This guide documents how 
     local development configuration, copy the file `.env.example` to `.env`
 
 - Run `docker compose up` to start your local system.  
-  (If on Apple Silicon machine, run `docker compose -f docker-compose.yml -f docker-compose.arm64.yml up --build`)
 
 - Start by importing municipalities. This step is important, otherwise you might get issues creating users later
   `docker compose run  web ./manage.py import_municipalities members/management/commands/municipalities.csv`
@@ -43,8 +42,9 @@ You are more than welcome to contribute to the system. This guide documents how 
     with the real world. For instance each member belongs to their own department.
 
 - To create a super user for the admin interface you can run
-    `docker compose run web ./manage.py createsuperuser`
-    (on Mac: `docker compose -f docker-compose.yml -f docker-compose.arm64.yml run web ./manage.py createsuperuser`)
+    ```bash
+    docker compose run web ./manage.py createsuperuser
+    ```
 
 - A pgAdmin container is configured as part of Docker Compose, and can be accessed on <http://localhost:5050>.
     Log in with credentials `admin@example.com`/`admin`. Connection to database has been configured in
