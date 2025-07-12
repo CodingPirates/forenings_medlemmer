@@ -186,7 +186,7 @@ class PersonAdmin(admin.ModelAdmin):
     consent_preview_link.short_description = "Privatlivspolitik"
 
     def get_readonly_fields(self, request, obj=None):
-        if type(obj) == Person and not request.user.is_superuser:
+        if type(obj) is Person and not request.user.is_superuser:
             readonly_fields = [
                 "name",
                 "streetname",

@@ -74,7 +74,7 @@ class Person(models.Model):
         max_length=200,
         validators=[
             RegexValidator(
-                '^(?!.*[:;,"[\]{}*&^%$#@!_+=\/\\\\<>|])\S+\s+\S+.*$',  # noqa: W605
+                r'^(?!.*[:;,"[\]{}*&^%$#@!_+=\/\\\\<>|])\S+\s+\S+.*$',  # noqa: W605
                 message="Indtast et gyldigt navn bestående af fornavn og minimum et efternavn.",
             )
         ],

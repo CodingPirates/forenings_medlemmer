@@ -90,7 +90,6 @@ INSTALLED_APPS = (
     "members",
     "crispy_forms",
     "crispy_bootstrap5",
-    "django_cron",
     "django.contrib.admin",
     "graphene_django",
     "django_extensions",
