@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
@@ -181,6 +182,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
     list_display = [
         "activity_link",
         "added_at",

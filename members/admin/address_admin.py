@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from members.models import Address
 
@@ -102,6 +103,8 @@ class AddressRegionListFilter(admin.SimpleListFilter):
 
 
 class AddressAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
+
     readonly_fields = (
         "created_at",
         "created_by",
