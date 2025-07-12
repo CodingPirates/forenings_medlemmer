@@ -3,10 +3,10 @@ from random import randint
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from django.core import mail
-from members.jobs import EmailSendCronJob
 from members.models.family import Family
 from members.models.person import Person
 from members.models.emailtemplate import EmailTemplate
+from django.core.management import call_command
 
 from members.tests.factories import FamilyFactory, PersonFactory
 
@@ -62,7 +62,7 @@ class TestModelFamily(TestCase):
 
         family = FamilyFactory()
         family.send_link_email()
-        EmailSendCronJob().do()
+        call_command("cron_job_email_send")
         self.assertEqual(1, len(mail.outbox))
         self.assertEqual("TEMPLATE SUBJECT", mail.outbox[0].subject)
 
