@@ -14,7 +14,10 @@
             <a href="{% url "admin:index" %}">ADMIN</a>
         {% endif %}
         <a href="{% url "family_detail" %}">Familie</a>
-        <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
+        <form action="{% url 'person_logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Log ud</button>
+        </form>
     {% else %}
         <a href="{% url "account_create" %}">Tilmeld barn</a>
         <a href="{% url "volunteer_signup" %}">Bliv frivillig</a>

@@ -40,7 +40,7 @@ class EntryPageTest(StaticLiveServerTestCase):
         log_in(self, self.person)
 
         self.browser.find_element(By.LINK_TEXT, "Familie")
-        self.browser.find_element(By.LINK_TEXT, "Log ud")
+        self.browser.find_element(By.XPATH, "//button[text()='Log ud']")
 
     def test_entry_page(self):
         self.browser.get(f"{self.live_server_url}")

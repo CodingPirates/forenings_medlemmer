@@ -1,5 +1,6 @@
 import codecs
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
@@ -36,6 +37,8 @@ from members.admin.admin_actions import AdminActions
 
 
 class PersonAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
+
     list_display = (
         "name",
         "membertype",
@@ -104,7 +107,6 @@ class PersonAdmin(admin.ModelAdmin):
 
     family_referer.allow_tags = True
     family_referer.short_description = "Hvor hørte de om os?"
-    list_per_page = 20
 
     def gender_text(self, item):
         return item.gender_text()
@@ -184,7 +186,7 @@ class PersonAdmin(admin.ModelAdmin):
     consent_preview_link.short_description = "Privatlivspolitik"
 
     def get_readonly_fields(self, request, obj=None):
-        if type(obj) == Person and not request.user.is_superuser:
+        if type(obj) is Person and not request.user.is_superuser:
             readonly_fields = [
                 "name",
                 "streetname",

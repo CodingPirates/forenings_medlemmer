@@ -1,4 +1,5 @@
 from uuid import uuid4
+from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
 
@@ -26,10 +27,9 @@ class FamilyAdmin(admin.ModelAdmin):
         "resend_link_email",
     ]  # new UUID gets used accidentially
     # actions = ['resend_link_email']
-
+    list_per_page = settings.LIST_PER_PAGE
     fields = ("email", "dont_send_mails", "confirmed_at")
     readonly_fields = ("confirmed_at",)
-    list_per_page = 20
 
     def create_new_uuid(self, request, queryset):
         for family in queryset:

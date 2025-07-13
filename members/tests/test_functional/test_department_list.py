@@ -61,7 +61,7 @@ class DepartmentListTest(StaticLiveServerTestCase):
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/department_list_1.png")
 
-        self.assertEquals(0, len(self.browser.find_elements(By.TAG_NAME, "nav")))
+        self.assertEqual(0, len(self.browser.find_elements(By.TAG_NAME, "nav")))
         # check that there's the "Hovedstaden" region tab
         self.browser.find_element(
             By.XPATH,

@@ -1,4 +1,5 @@
 import codecs
+from django.conf import settings
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.html import format_html
@@ -8,31 +9,64 @@ from members.models import ActivityParticipant
 from .person_admin import PersonAdmin
 
 
-class IsAnonymizationCandidateFilter(admin.SimpleListFilter):
-    title = "Aktiv mere end 5 år siden"
-    parameter_name = "is_candidate"
+class IsActiveFilter(admin.SimpleListFilter):
+    title = "Aktiv"
+    parameter_name = "is_active"
 
     def lookups(self, request, model_admin):
         return (
-            ("yes", "Ja"),
-            ("no", "Nej"),
+            ("yes", "Ja, seneste 5 år"),
+            ("no", "Nej, ikke aktiv seneste 5 år"),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == "yes":
-            # Filter to show only candidates
-            person_ids = [
-                person.id for person in queryset if person.is_anonymization_candidate()
-            ]
-            return queryset.filter(id__in=person_ids)
-        elif self.value() == "no":
-            # Filter to show only non-candidates
-            person_ids = [
-                person.id
-                for person in queryset
-                if not person.is_anonymization_candidate()
-            ]
-            return queryset.filter(id__in=person_ids)
+        from django.utils import timezone
+        from datetime import timedelta
+        from django.db.models import Q
+
+        five_years_ago = timezone.now() - timedelta(days=5 * 365)
+
+        if self.value() == "no":
+            # Show members that haven't been active in the last 5 years (anonymization candidates)
+            # This is the optimized database query version of is_anonymization_candidate()
+
+            return (
+                queryset.filter(
+                    # Person was created more than 5 years ago
+                    added_at__lt=five_years_ago
+                )
+                .filter(
+                    # AND (no user OR user hasn't logged in within 5 years)
+                    Q(user__isnull=True)
+                    | Q(user__last_login__lt=five_years_ago)
+                )
+                .filter(
+                    # AND (no activity participation OR latest activity was more than 5 years ago)
+                    ~Q(
+                        activityparticipant__activity__end_date__gte=five_years_ago.date()
+                    )
+                )
+                .distinct()
+            )
+
+        elif self.value() == "yes":
+            # Show members that have been active in the last 5 years (not anonymization candidates)
+
+            return queryset.filter(
+                Q(
+                    # Person was created less than 5 years ago
+                    added_at__gte=five_years_ago
+                )
+                | Q(
+                    # OR user has logged in within 5 years
+                    user__last_login__gte=five_years_ago
+                )
+                | Q(
+                    # OR has activity participation within 5 years
+                    activityparticipant__activity__end_date__gte=five_years_ago.date()
+                )
+            ).distinct()
+
         return queryset
 
 
@@ -41,6 +75,8 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
     Admin view for showing persons who are candidates for being anonymized.
     Inherits from PersonAdmin to reuse existing functionality.
     """
+
+    list_per_page = settings.LIST_PER_PAGE
 
     # Custom list display with requested columns
     list_display = (
@@ -57,14 +93,14 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
     # Filters for the anonymization candidates view
     list_filter = (
-        "membertype",  # Type
-        IsAnonymizationCandidateFilter,  # person.is_candidate
+        "membertype",
+        IsActiveFilter,
     )
 
     # Custom actions for this view
     actions = [
         "export_anonymization_candidates_csv",
-        "anonymize_persons",  # Reuse existing anonymization action
+        "anonymize_persons",
     ]
 
     # Override title and description
@@ -89,6 +125,12 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         qs = super().get_queryset(request)
         # Show only non-anonymized persons
         return qs.filter(anonymized=False)
+
+    def has_add_permission(self, request):
+        """
+        Hide add button on admin view page
+        """
+        return False
 
     def last_active(self, obj):
         """
