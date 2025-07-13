@@ -167,12 +167,16 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Sign up and redirect to payment link or family page
 
             # Make ActivityParticipant
+
             participant = ActivityParticipant(
                 person=person,
                 activity=activity,
                 note=signup_form.cleaned_data["note"],
                 price_in_dkk=activity.price_in_dkk,
             )
+            # Adjust participant price
+            if activity.price_in_dkk != price:
+                participant.price_in_dkk = price
 
             # Make a new member if it's a member activity
             member = None
