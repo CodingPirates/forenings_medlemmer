@@ -2,8 +2,10 @@ from django.contrib import admin, messages
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape, format_html
+from django.db import models
 from members.models.activitytype import ActivityType
 
 
@@ -270,14 +272,16 @@ class ActivityAdmin(admin.ModelAdmin):
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # Only show own departments when creating new activity
-        if (
-            db_field.name == "department"
-            and not request.user.is_superuser
-            and not request.user.has_perm("members.view_all_departments")
-        ):
-            kwargs["queryset"] = Department.objects.filter(
-                adminuserinformation__user=request.user
-            )
+        if (db_field.name == "department"):
+            departments = Department.objects.filter(models.Q(closed_dtm__isnull=True) |
+                    models.Q(closed_dtm__gt=timezone.now().date()))
+            
+            if (request.user.is_superuser or request.user.has_perm("members.view_all_departments")):
+                kwargs["queryset"] = departments
+            else:
+                kwargs["queryset"] = departments.filter(
+                    adminuserinformation__user=request.user
+                )
 
         if db_field.name == "address":
             kwargs["queryset"] = Address.get_user_addresses(request.user)
@@ -317,11 +321,9 @@ class ActivityAdmin(admin.ModelAdmin):
                 <p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>
                 <p>Startdato er første dag for aktiviteten, og slutdato er sidste for aktiviteten</p>""",
                 "fields": (
-                    (
-                        "name",
-                        "activitytype",
-                        "activity_link",
-                    ),
+                    "name",
+                    "activitytype",
+                    "activity_link",
                     "open_hours",
                     "description",
                     (
