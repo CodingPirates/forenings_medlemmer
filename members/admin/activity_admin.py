@@ -272,11 +272,15 @@ class ActivityAdmin(admin.ModelAdmin):
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # Only show own departments when creating new activity
-        if (db_field.name == "department"):
-            departments = Department.objects.filter(models.Q(closed_dtm__isnull=True) |
-                    models.Q(closed_dtm__gt=timezone.now().date()))
-            
-            if (request.user.is_superuser or request.user.has_perm("members.view_all_departments")):
+        if db_field.name == "department":
+            departments = Department.objects.filter(
+                models.Q(closed_dtm__isnull=True)
+                | models.Q(closed_dtm__gt=timezone.now().date())
+            )
+
+            if request.user.is_superuser or request.user.has_perm(
+                "members.view_all_departments"
+            ):
                 kwargs["queryset"] = departments
             else:
                 kwargs["queryset"] = departments.filter(

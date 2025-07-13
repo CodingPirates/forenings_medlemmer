@@ -121,14 +121,17 @@ class DepartmentAdmin(admin.ModelAdmin):
         "has_waiting_list",
     )
     autocomplete_fields = ("union",)
+
     def get_search_results(self, request, queryset, search_term):
         # Only show open departments in autocomplete (closed_dtm is None or in the future)
         from django.utils import timezone
+
         queryset = queryset.filter(
-            models.Q(closed_dtm__isnull=True) |
-            models.Q(closed_dtm__gt=timezone.now().date())
+            models.Q(closed_dtm__isnull=True)
+            | models.Q(closed_dtm__gt=timezone.now().date())
         )
         return super().get_search_results(request, queryset, search_term)
+
     raw_id_fields = ("union",)
     search_fields = (
         "name",
