@@ -32,9 +32,21 @@ class ActivityInviteAdminForm(forms.ModelForm):
         model = ActivityInvite
         exclude = []
 
+
     def __init__(self, *args, **kwds):
         super(ActivityInviteAdminForm, self).__init__(*args, **kwds)
         self.fields["person"].queryset = Person.objects.order_by(Lower("name"))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        price = cleaned_data.get("price_in_dkk")
+        price_note = cleaned_data.get("price_note", "")
+        activity = cleaned_data.get("activity")
+        if activity:
+            default_price = activity.price_in_dkk
+            if price is not None and price != default_price and not price_note.strip():
+                self.add_error("price_note", "Du skal angive en begrundelse for den særlige pris for denne deltager.")
+        return cleaned_data
 
 
 class ActivityInviteUnionListFilter(admin.SimpleListFilter):
