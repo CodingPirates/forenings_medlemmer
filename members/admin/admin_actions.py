@@ -138,10 +138,12 @@ class AdminActions(admin.ModelAdmin):
                 ):
                     mass_invitation_form.add_error(
                         "special_price_note",
-                        "Du skal angive en begrundelse for den særlige pris for denne deltager."
+                        "Du skal angive en begrundelse for den særlige pris for denne deltager.",
                     )
                     context["mass_invitation_form"] = mass_invitation_form
-                    return render(request, "admin/invite_many_to_activity.html", context)
+                    return render(
+                        request, "admin/invite_many_to_activity.html", context
+                    )
 
                 min_amount = activity.get_min_amount(activity.activitytype.id)
 
