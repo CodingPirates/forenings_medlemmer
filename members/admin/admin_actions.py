@@ -136,11 +136,14 @@ class AdminActions(admin.ModelAdmin):
                     special_price_in_dkk != activity.price_in_dkk
                     and mass_invitation_form.cleaned_data["special_price_note"] == ""
                 ):
-                    messages.error(
-                        request,
-                        "Fejl - ingen personer blev inviteret! Du skal angive en begrundelse for den særlige pris. Noten er ikke synlig for deltageren.",
+                    mass_invitation_form.add_error(
+                        "special_price_note",
+                        "Du skal angive en begrundelse for den særlige pris for denne deltager.",
                     )
-                    return
+                    context["mass_invitation_form"] = mass_invitation_form
+                    return render(
+                        request, "admin/invite_many_to_activity.html", context
+                    )
 
                 min_amount = activity.get_min_amount(activity.activitytype.id)
 
