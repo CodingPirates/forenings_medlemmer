@@ -270,7 +270,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         class MassConfirmForm(forms.Form):
             department = forms.ChoiceField(label="Afdeling", choices=department_list)
             email_text = forms.CharField(
-                label="Email ekstra info", widget=forms.Textarea
+                label="Email ekstra info", widget=forms.Textarea, required=False
             )
             confirmation = forms.ChoiceField(label="Bekræft", choices=confirm_list)
 
@@ -297,6 +297,7 @@ class WaitingListAdmin(admin.ModelAdmin):
                     mass_confirmation_form.is_valid()
                     and mass_confirmation_form.cleaned_data["department"] != "-"
                     and mass_confirmation_form.cleaned_data["confirmation"] == "1"
+                    and mass_confirmation_form.cleaned_data["email_text"] != ""
                 ):
                     department_confirmed = mass_confirmation_form.cleaned_data[
                         "department"
@@ -354,8 +355,28 @@ class WaitingListAdmin(admin.ModelAdmin):
                         return
 
                 else:
-                    messages.error(request, "ikke godkendt")
-                    return
+                    if mass_confirmation_form.cleaned_data["department"] == "-":
+                        mass_confirmation_form.add_error(
+                            "department",
+                            "Du skal vælge en afdeling for at kunne slette personer fra ventelisten.",
+                        )
+                    if mass_confirmation_form.cleaned_data["confirmation"] == "0":
+                        mass_confirmation_form.add_error(
+                            "confirmation",
+                            "Du skal vælge en bekræftelse for at kunne slette personer fra ventelisten.",
+                        )
+                    if mass_confirmation_form.cleaned_data["email_text"] == "":
+                        mass_confirmation_form.add_error(
+                            "email_text",
+                            "Du skal skrive en tekst der skal sendes med i emailen til de personer der bliver slettet fra ventelisten.",
+                        )
+
+                    context["mass_confirmation_form"] = mass_confirmation_form
+                    return render(
+                        request,
+                        "admin/delete_many_from_waitinglist.html",
+                        context,
+                    )
 
             else:
                 messages.error(
