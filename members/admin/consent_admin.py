@@ -10,7 +10,7 @@ from members.models import Person
 
 class ConsentAdmin(admin.ModelAdmin):
     change_form_template = "admin/members/consent/change_form.html"
-
+    list_per_page = settings.LIST_PER_PAGE
     list_display = (
         "id",
         "released_at",

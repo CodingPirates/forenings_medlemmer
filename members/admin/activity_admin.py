@@ -120,6 +120,7 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
 
 
 class ActivityAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
     list_display = (
         "name",
         "activitytype",
@@ -147,7 +148,6 @@ class ActivityAdmin(admin.ModelAdmin):
         "activity_link",
         "addressregion",
     )
-    list_per_page = 20
     raw_id_fields = (
         "union",
         "department",

@@ -90,7 +90,6 @@ INSTALLED_APPS = (
     "members",
     "crispy_forms",
     "crispy_bootstrap5",
-    "django_cron",
     "django.contrib.admin",
     "graphene_django",
     "django_extensions",
@@ -244,3 +243,5 @@ LOGIN_REDIRECT_URL = "/"
 MINIMUM_MEMBERSHIP_PRICE_IN_DKK = 75
 MINIMUM_SEASON_PRICE_IN_DKK = 150
 MINIMUM_PRICE_IN_DKK = 0
+
+LIST_PER_PAGE = 50

@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
 from django.db import transaction
@@ -197,6 +198,8 @@ class WaitingListAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj=obj, change=change, **kwargs)
         return form
+
+    list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
         "department_link",

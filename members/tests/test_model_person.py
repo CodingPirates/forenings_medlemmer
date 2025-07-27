@@ -161,7 +161,7 @@ class TestModelPerson(TestCase):
         self.assertEqual(department.waitinglist_set.count(), 2)
 
         # sanity check that they are in the same family
-        self.assertEquals(person_1.family, person_2.family)
+        self.assertEqual(person_1.family, person_2.family)
 
         request = self.create_request_with_permission("members.anonymize_persons")
         person_1.anonymize(request)
@@ -183,7 +183,7 @@ class TestModelPerson(TestCase):
         request = self.create_request_with_permission("members.anonymize_persons")
 
         # sanity check that are are pointing to same family object
-        self.assertEquals(person_1.family, person_2.family)
+        self.assertEqual(person_1.family, person_2.family)
 
         person_1.anonymize(request)
 
