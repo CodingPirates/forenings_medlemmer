@@ -1,4 +1,3 @@
-from datetime import date
 from django.core.management.base import BaseCommand
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
