@@ -167,7 +167,6 @@ def ActivitySignup(request, activity_id, person_id=None):
             # Sign up and redirect to payment link or family page
 
             # Make ActivityParticipant
-
             participant = ActivityParticipant(
                 person=person,
                 activity=activity,
