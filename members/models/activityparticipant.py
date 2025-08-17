@@ -82,8 +82,12 @@ class ActivityParticipant(models.Model):
         result_string = ""
 
         # Checking for price = 0 before checking for payment
-        invite = ActivityInvite.objects.filter(activity=self.activity, person=self.person).first()
-        price = invite.price_in_dkk if invite is not None else self.activity.price_in_dkk
+        invite = ActivityInvite.objects.filter(
+            activity=self.activity, person=self.person
+        ).first()
+        price = (
+            invite.price_in_dkk if invite is not None else self.activity.price_in_dkk
+        )
         if price == 0:
             result_string = f"{html_good_pre}Gratis.{html_post} "
             if format_as_html:
