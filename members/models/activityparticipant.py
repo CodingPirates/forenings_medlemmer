@@ -162,47 +162,32 @@ class ActivityParticipant(models.Model):
 
         missing_payments = []
         for participant in participants:
-            # Case A : Activity with price = 0
-            if participant.activity.price_in_dkk == 0:
-                if participant.price_in_dkk == 0:
-                    # Case A1 : Price is 0 and special price is 0
-                    continue
-                # Try to find a payment for this participant
-                payment = members.models.payment.Payment.objects.filter(
-                    activityparticipant=participant
-                ).first()
-                if not payment:
-                    # Case A2: participant with price > 0, no payment
-                    missing_payments.append(participant)
-                    continue
-                if payment.confirmed_at is not None:
-                    # Case A3: participant with price > 0, payment confirmed
-                    continue
-                else:
-                    # Case A4: participant with price > 0, payment not confirmed
-                    missing_payments.append(participant)
-                    continue
-            else:  # Case B: Activity with price > 0
-                if participant.price_in_dkk == 0:
-                    # Case B1: participant with price = 0
-                    continue
-                # Try to find a payment for this participant
-                payment = members.models.payment.Payment.objects.filter(
-                    activityparticipant=participant
-                ).first()
+            # Case A1: Price is 0 and special price is 0
+            # Case B1: participant with price = 0
+            if participant.price_in_dkk == 0:
+                continue
 
-                if not payment:
-                    # Case B2 : No payment exists
-                    missing_payments.append(participant)
-                    continue
+            # Try to find a payment for this participant
+            payment = members.models.payment.Payment.objects.filter(
+                activityparticipant=participant
+            ).first()
 
-                if payment.confirmed_at is not None:
-                    # Case B3 : Payment exists and confirmed
-                    continue
-                else:
-                    # Case B4: B4: participant with payment > 0, not confirmed
-                    missing_payments.append(participant)
-                    continue
+            # Case A2: participant with price > 0, no payment
+            # Case B2: No payment exists
+            if not payment:
+                missing_payments.append(participant)
+                continue
+
+            # Case A3: participant with price > 0, payment confirmed
+            # Case B3: Payment exists and confirmed
+            if payment.confirmed_at is not None:
+                continue
+
+            # Case A4: participant with price > 0, payment not confirmed
+            # Case B4: participant with payment > 0, not confirmed
+            else:
+                missing_payments.append(participant)
+                continue
 
         return missing_payments
 
