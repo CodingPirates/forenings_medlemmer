@@ -102,7 +102,7 @@ class ActivityParticipant(models.Model):
         except Exception:
             if format_as_html:
                 result_string = format_html(
-                    f"{html_error_pre}Andet er aftalt {self.price_in_dkk}.{html_post} "
+                    f"{html_error_pre}Andet er aftalt: {self.price_in_dkk} kr.{html_post} "
                 )
             else:
                 result_string = "Andet er aftalt. "
