@@ -15,7 +15,11 @@ class ConsentMiddleware:
             return self.get_response(request)
 
         # Ignore static/media/favicon requests for original_url
-        if request.path.startswith("/static/") or request.path.startswith("/media/") or request.path == "/favicon.ico":
+        if (
+            request.path.startswith("/static/")
+            or request.path.startswith("/media/")
+            or request.path == "/favicon.ico"
+        ):
             return self.get_response(request)
 
         if request.user.is_authenticated:
