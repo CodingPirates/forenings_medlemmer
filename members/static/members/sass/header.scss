@@ -27,10 +27,9 @@ nav {
             color: #cccccc;
         }
         @include definitions.for-phone {
-            // Bigger buttons on phone
-            font-size: 24px;
-            padding: 15px 0;
-            margin: 15px 0;
+            font-size: 20px;
+            padding: 5px 0;
+            margin: 5px 0;
             width: 100%;
             border: 1px solid white;
             text-align: center !important;
