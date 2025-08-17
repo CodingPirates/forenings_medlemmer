@@ -6,6 +6,7 @@ import members.models.family
 import members.models.person
 import members.models.waitinglist
 import members.models.activity
+from members.models.activityinvite import ActivityInvite
 import pytz
 from django.utils import timezone
 from django.utils.html import format_html
@@ -81,7 +82,13 @@ class ActivityParticipant(models.Model):
         result_string = ""
 
         # Checking for price = 0 before checking for payment
-        if self.activity.price_in_dkk == 0:
+        invite = ActivityInvite.objects.filter(
+            activity=self.activity, person=self.person
+        ).first()
+        price = (
+            invite.price_in_dkk if invite is not None else self.activity.price_in_dkk
+        )
+        if price == 0:
             result_string = f"{html_good_pre}Gratis.{html_post} "
             if format_as_html:
                 return format_html(result_string)

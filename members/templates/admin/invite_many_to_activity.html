@@ -27,6 +27,11 @@
 {% block content %}
 <div id="content-main">
   <form action="" method="post">
+    {% if mass_invitation_form.errors %}
+      <div class="errornote">
+        <p>Ret venligst fejlene herunder.</p>
+      </div>
+    {% endif %}
     <div>
       <fieldset class="module aligned">
         <h2>Vælg aktivitet</h2>
