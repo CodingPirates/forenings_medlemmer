@@ -38,7 +38,7 @@ class TestMissingPayments(TestCase):
             person = PersonFactory(
                 family=family,
                 birthday=datetime.now() - relativedelta(years=8 + i),
-                name=f"person{i+1}",
+                name=f"person{i + 1}",
             )
             persons.append(person)
         (
