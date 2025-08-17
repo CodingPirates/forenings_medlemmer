@@ -22,6 +22,7 @@ from .filters.person_admin_filters import (
     PersonWaitinglistListFilter,
     VolunteerListFilter,
     MunicipalityFilter,
+    RegionFilter,
     AnonymizedFilter,
 )
 
@@ -55,6 +56,7 @@ class PersonAdmin(admin.ModelAdmin):
         "gender",
         VolunteerListFilter,
         MunicipalityFilter,
+        RegionFilter,
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
         PersonParticipantListFilter,

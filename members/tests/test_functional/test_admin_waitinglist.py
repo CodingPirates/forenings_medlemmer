@@ -225,7 +225,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.save_screenshot_and_html("reset_department_filter")
 
         # Test the Gender (Køn) filter
-        select_element = get_select_element_by_onchange(self.browser, 3)
+        select_element = get_select_element_by_onchange(self.browser, 4)
         select = Select(select_element)
         select.select_by_visible_text("Dreng")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
@@ -234,7 +234,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertEqual(len(rows), 1)
         self.assertIn("person1", rows[0].text)
 
-        select_element = get_select_element_by_onchange(self.browser, 3)
+        select_element = get_select_element_by_onchange(self.browser, 4)
         select = Select(select_element)
         select.select_by_visible_text("Pige")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
@@ -243,7 +243,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertEqual(len(rows), 1)
         self.assertIn("person2", rows[0].text)
 
-        select_element = get_select_element_by_onchange(self.browser, 3)
+        select_element = get_select_element_by_onchange(self.browser, 4)
         select = Select(select_element)
         select.select_by_visible_text("Andet")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
@@ -252,15 +252,15 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertEqual(len(rows), 1)
         self.assertIn("person3", rows[0].text)
 
-        # Reset the Department filter to "Alle"
-        select_element = get_select_element_by_onchange(self.browser, 3)
+        # Reset the gender filter to "Alle"
+        select_element = get_select_element_by_onchange(self.browser, 4)
         select = Select(select_element)
         select.select_by_visible_text("Alle")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
         self.save_screenshot_and_html("reset_gender_filter")
 
         # Test minimum age filter - 7 years, all found
-        select_element = get_select_element_by_onchange(self.browser, 5)
+        select_element = get_select_element_by_onchange(self.browser, 6)
         select = Select(select_element)
         select.select_by_visible_text("7")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
@@ -272,7 +272,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertIn("person3", rows[2].text)
 
         # Test maximum age filter - 10 years, two found
-        select_element = get_select_element_by_onchange(self.browser, 6)
+        select_element = get_select_element_by_onchange(self.browser, 7)
         select = Select(select_element)
         select.select_by_visible_text("10")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
@@ -283,7 +283,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertIn("person2", rows[1].text)
 
         # Test minimum age filter - 10 years, one found
-        select_element = get_select_element_by_onchange(self.browser, 5)
+        select_element = get_select_element_by_onchange(self.browser, 6)
         select = Select(select_element)
         select.select_by_visible_text("10")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
@@ -293,18 +293,18 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertIn("person2", rows[0].text)
 
         # Reset the min and max age filters
-        select_element = get_select_element_by_onchange(self.browser, 5)
+        select_element = get_select_element_by_onchange(self.browser, 6)
         select = Select(select_element)
         select.select_by_visible_text("Alle")
 
-        select_element = get_select_element_by_onchange(self.browser, 6)
+        select_element = get_select_element_by_onchange(self.browser, 7)
         select = Select(select_element)
         select.select_by_visible_text("Alle")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
         self.save_screenshot_and_html("admin_waitinglist_reset_age_filters")
 
         # Test activity age filter - only for age 11-17 => one person found
-        select_element = get_select_element_by_onchange(self.browser, 4)
+        select_element = get_select_element_by_onchange(self.browser, 5)
         select = Select(select_element)
         select.select_by_visible_text("Department1, Activity1")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
@@ -314,7 +314,7 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.assertIn("person3", rows[0].text)
 
         # Reset activity age filter
-        select_element = get_select_element_by_onchange(self.browser, 4)
+        select_element = get_select_element_by_onchange(self.browser, 5)
         select = Select(select_element)
         select.select_by_visible_text("Alle")
         self.browser.find_element(By.XPATH, '//input[@type="submit"]').click()
