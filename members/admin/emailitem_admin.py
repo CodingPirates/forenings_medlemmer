@@ -50,7 +50,12 @@ class activityFilter(admin.SimpleListFilter):
 
         activityList = [("none", "(Ingen aktivitet)")]
         for activity in Activity.objects.filter(id__in=activities).order_by("name"):
-            activityList.append((str(activity.id), str(activity.name)))
+            department_name = (
+                activity.department.name if activity.department else "Ukendt afdeling"
+            )
+            activityList.append(
+                (str(activity.id), f"{department_name} - {activity.name}")
+            )
         return activityList
 
     def queryset(self, request, queryset):

@@ -27,6 +27,11 @@
 {% block content %}
 <div id="content-main">
   <form action="" method="post">
+    {% if mass_invitation_form.errors %}
+      <div class="errornote">
+        <p>Ret venligst fejlene herunder.</p>
+      </div>
+    {% endif %}
     <div>
       <fieldset class="module aligned">
         <h2>Vælg aktivitet</h2>
@@ -83,7 +88,7 @@
         <br>
         <div class="submit-row">
           <p class="deletelink-box"><a href="../" class="deletelink">Fortryd</a></p>
-          <input class="default" name="" type="submit" value="Fjern fra venteliste og send email for alle valgte personer/familier">
+          <input class="default" name="" type="submit" value="Er du sikker på, at du vil slette fra ventelisten?">
         </div>
       </fieldset>
     </div>

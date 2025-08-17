@@ -6,6 +6,7 @@ import members.models.family
 import members.models.person
 import members.models.waitinglist
 import members.models.activity
+from members.models.activityinvite import ActivityInvite
 import pytz
 from django.utils import timezone
 from django.utils.html import format_html
@@ -81,7 +82,13 @@ class ActivityParticipant(models.Model):
         result_string = ""
 
         # Checking for price = 0 before checking for payment
-        if self.activity.price_in_dkk == 0:
+        invite = ActivityInvite.objects.filter(
+            activity=self.activity, person=self.person
+        ).first()
+        price = (
+            invite.price_in_dkk if invite is not None else self.activity.price_in_dkk
+        )
+        if price == 0:
             result_string = f"{html_good_pre}Gratis.{html_post} "
             if format_as_html:
                 return format_html(result_string)
@@ -95,7 +102,7 @@ class ActivityParticipant(models.Model):
         except Exception:
             if format_as_html:
                 result_string = format_html(
-                    f"{html_error_pre}Andet er aftalt.{html_post} "
+                    f"{html_error_pre}Andet er aftalt: {self.price_in_dkk} kr.{html_post} "
                 )
             else:
                 result_string = "Andet er aftalt. "
@@ -147,11 +154,41 @@ class ActivityParticipant(models.Model):
 
     @staticmethod
     def get_missing_payments_for_family(family_id):
-        missing_payments = ActivityParticipant.objects.filter(
+        # Find participants for the family with activities not ended
+        participants = ActivityParticipant.objects.filter(
             person__family_id=family_id,
             activity__end_date__gt=timezone.now(),
-            payment__accepted_at=None,
-        )
+        ).select_related("activity", "person")
+
+        missing_payments = []
+        for participant in participants:
+            # Case A1: Price is 0 and special price is 0
+            # Case B1: participant with price = 0
+            if participant.price_in_dkk == 0:
+                continue
+
+            # Try to find a payment for this participant
+            payment = members.models.payment.Payment.objects.filter(
+                activityparticipant=participant
+            ).first()
+
+            # Case A2: participant with price > 0, no payment
+            # Case B2: No payment exists
+            if not payment:
+                missing_payments.append(participant)
+                continue
+
+            # Case A3: participant with price > 0, payment confirmed
+            # Case B3: Payment exists and confirmed
+            if payment.confirmed_at is not None:
+                continue
+
+            # Case A4: participant with price > 0, payment not confirmed
+            # Case B4: participant with payment > 0, not confirmed
+            else:
+                missing_payments.append(participant)
+                continue
+
         return missing_payments
 
     def save(self, *args, **kwargs):
