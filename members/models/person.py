@@ -1,12 +1,17 @@
+import random
+from datetime import timedelta
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.core.validators import RegexValidator
 from members.models.municipality import Municipality
+from members.models.consent import Consent
+from django.core.exceptions import PermissionDenied, ValidationError
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +26,18 @@ class Person(models.Model):
                 "view_full_address",
                 "Can view persons full address + phonenumber + email",
             ),
-            ("view_all_persons", "Can view persons not related to department"),
+            (
+                "view_all_persons",
+                "Can view persons not related to department",
+            ),
+            (
+                "anonymize_persons",
+                "Can anonymize persons",
+            ),
+            (
+                "view_consent_information",
+                "Can view consent information for persons",
+            ),
         )
 
     PARENT = "PA"
@@ -53,7 +69,16 @@ class Person(models.Model):
     membertype = models.CharField(
         "Type", max_length=2, choices=MEMBER_TYPE_CHOICES, default=PARENT
     )
-    name = models.CharField("Navn", max_length=200)
+    name = models.CharField(
+        "Navn",
+        max_length=200,
+        validators=[
+            RegexValidator(
+                r'^(?!.*[:;,"[\]{}*&^%$#@!_+=\/\\\\<>|])\S+\s+\S+.*$',  # noqa: W605
+                message="Indtast et gyldigt navn bestående af fornavn og minimum et efternavn.",
+            )
+        ],
+    )
     zipcode = models.CharField("Postnummer", max_length=4, blank=True)
     city = models.CharField("By", max_length=200, blank=True)
     streetname = models.CharField("Vejnavn", max_length=200, blank=True)
@@ -61,7 +86,7 @@ class Person(models.Model):
     floor = models.CharField("Etage", max_length=10, blank=True)
     door = models.CharField("Dør", max_length=5, blank=True)
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
-    municipality = municipality = models.ForeignKey(
+    municipality = models.ForeignKey(
         Municipality,
         on_delete=models.RESTRICT,
         blank=True,
@@ -93,11 +118,33 @@ class Person(models.Model):
         blank=True,
         null=True,
         default=None,
+        related_name="person_user",
     )
     address_invalid = models.BooleanField("Ugyldig adresse", default=False)
+    anonymized = models.BooleanField("Anonymiseret", default=False)
+    consent = models.ForeignKey(
+        Consent, null=True, blank=True, on_delete=models.PROTECT
+    )
+    consent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_DEFAULT,
+        blank=True,
+        null=True,
+        default=None,
+        related_name="person_consent_by",
+        verbose_name="Samtykke givet af",
+    )
+    consent_at = models.DateTimeField("Samtykke dato", null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not settings.TESTING:
+            updated = self.update_dawa_data(force=True, save=False)
+            if updated is not None:
+                self = updated
+        return super().save(*args, **kwargs)
 
     def address(self):
         return format_address(self.streetname, self.housenumber, self.floor, self.door)
@@ -133,61 +180,174 @@ class Person(models.Model):
         else:
             return "N/A"
 
-    def update_dawa_data(self):
-        if self.address_invalid:
+    def is_anonymization_candidate(self):
+        """
+        Determine if person is a candidate for anonymization.
+        Returns False if created_date, latest_activity or last_login is less than 5 years ago.
+        """
+        five_years_ago = timezone.now() - timedelta(days=5 * 365)
+
+        # Check if person was created less than 5 years ago
+        if self.added_at > five_years_ago:
+            return False
+
+        # Check if user has logged in within the last 5 years
+        if self.user and self.user.last_login and self.user.last_login > five_years_ago:
+            return False
+
+        # Check if person has participated in activities within the last 5 years
+        # Import here to avoid circular imports
+        from .activityparticipant import ActivityParticipant
+
+        latest_participation = (
+            ActivityParticipant.objects.filter(person=self)
+            .select_related("activity")
+            .order_by("-activity__end_date")
+            .first()
+        )
+
+        if latest_participation and latest_participation.activity.end_date:
+            if latest_participation.activity.end_date > five_years_ago.date():
+                return False
+
+        return True
+
+    def update_dawa_data(self, force=False, save=True):
+        if self.address_invalid and not force:
             return None
         if (
             self.dawa_id is None
             or self.latitude is None
             or self.longitude is None
             or self.municipality is None
+            or force
         ):
-            addressID = 0
-            dist = 0
-            req = "https://dawa.aws.dk/datavask/adresser?betegnelse="
-            req += quote_plus(self.addressWithZip())
             try:
-                washed = json.loads(requests.get(req).text)
-                addressID = washed["resultater"][0]["adresse"]["id"]
-                dist = washed["resultater"][0]["vaskeresultat"]["afstand"]
-            except Exception as error:
-                logger.error("Couldn't find addressID for " + self.name)
-                logger.error("Error " + str(error))
-            if addressID != 0 and dist < 10:
-                try:
-                    req = (
-                        "https://dawa.aws.dk/adresser/" + addressID + "?format=geojson"
-                    )
-                    address = json.loads(requests.get(req).text)
-                    if address["properties"]["etage"] is None:
-                        address["properties"]["etage"] = ""
-                    if address["properties"]["dør"] is None:
-                        address["properties"]["dør"] = ""
-                    if address["properties"]["supplerendebynavn"] is None:
-                        address["properties"]["supplerendebynavn"] = ""
-                    self.zipcode = address["properties"]["postnr"]
-                    self.city = address["properties"]["postnrnavn"]
-                    self.streetname = address["properties"]["vejnavn"]
-                    self.housenumber = address["properties"]["husnr"]
-                    self.floor = address["properties"]["etage"]
-                    self.door = address["properties"]["dør"]
-                    self.placename = address["properties"]["supplerendebynavn"]
-                    self.latitude = address["geometry"]["coordinates"][1]
-                    self.longitude = address["geometry"]["coordinates"][0]
-                    self.municipality = address["properties"]["kommunenavn"]
-                    self.dawa_id = address["properties"]["id"]
-                    self.save()
-                except Exception as error:
-                    logger.error("Couldn't find coordinates for " + self.name)
-                    logger.error("Error " + str(error))
+                url = f"https://api.dataforsyningen.dk/adresser?q={quote_plus(self.addressWithZip())}"
+                response = requests.get(url)
+                if response.status_code != 200:
                     self.address_invalid = True
+                    if save:
+                        self.save()
+                    return self
+
+                data = response.json()
+                if not data:
+                    self.address_invalid = True
+                    if save:
+                        self.save()
+                    return self
+
+                # DAWA returns result with address and "adgangsadresse". Address has fields "etage" and "dør",
+                # whereas "adgangsadresse" has all the shared address fields (e.g. for an apartment building)
+                address = data[0]
+                access_address = address["adgangsadresse"]
+
+                if address["etage"] is None:
+                    address["etage"] = ""
+                if address["dør"] is None:
+                    address["dør"] = ""
+                if access_address["supplerendebynavn"] is None:
+                    access_address["supplerendebynavn"] = ""
+
+                self.zipcode = access_address["postnummer"]["nr"]
+                self.city = access_address["postnummer"]["navn"]
+                self.streetname = access_address["vejstykke"]["navn"]
+                self.housenumber = access_address["husnr"]
+                self.floor = address["etage"]
+                self.door = address["dør"]
+                self.placename = access_address["supplerendebynavn"]
+                self.latitude = access_address["vejpunkt"]["koordinater"][1]
+                self.longitude = access_address["vejpunkt"]["koordinater"][0]
+                self.municipality = Municipality.objects.get(
+                    dawa_id=access_address["kommune"]["kode"]
+                )
+                self.dawa_id = address["id"]
+                if save:
                     self.save()
-                    return None
-            else:
+                return self
+
+            except Exception:
                 self.address_invalid = True
-                self.save()
+                if save:
+                    self.save()
 
     # TODO: Move to dawa_data in utils
+
+    def anonymize(self, request):
+        if not request.user.has_perm("members.anonymize_persons"):
+            raise PermissionDenied(
+                "Du har ikke tilladelse til at anonymisere personer."
+            )
+
+        if self.anonymized:
+            raise ValidationError("Personen er allerede anonymiseret.")
+
+        orig_email = self.email
+
+        self.name = "Anonymiseret"
+        self.zipcode = ""
+        self.city = ""
+        self.streetname = ""
+        self.housenumber = ""
+        self.floor = ""
+        self.door = ""
+        self.dawa_id = ""
+        self.longitude = None
+        self.latitude = None
+        self.placename = ""
+        self.email = ""
+        self.phone = ""
+
+        if self.birthday:
+            original_birthday = self.birthday
+
+            # Make sure we don't end up with the same birthday
+            while self.birthday == original_birthday:
+                self.birthday = self.birthday.replace(day=random.randint(1, 28))
+
+        self.notes = ""
+        self.address_invalid = (
+            True  # don't try to update address for anonymized persons
+        )
+        self.anonymized = True
+        self.save()
+
+        # Remove person from all waiting lists
+        for waiting_list in self.waitinglist_set.all():
+            waiting_list.delete()
+
+        self.family.anonymize_if_all_persons_anonymized(request)
+
+        # anonymize sent emails
+        email_items = self.emailitem_set.all()
+        for email_item in email_items:
+            email_item.subject = "Anonymiseret"
+            email_item.body_text = ""
+            email_item.body_html = ""
+            email_item.receiver = ""
+            email_item.save()
+
+        # anonymize activity participation notes
+        activity_items = self.activityparticipant_set.all()
+        for activity_item in activity_items:
+            activity_item.note = ""
+            activity_item.save()
+
+        # anonymize Django user if exists, there might be multiple users with the same email address
+        users = User.objects.filter(email__exact=orig_email)
+        if users.exists():
+            for user in users:
+                user.username = f"anonymized-{user.id}"
+                user.first_name = "Anonymiseret"
+                user.last_name = ""
+                user.email = f"{user.username}@localhost"
+                user.is_superuser = False
+                user.is_staff = False
+                user.is_active = False
+                user.save()
+        else:
+            pass  # no user accounts found for this person
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"

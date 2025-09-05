@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
 from django.db import transaction
@@ -8,17 +9,87 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
+from datetime import date
+from django.utils.translation import gettext_lazy as _
 
 from members.models import (
     Union,
     Department,
     AdminUserInformation,
+    Municipality,
+    Activity,
 )
 
 import members.models.emailtemplate
 
 # import members.admin.admin_actions
 from members.admin.admin_actions import AdminActions
+
+
+class WaitingListActivityFilter(admin.SimpleListFilter):
+    title = _("Alder ved aktivitet start")
+    parameter_name = "activity"
+
+    def lookups(self, request, model_admin):
+        activities = []
+        # Restrict activities to those in departments the user can access
+        accessible_departments = AdminUserInformation.get_departments_admin(
+            request.user
+        )
+        for activity in Activity.objects.filter(
+            department__in=accessible_departments,
+            activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+            end_date__gte=timezone.now(),
+        ).order_by("name"):
+            activities.append(
+                (str(activity.pk), f"{activity.department.name}, {activity.name}")
+            )
+        return activities
+
+    def queryset(self, request, queryset):
+        if self.value():
+            activity = Activity.objects.get(pk=self.value())
+            min_birth_date = activity.start_date.replace(
+                year=activity.start_date.year - activity.min_age
+            )
+            max_birth_date = activity.start_date.replace(
+                year=activity.start_date.year - activity.max_age - 1
+            )
+            return queryset.filter(
+                person__birthday__lte=min_birth_date,
+                person__birthday__gte=max_birth_date,
+            )
+        return queryset
+
+
+class WaitingListMinAgeFilter(admin.SimpleListFilter):
+    title = _("Minimum alder")
+    parameter_name = "min_age"
+
+    def lookups(self, request, model_admin):
+        return [(str(age), str(age)) for age in range(0, 101)]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            min_age = int(self.value())
+            min_birth_date = date.today().replace(year=date.today().year - min_age)
+            return queryset.filter(person__birthday__lte=min_birth_date)
+        return queryset
+
+
+class WaitingListMaxAgeFilter(admin.SimpleListFilter):
+    title = _("Maksimum alder")
+    parameter_name = "max_age"
+
+    def lookups(self, request, model_admin):
+        return [(str(age), str(age)) for age in range(0, 101)]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            max_age = int(self.value())
+            max_birth_date = date.today().replace(year=date.today().year - max_age - 1)
+            return queryset.filter(person__birthday__gte=max_birth_date)
+        return queryset
 
 
 class person_waitinglist_union_filter(admin.SimpleListFilter):
@@ -69,6 +140,33 @@ class person_waitinglist_department_filter(admin.SimpleListFilter):
             return queryset.filter(department__id=self.value())
 
 
+class person_waitinglist_municipality_filter(admin.SimpleListFilter):
+    title = "Kommune"
+    parameter_name = "person__municipality"
+
+    def lookups(self, request, model_admin):
+        # loop through the persons in waitinglist, and get the municipality values for the filter
+        municipalities = [("any", "(Med kommune)"), ("none", "(Uden kommune)")]
+        municipality_ids = model_admin.model.objects.values_list(
+            "person__municipality__id", flat=True
+        ).distinct()
+        for municipality in Municipality.objects.filter(
+            id__in=municipality_ids
+        ).order_by("name"):
+            municipalities.append((str(municipality.pk), municipality.name))
+        return municipalities
+
+    def queryset(self, request, queryset):
+        if self.value() == "any":
+            return queryset.exclude(person__municipality__isnull=True)
+        elif self.value() == "none":
+            return queryset.filter(person__municipality__isnull=True)
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(person__municipality__id=self.value())
+
+
 class WaitingListAdmin(admin.ModelAdmin):
     class Meta:
         verbose_name = "Venteliste"
@@ -77,6 +175,8 @@ class WaitingListAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj=obj, change=change, **kwargs)
         return form
+
+    list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
         "department_link",
@@ -94,7 +194,11 @@ class WaitingListAdmin(admin.ModelAdmin):
     list_filter = (
         person_waitinglist_union_filter,
         person_waitinglist_department_filter,
+        person_waitinglist_municipality_filter,
         "person__gender",
+        WaitingListActivityFilter,
+        WaitingListMinAgeFilter,
+        WaitingListMaxAgeFilter,
     )
 
     search_fields = [
@@ -102,7 +206,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         "department__union__name",
         "person__name",
         "person__zipcode",
-        "person__municipality",
+        "person__municipality__name",
     ]
     search_help_text = mark_safe(
         """Du kan søge på forening (navn), afdeling (navn) eller person (navn, postnummer eller kommune).<br>
@@ -166,7 +270,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         class MassConfirmForm(forms.Form):
             department = forms.ChoiceField(label="Afdeling", choices=department_list)
             email_text = forms.CharField(
-                label="Email ekstra info", widget=forms.Textarea
+                label="Email ekstra info", widget=forms.Textarea, required=False
             )
             confirmation = forms.ChoiceField(label="Bekræft", choices=confirm_list)
 
@@ -193,6 +297,7 @@ class WaitingListAdmin(admin.ModelAdmin):
                     mass_confirmation_form.is_valid()
                     and mass_confirmation_form.cleaned_data["department"] != "-"
                     and mass_confirmation_form.cleaned_data["confirmation"] == "1"
+                    and mass_confirmation_form.cleaned_data["email_text"] != ""
                 ):
                     department_confirmed = mass_confirmation_form.cleaned_data[
                         "department"
@@ -250,8 +355,28 @@ class WaitingListAdmin(admin.ModelAdmin):
                         return
 
                 else:
-                    messages.error(request, "ikke godkendt")
-                    return
+                    if mass_confirmation_form.cleaned_data["department"] == "-":
+                        mass_confirmation_form.add_error(
+                            "department",
+                            "Du skal vælge en afdeling for at kunne slette personer fra ventelisten.",
+                        )
+                    if mass_confirmation_form.cleaned_data["confirmation"] == "0":
+                        mass_confirmation_form.add_error(
+                            "confirmation",
+                            "Du skal vælge en bekræftelse for at kunne slette personer fra ventelisten.",
+                        )
+                    if mass_confirmation_form.cleaned_data["email_text"] == "":
+                        mass_confirmation_form.add_error(
+                            "email_text",
+                            "Du skal skrive en tekst der skal sendes med i emailen til de personer der bliver slettet fra ventelisten.",
+                        )
+
+                    context["mass_confirmation_form"] = mass_confirmation_form
+                    return render(
+                        request,
+                        "admin/delete_many_from_waitinglist.html",
+                        context,
+                    )
 
             else:
                 messages.error(
@@ -342,7 +467,9 @@ class WaitingListAdmin(admin.ModelAdmin):
     zipcode.admin_order_field = "person__zipcode"
 
     def municipality(self, item):
-        return item.person.municipality
+        if item.person.municipality is None:
+            return ""
+        return item.person.municipality.name
 
     municipality.short_description = "Kommune"
-    municipality.admin_order_field = "person__municipality"
+    municipality.admin_order_field = "person__municipality__name"

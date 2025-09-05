@@ -1,32 +1,29 @@
 from django.urls import re_path
-from django.views.generic import TemplateView
-
 from members.views import (
     AccountCreate,
     Activities,
     ActivitySignup,
     AdminSignup,
     ConfirmFamily,
+    consent_page,
+    consent_popup,
+    consent_preview,
     DeclineInvitation,
     DepartmentSignup,
     EntryPage,
     FamilyDetails,
     Membership,
+    MembershipSignup,
     PersonCreate,
     PersonUpdate,
     QuickpayCallback,
     SupportMembership,
-    volunteer_request_view,
     WaitingListSetSubscription,
     departmentView,
     paymentGatewayErrorView,
     userCreated,
     volunteerSignup,
-    create_user_view,
-    generate_code,
 )
-from .views.activity import activity_by_department
-
 from django.contrib.auth import views as auth_views
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
@@ -81,13 +78,6 @@ urlpatterns = [
     re_path(r"^membership/$", Membership, name="membership"),
     re_path(r"^support_membership/$", SupportMembership, name="support_membership"),
     re_path(r"^volunteer$", volunteerSignup, name="volunteer_signup"),
-    re_path(r"^volunteer_request/$", volunteer_request_view, name="volunteer_request"),
-    re_path(r"^generate_code/$", generate_code, name="generate_code"),
-    re_path(
-        r"^volunteer_request_created/$",
-        TemplateView.as_view(template_name="members/volunteer_request_created.html"),
-        name="volunteer_request_created",
-    ),
     re_path(r"^user_created/$", userCreated, name="user_created"),
     re_path(r"^admin_signup/$", AdminSignup, name="admin_signup"),
     re_path(r"^family/$", FamilyDetails, name="family_detail"),
@@ -111,6 +101,21 @@ urlpatterns = [
         name="activity_view_family",
     ),
     re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/person/(?P<person_id>[\d]+)/$",
+        MembershipSignup,
+        name="membership_signup",
+    ),
+    re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/person/(?P<person_id>[\d]+)/view/$",
+        MembershipSignup,
+        name="membership_view_person",
+    ),
+    re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/view/$",
+        MembershipSignup,
+        name="membership_view_family",
+    ),
+    re_path(
         r"^family/(?P<unique>[\w-]+)/invitation_decline/(?P<invitation_id>[\d]+)/$",
         DeclineInvitation,
         name="invitation_decline",
@@ -132,14 +137,15 @@ urlpatterns = [
     re_path(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     re_path(r"^department_signup$", DepartmentSignup, name="department_signup"),
     re_path(r"^departments$", departmentView, name="department_view"),
+    re_path(r"^consent_popup/$", consent_popup, name="consent_popup"),
     re_path(
-        r"^create_user/(?P<token>[0-9a-f-]+)/$", create_user_view, name="create_user"
+        r"^consent/preview/(?P<consent_id>\d+)/$",
+        consent_preview,
+        name="consent_preview",
     ),
-    # re_path(r'^admin/members/activity_by_department/(?P<department_id>\d+)/$', activity_by_department, name='activity_by_department'),
-    # re_path(r'^admin_members_activity_by_department/(?P<department_id>\d+)/$', activity_by_department, name='activity_by_department'),
     re_path(
-        r"^admin_members_activity_by_department/(?P<department_id>\d+)/$",
-        activity_by_department,
-        name="activity_by_department",
+        r"^consent/$",
+        consent_page,
+        name="consent_page",
     ),
 ]

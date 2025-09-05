@@ -2,8 +2,12 @@ from django.contrib import admin, messages
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape, format_html
+from django.db import models
+from members.models.activitytype import ActivityType
+
 
 from members.models import (
     ActivityParticipant,
@@ -65,6 +69,33 @@ class ActivityUnionListFilter(admin.SimpleListFilter):
             return queryset.filter(department__union__pk=self.value())
 
 
+class ActivityTypeListFilter(admin.SimpleListFilter):
+    title = "Aktivitetstype"
+    parameter_name = "activitytype__id"
+
+    def lookups(self, request, model_admin):
+        activitytypes = []
+
+        if request.user.is_superuser:
+            for activitytype in ActivityType.objects.all():
+                activitytypes.append(
+                    (str(activitytype.pk), str(activitytype.display_name))
+                )
+        else:
+            for activitytype in ActivityType.objects.exclude(id="FORENINGSMEDLEMSKAB"):
+                activitytypes.append(
+                    (str(activitytype.pk), str(activitytype.display_name))
+                )
+
+        return activitytypes
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(activitytype_id=self.value())
+
+
 class ActivityDepartmentListFilter(admin.SimpleListFilter):
     title = "Afdelinger"
     parameter_name = "department"
@@ -91,6 +122,7 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
 
 
 class ActivityAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
     list_display = (
         "name",
         "activitytype",
@@ -118,7 +150,6 @@ class ActivityAdmin(admin.ModelAdmin):
         "activity_link",
         "addressregion",
     )
-    list_per_page = 20
     raw_id_fields = (
         "union",
         "department",
@@ -127,7 +158,7 @@ class ActivityAdmin(admin.ModelAdmin):
         ActivityUnionListFilter,
         ActivityDepartmentListFilter,
         "open_invite",
-        "activitytype",
+        ActivityTypeListFilter,
         "address__region",
     )
     autocomplete_fields = (
@@ -233,22 +264,34 @@ class ActivityAdmin(admin.ModelAdmin):
         ):
             return qs
         departments = Department.objects.filter(adminuserinformation__user=request.user)
-        return qs.filter(department__in=departments)
+        return qs.filter(department__in=departments).exclude(
+            activitytype_id="FORENINGSMEDLEMSKAB"
+        )
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # Only show own departments when creating new activity
-        if (
-            db_field.name == "department"
-            and not request.user.is_superuser
-            and not request.user.has_perm("members.view_all_departments")
-        ):
-            kwargs["queryset"] = Department.objects.filter(
-                adminuserinformation__user=request.user
+        if db_field.name == "department":
+            departments = Department.objects.filter(
+                models.Q(closed_dtm__isnull=True)
+                | models.Q(closed_dtm__gt=timezone.now().date())
             )
+
+            if request.user.is_superuser or request.user.has_perm(
+                "members.view_all_departments"
+            ):
+                kwargs["queryset"] = departments
+            else:
+                kwargs["queryset"] = departments.filter(
+                    adminuserinformation__user=request.user
+                )
+
         if db_field.name == "address":
             kwargs["queryset"] = Address.get_user_addresses(request.user)
+
+        if db_field.name == "activitytype" and not request.user.is_superuser:
+            kwargs["queryset"] = ActivityType.objects.exclude(id="FORENINGSMEDLEMSKAB")
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def delete_queryset(self, request, queryset):
@@ -282,18 +325,15 @@ class ActivityAdmin(admin.ModelAdmin):
                 <p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>
                 <p>Startdato er første dag for aktiviteten, og slutdato er sidste for aktiviteten</p>""",
                 "fields": (
-                    (
-                        "name",
-                        "activitytype",
-                        "activity_link",
-                    ),
+                    "name",
+                    "activitytype",
+                    "activity_link",
                     "open_hours",
                     "description",
                     (
                         "start_date",
                         "end_date",
                     ),
-                    "member_justified",
                     "visible",
                     "visible_from",
                 ),

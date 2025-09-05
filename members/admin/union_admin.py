@@ -1,14 +1,68 @@
 import codecs
+import csv
+from django.conf import settings
 from django.contrib import admin
 from django.db.models.functions import Upper
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
 from django.utils.html import escape
-
+from io import StringIO
 from members.models import Address, Person, Department, AdminUserInformation
 
 from django.db.models import Count
+
+
+def generate_union_csv(queryset):
+    output = StringIO()
+    writer = csv.writer(output, delimiter=";", lineterminator="\n")
+
+    header = [
+        "Forening",
+        "Email",
+        "Oprettelsdato",
+        "Lukkedato",
+        "CVR",
+        "formand-navn",
+        "formand-email",
+        "formand-tlf",
+        "næstformand-navn",
+        "næstformand-email",
+        "næstformand-tlf",
+        "kasserer-navn",
+        "kasserer-email",
+        "kasserer-tlf",
+        "sekretær-navn",
+        "sekretær-email",
+        "sekretær-tlf",
+    ]
+    writer.writerow(header)
+
+    def person_fields(person):
+        if person is None:
+            return ["", "", ""]
+        return [
+            getattr(person, "name", ""),
+            getattr(person, "email", ""),
+            getattr(person, "phone", ""),
+        ]
+
+    for union in queryset:
+        row = [
+            union.name,
+            union.email,
+            union.founded_at.strftime("%Y-%m-%d") if union.founded_at else "",
+            union.closed_at.strftime("%Y-%m-%d") if union.closed_at else "",
+            union.cvr.strip() if union.cvr else "",
+            *person_fields(getattr(union, "chairman", None)),
+            *person_fields(getattr(union, "second_chair", None)),
+            *person_fields(getattr(union, "cashier", None)),
+            *person_fields(getattr(union, "secretary", None)),
+        ]
+        writer.writerow(row)
+
+    return output.getvalue()
 
 
 class AdminUserUnionInline(admin.TabularInline):
@@ -22,7 +76,7 @@ class AdminUserUnionInline(admin.TabularInline):
     extra = 0
     verbose_name = "Admin Bruger"
     verbose_name_plural = "Admin Brugere"
-
+    list_per_page = settings.LIST_PER_PAGE
     fields = (
         "user_username",
         "user_first_name",
@@ -89,13 +143,24 @@ class UnionAdmin(admin.ModelAdmin):
         "founded_at",
         "closed_at",
         "waitinglist_count_link",
+        "has_cvr_number",
     )
     list_filter = (
         "address__region",
         "founded_at",
         "closed_at",
     )
-    search_fields = ("name",)
+    search_fields = (
+        "name",
+        "email",
+        "address__streetname",
+        "address__housenumber",
+        "address__placename",
+        "address__zipcode",
+        "address__city",
+    )
+    search_help_text = "Du kan søge på forening (navn, adresse, email)"
+
     filter_horizontal = ["board_members"]
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
@@ -104,31 +169,31 @@ class UnionAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request, obj=None):
         # 20241113: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
 
-        info_fields = (
+        info_fields = [
             "bank_main_org",
             "bank_account",
             "statues",
             "founded_at",
             "closed_at",
-        )
+            "memberships_allowed_at",
+            "membership_price_in_dkk",
+        ]
 
         if request.user.is_superuser or request.user.has_perm(
             "members.show_ledger_account"
         ):
-            info_fields = (
-                "bank_main_org",
-                "bank_account",
-                "statues",
-                "founded_at",
-                "closed_at",
-                "gl_account",
-            )
+            info_fields.append("gl_account")
+
+        if request.user.is_superuser or request.user.has_perm(
+            "members.show_new_membership_model"
+        ):
+            info_fields.append("new_membership_model_activated_at")
 
         return [
             (
                 "Navn og Adresse",
                 {
-                    "fields": ("name", "email", "address"),
+                    "fields": ("name", "cvr", "email", "address"),
                     "description": "<p>Udfyld navnet på foreningen (f.eks København, \
                         vestjylland) og adressen<p>",
                 },
@@ -170,6 +235,22 @@ class UnionAdmin(admin.ModelAdmin):
                 },
             ),
         ]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and (
+            (
+                request.user.is_superuser
+                or request.user.has_perm("members.show_new_membership_model")
+            )
+            and (
+                obj.new_membership_model_activated_at is not None
+                and obj.new_membership_model_activated_at <= now()
+            )
+        ):
+            return [
+                "new_membership_model_activated_at",
+            ]
+        return []
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
@@ -218,55 +299,7 @@ class UnionAdmin(admin.ModelAdmin):
     waitinglist_count_link.admin_order_field = "waitinglist_count"
 
     def export_csv_union_info(self, request, queryset):
-        result_string = "Forening;Oprettelsdato;Lukkedato;"
-        result_string += "formand-navn;formand-email;formand-tlf;"
-        result_string += "næstformand-navn;næstformand-email;næstformand-tlf;"
-        result_string += "kasserer-navn;kasserer-email;kasserer-tlf;"
-        result_string += "sekretær-navn;sekretær-email;sekretær-tlf\n"
-
-        for union in queryset:
-            result_string += union.name
-            result_string += ";"
-            if union.founded_at is not None:
-                result_string += union.founded_at.strftime("%Y-%m-%d")
-            result_string += ";"
-            if union.closed_at is not None:
-                result_string += union.closed_at.strftime("%Y-%m-%d")
-            if union.chairman is None:
-                result_string += ";;;"
-            else:
-                result_string += (
-                    f";{union.chairman.name}"
-                    f";{union.chairman.email}"
-                    f";{union.chairman.phone}"
-                )
-            if union.second_chair is None:
-                result_string += ";;;"
-            else:
-                result_string += (
-                    f";{union.second_chair.name}"
-                    f";{union.second_chair.email}"
-                    f";{union.second_chair.phone}"
-                )
-            if union.cashier is None:
-                result_string += ";;;"
-            else:
-                result_string += (
-                    f";{union.cashier.name}"
-                    f";{union.cashier.email}"
-                    f";{union.cashier.phone}"
-                )
-            if union.secretary is None:
-                result_string += ";;;"
-            else:
-                result_string += (
-                    f";{union.secretary.name}"
-                    f";{union.secretary.email}"
-                    f";{union.secretary.phone}"
-                )
-
-            result_string += "\n"
-
+        result_string = generate_union_csv(queryset)
         response = HttpResponse(
             f'{codecs.BOM_UTF8.decode("UTF-8")}{result_string}',
             content_type="text/csv; charset=utf-8",
@@ -275,3 +308,10 @@ class UnionAdmin(admin.ModelAdmin):
         return response
 
     export_csv_union_info.short_description = "Exporter Foreningsinformationer"
+
+    def has_cvr_number(self, obj):
+        return bool(obj.cvr and obj.cvr.strip())
+
+    has_cvr_number.boolean = True
+    has_cvr_number.short_description = "CVR"
+    has_cvr_number.admin_order_field = "cvr"

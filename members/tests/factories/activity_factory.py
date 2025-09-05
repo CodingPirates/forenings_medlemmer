@@ -1,4 +1,5 @@
 import factory
+import random
 from members.tests.factories.factory_helpers import TIMEZONE, LOCALE
 from members.tests.factories.providers import DanishProvider, CodingPiratesProvider
 from members.models import Activity
@@ -22,11 +23,12 @@ Faker._DEFAULT_LOCALE = "dk_DK"
 class ActivityFactory(DjangoModelFactory):
     class Meta:
         model = Activity
-        exclude = ("active", "now")
+        exclude = ("active", "now", "fallback_date")
 
     # Helper fields
     active = Faker("boolean")
     now = timezone.now()
+    fallback_date = Faker("date_time", tzinfo=TIMEZONE)
 
     union = SubFactory(UnionFactory)
     department = SubFactory(DepartmentFactory, union=factory.SelfAttribute("..union"))
@@ -40,11 +42,7 @@ class ActivityFactory(DjangoModelFactory):
         "date_time_between", tzinfo=TIMEZONE, start_date="-100d", end_date="+100d"
     )
     start_date = LazyAttribute(
-        lambda d: (
-            datetime_before(d.now)
-            if d.active
-            else Faker("date_time", tzinfo=TIMEZONE).generate({})
-        )
+        lambda d: (datetime_before(d.now) if d.active else d.fallback_date)
     )
     end_date = LazyAttribute(
         lambda d: datetime_after(d.now) if d.active else datetime_before(d.now)
@@ -54,8 +52,5 @@ class ActivityFactory(DjangoModelFactory):
     price_in_dkk = Faker("random_number", digits=4)
     max_participants = Faker("random_number")
     min_age = Faker("random_int", min=5, max=18)
-    max_age = LazyAttribute(
-        lambda a: a.min_age + Faker("random_int", min=10, max=80).generate({})
-    )
-    member_justified = Faker("boolean")
+    max_age = LazyAttribute(lambda a: a.min_age + random.randint(10, 80))
     address = SubFactory(AddressFactory)

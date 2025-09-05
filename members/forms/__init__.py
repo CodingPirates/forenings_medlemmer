@@ -5,10 +5,12 @@ from .volunteer_request_form import VolunteerRequestForm
 from .admin_signup_form import adminSignupForm
 from .activity_signup_form import ActivitySignupForm
 from .activity_invite_decline_form import ActivivtyInviteDeclineForm
+from .membership_signup_form import MembershipSignupForm
 
 __all__ = [
     ActivivtyInviteDeclineForm,
     ActivitySignupForm,
+    MembershipSignupForm,
     PersonForm,
     signupForm,
     vol_signupForm,

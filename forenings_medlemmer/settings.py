@@ -90,10 +90,10 @@ INSTALLED_APPS = (
     "members",
     "crispy_forms",
     "crispy_bootstrap5",
-    "django_cron",
     "django.contrib.admin",
     "graphene_django",
     "django_extensions",
+    "rangefilter",
 )
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -113,6 +113,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "members.middleware.consent_middleware.ConsentMiddleware",
 )
 
 CORS_ORIGIN_WHITELIST = [host.replace(" ", "") for host in env.list("CORS_LIST")]
@@ -213,6 +214,7 @@ CRON_CLASSES = [
     "members.jobs.PollQuickpayPaymentsCronJob",
     "members.jobs.UpdateDawaData",
     "members.jobs.CaptureOutstandingPayments",
+    "members.jobs.DeleteNoteFieldCronJob",
 ]
 
 # Dont keep job logs more than 7 days old
@@ -237,3 +239,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 LOGIN_URL = "/account/login/"
 LOGIN_REDIRECT_URL = "/"
+
+MINIMUM_MEMBERSHIP_PRICE_IN_DKK = 75
+MINIMUM_SEASON_PRICE_IN_DKK = 150
+MINIMUM_PRICE_IN_DKK = 0
+
+LIST_PER_PAGE = 50

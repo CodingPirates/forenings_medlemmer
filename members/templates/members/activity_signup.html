@@ -9,7 +9,8 @@
       <div class="row">
         <div class="col-lg-6">
           <strong>Sted:</strong><br>
-            <address>
+            <address> 
+              {%if activity.address.descriptiontext%}{{activity.address.descriptiontext}}<br>{%endif%}
               {{activity.address.streetname}} {{activity.address.housenumber}}
               {%if activity.address.floor or activity.address.door%}, {%endif%}
               {%if activity.address.floor %}{{activity.address.floor}}.{%endif%}
@@ -37,7 +38,7 @@
         </div>
         <div class="col-lg-6">
           <p>
-          <strong>Pris:</strong><br>
+                    <strong>Pris eksl. evt. medlemskab af Coding Pirates {{ union.name }}:</strong><br>
           {{ price | floatformat:2}} kr<br>
           </p>
         </div>
@@ -82,6 +83,7 @@
           </p>
         </div>
       </div>
+
       {% if not view_only_mode %}
       <hr>
       {% crispy signupform %}
@@ -116,12 +118,24 @@
               {% endfor %}
             {% else %}
               {% for child in family.get_children %}
-                {% if child.id in family_subscriptions %}
-                  {{ child.firstname }} er opskrevet&nbsp;&nbsp;
-                {% else %}
-                  <a class="button" href="{% url 'waiting_list_subscription' child.id activity.department.id 'subscribe' %}">
-                    Opskriv {{ child.firstname }} på venteliste
+                {% if child.id in family_invites and child.id not in family_participants %}
+                  <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
+                    Tilmeld {{ child.firstname }}
                   </a>
+                {% elif child.id in family_subscriptions %}
+                  {{ child.firstname }} er opskrevet&nbsp;&nbsp;
+                {% elif child.id in family_invites %}
+                  <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
+                    Tilmeld {{ child.firstname }}
+                  </a>
+                {% else %}
+                  {% if child.id not in family_participants %}
+                    <a class="button" href="{% url 'waiting_list_subscription' child.id activity.department.id 'subscribe' %}">
+                      Opskriv {{ child.firstname }} på venteliste
+                    </a>
+                  {% else %}
+                    {{ child.firstname }} er tilmeldt
+                  {% endif %}
                 {% endif %}
               {% endfor %}
             {% endif %}

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.db.models.functions import Upper
 from django.contrib.auth.admin import UserAdmin
@@ -22,6 +23,7 @@ class PersonInline(admin.StackedInline):
     model = Person
     fields = ("name",)
     readonly_fields = ("name",)
+    fk_name = "user"
 
 
 class AdminUserGroupListFilter(admin.SimpleListFilter):
@@ -102,6 +104,7 @@ class AdminUserDepartmentListFilter(admin.SimpleListFilter):
 
 class UserAdmin(UserAdmin):
     inlines = (AdminUserInformationInline, PersonInline)
+    list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
         "username",

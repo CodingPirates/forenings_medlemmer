@@ -14,17 +14,27 @@ You are more than welcome to contribute to the system. This guide documents how 
     local development configuration, copy the file `.env.example` to `.env`
 
 - Run `docker compose up` to start your local system.  
-  (If on Apple Silicon machine, run `docker compose -f docker-compose.yml -f docker-compose.arm64.yml up --build`)
 
-- Run `docker compose run web ./manage.py get_live_data` to download public
-    data and insert it into your local database.
+- Start by importing municipalities. This step is important, otherwise you might get issues creating users later
+  `docker compose run  web ./manage.py import_municipalities members/management/commands/municipalities.csv`
 
-- To get some dummy members, families, etc. you can use the [factories][factories] to create them.
+- Optional, run `docker compose run web ./manage.py get_live_data` to download public data and insert it into your local database.
+
+- Optional, to get some dummy members, families, etc. you can use the [factories][factories] to create them.
 
     ```bash
-        docker compose run web ./manage.py shell
-        from members.tests.factories import MemberFactory
-        MemberFactory.create_batch(20)
+    docker compose run web ./manage.py shell
+    
+    (InteractiveConsole)
+    >>> from members.tests.factories import PersonFactory, ActivityFactory
+
+    >>> PersonFactory.create_batch(20)
+    [<Person: Frederick Robinson>, <Person: James Hays>, ...]
+
+    >>> ActivityFactory.create_batch(10)
+    [<Activity: Michaelsværk, Børne IT-konference 1998>, <Activity: Karenborg, Hackathon 1976>, ...]
+
+    >>> exit()
     ```
 
     Creates 20 members with associated families, departments, etc.
@@ -32,7 +42,9 @@ You are more than welcome to contribute to the system. This guide documents how 
     with the real world. For instance each member belongs to their own department.
 
 - To create a super user for the admin interface you can run
-    `docker compose run web ./manage.py createsuperuser`
+    ```bash
+    docker compose run web ./manage.py createsuperuser
+    ```
 
 - A pgAdmin container is configured as part of Docker Compose, and can be accessed on <http://localhost:5050>.
     Log in with credentials `admin@example.com`/`admin`. Connection to database has been configured in

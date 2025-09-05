@@ -74,6 +74,19 @@ class QuickpayTransaction(models.Model):
                 if self.transaction_id is None:
                     raise Exception("we did not get a transaction_id")
 
+                # We use autocapture to make sure the payment is captured in the correct accounting year
+                autocapture = False
+
+                if self.payment.member:
+                    autocapture = (
+                        self.payment.member.member_since.year <= timezone.now().year
+                    )
+
+                if self.payment.activity:
+                    autocapture = (
+                        self.payment.activity.start_date.year <= timezone.now().year
+                    )
+
                 # Enable auto-capture if the activity starts this year
                 link = client.put(
                     f"/payments/{self.transaction_id}/link",
@@ -83,8 +96,7 @@ class QuickpayTransaction(models.Model):
                         "continueurl": return_url,
                         "cancelurl": return_url,
                         "customer_email": self.payment.family.email,
-                        "autocapture": self.payment.activity.start_date.year
-                        <= timezone.now().year,
+                        "autocapture": autocapture,
                     },
                 )
 

@@ -9,6 +9,7 @@ from members.views.DepartmentSignup import DepartmentSignup
 from members.views.EntryPage import EntryPage
 from members.views.FamilyDetails import FamilyDetails
 from members.views.Membership import Membership
+from members.views.MembershipSignup import MembershipSignup
 from members.views.PersonCreate import PersonCreate
 from members.views.PersonUpdate import PersonUpdate
 from members.views.QuickpayCallback import QuickpayCallback
@@ -19,8 +20,6 @@ from members.views.departmentView import departmentView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.userCreated import userCreated
 from members.views.volunteerSignup import volunteerSignup
-from members.views.VolunteerRequest import (
-    volunteer_request_view,
-    generate_code,
-    create_user_view,
-)
+from members.views.ConsentPopup import consent_popup
+from members.views.ConsentPreview import consent_preview
+from members.views.ConsentPage import consent_page

@@ -8,6 +8,7 @@ from .waitinglist_factory import WaitingListFactory
 from .activity_participant_factory import ActivityParticipantFactory
 from .payment_factory import PaymentFactory
 from .volunteer_factory import VolunteerFactory
+from .member_factory import MemberFactory
 
 __all__ = [
     ActivityParticipantFactory,
@@ -20,4 +21,5 @@ __all__ = [
     PersonFactory,
     ActivityFactory,
     VolunteerFactory,
+    MemberFactory,
 ]

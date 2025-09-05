@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.utils import timezone
 
 
 class Union(models.Model):
     class Meta:
-        verbose_name_plural = "Foreninger"
         verbose_name = "Forening"
+        verbose_name_plural = "Foreninger"
         ordering = ["name"]
         permissions = (
             ("view_all_unions", "Can view all Foreninger"),
             ("show_ledger_account", "Show General Ledger Account"),
+            ("show_new_membership_model", "Show New Membership Model"),
         )
 
     help_union = """Vi tilføjer automatisk "Coding Pirates" foran navnet når vi nævner det de fleste steder på siden."""
@@ -68,6 +71,13 @@ class Union(models.Model):
         default=None,
         help_text="Dato for lukning af denne forening",
     )
+    memberships_allowed_at = models.DateField(
+        "Dato hvor medlemskaber er tilladt fra",
+        help_text="Hvis feltet er tomt, vil det ikke være tilladt at være medlem af foreningen.",
+        default=timezone.now,
+        blank=True,
+        null=True,
+    )
     address = models.ForeignKey(
         "Address", on_delete=models.PROTECT, verbose_name="Adresse"
     )
@@ -75,6 +85,20 @@ class Union(models.Model):
         "Person", blank=True, verbose_name="Menige medlemmer"
     )
     board_members_old = models.TextField("Menige medlemmer", blank=True)
+    help_text = f"Medlemskabet skal koste minimum {settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK} kr. pga. Dansk Ungdoms Fællesråds medlemsdefinition."
+    membership_price_in_dkk = models.DecimalField(
+        "Pris for medlemskab",
+        max_digits=10,
+        decimal_places=2,
+        default=settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK,
+        help_text=help_text,
+    )
+    new_membership_model_activated_at = models.DateTimeField(
+        "Ny medlemskabsmodel aktiveret",
+        blank=True,
+        null=True,
+        help_text="Bemærk: Aktiverer du den nye medlemstabel for en forening kan det ikke ændres tilbage! Det har betydning for flere ting, og vi låser derfor feltet. Står der ikke en dato i feltet, er den nye model ikke aktiv. Står der en dato i fremtiden er den heller ikke aktiv endnu, og kan ændres. Står der en dato i fortiden er den aktiv fra og med den dato.",
+    )
     bank_main_org = models.BooleanField(
         "Sæt kryds hvis I har konto hos hovedforeningen (og ikke har egen bankkonto).",
         default=True,
@@ -103,11 +127,34 @@ class Union(models.Model):
             )
         ],
     )
+    cvr = models.CharField(
+        "CVR-nummer",
+        max_length=8,
+        blank=True,
+        help_text="CVR-nummer i formatet 12345678",
+        validators=[
+            RegexValidator(
+                regex="^[0-9]{8}$",
+                message="Indtast CVR-nummer i det rigtige format.",
+            )
+        ],
+    )
 
     def __str__(self):
         return self.name
 
     def clean(self):
+        errors = {}
+        min_amount = settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK
+
+        if self.membership_price_in_dkk < min_amount:
+            errors["membership_price_in_dkk"] = (
+                f"Prisen er for lav. Medlemskaber skal koste mindst {min_amount} kr."
+            )
+
+        if errors:
+            raise ValidationError(errors)
+
         if self.bank_main_org is False and not self.bank_account:
             raise ValidationError(
                 "Vælg om foreningen har konto hos hovedforeningen. Hvis ikke skal bankkonto udfyldes."

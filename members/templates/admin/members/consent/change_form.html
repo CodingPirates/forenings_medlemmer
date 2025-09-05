@@ -1,0 +1,24 @@
+<!-- filepath: members/templates/admin/members/consent/change_form.html -->
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block content %}
+    {{ block.super }}
+    {% if readonly %}
+        <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", function() {
+                // Disable save buttons
+                var saveButtons = document.querySelectorAll("input[name='_save'], input[name='_continue'], input[name='_addanother']");
+                saveButtons.forEach(function(button) {
+                    button.disabled = true;
+                });
+
+                // Disable delete button
+                var deleteButton = document.querySelector("a.deletelink");
+                if (deleteButton) {
+                    deleteButton.style.display = 'none';
+                }
+            });
+        </script>
+    {% endif %}
+{% endblock %}

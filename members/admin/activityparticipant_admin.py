@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
@@ -181,6 +182,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
     list_display = [
         "activity_link",
         "added_at",
@@ -215,6 +217,10 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
     search_fields = (
         "person__name",
         "activity__name",
+    )
+
+    search_help_text = mark_safe(
+        "<b>Noter til aktiviteten slettes automatisk 14 dage efter aktiviteten er afholdt på grund af GDPR.</b>"
     )
 
     actions = [
