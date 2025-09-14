@@ -29,7 +29,7 @@ def get_dump():
         union_info["fields"]["address"] for union_info in dumps["union"]
     ]
     public_addresses += [
-        activity_info["fields"]["location"] for activity_info in dumps["activity"]
+        activity_info["fields"]["address"] for activity_info in dumps["activity"]
     ]
     dumps["address"] = [
         address for address in dumps["address"] if address["pk"] in public_addresses
