@@ -67,7 +67,7 @@ def generate_code(request):
         return JsonResponse({"success": False, "error": "Invalid request method."})
 
 
-def volunteer_request_view(request):
+def volunteer_request(request):
     if request.user.is_authenticated:
         person = user_to_person(request.user)
         if not person:
