@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils import timezone
 
-from members.models import Activity, AdminUserInformation
+from members.models import Activity, AdminUserInformation, Person
 from members.models.municipality import Municipality
 
 
@@ -231,3 +231,24 @@ class AnonymizedFilter(admin.SimpleListFilter):
             return queryset.filter(anonymized=False)
         else:
             return queryset
+
+
+class RegionFilter(admin.SimpleListFilter):
+    title = "Region"
+    parameter_name = "region"
+
+    def lookups(self, request, model_admin):
+        regions = [("none", "(Ingen region)")]
+        region_ids = Person.objects.values_list("region", flat=True).distinct()
+        for region in region_ids:
+            if region:
+                regions.append((region, region))
+        return list(set(regions))  # Ensure unique values in the dropdown
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return queryset.filter(region__isnull=True)
+        elif self.value() is None:
+            return queryset
+        else:
+            return queryset.filter(region=self.value())
