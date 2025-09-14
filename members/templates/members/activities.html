@@ -34,7 +34,7 @@
           når der er aktiviteter, som I kan tilmelde jer.
         </p>
         {% if invites %}
-          <p><i>Vær opmærksom på, at I tilmelder Jer den rigtige afdeling!</i></p>
+          <p><i>Vær opmærksom på, at I tilmelder jer den rigtige afdeling!</i></p>
           <table>
             <thead>
               <tr>
@@ -223,6 +223,11 @@
                                   {{ person.person.firstname }} er tilmeldt
                                 </div>
                               {% else %}
+                                {% if activity.seats_left == 0 %}
+                                  <div class="info-box">
+                                    Udsolgt - kan ikke tilmelde {{ person.person.firstname }}
+                                  </div>
+                                {% else %}
                                   {% if person.person in activity.persons %}
                                     <a
                                       class="button-success"
@@ -231,6 +236,7 @@
                                       Tilmeld {{ person.person.firstname }}
                                     </a>
                                   {% endif %}
+                                {% endif %}
                               {% endif %}
                             {% else %}
                               {% if activity.department in person.departments_is_waiting %}
@@ -303,10 +309,10 @@
                 <th>Aktivitet</th>
                 <th>Afdeling</th>
                 <th>Dato</th>
+                <th>Pris</th>
               </tr>
             </thead>
             <tbody>
-
                 {% for participation in participating %}
                   <tr>
                     <td>{{ participation.person.name }}</td>
@@ -330,6 +336,9 @@
                       {% if participation.activity.start_date != participation.activity.end_date %}
                       - {{ participation.activity.end_date }}
                       {% endif %}
+                    </td>
+                    <td>
+                      {{ participation.price_in_dkk }} kr.
                     </td>
                   </tr>
                 {% endfor %}

@@ -96,11 +96,15 @@ def Activities(request):
                     )
                 ]
             invites = ActivityInvite.objects.filter(
-                person__family=family, expire_dtm__gte=timezone.now(), rejected_at=None
+                person__family=family,
+                expire_dtm__gte=timezone.now(),
+                rejected_at=None,
+                person__anonymized=False,
             )
             participating = ActivityParticipant.objects.filter(
                 person__family=family,
                 activity__activitytype__in=["FORLØB", "ARRANGEMENT"],
+                person__anonymized=False,
             ).order_by("-activity__start_date")
 
             current_activities_with_persons = []
@@ -132,6 +136,7 @@ def Activities(request):
                         "signup_closing": curActivity.signup_closing,
                         "userregion": user_region,
                         "address": curActivity.address,
+                        "seats_left": curActivity.seats_left(),
                     }
                     if curActivity.address.region == user_region:
                         activities_for_region_of_user.append(a)

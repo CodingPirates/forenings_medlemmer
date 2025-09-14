@@ -1,7 +1,7 @@
 {% load static %}
 <nav>
     <a id="toggle" class="active" href="#" onClick="toggleNav()">
-        <i class="fa fa-bars fa-2x"></i>
+        <i class="fa fa-bars"></i>
     </a>
     <a href="{% url "entry_page" %}">Oversigt</a>
     <a href="{% url "department_signup" %}">Afdelinger</a>
@@ -14,7 +14,10 @@
             <a href="{% url "admin:index" %}">ADMIN</a>
         {% endif %}
         <a href="{% url "family_detail" %}">Familie</a>
-        <a id="login-logout" href="{% url 'person_logout' %}">Log ud</a>
+        <form action="{% url 'person_logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="nav-link">Log ud</button>
+        </form>
     {% else %}
         <a href="{% url "account_create" %}">Tilmeld barn</a>
         <a href="{% url "volunteer_signup" %}">Bliv frivillig</a>

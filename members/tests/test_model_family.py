@@ -3,10 +3,10 @@ from random import randint
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from django.core import mail
-from members.jobs import EmailSendCronJob
 from members.models.family import Family
 from members.models.person import Person
 from members.models.emailtemplate import EmailTemplate
+from django.core.management import call_command
 
 from members.tests.factories import FamilyFactory, PersonFactory
 
@@ -62,7 +62,7 @@ class TestModelFamily(TestCase):
 
         family = FamilyFactory()
         family.send_link_email()
-        EmailSendCronJob().do()
+        call_command("cron_job_email_send")
         self.assertEqual(1, len(mail.outbox))
         self.assertEqual("TEMPLATE SUBJECT", mail.outbox[0].subject)
 
@@ -85,3 +85,36 @@ class TestModelFamily(TestCase):
     # def test_get_abosolute_url(self):
     #     family = FamilyFactory()
     #     self.assertEqual("family_form", family.get_absolute_url())
+
+    def create_request_with_permission(self, permission):
+        return type(
+            "Request",
+            (object,),
+            {
+                "user": type(
+                    "User",
+                    (object,),
+                    {"has_perm": lambda self, perm: perm == permission},
+                )()
+            },
+        )()
+
+    def test_anonymize_family_with_no_members(self):
+        family = FamilyFactory(dont_send_mails=False)
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        family.anonymize(request)
+
+        self.assertEqual(family.email, f"anonym-{family.id}@codingpirates.dk")
+        self.assertTrue(family.dont_send_mails)
+        self.assertTrue(family.anonymized)
+
+    def test_cannot_anonymize_family_with_non_anonymized_members(self):
+        family = FamilyFactory()
+        PersonFactory(family=family)
+
+        with self.assertRaises(
+            Exception,
+            msg="Alle personer i en familie skal være anonymiseret, for at familien kan anonymiseres.",
+        ):
+            family.anonymize()

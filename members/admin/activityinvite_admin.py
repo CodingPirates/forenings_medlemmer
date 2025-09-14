@@ -1,6 +1,7 @@
 import codecs
 from datetime import timedelta
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.admin.widgets import AdminDateWidget
@@ -23,6 +24,8 @@ from members.models import (
     Person,
 )
 
+from members.admin.admin_actions import AdminActions
+
 
 class ActivityInviteAdminForm(forms.ModelForm):
     class Meta:
@@ -32,6 +35,20 @@ class ActivityInviteAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwds):
         super(ActivityInviteAdminForm, self).__init__(*args, **kwds)
         self.fields["person"].queryset = Person.objects.order_by(Lower("name"))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        price = cleaned_data.get("price_in_dkk")
+        price_note = cleaned_data.get("price_note", "")
+        activity = cleaned_data.get("activity")
+        if activity:
+            default_price = activity.price_in_dkk
+            if price is not None and price != default_price and not price_note.strip():
+                self.add_error(
+                    "price_note",
+                    "Du skal angive en begrundelse for den særlige pris for denne deltager.",
+                )
+        return cleaned_data
 
 
 class ActivityInviteUnionListFilter(admin.SimpleListFilter):
@@ -132,6 +149,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         verbose_name = "Invitation"
         verbose_name_plural = "Invitationer"
 
+    list_per_page = settings.LIST_PER_PAGE
     list_display = (
         "pk",
         "person_link",
@@ -166,7 +184,11 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
 
-    actions = ["export_csv_invitation_info", "extend_invitations"]
+    actions = [
+        "export_csv_invitation_info",
+        "extend_invitations",
+        AdminActions.invite_many_to_activity_action,
+    ]
 
     form = ActivityInviteAdminForm
 
@@ -283,9 +305,15 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     participating.admin_order_field = "is_participating"
 
     def export_csv_invitation_info(self, request, queryset):
-        result_string = """"Forening"; "Afdeling"; "Aktivitet"; "Deltager";\
-            "Deltager-email"; "Familie-email"; "Pris"; "Pris note"; "Ekstra email info" ;\
-            "Deltager i aktiviteten"; "Invitationsdato"; "Udløbsdato"; "Afslåetdato"\n"""
+        def handle_quote(str, sep):
+            return '"' + str.replace('"', '""') + '"' + sep
+
+        result_string = (
+            '"Forening"; "Afdeling"; "Aktivitet"; "Deltager"; '
+            '"Deltager-email"; "Familie-email"; "Pris"; "Pris note"; '
+            '"Ekstra email info" ;"Deltager i aktiviteten"; '
+            '"Invitationsdato"; "Udløbsdato"; "Afslåetdato"\n'
+        )
 
         for invitation in queryset:
             participate = (
@@ -306,20 +334,27 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                 else invitation.rejected_at.strftime("%Y-%m-%d")
             )
 
+            family_email = ""
+            person_email = ""
+
+            if not invitation.person.family.dont_send_mails:
+                family_email = invitation.person.family.email
+                person_email = invitation.person.email
+
             result_string += (
-                f"{invitation.activity.department.union.name};"
-                f"{invitation.activity.department.name};"
-                f"{invitation.activity.name};"
-                f"{invitation.person.name};"
-                f"{invitation.person.email};"
-                f"{invitation.person.family.email};"
-                f"{str(invitation.price_in_dkk)};"
-                '"' + invitation.price_note.replace('"', '""') + '";'
-                '"' + invitation.extra_email_info.replace('"', '""') + '";'
-                f"{participate};"
-                f'{invitation.invite_dtm.strftime("%Y-%m-%d")};'
-                f"{expire_date};"
-                f"{rejected_date}\n"
+                handle_quote(invitation.activity.department.union.name, ";")
+                + handle_quote(invitation.activity.department.name, ";")
+                + handle_quote(invitation.activity.name, ";")
+                + handle_quote(invitation.person.name, ";")
+                + handle_quote(person_email, ";")
+                + handle_quote(family_email, ";")
+                + handle_quote(str(invitation.price_in_dkk), ";")
+                + handle_quote(invitation.price_note, ";")
+                + handle_quote(invitation.extra_email_info, ";")
+                + handle_quote(participate, ";")
+                + handle_quote(invitation.invite_dtm.strftime("%Y-%m-%d"), ";")
+                + handle_quote(expire_date, ";")
+                + handle_quote(rejected_date, "\n")
             )
         response = HttpResponse(
             f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',

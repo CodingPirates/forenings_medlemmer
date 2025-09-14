@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from members.models.family import Family
 from members.models.person import Person
+from members.models.consent import Consent
 
 
 @xframe_options_exempt
@@ -26,9 +27,17 @@ def AccountCreate(request):
                     # Passwords dosent match throw an error
                     signup.add_error("password2", "Adgangskoder er ikke ens")
                     return render(
-                        request,
-                        "members/volunteer_signup.html",
-                        {"vol_signupform": signup},
+                        request, "members/account_create.html", {"signupform": signup}
+                    )
+
+                # Ensure consent is given
+                if not signup.cleaned_data["consent"]:
+                    signup.add_error(
+                        "consent",
+                        "Du skal acceptere privatlivspolitikken for at fortsætte.",
+                    )
+                    return render(
+                        request, "members/account_create.html", {"signupform": signup}
                     )
 
                 # check if family already exists
@@ -51,7 +60,8 @@ def AccountCreate(request):
                 # TODO: rewrite this! <<<<
                 # create new family.
                 family = Family.objects.create(
-                    email=signup.cleaned_data["parent_email"]
+                    email=signup.cleaned_data["parent_email"],
+                    referer=signup.cleaned_data["referer"],
                 )
                 family.confirmed_at = timezone.now()
                 family.save()
@@ -64,6 +74,15 @@ def AccountCreate(request):
                 password = signup.cleaned_data["password2"]
                 user.set_password(password)
                 user.save()
+
+                # Get the latest consent
+                latest_consent = (
+                    Consent.objects.filter(
+                        released_at__isnull=False, released_at__lte=timezone.now()
+                    )
+                    .order_by("-released_at")
+                    .first()
+                )
 
                 # create parent
                 parent = Person.objects.create(
@@ -83,6 +102,9 @@ def AccountCreate(request):
                     gender=signup.cleaned_data["parent_gender"],
                     family=family,
                     user=user,
+                    consent=latest_consent,  # Set the consent
+                    consent_by=user,  # Set the user who gave consent
+                    consent_at=timezone.now(),  # Set the timestamp for consent
                 )
                 parent.save()
 

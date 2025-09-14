@@ -5,11 +5,15 @@ from members.views import (
     ActivitySignup,
     AdminSignup,
     ConfirmFamily,
+    consent_page,
+    consent_popup,
+    consent_preview,
     DeclineInvitation,
     DepartmentSignup,
     EntryPage,
     FamilyDetails,
     Membership,
+    MembershipSignup,
     PersonCreate,
     PersonUpdate,
     QuickpayCallback,
@@ -97,6 +101,21 @@ urlpatterns = [
         name="activity_view_family",
     ),
     re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/person/(?P<person_id>[\d]+)/$",
+        MembershipSignup,
+        name="membership_signup",
+    ),
+    re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/person/(?P<person_id>[\d]+)/view/$",
+        MembershipSignup,
+        name="membership_view_person",
+    ),
+    re_path(
+        r"^family/membership/(?P<union_id>[\d]+)/view/$",
+        MembershipSignup,
+        name="membership_view_family",
+    ),
+    re_path(
         r"^family/(?P<unique>[\w-]+)/invitation_decline/(?P<invitation_id>[\d]+)/$",
         DeclineInvitation,
         name="invitation_decline",
@@ -118,4 +137,15 @@ urlpatterns = [
     re_path(r"^quickpay_callback$", QuickpayCallback, name="quickpay_callback"),
     re_path(r"^department_signup$", DepartmentSignup, name="department_signup"),
     re_path(r"^departments$", departmentView, name="department_view"),
+    re_path(r"^consent_popup/$", consent_popup, name="consent_popup"),
+    re_path(
+        r"^consent/preview/(?P<consent_id>\d+)/$",
+        consent_preview,
+        name="consent_preview",
+    ),
+    re_path(
+        r"^consent/$",
+        consent_page,
+        name="consent_page",
+    ),
 ]

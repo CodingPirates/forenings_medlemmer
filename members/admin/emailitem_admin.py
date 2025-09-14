@@ -1,4 +1,5 @@
 from typing import Any
+from django.conf import settings
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -49,7 +50,12 @@ class activityFilter(admin.SimpleListFilter):
 
         activityList = [("none", "(Ingen aktivitet)")]
         for activity in Activity.objects.filter(id__in=activities).order_by("name"):
-            activityList.append((str(activity.id), str(activity.name)))
+            department_name = (
+                activity.department.name if activity.department else "Ukendt afdeling"
+            )
+            activityList.append(
+                (str(activity.id), f"{department_name} - {activity.name}")
+            )
         return activityList
 
     def queryset(self, request, queryset):
@@ -120,6 +126,8 @@ class departmentFilter(admin.SimpleListFilter):
 
 
 class EmailItemAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
+
     list_display = [
         "created_dtm",
         "receiver",

@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.utils.safestring import mark_safe
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Field, Hidden, Div
 
@@ -15,7 +16,11 @@ class signupForm(forms.Form):
             next_url (str): Optional url that user will be redirected to after account creation and login.
                             Note: The user still needs to login, but will then be redirected to this url.
         """
+        consent_url = kwargs.pop("consent_url", "/consent/")
         super(signupForm, self).__init__(*args, **kwargs)
+        self.fields["consent"].label = mark_safe(
+            f'Jeg accepterer <a href="{consent_url}" target="_blank">Privatlivspolitikken</a>'
+        )
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.form_action = "account_create"
@@ -105,6 +110,13 @@ class signupForm(forms.Form):
                         ),
                         css_class="col-md-5",
                     ),
+                    Div(
+                        Div(
+                            Field("referer", id="referer"),
+                            css_class="col-md-6",
+                        )
+                    ),
+                    Div(Field("consent"), css_class="col-md-12"),
                     Hidden("dawa_id", "", id="id_dawa_id"),
                     css_class="row",
                 ),
@@ -145,14 +157,14 @@ class signupForm(forms.Form):
         widget=forms.PasswordInput(),
         label="Adgangskode",
         required=True,
-        max_length=20,
+        max_length=128,
         validators=[validate_password],
     )
     password2 = forms.CharField(
         widget=forms.PasswordInput(),
         label="Gentag adgangskode",
         required=True,
-        max_length=20,
+        max_length=128,
     )
 
     search_address = forms.CharField(
@@ -176,4 +188,14 @@ class signupForm(forms.Form):
         widget=forms.CheckboxInput,
         required=False,
         choices=((True, "True"), (False, "False")),
+    )
+    consent = forms.BooleanField(
+        label="Jeg accepterer privatlivspolitikken",
+        required=True,
+        error_messages={
+            "required": "Du skal acceptere privatlivspolitikken for at fortsætte."
+        },
+    )
+    referer = forms.CharField(
+        label="Hvor hørte du om Coding Pirates?", required=False, max_length=255
     )

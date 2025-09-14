@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -11,9 +12,9 @@ class Activity(models.Model):
         verbose_name_plural = "Aktiviteter"
         ordering = ["department__address__zipcode", "start_date"]
 
-    MEMBERSHIP_MIN_AMOUNT = 75
-    ACTIVITY_MIN_AMOUNT = 100
-    NO_MINIMUM_AMOUNT = 0
+    MEMBERSHIP_MIN_AMOUNT = settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK
+    ACTIVITY_MIN_AMOUNT = settings.MINIMUM_SEASON_PRICE_IN_DKK
+    NO_MINIMUM_AMOUNT = settings.MINIMUM_PRICE_IN_DKK
 
     department = models.ForeignKey(
         "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
@@ -32,22 +33,14 @@ class Activity(models.Model):
         on_delete=models.CASCADE,
         default="FORLØB",
         verbose_name="Aktivitetstype",
-        help_text="Angiv typen af aktivtet. "
-        + "Brugere vil se Forløb og Arrangementer under Aktiviteter. "
-        + "Medlemskab og Støttemedlemskab vil blive vist på separate sider. "
-        + "Normalt vil det kun være sekretariatet der oprettet aktiviteter for medlemskaber.",
+        help_text="""Angiv typen af aktivtet.
+        Brugere vil se Forløb og Arrangementer under Aktiviteter.
+        Medlemskab og Støttemedlemskab vil blive vist på separate sider.
+        Normalt vil det kun være sekretariatet der oprettet aktiviteter for medlemskaber.""",
     )
     open_hours = models.CharField("Tidspunkt", max_length=200)
     responsible_name = models.CharField("Ansvarlig", max_length=200)
     responsible_contact = models.EmailField("E-mail")
-    placename = models.CharField("Stednavn", max_length=200, blank=True, null=True)
-    zipcode = models.CharField("Postnummer", max_length=4)
-    city = models.CharField("By", max_length=200)
-    streetname = models.CharField("Vejnavn", max_length=200)
-    housenumber = models.CharField("Husnummer", max_length=200)
-    floor = models.CharField("Etage", max_length=200, blank=True, null=True)
-    door = models.CharField("Dør", max_length=200, blank=True, null=True)
-    dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
     description = models.TextField("Beskrivelse", blank=False)
     instructions = models.TextField("Tilmeldings instruktioner", blank=True)
     start_date = models.DateField("Start")
@@ -55,22 +48,16 @@ class Activity(models.Model):
     signup_closing = models.DateField("Tilmelding lukker", null=True)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
-    help_price = (
-        "Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk 100 kr. "
-    )
-    help_price += "til Coding Pirates Denmark pr. barn."
+    help_price = f"Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk {ACTIVITY_MIN_AMOUNT} kr. til Coding Pirates Denmark pr. barn."
     price_in_dkk = models.DecimalField(
         "Pris", max_digits=10, decimal_places=2, default=500, help_text=help_price
     )
     max_participants = models.PositiveIntegerField("Max deltagere", default=30)
     max_age = models.PositiveIntegerField("Maximum Alder", default=17)
     min_age = models.PositiveIntegerField("Minimum Alder", default=7)
-    help_temp = "Bestemmer om personerne bliver til medlemmer i forhold til DUF."
-    help_temp += " De fleste aktiviteter er forløb/sæsoner og medlemsberettiget. Hvis "
-    help_temp += "du er i tvivl, så spørg på Slack i #medlemsssystem-support."
-    member_justified = models.BooleanField(
-        "Aktiviteten gør personen til medlem", default=True, help_text=help_temp
-    )
+    help_text = """Bestemmer om personerne bliver til medlem i forhold til DUF.
+        De fleste aktiviteter er forløb/sæsoner og medlemsberettiget. Hvis
+        du er i tvivl, så spørg på Slack i #medlemssystem_support."""
     address = models.ForeignKey(
         "Address", on_delete=models.PROTECT, verbose_name="Adresse", null=False
     )
@@ -101,7 +88,13 @@ class Activity(models.Model):
         return self.department.name + ": " + self.name
 
     def is_season(self):
-        return (self.end_date - self.start_date).days > 30
+        return self.activitytype_id == "FORLØB"
+
+    def is_eligable_for_membership(self):
+        return (
+            self.activitytype_id == "FORLØB"
+            or self.activitytype_id == "FORENINGSMEDLEMSKAB"
+        )
 
     def will_reserve(self):
         return self.start_date.year > timezone.now().year

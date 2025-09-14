@@ -1,5 +1,7 @@
 import codecs
+from django.conf import settings
 from django.contrib import admin
+from django.db import models
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -26,7 +28,7 @@ class AdminUserDepartmentInline(admin.TabularInline):
     extra = 0
     verbose_name = "Admin Bruger"
     verbose_name_plural = "Admin Brugere"
-
+    list_per_page = settings.LIST_PER_PAGE
     fields = (
         "user_username",
         "user_first_name",
@@ -100,6 +102,7 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = (
         "department_link",
         "address",
+        "department_email",
         "isVisible",
         "isOpening",
         "has_waiting_list",
@@ -118,16 +121,32 @@ class DepartmentAdmin(admin.ModelAdmin):
         "has_waiting_list",
     )
     autocomplete_fields = ("union",)
+
+    def get_search_results(self, request, queryset, search_term):
+        # Only show open departments in autocomplete (closed_dtm is None or in the future)
+        from django.utils import timezone
+
+        queryset = queryset.filter(
+            models.Q(closed_dtm__isnull=True)
+            | models.Q(closed_dtm__gt=timezone.now().date())
+        )
+        return super().get_search_results(request, queryset, search_term)
+
     raw_id_fields = ("union",)
     search_fields = (
         "name",
         "union__name",
+        "department_email",
         "address__streetname",
         "address__housenumber",
         "address__placename",
         "address__zipcode",
         "address__city",
     )
+    search_help_text = (
+        "Du kan søge på afdeling (navn, adresse, email) eller forening (navn)"
+    )
+
     ordering = ["name"]
     filter_horizontal = ["department_leaders"]
 
@@ -221,19 +240,21 @@ class DepartmentAdmin(admin.ModelAdmin):
     waitinglist_count_link.admin_order_field = "waitinglist_count"
 
     def export_department_info_csv(self, request, queryset):
-        result_string = """"Forening"; "Afdeling"; "Afdeling-Startdato"; "Afdeling-lukkedato";\
-          "Kaptajn"; "Kaptajn-email"; "Kaptajn-telefon";\
-          "Adresse"; "Post#"; "By"; "Region";\
-          "Dato-sidste-forløb";\
-          "Dato-sidste-arrangement";\
-          "Dato-sidste-foreningsmedlemskab";\
-          "Dato-sidste-støttemedlemskab"\n"""
+        result_string = '"Forening"; "Afdeling"; "Email"; '
+        result_string += '"Afdeling-Startdato"; "Afdeling-lukkedato"; '
+        result_string += '"Kaptajn"; "Kaptajn-email"; "Kaptajn-telefon"; '
+        result_string += '"Adresse"; "Post#"; "By"; "Region"; '
+        result_string += '"Dato-sidste-forløb"; "Dato-sidste-arrangement"; '
+        result_string += (
+            '"Dato-sidste-foreningsmedlemskab"; "Dato-sidste-støttemedlemskab"\n'
+        )
 
         # There can be multiple departmentleaders (or even none)
 
         for d in queryset.order_by("name"):
             info1 = d.union.name + ";"
             info1 += d.name + ";"
+            info1 += d.department_email + ";"
             if d.created is not None:
                 info1 += d.created.strftime("%Y-%m-%d")
             info1 += ";"

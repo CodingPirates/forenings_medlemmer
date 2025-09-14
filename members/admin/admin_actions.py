@@ -93,6 +93,10 @@ class AdminActions(admin.ModelAdmin):
         elif queryset.model is ActivityParticipant:
             q = [pa.person.pk for pa in queryset]
             persons = Person.objects.filter(pk__in=q)
+        elif queryset.model is ActivityInvite:
+            persons = Person.objects.filter(
+                pk__in=queryset.values_list("person_id", flat=True)
+            )
         else:
             persons = queryset
 
@@ -132,11 +136,14 @@ class AdminActions(admin.ModelAdmin):
                     special_price_in_dkk != activity.price_in_dkk
                     and mass_invitation_form.cleaned_data["special_price_note"] == ""
                 ):
-                    messages.error(
-                        request,
-                        "Fejl - ingen personer blev inviteret! Du skal angive en begrundelse for den særlige pris. Noten er ikke synlig for deltageren.",
+                    mass_invitation_form.add_error(
+                        "special_price_note",
+                        "Du skal angive en begrundelse for den særlige pris for denne deltager.",
                     )
-                    return
+                    context["mass_invitation_form"] = mass_invitation_form
+                    return render(
+                        request, "admin/invite_many_to_activity.html", context
+                    )
 
                 min_amount = activity.get_min_amount(activity.activitytype.id)
 
@@ -164,6 +171,7 @@ class AdminActions(admin.ModelAdmin):
                         persons_already_invited = []
                         persons_already_participant = []
                         persons_invited = []
+                        persons_dont_send_mails = []
 
                         # get list of already created invitations on selected persons
                         already_invited = Person.objects.filter(
@@ -195,8 +203,14 @@ class AdminActions(admin.ModelAdmin):
                             with transaction.atomic():
                                 # for current_person in queryset:
                                 for current_person in persons:
+                                    # TODO: refactor this (according to Kristoffer)
+                                    # Check for the DontSendMails flag
+                                    if current_person.family.dont_send_mails:
+                                        persons_dont_send_mails.append(
+                                            current_person.name
+                                        )
                                     # check for already participant
-                                    if current_person.id in already_participant_ids:
+                                    elif current_person.id in already_participant_ids:
                                         persons_already_participant.append(
                                             current_person.name
                                         )
@@ -308,6 +322,17 @@ class AdminActions(admin.ModelAdmin):
                                 + escape(", ".join(persons_too_old))
                             )
 
+                        # Message about persons that have the dont_send_mails flag set
+                        persons_dont_send_mails_text = ""
+                        if len(persons_dont_send_mails) > 0:
+                            persons_dont_send_mails_text = (
+                                "<br><u>"
+                                + str(len(persons_dont_send_mails))
+                                + " har valgt ikke at modtage mails:</u><br> "
+                                + escape(", ".join(persons_dont_send_mails))
+                            )
+
+                        # Show message to user
                         messages.success(
                             request,
                             mark_safe(
@@ -315,7 +340,8 @@ class AdminActions(admin.ModelAdmin):
                                 + already_participating_text
                                 + already_invited_text
                                 + persons_too_young_text
-                                + persons_too_old_text,
+                                + persons_too_old_text
+                                + persons_dont_send_mails_text,
                             ),
                         )
                         return

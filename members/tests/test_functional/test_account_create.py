@@ -1,5 +1,6 @@
 import socket
 import os
+import time
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -10,7 +11,6 @@ from selenium.webdriver.support import expected_conditions as EC
 """
 This test goes to the root signup page and creates a child and parent.
 It uses the address Autocomplete widget to fill the address.
-
 Once the form is filled it uses the generated password and checks that it can be
 used to log in.
 """
@@ -22,7 +22,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.email = "parent@example.com"
-        self.password = "ois8Ieli7bah"
+        self.password = "securepassword123-securepassword123"
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--disable-dev-shm-usage")
         self.browser = webdriver.Remote(
@@ -46,10 +46,10 @@ class AccountCreateTest(StaticLiveServerTestCase):
         # Loads the front page
         self.browser.maximize_window()
 
-        if next_url is None or next_url == "":
-            self.browser.get(f"{self.live_server_url}/account/create")
-        else:
+        if next_url:
             self.browser.get(f"{self.live_server_url}/account/create?next={next_url}")
+        else:
+            self.browser.get(f"{self.live_server_url}/account/create")
 
         self.assertEqual("Coding Pirates Medlemssystem", self.browser.title)
         self.browser.save_screenshot("test-screens/sign_up_screen_1.png")
@@ -96,7 +96,7 @@ class AccountCreateTest(StaticLiveServerTestCase):
         # Set "Gentag password"
         field = self.browser.find_element(By.NAME, "password2")
         field.click()
-        field.send_keys(f"{self.password}l")
+        field.send_keys(self.password)
 
         # Use addresse Autocomplete
         field = self.browser.find_element(By.NAME, "search_address")
@@ -116,30 +116,31 @@ class AccountCreateTest(StaticLiveServerTestCase):
         )
         self.browser.save_screenshot("test-screens/sign_up_screen_2.png")
 
+        # click on consent checkbox
+        field = self.browser.find_element(By.NAME, "consent")
+        self.browser.execute_script("arguments[0].scrollIntoView(true);", field)
+        time.sleep(0.5)  # give browser a bit of time to scroll
+
+        field.click()
+
         # Submit form
         field.send_keys(Keys.TAB)
         field.send_keys(Keys.ENTER)
         self.browser.save_screenshot("test-screens/sign_up_screen_3.png")
-        # Check that it dosnt redirect since passwords arent matching
-        self.assertEqual(self.browser.current_url.split("/")[-2], "create")
 
-        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        self.browser.save_screenshot("test-screens/sign_up_screen_3a.png")
-
-        # Set password
-        field = self.browser.find_element(By.NAME, "password1")
-        field.click()
-        field.send_keys(self.password)
-
-        # Set "Gentag password"
-        field = self.browser.find_element(By.NAME, "password2")
-        field.click()
-        field.send_keys(self.password)
-
-        field.send_keys(Keys.TAB)
-        field.send_keys(Keys.TAB)
-        field.send_keys(Keys.ENTER)
-        self.browser.save_screenshot("test-screens/sign_up_screen_4.png")
+        # Assert redirection
+        if next_url:
+            # Check that the browser is redirected to the next_url
+            self.assertTrue(
+                self.browser.current_url.endswith(next_url),
+                f"Expected to be redirected to '{next_url}', but got '{self.browser.current_url}'",
+            )
+        else:
+            # Check that the browser is redirected to the default "user_created" page
+            self.assertTrue(
+                self.browser.current_url.endswith("user_created/"),
+                f"Expected to be redirected to 'user_created/', but got '{self.browser.current_url}'",
+            )
 
     def login_and_assert_frontpage_redirect_ui_flow(self):
         # Go to login page,
