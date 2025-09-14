@@ -166,12 +166,17 @@ def ActivitySignup(request, activity_id, person_id=None):
         if signup_form.is_valid():
             # Sign up and redirect to payment link or family page
 
+            # Fetch related invite if it exists
+            invite = ActivityInvite.objects.filter(
+                person=person, activity=activity
+            ).first()
+
             # Make ActivityParticipant
             participant = ActivityParticipant(
                 person=person,
                 activity=activity,
                 note=signup_form.cleaned_data["note"],
-                price_in_dkk=activity.price_in_dkk,
+                price_in_dkk=invite.price_in_dkk if invite else activity.price_in_dkk,
             )
 
             # Make a new member if it's a member activity
