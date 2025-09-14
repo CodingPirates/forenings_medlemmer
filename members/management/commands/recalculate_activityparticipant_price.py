@@ -9,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for activity_participant in ActivityParticipant.objects.all():
-            #Find matching activity
+            # Find matching activity
             activity = Activity.objects.filter(
                 id=activity_participant.activity_id
             ).first()
