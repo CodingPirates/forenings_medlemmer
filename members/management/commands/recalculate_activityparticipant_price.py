@@ -9,7 +9,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for activity_participant in ActivityParticipant.objects.all():
             # Find matching activity invite
-            activity_invite = ActivityInvite.objects.filter(activity=activity_participant.activity, person=activity_participant.person).first()
+            activity_invite = ActivityInvite.objects.filter(
+                activity=activity_participant.activity,
+                person=activity_participant.person,
+            ).first()
             if activity_invite:
                 activity_participant.price_in_dkk = activity_invite.price_in_dkk
             activity_participant.save()
