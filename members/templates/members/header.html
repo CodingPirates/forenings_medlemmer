@@ -16,7 +16,7 @@
         <a href="{% url "family_detail" %}">Familie</a>
         <form action="{% url 'person_logout' %}" method="post">
             {% csrf_token %}
-            <button type="submit">Log ud</button>
+            <button type="submit" class="nav-link">Log ud</button>
         </form>
     {% else %}
         <a href="{% url "account_create" %}">Tilmeld barn</a>
