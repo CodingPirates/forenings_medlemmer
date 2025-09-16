@@ -277,6 +277,29 @@ class ActivityAdmin(admin.ModelAdmin):
                 models.Q(closed_dtm__isnull=True)
                 | models.Q(closed_dtm__gt=timezone.now().date())
             )
+            # If editing an existing activity, include its department even if closed
+            obj = getattr(request, "activity_obj", None)
+            if (
+                not obj
+                and hasattr(request, "resolver_match")
+                and request.resolver_match
+            ):
+                # Try to get the object from the URL if possible
+                try:
+                    from members.models.activity import Activity
+
+                    pk = request.resolver_match.kwargs.get("object_id")
+                    if pk:
+                        obj = Activity.objects.filter(pk=pk).first()
+                except Exception:
+                    obj = None
+
+            if obj and obj.department_id:
+                departments = Department.objects.filter(
+                    models.Q(pk=obj.department_id)
+                    | models.Q(closed_dtm__isnull=True)
+                    | models.Q(closed_dtm__gt=timezone.now().date())
+                )
 
             if request.user.is_superuser or request.user.has_perm(
                 "members.view_all_departments"
