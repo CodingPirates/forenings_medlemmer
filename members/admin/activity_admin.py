@@ -332,6 +332,25 @@ class ActivityAdmin(admin.ModelAdmin):
         except Exception as e:
             messages.error(request, f"Fejl: {str(e)}")
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # Only set initial for new objects (not editing existing)
+        if obj is None:
+            departments = Department.objects.filter(
+                models.Q(closed_dtm__isnull=True)
+                | models.Q(closed_dtm__gt=timezone.now().date())
+            )
+            if not (
+                request.user.is_superuser
+                or request.user.has_perm("members.view_all_departments")
+            ):
+                departments = departments.filter(
+                    adminuserinformation__user=request.user
+                )
+            if departments.count() == 1:
+                form.base_fields["department"].initial = departments.first().pk
+        return form
+
     fieldsets = [
         (
             "Afdeling",
