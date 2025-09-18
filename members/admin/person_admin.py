@@ -1,16 +1,19 @@
 import codecs
+from datetime import date
 from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.utils import timezone
 from django.utils.html import format_html
 from django.urls import reverse
 
 from members.models import (
     Department,
     Person,
+    Payment,
 )
 
 from .filters.person_admin_filters import (
@@ -311,6 +314,21 @@ class PersonAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(request.get_full_path())
 
         for person in queryset:
+            # Check if person has a payment within the past 5 years - after current year
+            current_year = timezone.now().year
+            start_date = date(current_year - 5, 1, 1)
+
+            if Payment.objects.filter(
+                family=person.family,
+                added_at__gte=start_date
+            ).exists():
+                self.message_user(
+                    request,
+                    "Den valgte person kan ikke anonymiseres, fordi en person i familien har betalt i de sidste 5 år.",
+                    level="error",
+                )
+                return HttpResponseRedirect(request.get_full_path())
+
             if person.anonymized:
                 self.message_user(
                     request,
