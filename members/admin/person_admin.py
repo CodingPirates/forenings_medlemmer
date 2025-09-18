@@ -319,8 +319,7 @@ class PersonAdmin(admin.ModelAdmin):
             start_date = date(current_year - 5, 1, 1)
 
             if Payment.objects.filter(
-                family=person.family,
-                added_at__gte=start_date
+                family=person.family, added_at__gte=start_date
             ).exists():
                 self.message_user(
                     request,
