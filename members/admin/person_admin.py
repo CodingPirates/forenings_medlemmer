@@ -323,7 +323,7 @@ class PersonAdmin(admin.ModelAdmin):
             ).exists():
                 self.message_user(
                     request,
-                    "Den valgte person kan ikke anonymiseres, fordi en person i familien har betalt i de sidste 5 år.",
+                    "Den valgte person kan ikke anonymiseres, fordi en person i familien har betalt i de sidste 5 år, da bogføringsloven kræver, at vi opbevarer oplysningerne i 5 år. Hvis du sætter hak i 'Vil ikke kontaktes', sørger systemet for, at brugeren ikke kan logge ind. Det er også en ide at fjerne person(er) fra ventelister når der er sat hak i 'Vil ikke kontaktes'.",
                     level="error",
                 )
                 return HttpResponseRedirect(request.get_full_path())
