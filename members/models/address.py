@@ -172,4 +172,6 @@ class Address(models.Model):
         # Final set of address IDs to show
         address_ids = used_address_ids | unused_address_ids
 
-        return Address.objects.filter(pk__in=address_ids).order_by("streetname", "housenumber", "city")
+        return Address.objects.filter(pk__in=address_ids).order_by(
+            "streetname", "housenumber", "city"
+        )
