@@ -122,7 +122,7 @@ class Address(models.Model):
     @staticmethod
     def get_user_addresses(user):
         if user.is_superuser:
-            return Address.objects.all()
+            return Address.objects.all().order_by("streetname", "housenumber", "city")
 
         # Departments
         if user.has_perm("members.view_all_departments"):
@@ -172,4 +172,4 @@ class Address(models.Model):
         # Final set of address IDs to show
         address_ids = used_address_ids | unused_address_ids
 
-        return Address.objects.filter(pk__in=address_ids)
+        return Address.objects.filter(pk__in=address_ids).order_by("streetname", "housenumber", "city")
