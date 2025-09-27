@@ -118,6 +118,7 @@ class Address(models.Model):
                 return address
             else:
                 return None
+
     @staticmethod
     def get_all_address_ids(model):
         return set(model.objects.all().values_list("address_id", flat="True"))
@@ -136,7 +137,7 @@ class Address(models.Model):
         department_address_ids = set(department_qs.values_list("address_id", flat=True))
         department_ids = set(department_qs.values_list("id", flat=True))
 
-        # Get addresses for Unions that user can administrate: 
+        # Get addresses for Unions that user can administrate:
         if user.has_perm("members.view_all_unions"):
             union_qs = Union.objects.all()
         else:
