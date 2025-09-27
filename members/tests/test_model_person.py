@@ -10,6 +10,7 @@ from members.tests.factories import (
     PersonFactory,
     ActivityParticipantFactory,
     ActivityFactory,
+    PaymentFactory,
 )
 from members.tests.factories.department_factory import DepartmentFactory
 from members.tests.factories.factory_helpers import TIMEZONE
@@ -118,7 +119,9 @@ class TestModelPerson(TestCase):
             person.anonymize(request)
 
     def test_anonymize_person_in_single_member_family(self):
-        person = PersonFactory()
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person = PersonFactory()
+
         birthday = person.birthday
         municipality = person.municipality
 
@@ -150,8 +153,9 @@ class TestModelPerson(TestCase):
         self.assertTrue(person.family.anonymized)
 
     def test_anonymize_single_person_in_multi_member_family(self):
-        person_1 = PersonFactory()
-        person_2 = PersonFactory(family=person_1.family)
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person_1 = PersonFactory()
+            person_2 = PersonFactory(family=person_1.family)
 
         # create waiting list entries for both person
         department = DepartmentFactory()
@@ -178,8 +182,10 @@ class TestModelPerson(TestCase):
         self.assertFalse(person_1.family.anonymized)
 
     def test_anonymize_all_persons_in_multi_member_family(self):
-        person_1 = PersonFactory()
-        person_2 = PersonFactory(family=person_1.family)
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person_1 = PersonFactory()
+            person_2 = PersonFactory(family=person_1.family)
+
         request = self.create_request_with_permission("members.anonymize_persons")
 
         # sanity check that are are pointing to same family object
@@ -196,7 +202,9 @@ class TestModelPerson(TestCase):
         self.assertTrue(person_2.family.anonymized)
 
     def test_anonymize_person_with_user(self):
-        person = PersonFactory()
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person = PersonFactory()
+
         user = User.objects.create_user(
             username=person.name, email=person.email, password="password"
         )
@@ -208,7 +216,7 @@ class TestModelPerson(TestCase):
         self.assertTrue(person.anonymized)
 
         # retrive updated user from database, and verify that user is no longer active
-        user = User.objects.get(pk=user.pk)
+        user = User.objects.get(pk=person.user.pk)
 
         self.assertEqual(user.first_name, "Anonymiseret")
         self.assertNotEqual(user.email, person.email)  # email should be anonymized
@@ -217,7 +225,9 @@ class TestModelPerson(TestCase):
         self.assertFalse(user.is_active)
 
     def test_anonymize_person_with_sent_emails(self):
-        person = PersonFactory()
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person = PersonFactory()
+
         email = person.emailitem_set.create(
             receiver=person.email, subject="Test email", body_text="Test email body"
         )
@@ -234,33 +244,64 @@ class TestModelPerson(TestCase):
         self.assertEqual(email.body_text, "")
         self.assertEqual(email.receiver, "")
 
-    def test_is_anonymization_candidate_person_created_recently(self):
-        """Person created less than 5 years ago should not be a candidate."""
-        # Create person 3 years ago
-        three_years_ago = timezone.now() - timedelta(days=3 * 365)
-        with freeze_time(three_years_ago):
+    ############################################################
+    # Tests for is_anonymization_candidate()
+    def test_person_created_one_year_ago_is_not_anonymization_candidate(self):
+        """Person created 1 year ago cannot be anonymized."""
+        # Create person 1 year ago
+        one_year_ago = timezone.now() - timedelta(days=1 * 365)
+        with freeze_time(one_year_ago):
             person = PersonFactory()
 
-        self.assertFalse(person.is_anonymization_candidate())
+        self.assertFalse(person.is_anonymization_candidate()[0])
 
-    def test_is_anonymization_candidate_recent_login(self):
+    def test_person_created_two_years_ago_without_any_activity_is_anonymization_candidate(
+        self,
+    ):
+        """Person created exactly 2 years ago, without any activity, can be anonymized."""
+        # Create person 2 years and 1 day ago
+        two_years_ago = timezone.now() - timedelta(days=2 * 365)
+        with freeze_time(two_years_ago):
+            person = PersonFactory()
+
+        self.assertTrue(person.is_anonymization_candidate()[0])
+
+    def test_person_with_recent_login_is_not_anonymization_candidate(self):
         """Person with recent login should not be a candidate."""
         # Create person 6 years ago
         six_years_ago = timezone.now() - timedelta(days=6 * 365)
         with freeze_time(six_years_ago):
             person = PersonFactory()
 
-        # Create user with recent login (2 years ago)
+        # Create user with recent login (1 year ago)
         user = UserFactory()
-        user.last_login = timezone.now() - timedelta(days=2 * 365)
+        user.last_login = timezone.now() - timedelta(days=1 * 365)
         user.save()
         person.user = user
         person.save()
 
-        self.assertFalse(person.is_anonymization_candidate())
+        self.assertFalse(person.is_anonymization_candidate()[0])
 
-    def test_is_anonymization_candidate_recent_activity(self):
-        """Person with recent activity participation should not be a candidate."""
+    def test_person_with_non_recent_login_is_anonymization_candidate(self):
+        """Person with non-recent login should be a candidate."""
+        # Create person 6 years ago
+        six_years_ago = timezone.now() - timedelta(days=6 * 365)
+        with freeze_time(six_years_ago):
+            person = PersonFactory()
+
+        # Create user with non-recent login (2 years and 1 day ago)
+        user = UserFactory()
+        user.last_login = timezone.now() - timedelta(days=2 * 365 + 1)
+        user.save()
+        person.user = user
+        person.save()
+
+        self.assertTrue(person.is_anonymization_candidate()[0])
+
+    def test_candidate_recent_activity_participation_is_not_anonymization_candidate(
+        self,
+    ):
+        """Person with recent activity participation (2 years ago) should not be a candidate."""
         # Create person 6 years ago
         six_years_ago = timezone.now() - timedelta(days=6 * 365)
         with freeze_time(six_years_ago):
@@ -274,9 +315,9 @@ class TestModelPerson(TestCase):
         )
         ActivityParticipantFactory(person=person, activity=activity)
 
-        self.assertFalse(person.is_anonymization_candidate())
+        self.assertFalse(person.is_anonymization_candidate()[0])
 
-    def test_is_anonymization_candidate_old_person_no_recent_activity(self):
+    def test_old_person_no_recent_activity_is_anonymization_candidate(self):
         """Person created long ago with no recent activity or login should be a candidate."""
         # Create person 6 years ago
         six_years_ago = timezone.now() - timedelta(days=6 * 365)
@@ -298,9 +339,9 @@ class TestModelPerson(TestCase):
         person.user = user
         person.save()
 
-        self.assertTrue(person.is_anonymization_candidate())
+        self.assertTrue(person.is_anonymization_candidate()[0])
 
-    def test_is_anonymization_candidate_user_never_logged_in(self):
+    def test_user_never_logged_in_is_anonymization_candidate(self):
         """Person with user account that never logged in should be candidate if old enough."""
         # Create person 6 years ago
         six_years_ago = timezone.now() - timedelta(days=6 * 365)
@@ -314,10 +355,10 @@ class TestModelPerson(TestCase):
         person.user = user
         person.save()
 
-        self.assertTrue(person.is_anonymization_candidate())
+        self.assertTrue(person.is_anonymization_candidate()[0])
 
-    def test_is_anonymization_candidate_multiple_activities_latest_is_old(self):
-        """Person with multiple activities where the latest is old should be a candidate."""
+    def test_multiple_activities_latest_is_recent_is_not_anonymization_candidate(self):
+        """Person with multiple activities, one old and one recent, cannot be anonymized."""
         # Create person 6 years ago
         six_years_ago = timezone.now() - timedelta(days=6 * 365)
         with freeze_time(six_years_ago):
@@ -331,23 +372,55 @@ class TestModelPerson(TestCase):
         )
         ActivityParticipantFactory(person=person, activity=old_activity)
 
-        # Create even older activity (8 years ago)
-        eight_years_ago = timezone.now() - timedelta(days=8 * 365)
-        older_activity = ActivityFactory(
-            start_date=(eight_years_ago - timedelta(days=30)).date(),
-            end_date=eight_years_ago.date(),
+        # Create recent activity (1 year ago)
+        one_year_ago = timezone.now() - timedelta(days=1 * 365)
+        recent_activity = ActivityFactory(
+            start_date=(one_year_ago - timedelta(days=30)).date(),
+            end_date=one_year_ago.date(),
         )
-        ActivityParticipantFactory(person=person, activity=older_activity)
+        ActivityParticipantFactory(person=person, activity=recent_activity)
 
-        # Should be candidate because latest activity is still old
-        self.assertTrue(person.is_anonymization_candidate())
+        self.assertFalse(person.is_anonymization_candidate()[0])
 
-    def test_is_anonymization_candidate_exactly_five_years(self):
-        """Test edge case: person created exactly 5 years ago."""
-        # Create person exactly 5 years ago
-        exactly_five_years_ago = timezone.now() - timedelta(days=5 * 365)
-        with freeze_time(exactly_five_years_ago):
+    def test_person_created_exactly_two_years_ago_is_anonymization_candidate(self):
+        """Test edge case: person created exactly 2 years ago."""
+        # Create person exactly 2 years ago
+        exactly_two_years_ago = timezone.now() - timedelta(days=2 * 365)
+        with freeze_time(exactly_two_years_ago):
             person = PersonFactory()
 
-        # Should be candidate (created_at <= five_years_ago boundary)
-        self.assertTrue(person.is_anonymization_candidate())
+        self.assertTrue(person.is_anonymization_candidate()[0])
+
+    def test_person_created_over_2_years_with_payments_5_years_is_not_anonymization_candidate(
+        self,
+    ):
+        """Person with payments in the last 5 years cannot be anonymized."""
+        # Create person exactly 2 years and 1 day ago
+        two_years_and_one_day_ago = timezone.now() - timedelta(days=2 * 365 + 1)
+        with freeze_time(two_years_and_one_day_ago):
+            person = PersonFactory()
+
+        # Create payment in the last 5 years
+        PaymentFactory(person=person, added_at=timezone.now() - timedelta(days=4 * 365))
+
+        self.assertFalse(person.is_anonymization_candidate()[0])
+
+    def test_person_where_other_family_member_has_payments_5_years_is_not_anonymization_candidate(
+        self,
+    ):
+        """Person where other family member has payments in the last 5 years cannot be anonymized."""
+        # Create two persons, one 6 years ago
+        six_years_ago = timezone.now() - timedelta(days=6 * 365)
+        with freeze_time(six_years_ago):
+            parent = PersonFactory()
+            child = PersonFactory(family=parent.family)
+
+        # Create payment for child in the last 5 years
+        PaymentFactory(
+            person=child,
+            family=child.family,
+            added_at=timezone.now() - timedelta(days=4 * 365),
+        )
+
+        # parent cannot be anonymized, since child has payments in the last 5 years
+        self.assertFalse(parent.is_anonymization_candidate()[0])
