@@ -331,7 +331,7 @@ class Person(models.Model):
         is_anonymization_candidate, reason = self.is_anonymization_candidate()
         if not is_anonymization_candidate:
             raise ValidationError(
-                f"Personen {self.email} kan ikke anonymiseres: {reason}"
+                f"Personen {self.name} kan ikke anonymiseres: {reason}"
             )
 
         self.name = "Anonymiseret"
