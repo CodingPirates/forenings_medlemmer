@@ -118,6 +118,9 @@ class Address(models.Model):
                 return address
             else:
                 return None
+    @staticmethod
+    def get_all_address_ids(model):
+        return set(model.objects.all().values_list("address_id", flat="True"))
 
     @staticmethod
     def get_user_addresses(user):
@@ -153,15 +156,9 @@ class Address(models.Model):
 
         # Unused addresses: not linked to any department, union, or activity
         all_address_ids = set(Address.objects.all().values_list("id", flat=True))
-        all_department_address_ids = set(
-            Department.objects.all().values_list("address_id", flat=True)
-        )
-        all_union_address_ids = set(
-            Union.objects.all().values_list("address_id", flat=True)
-        )
-        all_activity_address_ids = set(
-            Activity.objects.all().values_list("address_id", flat=True)
-        )
+        all_department_address_ids = Address.get_all_address_ids(Department)
+        all_union_address_ids = Address.get_all_address_ids(Union)
+        all_activity_address_ids = Address.get_all_address_ids(Activity)
         all_used_address_ids = (
             all_department_address_ids
             | all_union_address_ids
