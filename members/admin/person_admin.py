@@ -1,19 +1,16 @@
 import codecs
-from datetime import date
 from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.utils import timezone
 from django.utils.html import format_html
 from django.urls import reverse
 
 from members.models import (
     Department,
     Person,
-    Payment,
 )
 
 from .filters.person_admin_filters import (
