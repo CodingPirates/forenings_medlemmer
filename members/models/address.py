@@ -124,10 +124,11 @@ class Address(models.Model):
 
     @staticmethod
     def get_user_addresses(user):
+        # If superuser, return all addresses
         if user.is_superuser:
             return Address.objects.all().order_by("streetname", "housenumber", "city")
 
-        # Departments
+        # Get addresses for Departments that user can administrate
         if user.has_perm("members.view_all_departments"):
             department_qs = Department.objects.all()
         else:
@@ -135,26 +136,26 @@ class Address(models.Model):
         department_address_ids = set(department_qs.values_list("address_id", flat=True))
         department_ids = set(department_qs.values_list("id", flat=True))
 
-        # Unions
+        # Get addresses for Unions that user can administrate: 
         if user.has_perm("members.view_all_unions"):
             union_qs = Union.objects.all()
         else:
             union_qs = Union.objects.filter(adminuserinformation__user=user)
         union_address_ids = set(union_qs.values_list("address_id", flat=True))
 
-        # Activities (only for departments user can administrate)
+        # Get addresses for Activities that are linked to departments that user can administrate
         activity_address_ids = set(
             Activity.objects.filter(department_id__in=department_ids).values_list(
                 "address_id", flat=True
             )
         )
 
-        # All used address IDs
+        # All used address IDs the Unions, Departments, and Activities that user can administrate
         used_address_ids = (
             department_address_ids | union_address_ids | activity_address_ids
         )
 
-        # Unused addresses: not linked to any department, union, or activity
+        # Unused addresses: not linked to any department, union, or activity in the system
         all_address_ids = set(Address.objects.all().values_list("id", flat=True))
         all_department_address_ids = Address.get_all_address_ids(Department)
         all_union_address_ids = Address.get_all_address_ids(Union)
