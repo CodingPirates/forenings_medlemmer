@@ -7,6 +7,7 @@ from crispy_forms.layout import Layout, Fieldset, Div, Field, Submit, Hidden, HT
 from members.models.volunteerrequest import VolunteerRequest
 
 from members.models import Person, Department, Activity
+from members.utils.user import user_to_person
 
 from django.forms.widgets import CheckboxSelectMultiple
 
@@ -84,21 +85,24 @@ class VolunteerRequestForm(forms.ModelForm):
         ]
 
         if user and user.is_authenticated:
-            family = user.person.family
-            self.fields["family_member"].queryset = family.person_set.all().order_by(
-                Lower("name")
-            )
-            self.fields["name"].initial = user.person.name
-            self.fields["phone"].initial = user.person.phone
-            self.fields["age"].initial = user.person.age_years()
-            self.fields["zip"].initial = user.person.zipcode
-            self.fields["email"].initial = user.person.email
-            self.fields["name"].widget = forms.HiddenInput()
-            self.fields["email"].widget = forms.HiddenInput()
-            self.fields["phone"].widget = forms.HiddenInput()
-            self.fields["age"].widget = forms.HiddenInput()
-            self.fields["zip"].widget = forms.HiddenInput()
-            self.fields["email_token"].widget = forms.HiddenInput()
+            person = user_to_person(user)
+            if person:
+                family = person.family
+                persons_qs = family.person_set.all().order_by(Lower("name"))
+                self.fields["family_member"].queryset = persons_qs
+                self.fields["family_member"].widget = forms.Select()  # Altid vis som select
+                # Skjul de andre felter, de udfyldes automatisk
+                self.fields["name"].widget = forms.HiddenInput()
+                self.fields["email"].widget = forms.HiddenInput()
+                self.fields["phone"].widget = forms.HiddenInput()
+                self.fields["age"].widget = forms.HiddenInput()
+                self.fields["zip"].widget = forms.HiddenInput()
+                self.fields["email_token"].widget = forms.HiddenInput()
+                self.fields["name"].initial = person.name
+                self.fields["phone"].initial = person.phone
+                self.fields["age"].initial = person.age_years()
+                self.fields["zip"].initial = person.zipcode
+                self.fields["email"].initial = person.email
         else:
             self.fields["family_member"].widget = forms.HiddenInput()
 

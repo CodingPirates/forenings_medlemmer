@@ -9,6 +9,7 @@
     <a href="{% url "membership" %}">Medlemskaber</a>
     <a href="{% url "support_membership" %}">Støttemedlemskaber</a>
     <div class="account-sep"></div>
+    <a href="{% url "volunteer_request" %}">Bliv frivillig</a>
     {% if user.is_authenticated %}
         {% if user.is_staff %}
             <a href="{% url "admin:index" %}">ADMIN</a>
@@ -20,7 +21,7 @@
         </form>
     {% else %}
         <a href="{% url "account_create" %}">Tilmeld barn</a>
-        <a href="{% url "volunteer_request" %}">Bliv frivillig</a>
+        
         <a id="login-logout" href="{% url 'person_login' %}{% if not 'logout' in request.path %}?next={{request.path}}{% endif %}">Log ind</a>
     {% endif %}
     <a href="https://codingpirates.dk" target="_blank">
