@@ -88,21 +88,43 @@ class VolunteerRequestForm(forms.ModelForm):
             person = user_to_person(user)
             if person:
                 family = person.family
-                persons_qs = family.person_set.all().order_by(Lower("name"))
-                self.fields["family_member"].queryset = persons_qs
-                self.fields["family_member"].widget = forms.Select()  # Altid vis som select
-                # Skjul de andre felter, de udfyldes automatisk
-                self.fields["name"].widget = forms.HiddenInput()
-                self.fields["email"].widget = forms.HiddenInput()
-                self.fields["phone"].widget = forms.HiddenInput()
-                self.fields["age"].widget = forms.HiddenInput()
-                self.fields["zip"].widget = forms.HiddenInput()
-                self.fields["email_token"].widget = forms.HiddenInput()
-                self.fields["name"].initial = person.name
-                self.fields["phone"].initial = person.phone
-                self.fields["age"].initial = person.age_years()
-                self.fields["zip"].initial = person.zipcode
-                self.fields["email"].initial = person.email
+                persons_qs = list(family.person_set.all().order_by(Lower("name")))
+
+                choices_list = [
+                    (p.pk, p.name if (getattr(p, "name", None) and p.name.strip()) else f"Person #{p.pk}")
+                    for p in persons_qs
+                ]
+                choices_list.insert(0, ("", "(Vælg person)"))
+                qs = Person.objects.filter(pk__in=[p.pk for p in persons_qs])
+                self.fields["family_member"].queryset = qs
+                self.fields["family_member"].choices = choices_list
+
+                if len(persons_qs) > 1:
+                    self.fields["family_member"].widget = forms.Select()
+                    self.fields["family_member"].required = True
+                    self.fields["family_member"].widget.attrs.update(
+                        {
+                            "class": "form-select js-no-enhance",
+                            "data-no-enhance": "1",
+                            "aria-label": "Vælg person",
+                        }
+                    )
+                    self.fields["name"].widget = forms.HiddenInput()
+                    self.fields["email"].widget = forms.HiddenInput()
+                    self.fields["phone"].widget = forms.HiddenInput()
+                    self.fields["age"].widget = forms.HiddenInput()
+                    self.fields["zip"].widget = forms.HiddenInput()
+                else:
+                    only = persons_qs[0] if persons_qs else None
+                    self.fields["family_member"].widget = forms.HiddenInput()
+                    self.fields["family_member"].required = False
+                    if only:
+                        self.fields["family_member"].initial = only.pk
+                        self.fields["name"].initial = only.name
+                        self.fields["phone"].initial = only.phone
+                        self.fields["age"].initial = only.age_years()
+                        self.fields["zip"].initial = only.zipcode
+                        self.fields["email"].initial = only.email
         else:
             self.fields["family_member"].widget = forms.HiddenInput()
 

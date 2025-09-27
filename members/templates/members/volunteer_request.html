@@ -28,7 +28,21 @@
         {% endif %}
         <form method="post" id="volunteer-request-form">
           {% csrf_token %}
-
+          <div class="form-group">
+            {{ volunteer_request_form.family_member|as_crispy_field }}
+          </div>
+<!--
+          <div class="form-group">
+            {# Debug: render raw select for at se om elementet findes i DOM #}
+            <label for="id_family_member">{{ volunteer_request_form.family_member.label }}</label>
+            <select id="id_family_member" name="family_member" class="form-select">
+              <option value="">-</option>
+              {% for val, text in volunteer_request_form.fields.family_member.choices %}
+                <option value="{{ val }}"{% if volunteer_request_form.data.family_member == val|stringformat:"s" or volunteer_request_form.initial.family_member == val %} selected{% endif %}>{{ text }}</option>
+              {% endfor %}
+            </select>
+            {# Hvis denne select ikke vises i browserens page source, så er den fjernet før render eller template variablen er forkert #}
+          </div> -->
           <div class="form-group">
             {{ volunteer_request_form.name|as_crispy_field }}
           </div>
