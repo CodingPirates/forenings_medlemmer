@@ -91,7 +91,14 @@ class VolunteerRequestForm(forms.ModelForm):
                 persons_qs = list(family.person_set.all().order_by(Lower("name")))
 
                 choices_list = [
-                    (p.pk, p.name if (getattr(p, "name", None) and p.name.strip()) else f"Person #{p.pk}")
+                    (
+                        p.pk,
+                        (
+                            p.name
+                            if (getattr(p, "name", None) and p.name.strip())
+                            else f"Person #{p.pk}"
+                        ),
+                    )
                     for p in persons_qs
                 ]
                 choices_list.insert(0, ("", "(Vælg person)"))
