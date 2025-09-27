@@ -1,5 +1,5 @@
 import random
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -8,6 +8,7 @@ from django.core.validators import RegexValidator
 from members.models.municipality import Municipality
 from members.models.consent import Consent
 from django.core.exceptions import PermissionDenied, ValidationError
+from members.models.payment import Payment
 from members.utils.address import format_address
 from urllib.parse import quote_plus
 import requests
@@ -199,19 +200,25 @@ class Person(models.Model):
     def is_anonymization_candidate(self):
         """
         Determine if person is a candidate for anonymization.
-        Returns False if created_date, latest_activity or last_login is less than 5 years ago.
+        Returns False if created_date, latest_activity or last_login is less than 2 years ago.
+        However we cannot anonymize if there is a payment in the last 5 full fiscal years.
         """
-        five_years_ago = timezone.now() - timedelta(days=5 * 365)
 
-        # Check if person was created less than 5 years ago
-        if self.added_at > five_years_ago:
-            return False
+        # we operate with two date boundaries:
+        # - 2 years
+        two_years_ago = timezone.now() - timedelta(days=2 * 365)
 
-        # Check if user has logged in within the last 5 years
-        if self.user and self.user.last_login and self.user.last_login > five_years_ago:
-            return False
+        # - January 1st of the year before 5 years ago, i.e. at least 5 full years
+        #
+        # current date 2025-09-27 => 2020-01-01
+        # current date 2025-12-31 => 2020-01-01
+        today = timezone.now().date()
+        if today.month == 12 and today.day == 31:
+            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
+        else:
+            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 6, 1, 1))
 
-        # Check if person has participated in activities within the last 5 years
+        # If person has participated in activities within the last 2 years, then cannot be anonymized
         # Import here to avoid circular imports
         from .activityparticipant import ActivityParticipant
 
@@ -223,10 +230,31 @@ class Person(models.Model):
         )
 
         if latest_participation and latest_participation.activity.end_date:
-            if latest_participation.activity.end_date > five_years_ago.date():
-                return False
+            if latest_participation.activity.end_date >= two_years_ago.date():
+                return False, "Har deltaget i aktiviteter seneste 2 år."
 
-        return True
+        if self.added_at >= two_years_ago:
+            return False, "Oprettet indenfor seneste 2 år."
+
+        if self.user and self.user.last_login and self.user.last_login >= two_years_ago:
+            return False, "Har logget ind seneste 2 år."
+
+        # We verify both person and family, i.e. a parent cannot be anonymized if there are payments for any of the children in family
+        if (
+            Payment.objects.filter(
+                person=self, added_at__gte=five_full_fiscal_years
+            ).exists()
+            or Payment.objects.filter(
+                family=self.family, added_at__gte=five_full_fiscal_years
+            ).exists()
+        ):
+            return (
+                False,
+                "Der eksisterer betaling indenfor seneste 5 fulde regnskabsår.",
+            )
+
+        # otherwise, the person can be anonymized
+        return True, ""
 
     def update_dawa_data(self, force=False, save=True):
         if self.address_invalid and not force:
@@ -300,7 +328,11 @@ class Person(models.Model):
         if self.anonymized:
             raise ValidationError("Personen er allerede anonymiseret.")
 
-        orig_email = self.email
+        is_anonymization_candidate, reason = self.is_anonymization_candidate()
+        if not is_anonymization_candidate:
+            raise ValidationError(
+                f"Personen {self.name} kan ikke anonymiseres: {reason}"
+            )
 
         self.name = "Anonymiseret"
         self.zipcode = ""
@@ -351,20 +383,19 @@ class Person(models.Model):
             activity_item.note = ""
             activity_item.save()
 
-        # anonymize Django user if exists, there might be multiple users with the same email address
-        users = User.objects.filter(email__exact=orig_email)
-        if users.exists():
-            for user in users:
-                user.username = f"anonymized-{user.id}"
-                user.first_name = "Anonymiseret"
-                user.last_name = ""
-                user.email = f"{user.username}@localhost"
-                user.is_superuser = False
-                user.is_staff = False
-                user.is_active = False
-                user.save()
-        else:
-            pass  # no user accounts found for this person
+        # anonymize Django user if exists
+        try:
+            user = User.objects.get(pk=self.user.pk)
+            user.username = f"anonymized-{user.id}"
+            user.first_name = "Anonymiseret"
+            user.last_name = ""
+            user.email = f"anonymized-{user.id}@localhost"
+            user.is_superuser = False
+            user.is_staff = False
+            user.is_active = False
+            user.save()
+        except User.DoesNotExist:
+            pass  # no user account found for this person, nothing to update then
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"

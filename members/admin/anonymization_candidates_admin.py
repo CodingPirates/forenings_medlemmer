@@ -15,55 +15,72 @@ class IsActiveFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ("yes", "Ja, seneste 5 år"),
-            ("no", "Nej, ikke aktiv seneste 5 år"),
+            ("yes", "Ja, seneste 2 år"),
+            ("no", "Nej, ikke aktiv seneste 2 år"),
         )
 
     def queryset(self, request, queryset):
         from django.utils import timezone
-        from datetime import timedelta
+        from datetime import timedelta, datetime
         from django.db.models import Q
 
-        five_years_ago = timezone.now() - timedelta(days=5 * 365)
+        two_years_ago = timezone.now() - timedelta(days=2 * 365)
+        today = timezone.now().date()
+        # Calculate the correct "five full fiscal years" boundary
+        if today.month == 12 and today.day == 31:
+            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
+        else:
+            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 6, 1, 1))
 
         if self.value() == "no":
-            # Show members that haven't been active in the last 5 years (anonymization candidates)
-            # This is the optimized database query version of is_anonymization_candidate()
-
+            # Show members that are anonymization candidates (no activity, login, or creation in last 2 years,
+            # and no payment in last 5 full fiscal years)
             return (
                 queryset.filter(
-                    # Person was created more than 5 years ago
-                    added_at__lt=five_years_ago
+                    # Person was created at least 2 years ago
+                    added_at__lt=two_years_ago
                 )
                 .filter(
-                    # AND (no user OR user hasn't logged in within 5 years)
+                    # AND (no user OR user hasn't logged in within 2 years)
                     Q(user__isnull=True)
-                    | Q(user__last_login__lt=five_years_ago)
+                    | Q(user__last_login__lt=two_years_ago)
                 )
                 .filter(
-                    # AND (no activity participation OR latest activity was more than 5 years ago)
+                    # AND (no activity participation OR latest activity was more than 2 years ago)
                     ~Q(
-                        activityparticipant__activity__end_date__gte=five_years_ago.date()
+                        activityparticipant__activity__end_date__gte=two_years_ago.date()
                     )
+                )
+                .filter(
+                    # AND no payment for person or family in last 5 full fiscal years
+                    ~Q(payment__added_at__gte=five_full_fiscal_years)
+                    & ~Q(family__payment__added_at__gte=five_full_fiscal_years)
                 )
                 .distinct()
             )
 
         elif self.value() == "yes":
-            # Show members that have been active in the last 5 years (not anonymization candidates)
-
+            # Show members that are NOT anonymization candidates (recent activity, login, creation, or payment)
             return queryset.filter(
                 Q(
-                    # Person was created less than 5 years ago
-                    added_at__gte=five_years_ago
+                    # Person was created less than 2 years ago
+                    added_at__gte=two_years_ago
                 )
                 | Q(
-                    # OR user has logged in within 5 years
-                    user__last_login__gte=five_years_ago
+                    # OR user has logged in within 2 years
+                    user__last_login__gte=two_years_ago
                 )
                 | Q(
-                    # OR has activity participation within 5 years
-                    activityparticipant__activity__end_date__gte=five_years_ago.date()
+                    # OR has activity participation within 2 years
+                    activityparticipant__activity__end_date__gte=two_years_ago.date()
+                )
+                | Q(
+                    # OR payment for person in last 5 full fiscal years
+                    payment__added_at__gte=five_full_fiscal_years
+                )
+                | Q(
+                    # OR payment for family in last 5 full fiscal years
+                    family__payment__added_at__gte=five_full_fiscal_years
                 )
             ).distinct()
 
@@ -165,7 +182,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             date_str = most_recent_date.strftime("%Y-%m-%d")
 
         # Color based on anonymization candidate status
-        is_candidate = obj.is_anonymization_candidate()
+        is_candidate = obj.is_anonymization_candidate()[0]
         color = "red" if is_candidate else "green"
 
         return format_html('<span style="color: {}">{}</span>', color, date_str)
@@ -241,7 +258,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             else:
                 last_login_str = "Aldrig"
 
-            is_candidate_str = "Ja" if person.is_anonymization_candidate() else "Nej"
+            is_candidate_str = "Ja" if person.is_anonymization_candidate()[0] else "Nej"
 
             # Calculate last active date (same logic as in last_active method)
             dates = []
