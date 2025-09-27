@@ -165,7 +165,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             date_str = most_recent_date.strftime("%Y-%m-%d")
 
         # Color based on anonymization candidate status
-        is_candidate = obj.is_anonymization_candidate()
+        is_candidate = obj.is_anonymization_candidate()[0]
         color = "red" if is_candidate else "green"
 
         return format_html('<span style="color: {}">{}</span>', color, date_str)
@@ -241,7 +241,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
             else:
                 last_login_str = "Aldrig"
 
-            is_candidate_str = "Ja" if person.is_anonymization_candidate() else "Nej"
+            is_candidate_str = "Ja" if person.is_anonymization_candidate()[0] else "Nej"
 
             # Calculate last active date (same logic as in last_active method)
             dates = []
