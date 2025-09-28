@@ -22,6 +22,7 @@ from .filters.person_admin_filters import (
     PersonWaitinglistListFilter,
     VolunteerListFilter,
     MunicipalityFilter,
+    RegionFilter,
     AnonymizedFilter,
 )
 
@@ -55,6 +56,7 @@ class PersonAdmin(admin.ModelAdmin):
         "gender",
         VolunteerListFilter,
         MunicipalityFilter,
+        RegionFilter,
         PersonWaitinglistListFilter,
         PersonInvitedListFilter,
         PersonParticipantListFilter,
@@ -329,7 +331,15 @@ class PersonAdmin(admin.ModelAdmin):
             if form.is_valid():
                 context["mass_confirmation_form"] = form
                 for person in queryset:
-                    person.anonymize(request)
+                    try:
+                        person.anonymize(request)
+                    except Exception as e:
+                        self.message_user(
+                            request,
+                            f"Fejl under anonymisering: {str(e)}",
+                            level="error",
+                        )
+                        return HttpResponseRedirect(request.get_full_path())
 
                 self.message_user(request, "Personen er blevet anonymiseret.")
                 return HttpResponseRedirect(request.get_full_path())
