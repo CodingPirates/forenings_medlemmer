@@ -20,6 +20,9 @@ from members.models import (
     Union,
     WaitingList,
     EmailItem,
+    Volunteer,
+    VolunteerRequest,
+    VolunteerRequestItem,
 )
 
 from .activity_admin import ActivityAdmin
@@ -39,6 +42,9 @@ from .union_admin import UnionAdmin
 from .user_admin import UserAdmin
 from .waitinglist_admin import WaitingListAdmin
 from .emailitem_admin import EmailItemAdmin
+from .volunteer_admin import VolunteerAdmin
+from .volunteerrequest_admin import VolunteerRequestAdmin
+from .volunteerrequestitem_admin import VolunteerRequestItemAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
@@ -60,6 +66,9 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Union, UnionAdmin)
 admin.site.register(WaitingList, WaitingListAdmin)
 admin.site.register(EmailItem, EmailItemAdmin)
+admin.site.register(Volunteer, VolunteerAdmin)
+admin.site.register(VolunteerRequest, VolunteerRequestAdmin)
+admin.site.register(VolunteerRequestItem, VolunteerRequestItemAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 # admin.site.register(AdminUserInformation, AdminUserInformationAdmin)

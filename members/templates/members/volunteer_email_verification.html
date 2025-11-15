@@ -1,0 +1,59 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="alert alert-info">
+        <h1>Bekræft din email adresse</h1>
+        <p>
+            Vi har sendt en verifikationskode til <strong>{{ email }}</strong>
+        </p>
+        <p>
+            Tjek din email og indtast den 6-cifrede kode herunder for at bekræfte din ansøgning om at blive frivillig.
+        </p>
+        {% if error %}
+            <div class="alert alert-danger mt-3">
+                {{ error }}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="verification_code" class="form-label">Verifikationskode</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="verification_code" 
+                        name="verification_code" 
+                        maxlength="6" 
+                        placeholder="Indtast 6-cifret kode"
+                        pattern="[0-9]{6}"
+                        required
+                        autocomplete="one-time-code"
+                    >
+                    <div class="form-text">Indtast den 6-cifrede kode du modtog på email</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Bekræft email</button>
+                <a href="{% url 'volunteer_signup' %}" class="btn btn-secondary">Start forfra</a>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-focus on the verification code input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('verification_code').focus();
+        });
+        
+        // Auto-format the input to only accept 6 digits
+        document.getElementById('verification_code').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            e.target.value = value;
+        });
+    </script>
+{% endblock %}

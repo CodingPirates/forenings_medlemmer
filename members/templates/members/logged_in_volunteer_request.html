@@ -1,0 +1,71 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="alert alert-secondary">
+        <h1>Frivillig anmodning</h1>
+        <p>
+            Som logget ind bruger kan du oprette en frivillig anmodning for en person i din familie.
+        </p>
+        <p>
+            Vælg den person der skal være frivillig, og angiv hvilke afdelinger eller aktiviteter I er interesserede i.
+        </p>
+        <p>
+            Du skal vælge mindst én afdeling eller aktivitet.
+        </p>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            {% crispy logged_in_form %}
+        </div>
+    </div>
+    
+    {% if debug_info %}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h6>Debug Information</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>User Email:</strong> {{ debug_info.user_email }}</p>
+            <p><strong>User has person record:</strong> {{ debug_info.user_has_person }}</p>
+            <p><strong>Family Email:</strong> {{ debug_info.family_email|default:"Not found" }}</p>
+            <p><strong>Person Count in Family:</strong> {{ debug_info.person_count|default:"Unknown" }}</p>
+        </div>
+    </div>
+    {% endif %}
+    
+    <script>
+        // Add some visual styling to help users understand they need to select at least one option
+        document.addEventListener('DOMContentLoaded', function() {
+            const departmentCheckboxes = document.querySelectorAll('input[name="departments"]');
+            const activityCheckboxes = document.querySelectorAll('input[name="activities"]');
+            
+            function updateSelectionStatus() {
+                const anyDepartmentSelected = Array.from(departmentCheckboxes).some(cb => cb.checked);
+                const anyActivitySelected = Array.from(activityCheckboxes).some(cb => cb.checked);
+                
+                if (anyDepartmentSelected || anyActivitySelected) {
+                    // Remove any previous error highlighting
+                    const deptDiv = document.querySelector('#div_id_departments');
+                    const actDiv = document.querySelector('#div_id_activities');
+                    if (deptDiv) deptDiv.classList.remove('border-warning');
+                    if (actDiv) actDiv.classList.remove('border-warning');
+                } else {
+                    // Add warning highlighting if no selections
+                    const deptDiv = document.querySelector('#div_id_departments');
+                    const actDiv = document.querySelector('#div_id_activities');
+                    if (deptDiv) deptDiv.classList.add('border-warning');
+                    if (actDiv) actDiv.classList.add('border-warning');
+                }
+            }
+            
+            // Add event listeners to all checkboxes
+            [...departmentCheckboxes, ...activityCheckboxes].forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectionStatus);
+            });
+            
+            // Initial check
+            updateSelectionStatus();
+        });
+    </script>
+{% endblock %}
