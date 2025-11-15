@@ -5,6 +5,7 @@ import members.models.emailitem
 import members.models.person
 import members.models.department
 import members.models.family
+import members.models.activity
 from django.conf import settings
 from django.template import Engine, Context
 
@@ -47,24 +48,23 @@ class EmailTemplate(models.Model):
         emails = []
 
         for receiver in receivers:
-            # each receiver must be Person, Family or string (email)
-
-            # Note - string specifically removed. We use family.dont_send_mails to make sure
-            # we dont send unwanted mails.
+            # each receiver must be Person, Family, Department, Activity or string (email)
 
             if type(receiver) not in (
                 members.models.person.Person,
                 members.models.family.Family,
                 members.models.department.Department,
+                members.models.activity.Activity,
+                str,
             ):
                 raise Exception(
-                    "Receiver must be of type Person or Family not "
+                    "Receiver must be of type Person, Family, Department, Activity or string (email) not "
                     + str(type(receiver))
                 )
 
             # figure out receiver
             if type(receiver) is str:
-                # check if family blacklisted. (TODO)
+                # Direct email address
                 destination_address = receiver
             elif type(receiver) is members.models.person.Person:
                 # skip if family does not want email
@@ -81,6 +81,12 @@ class EmailTemplate(models.Model):
             elif type(receiver) is members.models.department.Department:
                 context["department"] = receiver
                 destination_address = receiver.department_email
+            elif type(receiver) is members.models.activity.Activity:
+                # Activity object
+                context["activity"] = receiver
+                if hasattr(receiver, "department"):
+                    context["department"] = receiver.department
+                destination_address = receiver.responsible_contact
 
             # figure out Person and Family is applicable
             if type(receiver) is members.models.person.Person:

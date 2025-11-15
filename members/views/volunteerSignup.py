@@ -3,6 +3,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.core.mail import send_mail
 import os
 import random
+from datetime import datetime
 
 from django.conf import settings
 
@@ -15,6 +16,141 @@ from members.models.activity import Activity
 from members.models.person import Person
 from members.models.volunteerrequest import VolunteerRequest
 from members.models.volunteerrequestitem import VolunteerRequestItem
+from members.models.emailtemplate import EmailTemplate
+
+
+def ensure_volunteer_request_template():
+    """Ensure the VOLUNTEER_REQUEST email template exists"""
+    template_id = "VOLUNTEER_REQUEST"
+
+    try:
+        template = EmailTemplate.objects.get(idname=template_id)
+    except EmailTemplate.DoesNotExist:
+        # Create the template if it doesn't exist
+        body_html = "<h2>Ny frivillig anmodning</h2>"
+        body_html += (
+            "<p>En ny person har anmodet om at blive frivillig hos Coding Pirates.</p>"
+        )
+        body_html += ""
+        body_html += "{% if activity %}"
+        body_html += "<p><strong>Aktivitet:</strong> {{ activity.name }}<br>"
+        body_html += "<strong>Afdeling:</strong> {{ activity.department.name }}</p>"
+        body_html += "{% elif department %}"
+        body_html += "<p><strong>Afdeling:</strong> {{ department.name }}</p>"
+        body_html += "{% endif %}"
+        body_html += ""
+        body_html += '<p>Log venligst ind på <a href="{{ site }}/admin/">administratorsystemet</a> for at se detaljerne og kontakte personen.</p>'
+        body_html += ""
+        body_html += "<p>Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.</p>"
+        body_html += ""
+        body_html += "<p>Med venlig hilsen,<br>"
+        body_html += "Coding Pirates Danmark</p>"
+
+        body_text = "Ny frivillig anmodning"
+        body_text += ""
+        body_text += (
+            "En ny person har anmodet om at blive frivillig hos Coding Pirates."
+        )
+        body_text += ""
+        body_text += "{% if activity %}Aktivitet: {{ activity.name }}"
+        body_text += "Afdeling: {{ activity.department.name }}"
+        body_text += "{% elif department %}Afdeling: {{ department.name }}"
+        body_text += "{% endif %}"
+        body_text += ""
+        body_text += "Log venligst ind på {{ site }}/admin/ for at se detaljerne og kontakte personen."
+        body_text += ""
+        body_text += "Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse."
+        body_text += ""
+        body_text += "Med venlig hilsen,"
+        body_text += "Coding Pirates Danmark"
+
+        template = EmailTemplate.objects.create(
+            idname=template_id,
+            name="Ny frivillig anmodning",
+            description="Email til afdelingsledere og aktivitetsansvarlige når der kommer en ny frivillig anmodning",
+            subject="Coding Pirates. Ny frivillig anmodning - {{ timestamp }}",
+            from_address="kontakt@codingpirates.dk",
+            body_html=body_html,
+            body_text=body_text,
+            template_help="Template til notifikation af frivillig anmodning. Tilgængelige variable: activity, department, site, timestamp",
+        )
+
+    return template
+
+
+def send_volunteer_notification_emails(volunteer_request, departments, activities):
+    """Send notification emails to activity responsible contacts and department leaders using EmailTemplate"""
+
+    # Ensure the email template exists
+    template = ensure_volunteer_request_template()
+
+    # Create unique timestamp for this batch of emails
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Send emails for activities
+    for activity in activities:
+        if activity.responsible_contact:
+            try:
+                context = {
+                    "activity": activity,
+                    "department": activity.department,
+                    "volunteer_request": volunteer_request,
+                    "timestamp": timestamp,
+                }
+
+                # Check if responsible_contact is a Person object or email string
+                if isinstance(activity.responsible_contact, str):
+                    # If it's a string email, try to find a Person with that email first
+                    try:
+                        person = Person.objects.get(email=activity.responsible_contact)
+                        template.makeEmail(
+                            [person], context, allow_multiple_emails=True
+                        )
+                    except Person.DoesNotExist:
+                        # No Person found, use the enhanced makeEmail with string email directly
+                        template.makeEmail(
+                            [activity.responsible_contact],
+                            context,
+                            allow_multiple_emails=True,
+                        )
+                else:
+                    # If it's already a Person object, use it directly
+                    template.makeEmail(
+                        [activity.responsible_contact],
+                        context,
+                        allow_multiple_emails=True,
+                    )
+
+            except Exception as e:
+                print(f"Failed to send activity notification email: {e}")
+
+    # Send emails for departments
+    for department in departments:
+        try:
+            context = {
+                "department": department,
+                "volunteer_request": volunteer_request,
+                "timestamp": timestamp,
+            }
+
+            # Create list of recipients
+            recipients = []
+
+            # Add department object to send to department_email
+            if department.department_email:
+                recipients.append(department)
+
+            # Add department leaders as Person objects
+            for leader in department.department_leaders.all():
+                if leader.email:
+                    recipients.append(leader)
+
+            # Send emails using template
+            if recipients:
+                template.makeEmail(recipients, context, allow_multiple_emails=True)
+
+        except Exception as e:
+            print(f"Failed to send department notification email: {e}")
 
 
 @xframe_options_exempt
@@ -49,6 +185,11 @@ def volunteerSignup(request):
                         department=activity.department,
                         activity=activity,
                     )
+
+                # Send notification emails to responsible contacts and department leaders
+                send_volunteer_notification_emails(
+                    volunteer_request, departments, activities
+                )
 
                 # Redirect to success page
                 return render(
@@ -128,7 +269,10 @@ def volunteerSignup(request):
                         info_whishes=form_data.get("info_whishes", ""),
                     )
 
-                    # Create items
+                    # Create items and collect them for notification emails
+                    departments = []
+                    activities = []
+
                     for dept_id in departments_ids:
                         try:
                             dept = Department.objects.get(pk=dept_id)
@@ -136,6 +280,7 @@ def volunteerSignup(request):
                                 volunteer_request=volunteer_request,
                                 department=dept,
                             )
+                            departments.append(dept)
                         except Department.DoesNotExist:
                             pass
 
@@ -147,8 +292,14 @@ def volunteerSignup(request):
                                 department=act.department,
                                 activity=act,
                             )
+                            activities.append(act)
                         except Activity.DoesNotExist:
                             pass
+
+                    # Send notification emails to responsible contacts and department leaders
+                    send_volunteer_notification_emails(
+                        volunteer_request, departments, activities
+                    )
 
                     # Clear session keys
                     for k in [
