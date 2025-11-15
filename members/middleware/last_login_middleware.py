@@ -14,8 +14,11 @@ class LastLoginMiddleware:
             request.user.save()
 
             # Update family's last visit time
-            family = Person.objects.get(user=request.user).family
-            family.last_visit_at = timezone.now()
-            family.save()
+            try:
+                family = Person.objects.get(user=request.user).family
+                family.last_visit_at = timezone.now()
+                family.save()
+            except Person.DoesNotExist:
+                pass
 
         return self.get_response(request)
