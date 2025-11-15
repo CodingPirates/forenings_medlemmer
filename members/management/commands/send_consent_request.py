@@ -15,6 +15,10 @@ class Command(BaseCommand):
         ):
             send_consent_email = True
             email_consent_person = None
+
+            if family.dont_send_mails:
+                send_consent_email = False
+
             for person in family.get_persons():
                 if person.consent_at:
                     send_consent_email = False
