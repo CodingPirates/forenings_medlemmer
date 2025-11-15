@@ -1,11 +1,8 @@
 from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.core.mail import send_mail
 import os
 import random
 from datetime import datetime
-
-from django.conf import settings
 
 from members.forms import (
     VolunteerRequestForm,
@@ -27,41 +24,39 @@ def ensure_volunteer_request_template():
         template = EmailTemplate.objects.get(idname=template_id)
     except EmailTemplate.DoesNotExist:
         # Create the template if it doesn't exist
-        body_html = "<h2>Ny frivillig anmodning</h2>"
-        body_html += (
-            "<p>En ny person har anmodet om at blive frivillig hos Coding Pirates.</p>"
-        )
-        body_html += ""
-        body_html += "{% if activity %}"
-        body_html += "<p><strong>Aktivitet:</strong> {{ activity.name }}<br>"
-        body_html += "<strong>Afdeling:</strong> {{ activity.department.name }}</p>"
-        body_html += "{% elif department %}"
-        body_html += "<p><strong>Afdeling:</strong> {{ department.name }}</p>"
-        body_html += "{% endif %}"
-        body_html += ""
-        body_html += '<p>Log venligst ind på <a href="{{ site }}/admin/">administratorsystemet</a> for at se detaljerne og kontakte personen.</p>'
-        body_html += ""
-        body_html += "<p>Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.</p>"
-        body_html += ""
-        body_html += "<p>Med venlig hilsen,<br>"
+        body_html = "<h2>Ny frivillig anmodning</h2>\n"
+        body_html += "<p>En ny person har anmodet om at blive frivillig hos Coding Pirates.</p>\n"
+        body_html += "\n"
+        body_html += "{% if activity %}\n"
+        body_html += "<p><strong>Aktivitet:</strong> {{ activity.name }}<br>\n"
+        body_html += "<strong>Afdeling:</strong> {{ activity.department.name }}</p>\n"
+        body_html += "{% elif department %}\n"
+        body_html += "<p><strong>Afdeling:</strong> {{ department.name }}</p>\n"
+        body_html += "{% endif %}\n"
+        body_html += "\n"
+        body_html += '<p>Log venligst ind på <a href="{{ site }}/admin/">administratorsystemet</a> for at se detaljerne og kontakte personen.</p>\n'
+        body_html += "\n"
+        body_html += "<p>Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.</p>\n"
+        body_html += "\n"
+        body_html += "<p>Med venlig hilsen,<br>\n"
         body_html += "Coding Pirates Danmark</p>"
 
-        body_text = "Ny frivillig anmodning"
-        body_text += ""
+        body_text = "Ny frivillig anmodning\n"
+        body_text += "\n"
         body_text += (
-            "En ny person har anmodet om at blive frivillig hos Coding Pirates."
+            "En ny person har anmodet om at blive frivillig hos Coding Pirates.\n"
         )
-        body_text += ""
-        body_text += "{% if activity %}Aktivitet: {{ activity.name }}"
-        body_text += "Afdeling: {{ activity.department.name }}"
-        body_text += "{% elif department %}Afdeling: {{ department.name }}"
-        body_text += "{% endif %}"
-        body_text += ""
-        body_text += "Log venligst ind på {{ site }}/admin/ for at se detaljerne og kontakte personen."
-        body_text += ""
-        body_text += "Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse."
-        body_text += ""
-        body_text += "Med venlig hilsen,"
+        body_text += "\n"
+        body_text += "{% if activity %}Aktivitet: {{ activity.name }}\n"
+        body_text += "Afdeling: {{ activity.department.name }}\n"
+        body_text += "{% elif department %}Afdeling: {{ department.name }}\n"
+        body_text += "{% endif %}\n"
+        body_text += "\n"
+        body_text += "Log venligst ind på {{ site }}/admin/ for at se detaljerne og kontakte personen.\n"
+        body_text += "\n"
+        body_text += "Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.\n"
+        body_text += "\n"
+        body_text += "Med venlig hilsen,\n"
         body_text += "Coding Pirates Danmark"
 
         template = EmailTemplate.objects.create(
@@ -73,6 +68,54 @@ def ensure_volunteer_request_template():
             body_html=body_html,
             body_text=body_text,
             template_help="Template til notifikation af frivillig anmodning. Tilgængelige variable: activity, department, site, timestamp",
+        )
+
+    return template
+
+
+def ensure_volunteer_verification_template():
+    """Ensure the VOLUNTEER_VERIFICATION email template exists"""
+    template_id = "VOLUNTEER_VERIFICATION"
+
+    try:
+        template = EmailTemplate.objects.get(idname=template_id)
+    except EmailTemplate.DoesNotExist:
+        # Create the template if it doesn't exist
+        body_html = "<h2>Bekræft din email</h2>\n"
+        body_html += "<p>Hej {{ name }},</p>\n"
+        body_html += "\n"
+        body_html += (
+            "<p>Tak for din interesse i at blive frivillig hos Coding Pirates!</p>\n"
+        )
+        body_html += "\n"
+        body_html += "<p>For at bekræfte din email adresse, skal du indtaste følgende verifikationskode:</p>\n"
+        body_html += "<p><strong>{{ verification_code }}</strong></p>\n"
+        body_html += "\n"
+        body_html += "<p>Hvis du ikke har anmodet om at blive frivillig hos Coding Pirates, kan du ignorere denne email.</p>\n"
+        body_html += "\n"
+        body_html += "<p>Med venlig hilsen,<br>\n"
+        body_html += "Coding Pirates Danmark</p>"
+
+        body_text = "Hej {{ name }},\n"
+        body_text += "\n"
+        body_text += "Tak for din interesse i at blive frivillig hos Coding Pirates!\n"
+        body_text += "\n"
+        body_text += "For at bekræfte din email adresse, skal du indtaste følgende verifikationskode: {{ verification_code }}\n"
+        body_text += "\n"
+        body_text += "Hvis du ikke har anmodet om at blive frivillig hos Coding Pirates, kan du ignorere denne email.\n"
+        body_text += "\n"
+        body_text += "Med venlig hilsen,\n"
+        body_text += "Coding Pirates Danmark"
+
+        template = EmailTemplate.objects.create(
+            idname=template_id,
+            name="Email verifikation - Frivillig anmodning",
+            description="Email til verifikation af email adresse ved frivillig anmodning",
+            subject="Bekræft din email - Coding Pirates frivillig",
+            from_address="kontakt@codingpirates.dk",
+            body_html=body_html,
+            body_text=body_text,
+            template_help="Template til email verifikation. Tilgængelige variable: name, verification_code",
         )
 
     return template
@@ -360,29 +403,15 @@ def volunteerSignup(request):
 
                     request.session["volunteer_verification_code"] = code
 
-                    # Always send email (in dev environment, emails won't reach destination but that's OK)
+                    # Send verification email using EmailTemplate
                     try:
-                        subject = "Bekræft din email - Coding Pirates frivillig"
-                        message = f"""Hej {cd.get('name')},
-
-Tak for din interesse i at blive frivillig hos Coding Pirates!
-
-For at bekræfte din email adresse, skal du indtaste følgende verifikationskode: {code}
-
-Hvis du ikke har anmodet om at blive frivillig hos Coding Pirates, kan du ignorere denne email.
-
-Med venlig hilsen,
-Coding Pirates Danmark"""
-                        from_email = (
-                            getattr(settings, "DEFAULT_FROM_EMAIL", None)
-                            or "no-reply@codingpirates.dk"
-                        )
-                        send_mail(
-                            subject,
-                            message,
-                            from_email,
-                            [cd.get("email")],
-                            fail_silently=False,
+                        verification_template = ensure_volunteer_verification_template()
+                        context = {
+                            "name": cd.get("name"),
+                            "verification_code": code,
+                        }
+                        verification_template.makeEmail(
+                            [cd.get("email")], context, allow_multiple_emails=True
                         )
                     except Exception as e:
                         # Log the error but continue - in dev environment emails might fail
