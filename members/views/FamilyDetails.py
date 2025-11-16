@@ -1,11 +1,12 @@
 import datetime
+
 from django.conf import settings
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, user_passes_test
 
 from members.models.person import Person
-from members.utils.user import user_to_person, has_user
+from members.utils.user import has_user, user_to_person
 from members.views.UnacceptedInvitations import get_unaccepted_invitations_for_family
 
 
@@ -13,10 +14,6 @@ from members.views.UnacceptedInvitations import get_unaccepted_invitations_for_f
 @user_passes_test(has_user, "/admin_signup/")
 def FamilyDetails(request):
     family = user_to_person(request.user).family
-
-    # update visited field
-    family.last_visit_dtm = timezone.now()
-    family.save()
 
     need_confirmation = family.confirmed_at is None or (
         family.confirmed_at
