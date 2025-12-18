@@ -409,7 +409,7 @@ class TestModelPerson(TestCase):
         self,
     ):
         """Person where other family member has payments in the last 5 years cannot be anonymized."""
-        # Create two persons, one 6 years ago
+        # Create two persons, 6 years ago
         six_years_ago = timezone.now() - timedelta(days=6 * 365)
         with freeze_time(six_years_ago):
             parent = PersonFactory()
@@ -424,3 +424,47 @@ class TestModelPerson(TestCase):
 
         # parent cannot be anonymized, since child has payments in the last 5 years
         self.assertFalse(parent.is_anonymization_candidate()[0])
+
+    def test_person_created_over_2_years_with_payments_over_5_years_is_anonymization_candidate(
+        self,
+    ):
+        """Person with payments more than 5 years ago can be anonymized."""
+
+        # assume today's date: 2025-09-27
+        # person created: 2023-09-26 => over 2 years ago
+        # payment: 2019-12-31 => over 5 years ago
+
+        with freeze_time(datetime(2023, 9, 26)):
+            person = PersonFactory()
+
+        # Create payment last day in fiscal year before 5 years ago
+        PaymentFactory(person=person, added_at=timezone.make_aware(datetime(2019, 12, 31)))
+
+        with freeze_time(datetime(2025, 9, 27)):
+            self.assertTrue(person.is_anonymization_candidate()[0])
+
+    def test_person_where_other_family_member_has_payments_over_5_years_is_anonymization_candidate(
+        self,
+    ):
+        """Person where other family member has payments in the last 5 years cannot be anonymized."""
+        # Create two persons, 6 years ago
+
+        # assume today's date: 2025-12-31
+        # person created: 2019-12-31 => 6 years ago
+        # payment: 2020-12-31 => over 5 years ago (since we're on last day of fiscal year 2025)
+
+        six_years_ago = datetime(2019, 12, 31)
+        with freeze_time(six_years_ago):
+            parent = PersonFactory()
+            child = PersonFactory(family=parent.family)
+
+        # Create payment for child more than 5 years ago
+        PaymentFactory(
+            person=child,
+            family=child.family,
+            added_at=timezone.make_aware(datetime(2020, 12, 31))
+        )
+
+        # parent cannot be anonymized, since child has payments in the last 5 years
+        with freeze_time(datetime(2025, 12, 31)):
+            self.assertTrue(parent.is_anonymization_candidate()[0])
