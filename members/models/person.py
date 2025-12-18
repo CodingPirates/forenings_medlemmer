@@ -211,13 +211,9 @@ class Person(models.Model):
         # - January 1st of the year before 5 years ago, i.e. at least 5 full years,
         # for financial transactions
         #
-        # current date 2025-12-31 => 2021-01-01
         # current date 2025-09-27 => 2020-01-01
         today = timezone.now().date()
-        if today.month == 12 and today.day == 31:
-            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 4, 1, 1))
-        else:
-            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
+        five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
 
         # If person has participated in activities within the last 2 years, then cannot be anonymized
         # Import here to avoid circular imports

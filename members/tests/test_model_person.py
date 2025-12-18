@@ -453,7 +453,7 @@ class TestModelPerson(TestCase):
 
         # assume today's date: 2025-12-31
         # person created: 2019-12-31 => 6 years ago
-        # payment: 2020-12-31 => over 5 years ago (since we're on last day of fiscal year 2025)
+        # payment: 2019-12-31 => over 5 years ago
 
         six_years_ago = datetime(2019, 12, 31)
         with freeze_time(six_years_ago):
@@ -464,7 +464,7 @@ class TestModelPerson(TestCase):
         PaymentFactory(
             person=child,
             family=child.family,
-            added_at=timezone.make_aware(datetime(2020, 12, 31)),
+            added_at=timezone.make_aware(datetime(2019, 12, 31)),
         )
 
         # parent cannot be anonymized, since child has payments in the last 5 years
