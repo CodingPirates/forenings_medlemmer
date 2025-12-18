@@ -438,7 +438,9 @@ class TestModelPerson(TestCase):
             person = PersonFactory()
 
         # Create payment last day in fiscal year before 5 years ago
-        PaymentFactory(person=person, added_at=timezone.make_aware(datetime(2019, 12, 31)))
+        PaymentFactory(
+            person=person, added_at=timezone.make_aware(datetime(2019, 12, 31))
+        )
 
         with freeze_time(datetime(2025, 9, 27)):
             self.assertTrue(person.is_anonymization_candidate()[0])
@@ -462,7 +464,7 @@ class TestModelPerson(TestCase):
         PaymentFactory(
             person=child,
             family=child.family,
-            added_at=timezone.make_aware(datetime(2020, 12, 31))
+            added_at=timezone.make_aware(datetime(2020, 12, 31)),
         )
 
         # parent cannot be anonymized, since child has payments in the last 5 years
