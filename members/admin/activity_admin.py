@@ -363,7 +363,7 @@ class ActivityAdmin(admin.ModelAdmin):
             "Aktivitet",
             {
                 "description": """<p>Aktivitetsnavnet skal afspejle aktivitet samt tidspunkt.
-                F.eks. <em>Forårssæson 2018</em>.</p>
+                F.eks. <em>Forårssæsonen 2026</em>.</p>
                 <p>Tidspunkt er f.eks. <em>Onsdage 17:00-19:00</em></p>
                 <p>Startdato er første dag for aktiviteten, og slutdato er sidste for aktiviteten</p>""",
                 "fields": (

@@ -1,8 +1,7 @@
 import datetime
 
-from django.db.models.functions import Coalesce
 from django.db.models import Sum
-
+from django.db.models.functions import Coalesce
 
 from members.models import (
     Activity,
@@ -63,10 +62,10 @@ def old_stat_code(timestamp):
         + dailyStatisticsGeneral.waitinglist_female
     )
     dailyStatisticsGeneral.family_visits = Family.objects.filter(
-        last_visit_dtm__gt=(timestamp - datetime.timedelta(days=1))
+        last_visit_at__gt=(timestamp - datetime.timedelta(days=1))
     ).count()
     dailyStatisticsGeneral.dead_profiles = Family.objects.filter(
-        last_visit_dtm__lt=(timestamp - datetime.timedelta(days=365))
+        last_visit_at__lt=(timestamp - datetime.timedelta(days=365))
     ).count()
     dailyStatisticsGeneral.current_activity_participants = (
         Person.objects.filter(

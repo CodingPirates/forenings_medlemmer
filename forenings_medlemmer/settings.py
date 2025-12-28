@@ -9,14 +9,14 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import logging
 import os
 import sys
-import logging
-from environs import Env
+
 import dj_database_url
 import sentry_sdk
+from environs import Env
 from sentry_sdk.integrations.django import DjangoIntegration
-
 
 env = Env()
 env.read_env()
@@ -114,6 +114,7 @@ MIDDLEWARE = (
     "django.contrib.messages.middleware.MessageMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "members.middleware.consent_middleware.ConsentMiddleware",
+    "members.middleware.last_login_middleware.LastLoginMiddleware",
 )
 
 CORS_ORIGIN_WHITELIST = [host.replace(" ", "") for host in env.list("CORS_LIST")]
