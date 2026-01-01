@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import datetime
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -39,9 +40,19 @@ def Membership(request):
             memberships_for_region_of_user = []
             memberships_for_other_regions = []
             # augment open invites with the persons who could join it in the family
+            current_year = datetime.now().year
+            member_until = (
+                datetime.now().date().replace(year=current_year, month=12, day=31)
+            )
             for union in unions:
-                applicablePersons = Person.objects.filter(
-                    family=family,  # only members of this family
+                # Find persons in family who are NOT already members for this union this year
+                already_member_ids = set(
+                    Member.objects.filter(
+                        union=union, person__family=family, member_until=member_until
+                    ).values_list("person_id", flat=True)
+                )
+                applicablePersons = Person.objects.filter(family=family).exclude(
+                    id__in=already_member_ids
                 )
 
                 if applicablePersons.exists():
@@ -59,9 +70,9 @@ def Membership(request):
                         memberships_for_region_of_user.append(a)
                     else:
                         memberships_for_other_regions.append(a)
-                memberships_with_persons = (
-                    memberships_for_region_of_user + memberships_for_other_regions
-                )
+            memberships_with_persons = (
+                memberships_for_region_of_user + memberships_for_other_regions
+            )
 
     context = {
         "family": family,
