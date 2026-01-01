@@ -53,10 +53,10 @@ class Member(models.Model):
             raise ValidationError(errors)
 
     def paid(self):
-        # not paid if unconfirmed payments on this activity participation
-        return not members.models.payment.Payment.objects.filter(
-            member=self, accepted_at=None
-        )
+        # Paid only if there is a payment for this member with confirmed_at set
+        return members.models.payment.Payment.objects.filter(
+            member=self, confirmed_at__isnull=False
+        ).exists()
 
     def get_payment_link(self):
         payment = members.models.payment.Payment.objects.get(
