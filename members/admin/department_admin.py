@@ -147,7 +147,6 @@ class DepartmentAdmin(admin.ModelAdmin):
         base.append("department_union_link")
         return base
 
-
     def get_list_filter(self, request):
         base = [
             "address__region",
@@ -158,9 +157,12 @@ class DepartmentAdmin(admin.ModelAdmin):
             "closed_dtm",
             "has_waiting_list",
         ]
-        if request.user.is_superuser or request.user.has_perm("members.view_activity_mode"):
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_activity_mode"
+        ):
             base.append("activity_mode")
         return base
+
     autocomplete_fields = ("union",)
 
     def get_search_results(self, request, queryset, search_term):
