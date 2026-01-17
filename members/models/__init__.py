@@ -24,6 +24,8 @@ import members.models.anonymization_candidate
 import members.models.quickpaytransaction
 import members.models.union
 import members.models.volunteer
+import members.models.volunteerrequest
+import members.models.volunteerrequestitem
 import members.models.waitinglist
 import members.models.zipcoderegion  # noqa  # fine to hav eall models included
 
@@ -53,6 +55,8 @@ from .person import Person
 from .anonymization_candidate import AnonymizationCandidate
 from .union import Union
 from .volunteer import Volunteer
+from .volunteerrequest import VolunteerRequest
+from .volunteerrequestitem import VolunteerRequestItem
 from .waitinglist import WaitingList
 from .zipcoderegion import ZipcodeRegion
 
@@ -85,6 +89,8 @@ __all__ = [
     Person,
     Union,
     Volunteer,
+    VolunteerRequest,
+    VolunteerRequestItem,
     WaitingList,
     ZipcodeRegion,
 ]

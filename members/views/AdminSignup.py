@@ -65,9 +65,12 @@ def AdminSignup(request):
                 )
                 admin_person.save()
 
-                department = Department.objects.get(
-                    name=admin_signup.cleaned_data["volunteer_department"]
-                )
+                dept_val = admin_signup.cleaned_data["volunteer_department"]
+                if isinstance(dept_val, Department):
+                    department = dept_val
+                else:
+                    # assume a name was supplied
+                    department = Department.objects.get(name=dept_val)
                 vol_obj = Volunteer.objects.create(
                     person=admin_person, department=department
                 )

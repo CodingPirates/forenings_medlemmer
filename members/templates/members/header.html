@@ -13,6 +13,7 @@
         {% if user.is_staff %}
             <a href="{% url "admin:index" %}">ADMIN</a>
         {% endif %}
+        <a href="{% url "volunteer_signup" %}">BLIV FRIVILLIG</a>
         <a href="{% url "family_detail" %}">Familie</a>
         <form action="{% url 'person_logout' %}" method="post">
             {% csrf_token %}
@@ -20,7 +21,7 @@
         </form>
     {% else %}
         <a href="{% url "account_create" %}">Tilmeld barn</a>
-        <a href="{% url "volunteer_signup" %}">Bliv frivillig</a>
+            <a href="{% url "volunteer_signup" %}">BLIV FRIVILLIG</a>
         <a id="login-logout" href="{% url 'person_login' %}{% if not 'logout' in request.path %}?next={{request.path}}{% endif %}">Log ind</a>
     {% endif %}
     <a href="https://codingpirates.dk" target="_blank">

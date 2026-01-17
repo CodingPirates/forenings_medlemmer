@@ -1,0 +1,11 @@
+{% extends "members/base.html" %}
+{% block content %}
+  <h1>Bekræft din email</h1>
+  <p>Vi har sendt en 6-cifret kode til {{ email }}. Indtast den her for at bekræfte og færdiggøre din anmodning.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <label>Kode <input type="text" name="token"></label>
+    <button type="submit">Bekræft</button>
+  </form>
+{% endblock %}

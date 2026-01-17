@@ -111,7 +111,7 @@ class adminSignupForm(forms.Form):
     floor = forms.CharField(label="Etage", required=False, max_length=3)
     door = forms.CharField(label="Dør", required=False, max_length=5)
     placename = forms.CharField(label="Stednavn", required=False, max_length=200)
-    zipcode = forms.CharField(label="Postnummer", max_length=4.0, required=True)
+    zipcode = forms.CharField(label="Postnummer", max_length=4, required=True)
     city = forms.CharField(label="By", max_length=200, required=True)
     dawa_id = forms.CharField(
         label="Dawa ID", max_length=200, widget=forms.HiddenInput(), required=False

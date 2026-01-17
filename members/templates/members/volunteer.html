@@ -1,0 +1,55 @@
+{% extends "members/base.html" %}
+{% block content %}
+<h1>Til frivillige</h1>
+
+<form method="post">
+  {% csrf_token %}
+
+  {% if user.is_authenticated %}
+    <label for="person">Vælg person i familien</label>
+    <select name="person" id="person">
+      <option value="">-- vælg --</option>
+      {% for p in persons %}
+        <option value="{{ p.pk }}">{{ p }}</option>
+      {% endfor %}
+    </select>
+    <p>Hvis personen ikke findes, kan du i stedet indtaste oplysninger nedenfor.</p>
+  {% endif %}
+
+  <div>
+    <h3>Kontaktoplysninger (kun for ikke-loggede eller hvis du vil angive anden kontakt)</h3>
+    <label>Navn <input type="text" name="name" value="{{ form.name|default:'' }}"></label><br>
+    <label>Email <input type="email" name="email" value="{{ form.email|default:'' }}"></label><br>
+    <label>Telefon <input type="text" name="phone" value="{{ form.phone|default:'' }}"></label><br>
+    <label>Alder <input type="text" name="age" value="{{ form.age|default:'' }}"></label><br>
+    <label>Postnummer <input type="text" name="zip" value="{{ form.zip|default:'' }}"></label><br>
+  </div>
+
+  <div>
+    <h3>Ønsker og reference</h3>
+    <label>Ønsker <textarea name="whishes">{{ form.whishes|default:'' }}</textarea></label><br>
+    <label>Reference <input type="text" name="reference" value="{{ form.reference|default:'' }}"></label><br>
+  </div>
+
+  <div>
+    <h3>Vælg afdelinger (mindst én eller vælg aktiviteter)</h3>
+    {% for d in departments %}
+      <label><input type="checkbox" name="departments" value="{{ d.pk }}"> {{ d }}</label><br>
+    {% empty %}
+      <p>Ingen afdelinger fundet.</p>
+    {% endfor %}
+  </div>
+
+  <div>
+    <h3>Vælg aktiviteter (forløb eller arrangement) med slutdato i fremtiden</h3>
+    <p>Vælg specifikke aktiviteter du er interesseret i at hjælpe med (klik på linket for at se mere information)</p>
+    {% for a in activities %}
+      <label><input type="checkbox" name="activities" value="{{ a.pk }}"> {{ a }}</label><br>
+    {% empty %}
+      <p>Ingen fremtidige aktiviteter fundet.</p>
+    {% endfor %}
+  </div>
+
+  <button type="submit">Send anmodning</button>
+</form>
+{% endblock %}

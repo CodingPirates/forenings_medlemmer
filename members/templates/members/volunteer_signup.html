@@ -2,7 +2,8 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="alert alert-secondary">
-        <h1>Til frivillige der ikke tidligere er oprettet som forælder</h1>
+        {# brug heading fra view når den er sendt, ellers fallback til eksisterende tekst #}
+        <h1>{% if heading %}{{ heading }}{% else %}Til frivillige der ikke tidligere er oprettet som forælder{% endif %}</h1>
         <p>Hvis du har børn der er tilmeldt i systemet og allerede er oprettet som familie, så log blot på jeres familie side med den email du opskrev dig med, da du tilmeldte dig. Her kan du også tilføje flere personer, hvis det f.eks. er din partner der har tilmeldt børnene men du nu selv vil være med som frivillig.</p>
         <p>
             Denne formular er tænkt til frivillige, der ikke har børn der er medlemmer i Coding Pirates.
@@ -22,4 +23,9 @@
             {{ vol_signupform.consent.errors }}
           </div>
         </div>
+{% endblock %}
+
+{% block extra_scripts %}
+  {{ block.super }}
+  {# Header now contains the correct link for authenticated users; no DOM insertion required. #}
 {% endblock %}

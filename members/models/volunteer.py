@@ -13,13 +13,23 @@ class Volunteer(models.Model):
     department = models.ForeignKey(
         "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
     )
+    activity = models.ForeignKey(
+        "Activity",
+        on_delete=models.CASCADE,
+        verbose_name="Aktivitet",
+        blank=True,
+        null=True,
+    )
 
     def has_certificate(self):
         return self.person.has_certificate
 
-    added_at = models.DateTimeField("Start", default=timezone.now)
+    added_at = models.DateTimeField("Oprettet", default=timezone.now)
     confirmed = models.DateTimeField("Bekræftet", blank=True, null=True, default=None)
-    removed = models.DateTimeField("Slut", blank=True, null=True, default=None)
+    removed = models.DateTimeField("Fjernet", blank=True, null=True, default=None)
+
+    start_date = models.DateField("Start", blank=True, null=True, default=None)
+    end_date = models.DateField("Slut", blank=True, null=True, default=None)
 
     def __str__(self):
         return self.person.__str__()
