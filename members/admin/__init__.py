@@ -1,3 +1,5 @@
+# Ensure ActivityMode admin registration is loaded
+from .activitymode_admin import ActivityModeAdmin  # noqa: F401
 from django.contrib import admin
 
 from django.contrib.auth.models import User
