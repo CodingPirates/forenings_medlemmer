@@ -8,6 +8,7 @@ from members.models.person import Person
 # run command locally in Docker:
 # docker compose run web ./manage.py anonymize_families_without_consent --dry-run
 
+
 class Command(BaseCommand):
     help = "Batch anonymize families where: 1) No consent given by anyone in family, 2) All persons are anonymization candidates"
 
@@ -33,7 +34,8 @@ class Command(BaseCommand):
                     "User",
                     (object,),
                     {
-                        "has_perm": lambda self, perm: perm == "members.anonymize_persons"
+                        "has_perm": lambda self, perm: perm
+                        == "members.anonymize_persons"
                     },
                 )()
             },
@@ -44,7 +46,10 @@ class Command(BaseCommand):
         persons = family.get_persons().filter(anonymized=False)
         for person in persons:
             if person.consent is not None:
-                return False, f"Person {person.name} (ID: {person.id}) has given consent"
+                return (
+                    False,
+                    f"Person {person.name} (ID: {person.id}) has given consent",
+                )
         return True, ""
 
     def all_persons_are_candidates(self, family):
@@ -57,7 +62,10 @@ class Command(BaseCommand):
         for person in persons:
             is_candidate, reason = person.is_anonymization_candidate(relaxed=True)
             if not is_candidate:
-                return False, f"Person {person.name} (ID: {person.id}) is not a candidate: {reason}"
+                return (
+                    False,
+                    f"Person {person.name} (ID: {person.id}) is not a candidate: {reason}",
+                )
         return True, ""
 
     def handle(self, *args, **options):
@@ -74,7 +82,9 @@ class Command(BaseCommand):
         self.stdout.write(f"Found {total_families} non-anonymized families to check")
 
         if dry_run:
-            self.stdout.write(self.style.WARNING("DRY RUN MODE - No changes will be made"))
+            self.stdout.write(
+                self.style.WARNING("DRY RUN MODE - No changes will be made")
+            )
 
         anonymized_count = 0
         skipped_count = 0
@@ -120,7 +130,9 @@ class Command(BaseCommand):
             if verbose:
                 self.stdout.write(f"  ✓ Eligible for anonymization")
                 persons = family.get_persons()
-                self.stdout.write(f"  Will anonymize {persons.count()} person(s) and the family")
+                self.stdout.write(
+                    f"  Will anonymize {persons.count()} person(s) and the family"
+                )
 
             if not dry_run:
                 try:
@@ -133,19 +145,25 @@ class Command(BaseCommand):
                         for person in persons:
                             person.anonymize(request, relaxed=True)
                             if verbose:
-                                self.stdout.write(f"    Anonymized person {person.id} ({person.name})")
+                                self.stdout.write(
+                                    f"    Anonymized person {person.id} ({person.name})"
+                                )
                     else:
                         # All persons already anonymized, anonymize family directly
                         family.anonymize(request, relaxed=True)
                         if verbose:
-                            self.stdout.write(f"    All persons already anonymized, anonymizing family")
+                            self.stdout.write(
+                                f"    All persons already anonymized, anonymizing family"
+                            )
 
                     # Refresh family to verify it was anonymized
                     family.refresh_from_db()
                     if family.anonymized:
                         anonymized_count += 1
                         if verbose:
-                            self.stdout.write(f"  ✓ Successfully anonymized family {family.id}")
+                            self.stdout.write(
+                                f"  ✓ Successfully anonymized family {family.id}"
+                            )
                     else:
                         # This shouldn't happen, but log a warning if it does
                         self.stdout.write(

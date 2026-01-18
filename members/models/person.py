@@ -239,7 +239,11 @@ class Person(models.Model):
             if self.added_at >= two_years_ago:
                 return False, "Oprettet indenfor seneste 2 år."
 
-            if self.user and self.user.last_login and self.user.last_login >= two_years_ago:
+            if (
+                self.user
+                and self.user.last_login
+                and self.user.last_login >= two_years_ago
+            ):
                 return False, "Har logget ind seneste 2 år."
 
         # We verify both person and family, i.e. a parent cannot be anonymized if there are payments for any of the children in family
@@ -339,7 +343,9 @@ class Person(models.Model):
         if self.anonymized:
             raise ValidationError("Personen er allerede anonymiseret.")
 
-        is_anonymization_candidate, reason = self.is_anonymization_candidate(relaxed=relaxed)
+        is_anonymization_candidate, reason = self.is_anonymization_candidate(
+            relaxed=relaxed
+        )
         if not is_anonymization_candidate:
             raise ValidationError(
                 f"Personen {self.name} kan ikke anonymiseres: {reason}"
