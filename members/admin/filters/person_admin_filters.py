@@ -18,6 +18,9 @@ class PersonParticipantCurrentYearListFilter(admin.SimpleListFilter):
         ).order_by("department__name", "-start_date"):
             activities.append((str(activity.pk), str(activity)))
 
+        if len(activities) <= 1:
+            return ()
+
         return activities
 
     def queryset(self, request, queryset):
@@ -43,6 +46,9 @@ class PersonParticipantLastYearListFilter(admin.SimpleListFilter):
             start_date__year=timezone.now().year - 1,
         ).order_by("department__name", "-start_date"):
             activities.append((str(activity.pk), str(activity)))
+
+        if len(activities) <= 1:
+            return ()
 
         return activities
 
@@ -70,6 +76,9 @@ class PersonParticipantActiveListFilter(admin.SimpleListFilter):
         ).order_by("department__name", "-start_date"):
             activities.append((str(activity.pk), str(activity)))
 
+        if len(activities) <= 1:
+            return ()
+
         return activities
 
     def queryset(self, request, queryset):
@@ -94,6 +103,9 @@ class PersonParticipantListFilter(admin.SimpleListFilter):
         ).order_by("department__name", "-start_date"):
             activities.append((str(activity.pk), str(activity)))
 
+        if len(activities) <= 1:
+            return ()
+
         return activities
 
     def queryset(self, request, queryset):
@@ -117,6 +129,9 @@ class PersonInvitedListFilter(admin.SimpleListFilter):
             department__in=AdminUserInformation.get_departments_admin(request.user)
         ).order_by("department__name", "-start_date"):
             activities.append((str(activity.pk), str(activity)))
+
+        if len(activities) <= 1:
+            return ()
 
         return activities
 
@@ -151,6 +166,9 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
             ):
                 departments.append((str(department.pk), department.name))
 
+        if len(departments) <= 1:
+            return ()
+
         return departments
 
     def queryset(self, request, queryset):
@@ -174,6 +192,9 @@ class VolunteerListFilter(admin.SimpleListFilter):
             request.user
         ).order_by("name"):
             departments.append((str(department.pk), department.name))
+
+        if len(departments) <= 1:
+            return ()
 
         return departments
 
@@ -205,6 +226,9 @@ class MunicipalityFilter(admin.SimpleListFilter):
         municipalities = [("none", "Ingen kommune")]
         for municipality in Municipality.objects.all().order_by("name"):
             municipalities.append((str(municipality.pk), municipality.name))
+
+        if len(municipalities) <= 1:
+            return ()
 
         return municipalities
 
@@ -243,6 +267,10 @@ class RegionFilter(admin.SimpleListFilter):
         for region in region_ids:
             if region:
                 regions.append((region, region))
+
+        if len(regions) <= 2:
+            return ()
+
         return list(set(regions))  # Ensure unique values in the dropdown
 
     def queryset(self, request, queryset):

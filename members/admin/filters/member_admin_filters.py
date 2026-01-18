@@ -15,6 +15,9 @@ class MemberCurrentYearListFilter(admin.SimpleListFilter):
         ).order_by("name"):
             unions.append((str(union.pk), str(union)))
 
+        if len(unions) <= 1:
+            return ()
+
         return unions
 
     def queryset(self, request, queryset):
@@ -43,6 +46,9 @@ class MemberLastYearListFilter(admin.SimpleListFilter):
         ).order_by("name"):
             unions.append((str(union.pk), str(union)))
 
+        if len(unions) <= 1:
+            return ()
+
         return unions
 
     def queryset(self, request, queryset):
@@ -70,6 +76,9 @@ class MemberAdminListFilter(admin.SimpleListFilter):
             pk__in=AdminUserInformation.get_unions_admin(request.user)
         ).order_by("name"):
             unions.append((str(union.pk), str(union)))
+
+        if len(unions) <= 1:
+            return ()
 
         return unions
 

@@ -1,15 +1,15 @@
 from typing import Any
+
 from django.conf import settings
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 # from members.models import EmailItem
-
 from members.models import (
-    EmailItem,
     Activity,
     Department,
+    EmailItem,
 )
 
 
@@ -17,8 +17,7 @@ class activityFilter(admin.SimpleListFilter):
     title = _("Aktivitet")
     parameter_name = "activity"
 
-    def lookups(self, request: Any, model_admin: Any) -> list[tuple[Any, str]]:
-
+    def lookups(self, request: Any, model_admin: Any):
         queryset = EmailItem.objects
         filtervalue = None
         queryset, filtervalue = getRequestDateFilter(
@@ -56,6 +55,10 @@ class activityFilter(admin.SimpleListFilter):
             activityList.append(
                 (str(activity.id), f"{department_name} - {activity.name}")
             )
+
+        if len(activityList) <= 2:
+            return ()
+
         return activityList
 
     def queryset(self, request, queryset):
@@ -70,7 +73,7 @@ class departmentFilter(admin.SimpleListFilter):
     title = _("Afdeling")
     parameter_name = "department__calculated"
 
-    def lookups(self, request: Any, model_admin: Any) -> list[tuple[Any, str]]:
+    def lookups(self, request: Any, model_admin: Any):
         queryset = EmailItem.objects
         filtervalue = None
         queryset, filtervalue = getRequestDateFilter(
@@ -109,12 +112,17 @@ class departmentFilter(admin.SimpleListFilter):
         if filtervalue is not None:
             self.title = f"Afdeling (mail {filtervalue})"
 
-        return [
-            (str(department.id), str(department.name))
-            for department in Department.objects.filter(id__in=departments).order_by(
-                "name"
-            )
-        ]
+        departments = []
+
+        for department in Department.objects.filter(id__in=departments).order_by(
+            "name"
+        ):
+            departments.append((str(department.id), str(department.name)))
+
+        if len(departments) <= 1:
+            return ()
+
+        return departments
 
     def queryset(self, request, queryset):
         if self.value():
