@@ -1,22 +1,24 @@
 import codecs
+
 from django.conf import settings
 from django.contrib import admin, messages
 from django.db import models
-from django.db.models.functions import Upper
-from django.urls import reverse
-from django.utils.safestring import mark_safe
-from members.models import (
-    Union,
-    Address,
-    Person,
-    Activity,
-    AdminUserInformation,
-)
-from django.utils.html import escape
-from django.http import HttpResponse
 from django.db.models import Count
-from django.utils import timezone
+from django.db.models.functions import Upper
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+
+from members.models import (
+    Activity,
+    Address,
+    AdminUserInformation,
+    Person,
+    Union,
+)
 
 
 class AdminUserDepartmentInline(admin.TabularInline):
@@ -93,7 +95,15 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
     parameter_name = "Union"
 
     def lookups(self, request, model_admin):
-        return [(str(union.pk), str(union.name)) for union in Union.objects.all()]
+        unions = []
+
+        for union in Union.objects.all():
+            unions.append((str(union.pk), str(union.name)))
+
+        if len(unions) <= 1:
+            return ()
+
+        return unions
 
     def queryset(self, request, queryset):
         return queryset if self.value() is None else queryset.filter(union=self.value())
@@ -256,7 +266,6 @@ class DepartmentAdmin(admin.ModelAdmin):
     update_activity_mode_action.short_description = "Opdater aktivitetsform"
 
     def activity_mode_update_view(self, request):
-
         from members.forms.activity_mode_update_form import ActivityModeUpdateForm
 
         ids = request.GET.get("ids", "")
@@ -445,7 +454,7 @@ class DepartmentAdmin(admin.ModelAdmin):
                     result_string += info2 + "\n"
 
         response = HttpResponse(
-            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            f"{codecs.BOM_UTF8.decode('utf-8')}{result_string}",
             content_type="text/csv; charset=utf-8",
         )
         response["Content-Disposition"] = 'attachment; filename="afdelingsinfo.csv"'
