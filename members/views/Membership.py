@@ -70,10 +70,9 @@ def Membership(request):
                         memberships_for_region_of_user.append(a)
                     else:
                         memberships_for_other_regions.append(a)
-            memberships_with_persons = (
-                memberships_for_region_of_user + memberships_for_other_regions
-            )
-
+                memberships_with_persons = (
+                    memberships_for_region_of_user + memberships_for_other_regions
+                )
     context = {
         "family": family,
         "members": members,
