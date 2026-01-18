@@ -18,7 +18,6 @@ import members.models.family
 import members.models.municipality
 import members.models.member
 import members.models.notification
-from members.models.slacklog import SlackLog
 from members.models.slackinvitesetup import SlackInvitationSetup
 from members.models.slackinvitelog import SlackInviteLog
 import members.models.payment
@@ -90,7 +89,6 @@ __all__ = [
     Volunteer,
     WaitingList,
     ZipcodeRegion,
-    SlackLog,
     SlackInviteLog,
     SlackInvitationSetup,
 ]
