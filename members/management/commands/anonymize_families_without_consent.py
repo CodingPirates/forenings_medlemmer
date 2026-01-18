@@ -40,16 +40,16 @@ class Command(BaseCommand):
             },
         )()
 
-    def family_has_no_consent(self, family):
-        """Check if no person in the family has given consent"""
+    def family_has_consent(self, family):
+        """Check if any person in the family has given consent"""
         persons = family.get_persons().filter(anonymized=False)
         for person in persons:
             if person.consent is not None:
                 return (
-                    False,
+                    True,
                     f"Person {person.name} (ID: {person.id}) has given consent",
                 )
-        return True, ""
+        return False, ""
 
     def all_persons_are_candidates(self, family):
         """Check if all non-anonymized persons in the family are anonymization candidates"""
@@ -109,9 +109,9 @@ class Command(BaseCommand):
             if verbose:
                 self.stdout.write(f"\nChecking family {family.id}...")
 
-            # Check if family has no consent
-            no_consent, consent_reason = self.family_has_no_consent(family)
-            if not no_consent:
+            # Check if family has consent
+            has_consent, consent_reason = self.family_has_consent(family)
+            if has_consent:
                 if verbose:
                     self.stdout.write(f"  Skipped: {consent_reason}")
                 skipped_count += 1
