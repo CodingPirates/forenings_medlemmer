@@ -31,6 +31,7 @@ class PaymentAdmin(admin.ModelAdmin):
         "amount_ore",
         "family",
         "get_confirmed_at_display",
+        "get_accepted_at_display",
         "get_cancelled_at_display",
         "get_rejected_at_display",
         "get_activityparticipant_display",
@@ -53,6 +54,11 @@ class PaymentAdmin(admin.ModelAdmin):
         return obj.confirmed_at.strftime("%Y-%m-%d %H:%M") if obj.confirmed_at else ""
 
     get_confirmed_at_display.short_description = "Bekræftet"
+
+    def get_accepted_at_display(self, obj):
+        return obj.accepted_at.strftime("%Y-%m-%d %H:%M") if obj.accepted_at else ""
+
+    get_accepted_at_display.short_description = "Accepteret"
 
     def get_cancelled_at_display(self, obj):
         return obj.cancelled_at.strftime("%Y-%m-%d %H:%M") if obj.cancelled_at else ""
