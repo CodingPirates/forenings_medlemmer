@@ -207,6 +207,10 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         ParticipantPaymentListFilter,
         "activity__activitytype",
     )
+    autocomplete_fields = (
+        "person",
+        "activity",
+    )
     list_display_links = (
         "added_at",
         "photo_permission",

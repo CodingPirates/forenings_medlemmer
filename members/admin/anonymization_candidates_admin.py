@@ -27,10 +27,7 @@ class IsActiveFilter(admin.SimpleListFilter):
         two_years_ago = timezone.now() - timedelta(days=2 * 365)
         today = timezone.now().date()
         # Calculate the correct "five full fiscal years" boundary
-        if today.month == 12 and today.day == 31:
-            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
-        else:
-            five_full_fiscal_years = timezone.make_aware(datetime(today.year - 6, 1, 1))
+        five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
 
         if self.value() == "no":
             # Show members that are anonymization candidates (no activity, login, or creation in last 2 years,
