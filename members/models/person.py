@@ -197,11 +197,18 @@ class Person(models.Model):
         else:
             return "N/A"
 
-    def is_anonymization_candidate(self):
+    def is_anonymization_candidate(self, relaxed=False):
         """
         Determine if person is a candidate for anonymization.
-        Returns False if created_date, latest_activity or last_login is less than 2 years ago.
-        However we cannot anonymize if there is a payment in the last 5 full fiscal years.
+        We cannot anonymize if there is a payment in the last 5 full fiscal years.
+
+        Args:
+            relaxed: If True, only checks for financial transactions. Allows anonymization
+                    even if person has been logged in or created recently.
+
+        Returns: Tuple (is_candidate, reason):
+        - is_candidate: False if e.g. latest_activity
+        - reason: Description of why the person is not a candidate
         """
 
         # we operate with two date boundaries:
@@ -230,11 +237,17 @@ class Person(models.Model):
             if latest_participation.activity.end_date >= two_years_ago.date():
                 return False, "Har deltaget i aktiviteter seneste 2 år."
 
-        if self.added_at >= two_years_ago:
-            return False, "Oprettet indenfor seneste 2 år."
+        # if in relaxed mode, we allow aononymization of persons created or logged in
+        if not relaxed:
+            if self.added_at >= two_years_ago:
+                return False, "Oprettet indenfor seneste 2 år."
 
-        if self.user and self.user.last_login and self.user.last_login >= two_years_ago:
-            return False, "Har logget ind seneste 2 år."
+            if (
+                self.user
+                and self.user.last_login
+                and self.user.last_login >= two_years_ago
+            ):
+                return False, "Har logget ind seneste 2 år."
 
         # We verify both person and family, i.e. a parent cannot be anonymized if there are payments for any of the children in family
         if (
@@ -316,7 +329,15 @@ class Person(models.Model):
 
     # TODO: Move to dawa_data in utils
 
-    def anonymize(self, request):
+    def anonymize(self, request, relaxed=False):
+        """
+        Anonymize a person.
+
+        Args:
+            request: Request object with user that has anonymize_persons permission
+            relaxed: If True, uses relaxed validation (only checks financial transactions).
+                    Allows anonymization even if person has been logged in or created recently.
+        """
         if not request.user.has_perm("members.anonymize_persons"):
             raise PermissionDenied(
                 "Du har ikke tilladelse til at anonymisere personer."
@@ -325,7 +346,9 @@ class Person(models.Model):
         if self.anonymized:
             raise ValidationError("Personen er allerede anonymiseret.")
 
-        is_anonymization_candidate, reason = self.is_anonymization_candidate()
+        is_anonymization_candidate, reason = self.is_anonymization_candidate(
+            relaxed=relaxed
+        )
         if not is_anonymization_candidate:
             raise ValidationError(
                 f"Personen {self.name} kan ikke anonymiseres: {reason}"
