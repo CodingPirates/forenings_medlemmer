@@ -49,6 +49,7 @@ class ActivityInvite(models.Model):
     )
     price_note = models.TextField("Note om særpris", blank=True)
     extra_email_info = models.TextField("Ekstra email info", blank=True)
+    reminder_sent_at = models.DateField("Påmindet", blank=True, null=True)
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
