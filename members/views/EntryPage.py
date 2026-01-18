@@ -1,5 +1,5 @@
-from django.views.decorators.clickjacking import xframe_options_exempt
 from django.shortcuts import render
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from members.models.activityparticipant import ActivityParticipant
 from members.utils.user import user_to_person
@@ -27,6 +27,7 @@ def EntryPage(request):
             for payment in Payment.objects.filter(
                 family=family,
                 confirmed_at__isnull=True,
+                accepted_at__isnull=True,
                 cancelled_at__isnull=True,
                 refunded_at__isnull=True,
                 rejected_at__isnull=True,
