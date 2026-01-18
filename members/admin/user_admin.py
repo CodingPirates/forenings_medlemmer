@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.contrib import admin
-from django.db.models.functions import Upper
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
-from members.models import AdminUserInformation, Person, Union, Department
+from django.db.models.functions import Upper
+
+from members.models import AdminUserInformation, Department, Person, Union
 
 
 class AdminUserInformationInline(admin.StackedInline):
@@ -39,6 +40,10 @@ class AdminUserGroupListFilter(admin.SimpleListFilter):
                     str(aGroup.name),
                 ),
             )
+
+        if len(groupList) <= 1:
+            return ()
+
         return groupList
 
     def queryset(self, request, queryset):
@@ -63,6 +68,10 @@ class AdminUserUnionListFilter(admin.SimpleListFilter):
                     str(aUnion.name),
                 ),
             )
+
+        if len(unionList) <= 1:
+            return ()
+
         return unionList
 
     def queryset(self, request, queryset):
@@ -89,6 +98,10 @@ class AdminUserDepartmentListFilter(admin.SimpleListFilter):
                     str(aDepartment.name),
                 ),
             )
+
+        if len(departmentList) <= 1:
+            return ()
+
         return departmentList
 
     def queryset(self, request, queryset):

@@ -1,26 +1,24 @@
-from django.contrib import admin, messages
 from django.conf import settings
+from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect
+from django.db import models
+from django.shortcuts import redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django.utils.html import escape, format_html
-from django.db import models
-from members.models.activitytype import ActivityType
-from members.forms.season_fee_update_form import SeasonFeeUpdateForm
+from django.utils.safestring import mark_safe
 
 # from members.admin.admin_actions import export_participants_csv
 from members.admin.admin_actions import AdminActions
-
+from members.forms.season_fee_update_form import SeasonFeeUpdateForm
 from members.models import (
     ActivityParticipant,
+    Address,
     AdminUserInformation,
     Department,
     Union,
-    Address,
 )
-
+from members.models.activitytype import ActivityType
 
 from .inlines import EmailItemInline
 
@@ -61,6 +59,10 @@ class ActivityUnionListFilter(admin.SimpleListFilter):
             .distinct()
         ):
             unions.append((str(union1.pk), str(union1.name)))
+
+        if len(unions) <= 1:
+            return ()
+
         return unions
 
     def queryset(self, request, queryset):
@@ -88,6 +90,9 @@ class ActivityTypeListFilter(admin.SimpleListFilter):
                     (str(activitytype.pk), str(activitytype.display_name))
                 )
 
+        if len(activitytypes) <= 1:
+            return ()
+
         return activitytypes
 
     def queryset(self, request, queryset):
@@ -113,6 +118,10 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
             .distinct()
         ):
             departments.append((str(department1.pk), str(department1)))
+
+        if len(departments) <= 1:
+            return ()
+
         return departments
 
     def queryset(self, request, queryset):

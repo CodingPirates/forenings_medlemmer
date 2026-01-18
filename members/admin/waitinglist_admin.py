@@ -1,29 +1,28 @@
+from datetime import date
+
 from django import forms
 from django.conf import settings
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.db import transaction
 from django.db.models import Q
-from django.utils import timezone
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.safestring import mark_safe
+from django.utils import timezone
 from django.utils.html import escape
-from datetime import date
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-
-from members.models import (
-    Union,
-    Department,
-    AdminUserInformation,
-    Municipality,
-    Activity,
-)
 
 import members.models.emailtemplate
 
 # import members.admin.admin_actions
 from members.admin.admin_actions import AdminActions
+from members.models import (
+    Activity,
+    AdminUserInformation,
+    Department,
+    Municipality,
+    Union,
+)
 
 
 class WaitingListActivityFilter(admin.SimpleListFilter):
@@ -44,6 +43,10 @@ class WaitingListActivityFilter(admin.SimpleListFilter):
             activities.append(
                 (str(activity.pk), f"{activity.department.name}, {activity.name}")
             )
+
+        if len(activities) <= 1:
+            return ()
+
         return activities
 
     def queryset(self, request, queryset):
@@ -103,6 +106,9 @@ class person_waitinglist_union_filter(admin.SimpleListFilter):
         ):
             unions.append((str(union.pk), union.name))
 
+        if len(unions) <= 1:
+            return ()
+
         return unions
 
     def queryset(self, request, queryset):
@@ -126,6 +132,9 @@ class person_waitinglist_department_filter(admin.SimpleListFilter):
             request.user
         ).order_by("name"):
             departments.append((str(department.pk), department.name))
+
+        if len(departments) <= 1:
+            return ()
 
         return departments
 
@@ -154,6 +163,10 @@ class person_waitinglist_municipality_filter(admin.SimpleListFilter):
             id__in=municipality_ids
         ).order_by("name"):
             municipalities.append((str(municipality.pk), municipality.name))
+
+        if len(municipalities) <= 1:
+            return ()
+
         return municipalities
 
     def queryset(self, request, queryset):
@@ -179,6 +192,10 @@ class person_waitinglist_region_filter(admin.SimpleListFilter):
         for region in region_ids:
             if region:
                 regions.append((region, region))
+
+        if len(regions) <= 2:
+            return ()
+
         return list(set(regions))  # Ensure unique values in the dropdown
 
     def queryset(self, request, queryset):
