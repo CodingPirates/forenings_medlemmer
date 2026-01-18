@@ -51,22 +51,6 @@ class Command(BaseCommand):
                 )
         return False, ""
 
-    def all_persons_are_candidates(self, family):
-        """Check if all non-anonymized persons in the family are anonymization candidates"""
-        persons = family.get_persons().filter(anonymized=False)
-        if not persons.exists():
-            # All persons are already anonymized, family can be anonymized
-            return True, ""
-
-        for person in persons:
-            is_candidate, reason = person.is_anonymization_candidate(relaxed=True)
-            if not is_candidate:
-                return (
-                    False,
-                    f"Person {person.name} (ID: {person.id}) is not a candidate: {reason}",
-                )
-        return True, ""
-
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
         verbose = options["verbose"]
@@ -103,7 +87,7 @@ class Command(BaseCommand):
                     self.stdout.write(
                         f"Progress: {processed_count}/{total_families} families processed "
                         f"({anonymized_count} anonymized, {skipped_count} skipped, {error_count} errors) "
-                        f"- {elapsed_minutes:.1f} minutes elapsed"
+                        f"- {int(elapsed_minutes)} minutes elapsed"
                     )
                     last_progress_time = current_time
             if verbose:
@@ -117,68 +101,31 @@ class Command(BaseCommand):
                 skipped_count += 1
                 continue
 
-            # Check if all persons are anonymization candidates
-            all_candidates, candidate_reason = self.all_persons_are_candidates(family)
-            if not all_candidates:
-                if verbose:
-                    self.stdout.write(f"  Skipped: {candidate_reason}")
-                skipped_count += 1
-                continue
-
-            # Both conditions met - anonymize the family
-            if verbose:
-                self.stdout.write("  ✓ Eligible for anonymization")
-                persons = family.get_persons()
-                self.stdout.write(
-                    f"  Will anonymize {persons.count()} person(s) and the family"
-                )
-
             if not dry_run:
                 try:
-                    # Anonymize all non-anonymized persons in the family
-                    # Note: person.anonymize() automatically anonymizes the family
-                    # when all persons are anonymized
+                    # Anonymize persons in the family
+                    # person.anonymize() will handle validation and automatically
+                    # anonymize the family when all persons are anonymized
                     persons = family.get_persons().filter(anonymized=False)
-
-                    if persons.exists():
-                        for person in persons:
+                    for person in persons:
+                        if (person.is_anonymization_candidate(relaxed=True))[0]:
                             person.anonymize(request, relaxed=True)
                             if verbose:
                                 self.stdout.write(
                                     f"    Anonymized person {person.id} ({person.name})"
                                 )
-                    else:
-                        # All persons already anonymized, anonymize family directly
-                        family.anonymize(request, relaxed=True)
-                        if verbose:
-                            self.stdout.write(
-                                "    All persons already anonymized, anonymizing family"
-                            )
-
-                    # Refresh family to verify it was anonymized
-                    family.refresh_from_db()
-                    if family.anonymized:
-                        anonymized_count += 1
-                        if verbose:
-                            self.stdout.write(
-                                f"  ✓ Successfully anonymized family {family.id}"
-                            )
-                    else:
-                        # This shouldn't happen, but log a warning if it does
-                        self.stdout.write(
-                            self.style.WARNING(
-                                f"  ⚠ Family {family.id} persons anonymized but family not anonymized"
-                            )
-                        )
 
                 except Exception as e:
                     error_count += 1
-                    self.stdout.write(
-                        self.style.ERROR(
-                            f"  ✗ Error anonymizing family {family.id}: {str(e)}"
+                    if verbose:
+                        self.stdout.write(
+                            self.style.ERROR(
+                                f"  ✗ Error anonymizing family {family.id}: {str(e)}"
+                            )
                         )
-                    )
+                    skipped_count += 1
             else:
+                # Dry run: just count eligible families
                 anonymized_count += 1
                 if not verbose:
                     self.stdout.write(f"Would anonymize family {family.id}")
