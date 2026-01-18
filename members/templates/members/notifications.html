@@ -3,21 +3,23 @@
 <link href="{% static "members/css/notification.css" %}" rel="stylesheet" type="text/css" />
 
 <div>
-    {% for missing_payment in missing_payments %}
-    <div class="alert alert-warning notification" role="alert" style="">
-        <div>
-            Der er ikke betalt for
-            {{ missing_payment.person.name }}
-            til "{{ missing_payment.activity.name }}"
-            hos Coding Pirates {{missing_payment.activity.department.name}}.
+    {% if not unpaid_payments %}
+        {% for missing_payment in missing_payments %}
+        <div class="alert alert-warning notification" role="alert" style="">
+            <div>
+                Der er ikke betalt for
+                {{ missing_payment.person.name }}
+                til "{{ missing_payment.activity.name }}"
+                hos Coding Pirates {{missing_payment.activity.department.name}}.
+            </div>
+            <div>
+                <a class="btn btn-primary" style="background-color:red" href="{{ missing_payment.get_payment_link }}">
+                    Betal
+                </a>
+            </div>
         </div>
-        <div>
-            <a class="btn btn-primary" style="background-color:red" href="{{ missing_payment.get_payment_link }}">
-                Betal
-            </a>
-        </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 
     {% for invitation in invites %}
     <div class="alert alert-info notification" role="alert" style="">

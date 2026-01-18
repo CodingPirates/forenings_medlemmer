@@ -1,13 +1,17 @@
 from django.contrib import admin, messages
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.urls import reverse
+from django.shortcuts import render, redirect
+from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import escape, format_html
 from django.db import models
 from members.models.activitytype import ActivityType
+from members.forms.season_fee_update_form import SeasonFeeUpdateForm
 
+# from members.admin.admin_actions import export_participants_csv
+from members.admin.admin_actions import AdminActions
 
 from members.models import (
     ActivityParticipant,
@@ -17,11 +21,8 @@ from members.models import (
     Address,
 )
 
-from .inlines import (
-    EmailItemInline,
-)
 
-from members.admin.admin_actions import AdminActions
+from .inlines import EmailItemInline
 
 
 class ActivityParticipantInline(admin.TabularInline):
@@ -122,20 +123,141 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
 
 
 class ActivityAdmin(admin.ModelAdmin):
+    actions = [AdminActions.export_participants_csv, "update_season_fee_action"]
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "season_fee_update/",
+                self.admin_site.admin_view(self.season_fee_update_view),
+                name="season_fee_update",
+            ),
+        ]
+        return custom_urls + urls
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        # Remove update_season_fee_action if user is not superuser or lacks permission
+        if "update_season_fee_action" in actions:
+            if not (
+                request.user.is_superuser
+                or request.user.has_perm("members.change_season_fee")
+            ):
+                del actions["update_season_fee_action"]
+        return actions
+
+    # --- Custom admin actions ---
+
+    def update_season_fee_action(self, request, queryset):
+        if not (
+            request.user.is_superuser
+            or request.user.has_perm("members.change_season_fee")
+        ):
+            self.message_user(
+                request,
+                "Du har ikke rettigheder til at opdatere sæsonbidrag.",
+                level=messages.ERROR,
+            )
+            return
+        # If no value is provided, redirect to custom form view
+        if not request.POST.get("season_fee_value"):
+            selected = queryset.values_list("pk", flat=True)
+            ids = ",".join(str(pk) for pk in selected)
+            return redirect(f"season_fee_update/?ids={ids}")
+        # If value is provided, process as before
+        try:
+            new_fee = float(request.POST.get("season_fee_value"))
+        except (TypeError, ValueError):
+            self.message_user(
+                request, "Ugyldig værdi for sæsonbidrag.", level=messages.ERROR
+            )
+            return
+        updated = queryset.update(season_fee=new_fee)
+        self.message_user(
+            request,
+            f"Opdaterede sæsonbidrag for {updated} aktiviteter.",
+            level=messages.SUCCESS,
+        )
+
+    update_season_fee_action.short_description = "Opdater sæsonbidrag"
     list_per_page = settings.LIST_PER_PAGE
-    list_display = (
-        "name",
-        "activitytype",
-        "start_end",
-        "open_invite",
-        "price_in_dkk",
-        "seats_total",
-        "seats_used",
-        "seats_free",
-        "age",
-        "union_link",
-        "department_link",
-    )
+
+    def get_list_display(self, request):
+        base = [
+            "name",
+            "activitytype",
+            "start_end",
+            "open_invite",
+            "price_in_dkk",
+            "seats_total",
+            "seats_used",
+            "seats_free",
+            "age",
+        ]
+        if request.user.is_superuser:
+            base += ["season_fee_short"]
+        base += ["union_link", "department_link"]
+        return base
+
+    def season_fee_update_view(self, request):
+        # Get selected activity IDs from query params
+        ids = request.GET.get("ids", "")
+        id_list = [int(pk) for pk in ids.split(",") if pk.isdigit()]
+        queryset = self.model.objects.filter(pk__in=id_list)
+        if not (
+            request.user.is_superuser
+            or request.user.has_perm("members.change_season_fee")
+        ):
+            self.message_user(
+                request,
+                "Du har ikke rettigheder til at opdatere sæsonbidrag.",
+                level=messages.ERROR,
+            )
+            return redirect("..")
+        error_message = None
+        if request.method == "POST":
+            form = SeasonFeeUpdateForm(request.POST)
+            if form.is_valid():
+                new_fee = form.cleaned_data["season_fee_value"]
+                reason = form.cleaned_data["reason"]
+                # Validation: no negative, not above price_in_dkk
+                if new_fee < 0:
+                    error_message = "Sæsonbidrag kan ikke være negativt."
+                else:
+                    over_price = [
+                        a for a in queryset if new_fee > (a.price_in_dkk or 0)
+                    ]
+                    if over_price:
+                        error_message = "Sæsonbidrag kan ikke være højere end prisen for en eller flere aktiviteter."
+                if not error_message:
+                    updated = 0
+                    for activity in queryset:
+                        activity.season_fee = new_fee
+                        activity.season_fee_change_reason = reason
+                        activity.save(
+                            update_fields=["season_fee", "season_fee_change_reason"]
+                        )
+                        # Log the change in admin history
+                        self.log_change(
+                            request,
+                            activity,
+                            f"[Bulk] Sæsonbidrag ændret til {new_fee} (Begrundelse: {reason}) via admin handling.",
+                        )
+                        updated += 1
+                    self.message_user(
+                        request,
+                        f"Opdaterede sæsonbidrag for {updated} aktiviteter.",
+                        level=messages.SUCCESS,
+                    )
+                    return redirect("..")
+        else:
+            form = SeasonFeeUpdateForm()
+        return render(
+            request,
+            "admin/season_fee_update_form.html",
+            {"form": form, "activities": queryset, "error_message": error_message},
+        )
 
     date_hierarchy = "start_date"
     search_fields = (
@@ -144,12 +266,50 @@ class ActivityAdmin(admin.ModelAdmin):
         "department__name",
         "description",
     )
-    readonly_fields = (
-        "seats_left",
-        "participants",
-        "activity_link",
-        "addressregion",
-    )
+
+    def get_readonly_fields(self, request, obj=None):
+        base = [
+            "seats_left",
+            "participants",
+            "activity_link",
+            "addressregion",
+        ]
+        # Only allow users with 'members.change_season_fee' to edit the field and reason
+        if not (
+            request.user.is_superuser
+            or request.user.has_perm("members.change_season_fee")
+        ):
+            base.append("season_fee")
+            base.append("season_fee_change_reason")
+        return base
+
+    def save_model(self, request, obj, form, change):
+        # Only set season_fee to default if no override reason is given
+        if not obj.season_fee_change_reason:
+            if obj.activitytype_id == "FORLØB":
+                obj.season_fee = 150
+            else:
+                obj.season_fee = 0
+        # else: keep the user-set value (with reason)
+        super().save_model(request, obj, form, change)
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if not (
+            request.user.is_superuser
+            or request.user.has_perm("members.change_season_fee")
+        ):
+            new_fieldsets = []
+            for name, opts in fieldsets:
+                fields = list(opts.get("fields", ()))
+                if "season_fee_change_reason" in fields:
+                    fields.remove("season_fee_change_reason")
+                opts = dict(opts)
+                opts["fields"] = tuple(fields)
+                new_fieldsets.append((name, opts))
+            return new_fieldsets
+        return fieldsets
+
     raw_id_fields = (
         "union",
         "department",
@@ -165,9 +325,6 @@ class ActivityAdmin(admin.ModelAdmin):
         "address",
         "department",
     )
-    actions = [
-        AdminActions.export_participants_csv,
-    ]
     save_as = True
 
     ordering = ("-start_date", "department__name", "name")
@@ -224,6 +381,11 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def addressregion(self, obj):
         return str(obj.address.region)
+
+    def season_fee_short(self, obj):
+        return f"{obj.season_fee}"
+
+    season_fee_short.short_description = "Sæsonbidrag"
 
     addressregion.short_description = "Region"
 
@@ -369,6 +531,8 @@ class ActivityAdmin(admin.ModelAdmin):
                 "fields": (
                     "name",
                     "activitytype",
+                    "season_fee",
+                    "season_fee_change_reason",
                     "activity_link",
                     "open_hours",
                     "description",
