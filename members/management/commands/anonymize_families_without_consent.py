@@ -1,4 +1,6 @@
 from django.core.management.base import BaseCommand
+from django.utils import timezone
+from datetime import timedelta
 
 from members.models.family import Family
 from members.models.person import Person
@@ -77,8 +79,24 @@ class Command(BaseCommand):
         anonymized_count = 0
         skipped_count = 0
         error_count = 0
+        processed_count = 0
+        last_progress_time = timezone.now()
+        start_time = timezone.now()
 
         for family in families:
+            processed_count += 1
+
+            # Log progress every minute when not in verbose mode
+            if not verbose:
+                current_time = timezone.now()
+                if current_time - last_progress_time >= timedelta(minutes=1):
+                    elapsed_minutes = (current_time - start_time).total_seconds() / 60
+                    self.stdout.write(
+                        f"Progress: {processed_count}/{total_families} families processed "
+                        f"({anonymized_count} anonymized, {skipped_count} skipped, {error_count} errors) "
+                        f"- {elapsed_minutes:.1f} minutes elapsed"
+                    )
+                    last_progress_time = current_time
             if verbose:
                 self.stdout.write(f"\nChecking family {family.id} ({family.email})...")
 
