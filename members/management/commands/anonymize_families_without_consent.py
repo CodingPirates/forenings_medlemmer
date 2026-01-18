@@ -98,7 +98,7 @@ class Command(BaseCommand):
                     )
                     last_progress_time = current_time
             if verbose:
-                self.stdout.write(f"\nChecking family {family.id} ({family.email})...")
+                self.stdout.write(f"\nChecking family {family.id}...")
 
             # Check if family has no consent
             no_consent, consent_reason = self.family_has_no_consent(family)
@@ -146,8 +146,6 @@ class Command(BaseCommand):
                         anonymized_count += 1
                         if verbose:
                             self.stdout.write(f"  ✓ Successfully anonymized family {family.id}")
-                        else:
-                            self.stdout.write(f"Anonymized family {family.id} ({family.email})")
                     else:
                         # This shouldn't happen, but log a warning if it does
                         self.stdout.write(
@@ -166,7 +164,7 @@ class Command(BaseCommand):
             else:
                 anonymized_count += 1
                 if not verbose:
-                    self.stdout.write(f"Would anonymize family {family.id} ({family.email})")
+                    self.stdout.write(f"Would anonymize family {family.id}")
 
         # Summary
         self.stdout.write("\n" + "=" * 50)
