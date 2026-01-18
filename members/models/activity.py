@@ -33,11 +33,25 @@ class Activity(models.Model):
         on_delete=models.CASCADE,
         default="FORLØB",
         verbose_name="Aktivitetstype",
-        help_text="""Angiv typen af aktivtet.
-        Brugere vil se Forløb og Arrangementer under Aktiviteter.
-        Medlemskab og Støttemedlemskab vil blive vist på separate sider.
-        Normalt vil det kun være sekretariatet der oprettet aktiviteter for medlemskaber.""",
+        help_text="""Angiv typen af aktivitet. Brugere vil se Forløb og Arrangementer under Aktiviteter.<br>Medlemskab og Støttemedlemskab vil blive vist på separate sider.<br>Medlemskab bliver oprettet automatisk af systemet.""",
     )
+
+    season_fee = models.DecimalField(
+        "Sæsonbidrag til Coding Pirates Denmark",
+        max_digits=7,
+        decimal_places=2,
+        default=None,
+        null=True,
+        blank=True,
+        help_text="""Standard er 150 kr for sæson/forløb, 0 kr for Arrangementer og Støttemedlemskaber.<br>Beregnes automatisk ved oprettelse af aktiviteten.""",
+    )
+    season_fee_change_reason = models.CharField(
+        "Begrundelse for ændring af sæsonbidrag",
+        max_length=255,
+        blank=True,
+        help_text="Påkrævet hvis sæsonbidrag ændres fra standard.",
+    )
+
     open_hours = models.CharField("Tidspunkt", max_length=200)
     responsible_name = models.CharField("Ansvarlig", max_length=200)
     responsible_contact = models.EmailField("E-mail")
@@ -159,6 +173,43 @@ class Activity(models.Model):
             errors["signup_closing"] = (
                 "Tilmeldingsfristen skal være før aktiviteten slutter"
             )
+
+        if self.max_age < self.min_age:
+            errors["max_age"] = "Maksimumsalder skal være større end minimumsalder."
+
+        if (
+            self.start_date
+            and self.end_date
+            and self.start_date.year >= timezone.now().year
+        ):
+            # Validering er ikke for historiske aktiviteter
+            duration = (self.end_date - self.start_date).days + 1
+            if self.activitytype.id == "FORLØB" and duration <= 14:
+                errors["end_date"] = "Et forløb skal vare mindst 15 dage."
+            if self.activitytype.id == "ARRANGEMENT" and duration > 14:
+                errors["end_date"] = "Et arrangement kan maksimalt vare 14 dage."
+
+        if self.activitytype and self.activitytype.id == "FORLØB":
+            default_fee = 150
+        else:
+            default_fee = 0
+
+        if self.season_fee is None:
+            self.season_fee = default_fee
+
+        if self.season_fee is not None and self.season_fee < 0:
+            errors["season_fee"] = "Sæsonbidraget kan ikke være negativt."
+
+        if self.season_fee != default_fee and not self.season_fee_change_reason:
+            errors["season_fee_change_reason"] = (
+                "Du skal angive en begrundelse for at ændre sæsonbidraget."
+            )
+
+        if (
+            self.activitytype
+            and self.activitytype.id in ["FORENINGSMEDLEMSKAB", "STØTTEMEDLEMSKAB"]
+        ) and (self.price_in_dkk != 0):
+            errors["price_in_dkk"] = "Prisen for medlemskaber skal være 0 kr."
 
         if errors:
             raise ValidationError(errors)

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from django.db import models
-import members.models.quickpaytransaction
 from django.utils import timezone
+
+import members.models.quickpaytransaction
 
 
 class Payment(models.Model):
@@ -93,6 +94,8 @@ class Payment(models.Model):
     def set_accepted(self):
         if self.accepted_at is None:
             self.accepted_at = timezone.now()
+            self.rejected_at = None
+            self.rejected_message = None
             self.save()
 
     def set_confirmed(self):

@@ -17,6 +17,10 @@ from .filters.member_admin_filters import (
 
 
 class MemberAdmin(admin.ModelAdmin):
+    search_fields = [
+        "person__name",
+        "person__email",
+    ]
     list_per_page = settings.LIST_PER_PAGE
     date_hierarchy = "member_since"
     list_display = [
