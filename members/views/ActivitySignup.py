@@ -203,6 +203,7 @@ def ActivitySignup(request, activity_id, person_id=None):
                         if activity.start_date.year == datetime.now().year
                         else date(activity.end_date.year, 1, 1)
                     ),
+                    member_until=date(activity.end_date.year, 12, 31),
                 )
                 member.save()
 

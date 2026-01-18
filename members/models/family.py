@@ -1,10 +1,12 @@
 import uuid
+
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
+
+import members.models.emailtemplate
 
 from .person import Person
-import members.models.emailtemplate
 
 
 class Family(models.Model):
@@ -26,9 +28,12 @@ class Family(models.Model):
     dont_send_mails = models.BooleanField("Vil ikke kontaktes", default=False)
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     confirmed_at = models.DateTimeField("Bekræftet", null=True, blank=True)
-    last_visit_dtm = models.DateTimeField("Sidst besøgt", null=True, blank=True)
+    last_visit_at = models.DateTimeField("Sidst besøgt", null=True, blank=True)
     deleted_dtm = models.DateTimeField("Slettet", null=True, blank=True)
     anonymized = models.BooleanField("Anonymiseret", default=False)
+    temp_anonymization_warning_sent_at = models.DateTimeField(
+        "Anonymiseringsadvarsel sendt", null=True, blank=True
+    )
 
     def get_abosolute_url(self):
         return reverse("family_form")

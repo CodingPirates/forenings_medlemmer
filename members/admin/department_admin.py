@@ -1,6 +1,6 @@
 import codecs
 from django.conf import settings
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db import models
 from django.db.models.functions import Upper
 from django.urls import reverse
@@ -15,6 +15,8 @@ from members.models import (
 from django.utils.html import escape
 from django.http import HttpResponse
 from django.db.models import Count
+from django.utils import timezone
+from django.shortcuts import redirect, render
 
 
 class AdminUserDepartmentInline(admin.TabularInline):
@@ -99,37 +101,77 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
 class DepartmentAdmin(admin.ModelAdmin):
     inlines = [AdminUserDepartmentInline]
-    list_display = (
-        "department_link",
-        "address",
-        "department_email",
-        "isVisible",
-        "isOpening",
-        "has_waiting_list",
-        "created",
-        "closed_dtm",
-        "waitinglist_count_link",
-        "department_union_link",
-    )
-    list_filter = (
-        "address__region",
-        UnionDepartmentFilter,
-        "isVisible",
-        "isOpening",
-        "created",
-        "closed_dtm",
-        "has_waiting_list",
-    )
+
+    def get_fieldsets(self, request, obj=None):
+        # Copy the default fieldsets
+        fieldsets = (
+            list(super().get_fieldsets(request, obj))
+            if hasattr(super(), "get_fieldsets")
+            else list(self.fieldsets)
+        )
+        # Find the Afdelingssiden section
+        for i, (title, opts) in enumerate(fieldsets):
+            if title == "Afdelingssiden":
+                fields = list(opts["fields"])
+                # Only add if user is superuser or has special permission
+                if request.user.is_superuser or request.user.has_perm(
+                    "members.change_activity_mode"
+                ):
+                    if "activity_mode" not in fields:
+                        idx = (
+                            fields.index("isVisible") + 1
+                            if "isVisible" in fields
+                            else len(fields)
+                        )
+                        fields.insert(idx, "activity_mode")
+                        opts = dict(opts)
+                        opts["fields"] = tuple(fields)
+                        fieldsets[i] = (title, opts)
+                break
+        return fieldsets
+
+    def get_list_display(self, request):
+        base = [
+            "department_link",
+            "address",
+            "department_email",
+            "isVisible",
+            "isOpening",
+            "has_waiting_list",
+            "created",
+            "closed_dtm",
+            "waitinglist_count_link",
+        ]
+        if request.user.is_superuser:
+            base.append("department_activitymode_code")
+        base.append("department_union_link")
+        return base
+
+    def get_list_filter(self, request):
+        base = [
+            "address__region",
+            UnionDepartmentFilter,
+            "isVisible",
+            "isOpening",
+            "created",
+            "closed_dtm",
+            "has_waiting_list",
+        ]
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_activity_mode"
+        ):
+            base.append("activity_mode")
+        return base
+
     autocomplete_fields = ("union",)
 
     def get_search_results(self, request, queryset, search_term):
         # Only show open departments in autocomplete (closed_dtm is None or in the future)
-        from django.utils import timezone
-
-        queryset = queryset.filter(
-            models.Q(closed_dtm__isnull=True)
-            | models.Q(closed_dtm__gt=timezone.now().date())
-        )
+        if request.path.endswith("/autocomplete/"):
+            queryset = queryset.filter(
+                models.Q(closed_dtm__isnull=True)
+                | models.Q(closed_dtm__gt=timezone.now().date())
+            )
         return super().get_search_results(request, queryset, search_term)
 
     raw_id_fields = ("union",)
@@ -152,7 +194,117 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     actions = [
         "export_department_info_csv",
+        "update_activity_mode_action",
     ]
+
+    def get_urls(self):
+        from django.urls import path
+
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "activity_mode_update/",
+                self.admin_site.admin_view(self.activity_mode_update_view),
+                name="activity_mode_update",
+            ),
+        ]
+        return custom_urls + urls
+
+    def update_activity_mode_action(self, request, queryset):
+        if not (
+            request.user.is_superuser
+            or request.user.has_perm("members.change_activity_mode")
+        ):
+            self.message_user(
+                request,
+                "Du har ikke rettigheder til at opdatere aktivitetsform.",
+                level=admin.messages.ERROR,
+            )
+            return
+        if not request.POST.get("activity_mode"):
+            selected = queryset.values_list("pk", flat=True)
+            ids = ",".join(str(pk) for pk in selected)
+            return redirect(f"activity_mode_update/?ids={ids}")
+        # If value is provided, process as before
+        from members.models.activitymode import ActivityMode
+
+        try:
+            new_mode = ActivityMode.objects.get(pk=request.POST.get("activity_mode"))
+        except ActivityMode.DoesNotExist:
+            self.message_user(
+                request, "Ugyldig aktivitetsform.", level=admin.messages.ERROR
+            )
+            return
+        reason = request.POST.get("reason", "")
+        updated = 0
+        for dept in queryset:
+            dept.activity_mode = new_mode
+            # Optionally, you could add a log or reason field if you want to store the reason
+            dept.save(update_fields=["activity_mode"])
+            self.log_change(
+                request,
+                dept,
+                f"[Bulk] Aktivitetsform ændret til {new_mode} (Begrundelse: {reason}) via admin handling.",
+            )
+            updated += 1
+        self.message_user(
+            request,
+            f"Opdaterede aktivitetsform for {updated} afdelinger.",
+            level=admin.messages.SUCCESS,
+        )
+
+    update_activity_mode_action.short_description = "Opdater aktivitetsform"
+
+    def activity_mode_update_view(self, request):
+
+        from members.forms.activity_mode_update_form import ActivityModeUpdateForm
+
+        ids = request.GET.get("ids", "")
+        id_list = [int(pk) for pk in ids.split(",") if pk.isdigit()]
+        queryset = self.model.objects.filter(pk__in=id_list)
+        if not (
+            request.user.is_superuser
+            or request.user.has_perm("members.change_activity_mode")
+        ):
+            self.message_user(
+                request,
+                "Du har ikke rettigheder til at opdatere aktivitetsform.",
+                level=messages.ERROR,
+            )
+            return redirect("..")
+        error_message = None
+        if request.method == "POST":
+            form = ActivityModeUpdateForm(request.POST)
+            if form.is_valid():
+                new_mode = form.cleaned_data["activity_mode"]
+                updated = 0
+                for dept in queryset:
+                    dept.activity_mode = new_mode
+                    dept.save(update_fields=["activity_mode"])
+                    self.log_change(
+                        request,
+                        dept,
+                        f"[Bulk] Aktivitetsform ændret til {new_mode} via admin handling.",
+                    )
+                    updated += 1
+                self.message_user(
+                    request,
+                    f"Opdaterede aktivitetsform for {updated} afdelinger.",
+                    level=messages.SUCCESS,
+                )
+                return redirect("..")
+        else:
+            form = ActivityModeUpdateForm()
+        return render(
+            request,
+            "admin/activity_mode_update_form.html",
+            {"form": form, "departments": queryset, "error_message": error_message},
+        )
+
+    def department_activitymode_code(self, obj):
+        return obj.activity_mode.code if obj.activity_mode else ""
+
+    department_activitymode_code.short_description = "Aktivitetsform"
 
     # Solution found on https://stackoverflow.com/questions/57056994/django-model-form-with-only-view-permission-puts-all-fields-on-exclude
     # formfield_for_foreignkey described in documentation here: https://docs.djangoproject.com/en/4.2/ref/contrib/admin/#django.contrib.admin.ModelAdmin.formfield_for_foreignkey
