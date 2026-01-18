@@ -54,7 +54,7 @@ class Member(models.Model):
             raise ValidationError(errors)
 
     def paid(self):
-        # Paid only if there is a payment for this member with confirmed_at set
+        # Paid only if there is a payment for this member with accepted_at set
         return not members.models.payment.Payment.objects.filter(
             member=self, accepted_at=None
         ).exists()
