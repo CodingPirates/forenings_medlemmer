@@ -74,4 +74,3 @@ class SlackInvitationSetup(models.Model):
             self.admin_password_encrypted = f.encrypt(value.encode("utf-8"))
         else:
             self.admin_password_encrypted = b""
-
