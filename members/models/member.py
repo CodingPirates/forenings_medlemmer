@@ -1,4 +1,5 @@
 from datetime import date
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -53,10 +54,10 @@ class Member(models.Model):
             raise ValidationError(errors)
 
     def paid(self):
-        # not paid if unconfirmed payments on this activity participation
+        # Paid only if there is a payment for this member with accepted_at set
         return not members.models.payment.Payment.objects.filter(
             member=self, accepted_at=None
-        )
+        ).exists()
 
     def get_payment_link(self):
         payment = members.models.payment.Payment.objects.get(
