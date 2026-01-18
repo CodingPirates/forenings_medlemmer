@@ -470,3 +470,17 @@ class TestModelPerson(TestCase):
         # parent cannot be anonymized, since child has payments in the last 5 years
         with freeze_time(datetime(2025, 12, 31)):
             self.assertTrue(parent.is_anonymization_candidate()[0])
+
+    def test_person_created_recently_is_anonymization_candidate_in_relaxed_mode(self):
+        """Person created recently can be anonymized in relaxed mode if no payments."""
+        # Create person 1 year ago (recently)
+        one_year_ago = timezone.now() - timedelta(days=1 * 365)
+        with freeze_time(one_year_ago):
+            person = PersonFactory()
+
+        # In normal mode, should fail because created recently
+        self.assertFalse(person.is_anonymization_candidate(relaxed=False)[0])
+
+        # In relaxed mode, should pass because creation date check is skipped
+        # (assuming no payments and no recent activity)
+        self.assertTrue(person.is_anonymization_candidate(relaxed=True)[0])
