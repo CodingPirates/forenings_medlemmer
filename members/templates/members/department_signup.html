@@ -75,6 +75,7 @@
                   <th>Adresse</th>
                   <th>Åbningstid</th>
                   <th>Opskriv på venteliste</th>
+                  <th>Aktivitetsform</th>
                 </tr>
               </thead>
               <tbody class="department-tbody" id="table-body-{{region.grouper|slugify}}">
@@ -122,6 +123,9 @@
                         Ingen venteliste, se afdelingens aktiviteter under <b>Aktiviteter</b>
                       </div>
                     {% endif %}
+                  </td>
+                  <td>
+                    {{ department.activity_mode.name }}
                   </td>
                 </tr>
               {% endfor %}
