@@ -9,9 +9,18 @@ from members.views.UnacceptedInvitations import get_unaccepted_invitations_for_f
 @xframe_options_exempt
 def EntryPage(request):
     context = {}
+    show_slack_menu = False
+    if request.user.is_authenticated:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.can_approve_slack_invites"
+        ):
+            show_slack_menu = True
     if not request.user.is_anonymous:
         user = user_to_person(request.user)
-        if user is not None:
+        if user is None:
+            # e.g. if logged in as admin
+            context = {"show_slack_menu": show_slack_menu}
+        else:
             family = user.family
             unaccepted_invitations = get_unaccepted_invitations_for_family(family)
             missing_payments = ActivityParticipant.get_missing_payments_for_family(
@@ -45,6 +54,9 @@ def EntryPage(request):
                 "invites": unaccepted_invitations,
                 "unpaid_payments": unpaid_payments,
                 "total_missing_dkk": total_missing_dkk,
+                "show_slack_menu": show_slack_menu,
             }
+    else:
+        context = {"show_slack_menu": show_slack_menu}
 
     return render(request, "members/entry_page.html", context)

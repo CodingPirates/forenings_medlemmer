@@ -1,3 +1,4 @@
+
 [tool.black]
 line-length = 88
 target-version = ['py310', 'py311']
@@ -38,3 +39,5 @@ selenium = "4.35.0"
 sentry-sdk = "2.32.0"
 tqdm = "4.67.1"
 whitenoise = "6.9.0"
+chromedriver-binary = "^114.0.5735.90.0"
+chromium = "*"

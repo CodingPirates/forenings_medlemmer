@@ -1,4 +1,5 @@
 from django.urls import re_path
+from members.views.SlackInviteApproval import slack_invite_approval
 from members.views import (
     AccountCreate,
     Activities,
@@ -29,6 +30,9 @@ from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
+    re_path(
+        r"^slack_invite_approval/$", slack_invite_approval, name="slack_invite_approval"
+    ),
     re_path(r"^$", EntryPage, name="entry_page"),
     re_path(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     re_path(r"^account/create/$", AccountCreate, name="account_create"),

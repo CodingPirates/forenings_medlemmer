@@ -10,6 +10,9 @@
     <a href="{% url "support_membership" %}">Støttemedlemskaber</a>
     <div class="account-sep"></div>
     {% if user.is_authenticated %}
+        {% if show_slack_menu %}
+            <a href="{% url 'slack_invite_approval' %}">Slack</a>
+        {% endif %}
         {% if user.is_staff %}
             <a href="{% url "admin:index" %}">ADMIN</a>
         {% endif %}

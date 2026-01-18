@@ -306,6 +306,29 @@ files = [
 ]
 
 [[package]]
+name = "chromedriver-binary"
+version = "114.0.5735.90.0"
+description = "Installer for chromedriver."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "chromedriver-binary-114.0.5735.90.0.tar.gz", hash = "sha256:7c9b82aa6f7685131f4763c91fd40b01935644ec1e14bf6038afaa678818b215"},
+]
+
+[[package]]
+name = "chromium"
+version = "0.0.0"
+description = "A hobby project"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "chromium-0.0.0-py3-none-any.whl", hash = "sha256:a789163f8c17a5007259cc58fd77eff13ca4b7e2cd74ea79ba7bdef2daa2d853"},
+    {file = "chromium-0.0.0.tar.gz", hash = "sha256:dfed04f56ab56721c1e05c77a97a79ad1b88be44c222eb1f7ffbd6fff54e1e72"},
+]
+
+[[package]]
 name = "click"
 version = "8.3.1"
 description = "Composable command line interface toolkit"
@@ -1283,4 +1306,4 @@ h11 = ">=0.16.0,<1"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "d70b925b659836a78a74b8f5fa5bb0645d796163023d80d3e9c558aa6eea0bdc"
+content-hash = "4e1d49435e83c834972b7069459b804c6a2c0b545092597c20a6979cdd5fd1db"

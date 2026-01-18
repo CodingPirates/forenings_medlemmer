@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-# ensure all models are included - otherwise makemigrations fails to detect models
+# Ensure all models are included - otherwise makemigrations fails to detect models
 import members.models.activity
 import members.models.activitytype
 import members.models.activityinvite
@@ -18,6 +18,8 @@ import members.models.family
 import members.models.municipality
 import members.models.member
 import members.models.notification
+from members.models.slackinvitesetup import SlackInvitationSetup
+from members.models.slackinvitelog import SlackInviteLog
 import members.models.payment
 import members.models.person
 import members.models.anonymization_candidate
@@ -25,7 +27,7 @@ import members.models.quickpaytransaction
 import members.models.union
 import members.models.volunteer
 import members.models.waitinglist
-import members.models.zipcoderegion  # noqa  # fine to hav eall models included
+import members.models.zipcoderegion  # noqa  # fine to have all models included
 
 
 # Export models not files
@@ -87,4 +89,6 @@ __all__ = [
     Volunteer,
     WaitingList,
     ZipcodeRegion,
+    SlackInviteLog,
+    SlackInvitationSetup,
 ]
