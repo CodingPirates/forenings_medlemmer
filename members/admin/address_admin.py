@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.contrib import admin
-from members.models import Address
 
 from members.models import (
-    Union,
-    Department,
     Activity,
+    Address,
+    Department,
+    Union,
 )
 
 
@@ -91,6 +91,10 @@ class AddressRegionListFilter(admin.SimpleListFilter):
                         str(aRegion.region),
                     ),
                 )
+
+        if len(regionList) <= 1:
+            return ()
+
         return regionList
 
     def queryset(self, request, queryset):

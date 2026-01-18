@@ -2,16 +2,15 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
+from members.admin.admin_actions import AdminActions
 from members.models import (
     Activity,
     AdminUserInformation,
     Union,
 )
-
-from members.admin.admin_actions import AdminActions
 
 
 class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
@@ -19,12 +18,16 @@ class ActivityParticipantDepartmentFilter(admin.SimpleListFilter):
     parameter_name = "department"
 
     def lookups(self, request, model_admin):
-        return [
-            (str(department.pk), str(department))
-            for department in AdminUserInformation.get_departments_admin(
-                request.user
-            ).order_by("name")
-        ]
+        departments = []
+        for department in AdminUserInformation.get_departments_admin(
+            request.user
+        ).order_by("name"):
+            departments.append((str(department.pk), str(department)))
+
+        if len(departments) <= 1:
+            return ()
+
+        return departments
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -41,13 +44,17 @@ class ActivityParticipantListCurrentYearFilter(admin.SimpleListFilter):
     parameter_name = "activity_current_year"
 
     def lookups(self, request, model_admin):
-        activitys = []
+        activities = []
         for act in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year__gte=timezone.now().year,
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(act.pk), str(act)))
-        return activitys
+            activities.append((str(act.pk), str(act)))
+
+        if len(activities) <= 1:
+            return ()
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -64,13 +71,17 @@ class ActivityParticipantListLastYearFilter(admin.SimpleListFilter):
     parameter_name = "activity_last_year"
 
     def lookups(self, request, model_admin):
-        activitys = []
+        activities = []
         for act in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year=timezone.now().year - 1,
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(act.pk), str(act)))
-        return activitys
+            activities.append((str(act.pk), str(act)))
+
+        if len(activities) <= 1:
+            return ()
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -87,13 +98,17 @@ class ActivityParticipantListOldYearsFilter(admin.SimpleListFilter):
     parameter_name = "activity_old_years"
 
     def lookups(self, request, model_admin):
-        activitys = []
+        activities = []
         for act in Activity.objects.filter(
             department__in=AdminUserInformation.get_departments_admin(request.user),
             start_date__year__lte=timezone.now().year - 2,
         ).order_by("department__name", "-start_date"):
-            activitys.append((str(act.pk), str(act)))
-        return activitys
+            activities.append((str(act.pk), str(act)))
+
+        if len(activities) <= 1:
+            return ()
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -118,6 +133,10 @@ class ActivityParticipantUnionFilter(admin.SimpleListFilter):
             .distinct()
         ):
             unions.append((str(union1.pk), str(union1.name)))
+
+        if len(unions) <= 1:
+            return ()
+
         return unions
 
     def queryset(self, request, queryset):
@@ -143,14 +162,14 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
 
-        activitys = [
+        activities = [
             ("pending", "Afventende"),
             ("rejected", "Afvist"),
             ("ok", "Betalt"),
             ("none", "Ikke betalt"),
             ("confirmed", "Hævet"),
         ]
-        return activitys
+        return activities
 
     def queryset(self, request, queryset):
         """
