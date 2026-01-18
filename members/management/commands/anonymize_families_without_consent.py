@@ -85,8 +85,9 @@ class Command(BaseCommand):
                 if current_time - last_progress_time >= timedelta(minutes=1):
                     elapsed_minutes = (current_time - start_time).total_seconds() / 60
                     self.stdout.write(
+                        f"[{current_time.strftime('%Y-%m-%d %H:%M:%S')}] "
                         f"Progress: {processed_count}/{total_families} families processed "
-                        f"({anonymized_count} anonymized, {skipped_count} skipped, {error_count} errors) "
+                        f"({anonymized_count} persons anonymized, {skipped_count} skipped, {error_count} errors) "
                         f"- {int(elapsed_minutes)} minutes elapsed"
                     )
                     last_progress_time = current_time
@@ -101,43 +102,39 @@ class Command(BaseCommand):
                 skipped_count += 1
                 continue
 
-            if not dry_run:
-                try:
-                    # Anonymize persons in the family
-                    # person.anonymize() will handle validation and automatically
-                    # anonymize the family when all persons are anonymized
-                    persons = family.get_persons().filter(anonymized=False)
-                    for person in persons:
-                        if (person.is_anonymization_candidate(relaxed=True))[0]:
+            try:
+                # Anonymize persons in the family
+                # person.anonymize() will handle validation and automatically
+                # anonymize the family when all persons are anonymized
+                persons = family.get_persons().filter(anonymized=False)
+                for person in persons:
+                    if (person.is_anonymization_candidate(relaxed=True))[0]:
+                        anonymized_count += 1
+                        if not dry_run:
                             person.anonymize(request, relaxed=True)
-                            if verbose:
-                                self.stdout.write(
-                                    f"    Anonymized person {person.id} ({person.name})"
-                                )
-
-                except Exception as e:
-                    error_count += 1
-                    if verbose:
-                        self.stdout.write(
-                            self.style.ERROR(
-                                f"  ✗ Error anonymizing family {family.id}: {str(e)}"
+                        if verbose:
+                            self.stdout.write(
+                                f"    Anonymized person {person.id} ({person.name})"
                             )
+
+            except Exception as e:
+                error_count += 1
+                if verbose:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f"  ✗ Error anonymizing family {family.id}: {str(e)}"
                         )
-                    skipped_count += 1
-            else:
-                # Dry run: just count eligible families
-                anonymized_count += 1
-                if not verbose:
-                    self.stdout.write(f"Would anonymize family {family.id}")
+                    )
+                skipped_count += 1
 
         # Summary
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write("Summary:")
         self.stdout.write(f"  Total families checked: {total_families}")
         if dry_run:
-            self.stdout.write(f"  Would anonymize: {anonymized_count}")
+            self.stdout.write(f"  Would anonymize persons: {anonymized_count}")
         else:
-            self.stdout.write(f"  Anonymized: {anonymized_count}")
+            self.stdout.write(f"  Anonymized persons: {anonymized_count}")
         self.stdout.write(f"  Skipped: {skipped_count}")
         if error_count > 0:
             self.stdout.write(self.style.ERROR(f"  Errors: {error_count}"))
