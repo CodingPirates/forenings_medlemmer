@@ -7,7 +7,6 @@ from members.models import (
     ActivityInvite,
     EmailTemplate,
 )
-from members.models.activityparticipant import ActivityParticipant
 
 
 class Command(BaseCommand):
