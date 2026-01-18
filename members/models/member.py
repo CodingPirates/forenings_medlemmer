@@ -1,4 +1,5 @@
 from datetime import date
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -54,8 +55,8 @@ class Member(models.Model):
 
     def paid(self):
         # Paid only if there is a payment for this member with confirmed_at set
-        return members.models.payment.Payment.objects.filter(
-            member=self, confirmed_at__isnull=False
+        return not members.models.payment.Payment.objects.filter(
+            member=self, accepted_at=None
         ).exists()
 
     def get_payment_link(self):
