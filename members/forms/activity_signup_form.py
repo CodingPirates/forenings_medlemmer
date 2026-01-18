@@ -88,7 +88,7 @@ class ActivitySignupForm(forms.Form):
 
     note = forms.CharField(
         label=mark_safe(
-            "<span style='color:red'><b>Ekstra information:</b></span> Har deltageren nogle behov?"
+            "<span style='color:red'><b>Ekstra information:</b></span> Har den tilmeldte person nogle behov?"
         ),
         widget=forms.Textarea,
         required=False,
