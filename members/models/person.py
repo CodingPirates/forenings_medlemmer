@@ -200,12 +200,15 @@ class Person(models.Model):
     def is_anonymization_candidate(self, relaxed=False):
         """
         Determine if person is a candidate for anonymization.
-        Returns False if created_date, latest_activity or last_login is less than 2 years ago.
-        However we cannot anonymize if there is a payment in the last 5 full fiscal years.
+        We cannot anonymize if there is a payment in the last 5 full fiscal years.
 
         Args:
             relaxed: If True, only checks for financial transactions. Allows anonymization
                     even if person has been logged in or created recently.
+
+        Returns: Tuple (is_candidate, reason):
+        - is_candidate: False if e.g. latest_activity
+        - reason: Description of why the person is not a candidate
         """
 
         # we operate with two date boundaries:
