@@ -29,6 +29,9 @@ class SlackInviteLog(models.Model):
         verbose_name = "Slack Invite Log"
         verbose_name_plural = "Slack Invite Logs"
         ordering = ["-created_at"]
+        permissions = [
+            ("can_approve_slack_invites", "Can approve Slack invites"),
+        ]
 
     def clean(self):
         from django.core.validators import validate_email

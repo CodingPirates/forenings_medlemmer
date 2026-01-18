@@ -75,5 +75,3 @@ class SlackInvitationSetup(models.Model):
         else:
             self.admin_password_encrypted = b""
 
-    def print_decrypted_password(self):
-        print(f"[DEBUG] Decrypted Slack password: {self.admin_password}")
