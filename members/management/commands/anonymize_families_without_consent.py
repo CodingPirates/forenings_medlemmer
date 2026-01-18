@@ -3,7 +3,6 @@ from django.utils import timezone
 from datetime import timedelta
 
 from members.models.family import Family
-from members.models.person import Person
 
 # run command locally in Docker:
 # docker compose run web ./manage.py anonymize_families_without_consent --dry-run
@@ -128,7 +127,7 @@ class Command(BaseCommand):
 
             # Both conditions met - anonymize the family
             if verbose:
-                self.stdout.write(f"  ✓ Eligible for anonymization")
+                self.stdout.write("  ✓ Eligible for anonymization")
                 persons = family.get_persons()
                 self.stdout.write(
                     f"  Will anonymize {persons.count()} person(s) and the family"
@@ -153,7 +152,7 @@ class Command(BaseCommand):
                         family.anonymize(request, relaxed=True)
                         if verbose:
                             self.stdout.write(
-                                f"    All persons already anonymized, anonymizing family"
+                                "    All persons already anonymized, anonymizing family"
                             )
 
                     # Refresh family to verify it was anonymized
