@@ -20,6 +20,8 @@ from members.models import (
     Union,
     WaitingList,
     EmailItem,
+    SlackInviteLog,
+    SlackInvitationSetup,
 )
 
 from .activity_admin import ActivityAdmin
@@ -39,6 +41,8 @@ from .union_admin import UnionAdmin
 from .user_admin import UserAdmin
 from .waitinglist_admin import WaitingListAdmin
 from .emailitem_admin import EmailItemAdmin
+from .slackinvitelog_admin import SlackInviteLogAdmin
+from .slackinvitesetup_admin import SlackInvitationSetupAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
@@ -60,6 +64,8 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Union, UnionAdmin)
 admin.site.register(WaitingList, WaitingListAdmin)
 admin.site.register(EmailItem, EmailItemAdmin)
+admin.site.register(SlackInviteLog, SlackInviteLogAdmin)
+admin.site.register(SlackInvitationSetup, SlackInvitationSetupAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 # admin.site.register(AdminUserInformation, AdminUserInformationAdmin)

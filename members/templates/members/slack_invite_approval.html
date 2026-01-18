@@ -1,0 +1,71 @@
+{% extends "members/base.html" %}
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="color: #a94442; background-color: #f2dede; border: 1px solid #ebccd1; padding: 12px; font-weight: bold; border-radius: 4px; margin-bottom: 20px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<h1>Opret Slack Invitation</h1>
+{% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+{% if success or error %}
+    {% if success %}
+        <div class="alert alert-success">
+            Invitation for <b>{{ invited_name }}</b> ({{ invited_email }}) blev sendt til Slack.<br>
+            <br>
+            <b>Tid:</b> {{ processing_time }} sekunder.<br>
+            <form method="get">
+                <button type="submit" class="btn btn-primary mt-3">Fortsæt</button>
+            </form>
+        </div>
+    {% else %}
+        <div class="alert alert-danger">
+            {{ error }}<br>
+            <br>
+            <b>Tid:</b> {{ processing_time }} sekunder.<br>
+            <form method="get">
+                <button type="submit" class="btn btn-primary mt-3">Continue</button>
+            </form>
+        </div>
+    {% endif %}
+{% else %}
+    <form method="post" class="approve-form" id="invite-form">
+        {% csrf_token %}
+        <div class="form-group" style="margin-bottom: 28px;">
+            <label for="emails">Email(s)</label>
+            <input type="text" name="emails" id="emails" required class="form-control" placeholder="Skriv en eller flere email adresser, adskilt af mellemrum" value="{{ emails|default:'' }}" />
+            <small class="form-text text-muted">Du kan skrive flere email addresser, adskilt af mellemrum.</small>
+        </div>
+        <div class="form-group" style="margin-bottom: 28px;">
+            <label for="purpose">Formål</label>
+            <input type="text" name="purpose" id="purpose" required class="form-control" placeholder="Formål" value="{{ purpose|default:'' }}" />
+        </div>
+        <button type="submit" class="btn btn-success">Invite</button>
+    </form>
+    <div id="progress-indicator" style="display:none; margin-top:20px;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Behandler...</span>
+        </div>
+        <span style="margin-left:10px;">Behandler invitation, vent venligst...</span>
+    </div>
+    <script>
+    document.getElementById('invite-form').addEventListener('submit', function() {
+        document.getElementById('progress-indicator').style.display = 'block';
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            alert.style.display = 'none';
+        });
+        // Disable fields and button
+        document.getElementById('emails').setAttribute('disabled', 'disabled');
+        document.getElementById('purpose').setAttribute('disabled', 'disabled');
+        var btn = document.querySelector('#invite-form button[type="submit"]');
+        if (btn) {
+            btn.setAttribute('disabled', 'disabled');
+        }
+    });
+    </script>
+{% endif %}
+{% endblock %}
