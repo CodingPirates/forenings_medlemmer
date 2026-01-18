@@ -55,7 +55,8 @@ class Command(BaseCommand):
                 "union": invite.activity.department.union,
             }
             print(
-                f"Sending reminder for activity '{invite.activity.department.name}/{invite.activity.name}' to person '{invite.person.name}'"
+                f"Sending reminder for activity '{invite.activity.department.name}/{invite.activity.name}' "
+                f"to invite id {invite.id}"
             )
             template.makeEmail(
                 [invite.person.family], context, allow_multiple_emails=True
