@@ -1,7 +1,7 @@
-from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Field, HTML, Div
 from crispy_forms.bootstrap import FormActions
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import HTML, Div, Field, Fieldset, Layout, Submit
+from django import forms
 from django.utils.safestring import mark_safe
 
 from members.models.activityparticipant import ActivityParticipant
@@ -88,7 +88,7 @@ class ActivitySignupForm(forms.Form):
 
     note = forms.CharField(
         label=mark_safe(
-            "<span style='color:red'><b>Evt. ekstra information:</b></span> Her kan du informere om evt. behov"
+            "<span style='color:red'><b>Ekstra information:</b></span> Har deltageren nogle behov?"
         ),
         widget=forms.Textarea,
         required=False,
