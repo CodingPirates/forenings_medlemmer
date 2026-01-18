@@ -1,24 +1,23 @@
 from datetime import datetime
-from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 
+from dateutil.relativedelta import relativedelta
 from django.test import TestCase
+from django.utils import timezone
 
 from members.models.activityparticipant import ActivityParticipant
 from members.models.payment import Payment
 
 from .factories import (
-    FamilyFactory,
-    PersonFactory,
     ActivityFactory,
     ActivityParticipantFactory,
+    FamilyFactory,
     PaymentFactory,
+    PersonFactory,
 )
 
 
 class TestMissingPayments(TestCase):
     def test_payments_for_family(self):
-
         # Tests (* means: Missing payment)
         #   A: Activityprice = 0
         #   A1: participant with price = 0 without payment
@@ -179,8 +178,10 @@ class TestMissingPayments(TestCase):
         with self.subTest("A3: participant with price > 0, payment confirmed"):
             self.assertNotIn(participant_a3, missing_payments)
 
-        with self.subTest("A4: participant with price > 0, payment not confirmed"):
-            self.assertIn(participant_a4, missing_payments)
+        with self.subTest(
+            "A4: participant with price > 0, payment not confirmed, but accepted = payment information have been entered"
+        ):
+            self.assertNotIn(participant_a4, missing_payments)
 
         # Check missing payments for activity 2
         with self.subTest("B1: participant with price = 0"):
@@ -192,5 +193,7 @@ class TestMissingPayments(TestCase):
         with self.subTest("B3: participant with payment > 0, confirmed"):
             self.assertNotIn(participant_b3, missing_payments)
 
-        with self.subTest("B4: participant with payment > 0, not confirmed"):
-            self.assertIn(participant_b4, missing_payments)
+        with self.subTest(
+            "B4: participant with payment > 0, not confirmed, but accepted = payment information have been entered"
+        ):
+            self.assertNotIn(participant_b4, missing_payments)
