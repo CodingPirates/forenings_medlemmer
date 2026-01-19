@@ -1,6 +1,9 @@
 # Selenium imports
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # NoSuchElementException import removed (unused)
 import time
@@ -31,7 +34,24 @@ def slack_invite_approval(request):
         invite_url = setup.invite_url if setup else None
         admin_username = setup.admin_username if setup else None
         admin_password = setup.admin_password if setup else None
-        emails = [e.strip() for e in emails_raw.split() if e.strip()]
+        # Accept both newlines and spaces as delimiters, but prefer newlines
+        emails = []
+        for line in emails_raw.splitlines():
+            for e in line.strip().split():
+                if e:
+                    emails.append(e)
+
+        # Defensive: No emails provided
+        if not emails:
+            messages.error(
+                request,
+                "Ingen email-adresser blev angivet. Skriv mindst én gyldig email-adresse.",
+            )
+            return render(
+                request,
+                "members/slack_invite_approval.html",
+                {"emails": emails_raw, "purpose": purpose},
+            )
 
         # Email format validation
         email_regex = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
@@ -46,6 +66,7 @@ def slack_invite_approval(request):
             # Then, use stricter regex
             if not email_regex.match(e):
                 invalid_emails.append(e)
+
         if invalid_emails:
             messages.error(
                 request, f"Invalid email address(es): {', '.join(invalid_emails)}"
@@ -56,8 +77,9 @@ def slack_invite_approval(request):
                 {"emails": emails_raw, "purpose": purpose},
             )
 
+        emails_for_slack = " ".join(emails)
         log = SlackInviteLog.objects.create(
-            email=emails_raw,
+            email=emails_for_slack,
             purpose=purpose,
             invite_url=invite_url,
             created_by=user,
@@ -73,54 +95,63 @@ def slack_invite_approval(request):
                 request, "Slack admin invite URL, username, or password not configured."
             )
             return render(request, "members/slack_invite_approval.html")
-        from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
 
-        processing_time = None
+        step = "initializing Chrome"
         try:
             options = webdriver.ChromeOptions()
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             driver = webdriver.Chrome(options=options)
+
+            step = "loading Slack invite URL"
             driver.get(invite_url)
+
             # Dismiss cookie banner if present
             try:
+                step = "dismissing cookie banner"
                 WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.ID, "onetrust-reject-all-handler"))
                 ).click()
             except Exception:
                 pass  # Banner not present, continue
-            # Wait for login form
+
+            step = "waiting for login form"
             WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.ID, "email"))
             )
+
+            step = "entering Slack admin credentials"
             driver.find_element(By.ID, "email").send_keys(admin_username)
             driver.find_element(By.ID, "password").send_keys(admin_password)
             driver.find_element(By.XPATH, '//button[@type="submit"]').click()
-            # Wait for "Invite people" button
+
+            step = "waiting for 'Invite people' button"
             WebDriverWait(driver, 20).until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, '[data-qa="admin_invite_people_btn"]')
                 )
             ).click()
-            # Wait for invite modal
+
+            step = "waiting for invite modal"
             WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located(
                     (By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]')
                 )
             )
+
+            step = "entering emails into invite field"
             invite_input = driver.find_element(
                 By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]'
             )
-            # Enter each email and press Enter after each
             from selenium.webdriver.common.keys import Keys
 
             for email in emails:
                 invite_input.send_keys(email)
                 invite_input.send_keys(Keys.ENTER)
                 time.sleep(0.2)
-            # Dismiss modal overlay if present before clicking Send
+
+            step = "dismissing modal overlays before sending"
             try:
                 overlays = driver.find_elements(By.CLASS_NAME, "ReactModal__Overlay")
                 for overlay in overlays:
@@ -137,7 +168,8 @@ def slack_invite_approval(request):
                             pass
             except Exception:
                 pass
-            # Wait for Send button to be enabled and clickable
+
+            step = "waiting for Send button to be enabled"
             WebDriverWait(driver, 10).until(
                 lambda d: d.find_element(
                     By.XPATH,
@@ -150,40 +182,41 @@ def slack_invite_approval(request):
                 .get_attribute("class")
                 .__contains__("c-button--disabled")
             )
+
+            step = "clicking Send button"
             send_btn = driver.find_element(
                 By.XPATH,
                 '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
             )
             send_btn.click()
-            # Try to detect success, but if no exception, treat as success
-            # success variable removed (was unused)
+
+            step = "waiting for success indicator"
             try:
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located(
                         (By.XPATH, '//*[contains(text(), "You\'ve invited")]')
                     )
                 )
-                # success variable removed (was unused)
             except Exception:
                 # Try alternate success indicators
                 try:
                     driver.find_element(
                         By.XPATH, '//*[contains(text(), "already a member")]'
                     )
-                    # success variable removed (was unused)
                 except Exception:
                     try:
                         driver.find_element(
                             By.XPATH, '//*[contains(text(), "already been invited")]'
                         )
-                        # success variable removed (was unused)
                     except Exception:
                         pass
+
             # If no exception was raised during the process, treat as success
             log.status = 2
             log.save()
             driver.quit()
             processing_time = round(_time.time() - start_time, 2)
+
         except Exception as e:
             log.status = 3
             page_source = ""
@@ -191,7 +224,7 @@ def slack_invite_approval(request):
                 page_source = driver.page_source
             except Exception:
                 pass
-            log.message = f"Selenium error: {e}\n\nPage source:\n{page_source}"
+            log.message = f"Selenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
             log.save()
             try:
                 driver.quit()
@@ -206,13 +239,15 @@ def slack_invite_approval(request):
 
                 send_mail(
                     subject="Slack Invite Failure",
-                    message=f"Slack invite failed for: {emails_raw}\nPurpose: {purpose}\nError: {e}\n\nSee SlackInviteLog for details.",
+                    message=f"Slack invite failed for: {emails_raw}\nPurpose: {purpose}\nStep: {step}\nError: {e}\n\nSee SlackInviteLog for details.",
                     from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
                     recipient_list=recipients,
                 )
             processing_time = round(_time.time() - start_time, 2)
             # Show error to user and preserve form fields
-            messages.error(request, f"Slack invite failed: {e}")
+            messages.error(
+                request, f"Slack invite failed at step: {step}. Exception: {e}"
+            )
             return render(
                 request,
                 "members/slack_invite_approval.html",
@@ -221,6 +256,8 @@ def slack_invite_approval(request):
                     "purpose": purpose,
                 },
             )
+            driver.quit()
+            processing_time = round(_time.time() - start_time, 2)
         # Always show success to user, even if error occurred
         return render(
             request,

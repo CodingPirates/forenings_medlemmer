@@ -36,8 +36,8 @@
         {% csrf_token %}
         <div class="form-group" style="margin-bottom: 28px;">
             <label for="emails">Email(s)</label>
-            <input type="text" name="emails" id="emails" required class="form-control" placeholder="Skriv en eller flere email adresser, adskilt af mellemrum" value="{{ emails|default:'' }}" />
-            <small class="form-text text-muted">Du kan skrive flere email addresser, adskilt af mellemrum.</small>
+            <textarea name="emails" id="emails" required class="form-control" rows="4" placeholder="Skriv én email pr. linje">{{ emails|default:'' }}</textarea>
+            <small class="form-text text-muted">Skriv én email pr. linje.</small>
         </div>
         <div class="form-group" style="margin-bottom: 28px;">
             <label for="purpose">Formål</label>
@@ -59,8 +59,8 @@
             alert.style.display = 'none';
         });
         // Disable fields and button
-        document.getElementById('emails').setAttribute('disabled', 'disabled');
-        document.getElementById('purpose').setAttribute('disabled', 'disabled');
+        // document.getElementById('emails').setAttribute('disabled', 'disabled');
+        // document.getElementById('purpose').setAttribute('disabled', 'disabled');
         var btn = document.querySelector('#invite-form button[type="submit"]');
         if (btn) {
             btn.setAttribute('disabled', 'disabled');
