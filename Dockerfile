@@ -4,8 +4,10 @@ WORKDIR /app
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update && apt-get install -y \
     graphviz \
-    nodejs
-
+    nodejs 
+    
+RUN apt-get update && apt-get install -y chromium
+RUN apt-get update && apt-get install -y chromium-driver
 
 RUN npm install -g npm
 
