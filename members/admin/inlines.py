@@ -145,7 +145,15 @@ class PersonInline(admin.TabularInline):
     admin_link.short_description = "Navn"
 
     model = Person
-    fields = ("admin_link", "membertype", "zipcode", "added_at", "notes")
+
+    def login_email(self, instance):
+        if instance.user:
+            return instance.user.email or "(ingen email)"
+        return "—"
+
+    login_email.short_description = "Login E-mail"
+
+    fields = ("admin_link", "membertype", "zipcode", "added_at", "notes", "login_email")
     readonly_fields = fields
     can_delete = False
     classes = ["hideheader"]
