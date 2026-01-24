@@ -162,7 +162,14 @@ class UnionAdmin(admin.ModelAdmin):
     search_help_text = "Du kan søge på forening (navn, adresse, email)"
 
     filter_horizontal = ["board_members"]
-    raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
+
+    autocomplete_fields = (
+        "address",
+        "chairman",
+        "second_chair",
+        "cashier",
+        "secretary",
+    )
 
     actions = ["export_csv_union_info"]
 

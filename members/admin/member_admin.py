@@ -38,10 +38,7 @@ class MemberAdmin(admin.ModelAdmin):
         ("person__birthday", DateRangeFilterBuilder()),
     ]
 
-    raw_id_fields = [
-        "union",
-        "person",
-    ]
+    autocomplete_fields = ("union", "person")
 
     def get_queryset(self, request):
         qs = super(MemberAdmin, self).get_queryset(request)

@@ -66,13 +66,12 @@ class PersonAdmin(admin.ModelAdmin):
         AnonymizedFilter,
     )
     search_fields = ("name", "family__email", "notes")
-    autocomplete_fields = ["municipality"]
+    autocomplete_fields = ["municipality", "user", "family"]
     actions = [
         AdminActions.invite_many_to_activity_action,
         "export_emaillist",
         "export_csv",
     ]
-    raw_id_fields = ("family", "user")
 
     inlines = [
         PaymentInline,
