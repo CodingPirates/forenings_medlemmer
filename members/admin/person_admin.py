@@ -5,7 +5,9 @@ from django.contrib import admin
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.utils.html import format_html
+from django.utils.html import escape, format_html
+from django.utils.safestring import mark_safe
+
 from django.urls import reverse
 
 from members.models import (
@@ -41,10 +43,11 @@ class PersonAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
-        "name",
+        "key_column",
+        "person_link",
         "membertype",
         "gender_text",
-        "family_url",
+        "family_link",
         "age_years",
         "zipcode",
         "added_at",
@@ -67,6 +70,11 @@ class PersonAdmin(admin.ModelAdmin):
     )
     search_fields = ("name", "family__email", "notes")
     autocomplete_fields = ["municipality"]
+
+    @admin.display(ordering="pk", description="key")
+    def key_column(self, obj):
+        return obj.pk
+
     actions = [
         AdminActions.invite_many_to_activity_action,
         "export_emaillist",
@@ -96,13 +104,21 @@ class PersonAdmin(admin.ModelAdmin):
 
         return actions
 
-    def family_url(self, item):
+    def person_link(self, item):
+        url = reverse("admin:members_person_change", args=[item.id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.name))
+        return mark_safe(link)
+
+    person_link.short_description = "Person"
+    person_link.admin_order_field = "name"
+
+    def family_link(self, item):
         return format_html(
             '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
         )
 
-    family_url.allow_tags = True
-    family_url.short_description = "Familie"
+    family_link.allow_tags = True
+    family_link.short_description = "Familie"
 
     def family_referer(self, item):
         return item.family.referer

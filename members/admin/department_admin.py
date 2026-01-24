@@ -142,6 +142,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     def get_list_display(self, request):
         base = [
+            "key_column",
             "department_link",
             "address",
             "department_email",
@@ -156,6 +157,10 @@ class DepartmentAdmin(admin.ModelAdmin):
             base.append("department_activitymode_code")
         base.append("department_union_link")
         return base
+
+    @admin.display(ordering="pk", description="key")
+    def key_column(self, obj):
+        return obj.pk
 
     def get_list_filter(self, request):
         base = [

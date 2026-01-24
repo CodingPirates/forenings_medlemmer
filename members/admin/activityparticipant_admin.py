@@ -203,6 +203,7 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
     list_display = [
+        "key_column",
         "activity_link",
         "added_at",
         "activity_person_link",
@@ -216,6 +217,10 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "activity_activitytype",
         "activity_department_link",
     ]
+
+    @admin.display(ordering="pk", description="key")
+    def key_column(self, obj):
+        return obj.pk
 
     list_filter = (
         ActivityParticipantUnionFilter,

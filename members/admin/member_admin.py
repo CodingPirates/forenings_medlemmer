@@ -1,5 +1,8 @@
+from glob import escape
 from django.conf import settings
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from members.models import (
     Union,
@@ -24,11 +27,16 @@ class MemberAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
     date_hierarchy = "member_since"
     list_display = [
-        "person",
-        "union",
+        "key_column",
+        "person_link",
+        "union_link",
         "member_since",
         "member_until",
     ]
+
+    @admin.display(ordering="pk", description="key")
+    def key_column(self, obj):
+        return obj.pk
 
     list_filter = [
         "person__gender",
@@ -36,11 +44,6 @@ class MemberAdmin(admin.ModelAdmin):
         MemberLastYearListFilter,
         MemberAdminListFilter,
         ("person__birthday", DateRangeFilterBuilder()),
-    ]
-
-    raw_id_fields = [
-        "union",
-        "person",
     ]
 
     def get_queryset(self, request):
@@ -56,3 +59,19 @@ class MemberAdmin(admin.ModelAdmin):
                 adminuserinformation__user=request.user
             ).values("id")
             return qs.filter(union__in=unions)
+
+    def person_link(self, item):
+        url = reverse("admin:members_person_change", args=[item.person_id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.name))
+        return mark_safe(link)
+
+    person_link.short_description = "Person"
+    person_link.admin_order_field = "person__name"
+
+    def union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.union_id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.union.name))
+        return mark_safe(link)
+
+    union_link.short_description = "Forening"
+    union_link.admin_order_field = "union__name"

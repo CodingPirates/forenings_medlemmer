@@ -25,7 +25,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = [
-        "pk",
+        "key_column",
         "get_added_at_display",
         "payment_type",
         "amount_ore",
@@ -43,6 +43,10 @@ class PaymentAdmin(admin.ModelAdmin):
         "payment_type",
         "activity",
     ]
+
+    @admin.display(ordering="pk", description="key")
+    def key_column(self, obj):
+        return obj.pk
 
     # raw_id_fields = ("person", "family", "member")
     def get_added_at_display(self, obj):

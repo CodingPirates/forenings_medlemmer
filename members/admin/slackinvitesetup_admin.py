@@ -40,9 +40,13 @@ class SlackInvitationSetupForm(forms.ModelForm):
 
 class SlackInvitationSetupAdmin(admin.ModelAdmin):
     form = SlackInvitationSetupForm
-    list_display = ("invite_url", "updated_at", "updated_by")
+    list_display = ("key_column", "invite_url", "updated_at", "updated_by")
     readonly_fields = ("updated_at", "updated_by")
 
     def save_model(self, request, obj, form, change):
         obj.updated_by = request.user
         super().save_model(request, obj, form, change)
+
+    @admin.display(ordering="pk", description="key")
+    def key_column(self, obj):
+        return obj.pk

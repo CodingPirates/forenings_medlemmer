@@ -137,6 +137,7 @@ class AdminUserUnionInline(admin.TabularInline):
 class UnionAdmin(admin.ModelAdmin):
     inlines = [AdminUserUnionInline]
     list_display = (
+        "key_column",
         "union_link",
         "address",
         "email",
@@ -165,6 +166,10 @@ class UnionAdmin(admin.ModelAdmin):
     raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
 
     actions = ["export_csv_union_info"]
+
+    @admin.display(ordering="pk", description="key")
+    def key_column(self, obj):
+        return obj.pk
 
     def get_fieldsets(self, request, obj=None):
         # 20241113: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
