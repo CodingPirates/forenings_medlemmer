@@ -254,6 +254,8 @@ class WaitingListAdmin(admin.ModelAdmin):
         'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
     )
 
+    autocomplete_fields = ("department", "person")
+
     actions = [
         "delete_many_from_department_waitinglist_action",
         AdminActions.invite_many_to_activity_action,

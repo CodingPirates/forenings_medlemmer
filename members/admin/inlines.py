@@ -22,7 +22,7 @@ class ActivityInviteInline(admin.TabularInline):
     model = ActivityInvite
     extra = 0
     can_delete = False
-    raw_id_fields = ("activity",)
+    autocomplete_fields = ("activity",)
 
     fieldsets = (
         (
@@ -112,7 +112,7 @@ class EquipmentLoanInline(admin.TabularInline):
     )
     readonly_fields = ("loaned_dtm",)
     can_delete = False
-    raw_id_fields = ("person",)
+    autocomplete_fields = ("person", "department")
     formfield_overrides = {
         models.TextField: {"widget": Textarea(attrs={"rows": 2, "cols": 40})}
     }

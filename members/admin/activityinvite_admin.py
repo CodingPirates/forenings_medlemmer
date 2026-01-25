@@ -198,6 +198,8 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
 
+    autocomplete_fields = ("person", "activity")
+
     actions = [
         "export_csv_invitation_info",
         "extend_invitations",

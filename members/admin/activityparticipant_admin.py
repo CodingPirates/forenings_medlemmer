@@ -236,7 +236,6 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         "note",
     )
     date_hierarchy = "activity__start_date"
-    raw_id_fields = ("activity",)
     search_fields = (
         "person__name",
         "activity__name",

@@ -148,10 +148,7 @@ class MemberAdmin(admin.ModelAdmin):
         ("person__birthday", DateRangeFilterBuilder()),
     ]
 
-    raw_id_fields = [
-        "union",
-        "person",
-    ]
+    autocomplete_fields = ("union", "person")
 
     actions = ["export_csv_member_info", "export_csv_member_address"]
 

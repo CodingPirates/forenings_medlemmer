@@ -110,7 +110,10 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
 
 class DepartmentAdmin(admin.ModelAdmin):
+
     inlines = [AdminUserDepartmentInline]
+
+    autocomplete_fields = ("union", "address")
 
     def get_fieldsets(self, request, obj=None):
         # Copy the default fieldsets
@@ -173,8 +176,6 @@ class DepartmentAdmin(admin.ModelAdmin):
             base.append("activity_mode")
         return base
 
-    autocomplete_fields = ("union",)
-
     def get_search_results(self, request, queryset, search_term):
         # Only show open departments in autocomplete (closed_dtm is None or in the future)
         if request.path.endswith("/autocomplete/"):
@@ -184,7 +185,6 @@ class DepartmentAdmin(admin.ModelAdmin):
             )
         return super().get_search_results(request, queryset, search_term)
 
-    raw_id_fields = ("union",)
     search_fields = (
         "name",
         "union__name",
