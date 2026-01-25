@@ -15,9 +15,12 @@ from .inlines import (
 class FamilyAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         if request.user.has_perm("members.view_family_unique"):
-            return ("email", "unique")
+            return ("id", "email", "unique")
         else:
-            return ("email",)
+            return (
+                "id",
+                "email",
+            )
 
     search_fields = ("email",)
 

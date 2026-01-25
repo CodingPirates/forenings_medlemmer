@@ -34,10 +34,17 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
 
     email_summary.short_description = "Email(s)"
 
-    list_display = ("formatted_created_at", "email_summary", "created_by", "status")
+    list_display = (
+        "id",
+        "formatted_created_at",
+        "email_summary",
+        "created_by",
+        "status",
+    )
     list_filter = ("status", CreatedBySlackLogFilter)
     search_fields = ("email", "message")
     readonly_fields = (
+        "id",
         "created_at",
         "email_multiline",
         "purpose",

@@ -25,7 +25,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = [
-        "pk",
+        "id",
         "get_added_at_display",
         "payment_type",
         "amount_ore",
@@ -44,7 +44,6 @@ class PaymentAdmin(admin.ModelAdmin):
         "activity",
     ]
 
-    # raw_id_fields = ("person", "family", "member")
     def get_added_at_display(self, obj):
         return obj.added_at.strftime("%Y-%m-%d %H:%M") if obj.added_at else ""
 
@@ -80,7 +79,6 @@ class PaymentAdmin(admin.ModelAdmin):
 
     get_member_display.short_description = "medlemskab"
     list_filter = ["payment_type", "activity"]
-    raw_id_fields = ("person", "activityparticipant", "family", "member")
     date_hierarchy = "added_at"
     search_fields = ("family__email",)
     select_related = "activityparticipant"

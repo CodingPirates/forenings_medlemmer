@@ -194,7 +194,8 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def get_list_display(self, request):
         base = [
-            "name",
+            "id",
+            "activity_link",
             "activitytype",
             "start_end",
             "open_invite",
@@ -280,7 +281,7 @@ class ActivityAdmin(admin.ModelAdmin):
         base = [
             "seats_left",
             "participants",
-            "activity_link",
+            "activity_url",
             "addressregion",
         ]
         # Only allow users with 'members.change_season_fee' to edit the field and reason
@@ -319,10 +320,6 @@ class ActivityAdmin(admin.ModelAdmin):
             return new_fieldsets
         return fieldsets
 
-    raw_id_fields = (
-        "union",
-        "department",
-    )
     list_filter = (
         ActivityUnionListFilter,
         ActivityDepartmentListFilter,
@@ -408,7 +405,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     activity_membership_union_link.short_description = "Forening for medlemskab"
 
-    def activity_link(self, obj):
+    def activity_url(self, obj):
         if obj.id is None:
             return ""
 
@@ -425,7 +422,15 @@ class ActivityAdmin(admin.ModelAdmin):
 
         return mark_safe(link)
 
-    activity_link.short_description = "Link til aktivitet"
+    activity_url.short_description = "Link til aktivitet"
+
+    def activity_link(self, item):
+        url = reverse("admin:members_activity_change", args=[item.id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.name))
+        return mark_safe(link)
+
+    activity_link.short_description = "Aktivitet"
+    activity_link.admin_order_field = "activity__name"
 
     # Only view activities on own department
     def get_queryset(self, request):
@@ -542,7 +547,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     "activitytype",
                     "season_fee",
                     "season_fee_change_reason",
-                    "activity_link",
+                    "activity_url",
                     "open_hours",
                     "description",
                     (
