@@ -133,7 +133,6 @@ def ActivitySignup(request, activity_id, person_id=None):
     # check if activity is full
     if activity.seats_left() <= 0:
         view_only_mode = True  # activity full
-    #    signup_closed = True
 
     if invitation is not None:
         price = invitation.price_in_dkk
