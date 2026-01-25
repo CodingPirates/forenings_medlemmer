@@ -198,6 +198,8 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
 
+    autocomplete_fields = ("person", "activity")
+
     actions = [
         "export_csv_invitation_info",
         "extend_invitations",
@@ -379,7 +381,9 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         )
         return response
 
-    export_csv_invitation_info.short_description = "Exporter Invitationsinformationer"
+    export_csv_invitation_info.short_description = (
+        "Eksporter invitationsinformationer (CSV)"
+    )
 
     def extend_invitations(modelAdmin, request, queryset):
         class ExtendInvitationsForm(forms.Form):

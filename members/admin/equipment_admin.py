@@ -12,7 +12,7 @@ class EquipmentAdmin(admin.ModelAdmin):
     list_filter = ["department", "union"]
     list_display = ["id", "title", "count", "union_link", "department_link"]
     search_fields = ("title", "notes")
-    raw_id_fields = ("department", "union")
+    autocomplete_fields = ("department", "union")
     inlines = (EquipmentLoanInline,)
 
     def union_link(self, item):

@@ -324,10 +324,6 @@ class ActivityAdmin(admin.ModelAdmin):
             return new_fieldsets
         return fieldsets
 
-    raw_id_fields = (
-        "union",
-        "department",
-    )
     list_filter = (
         ActivityUnionListFilter,
         ActivityDepartmentListFilter,

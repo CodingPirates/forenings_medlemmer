@@ -172,14 +172,28 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
         return departments
 
     def queryset(self, request, queryset):
+        from django.db.models import Exists, OuterRef
+        from members.models import WaitingList
+
         if self.value() == "any":
-            return queryset.exclude(waitinglist__isnull=True)
+            waitinglist_exists = WaitingList.objects.filter(person=OuterRef("pk"))
+            return queryset.annotate(on_waitinglist=Exists(waitinglist_exists)).filter(
+                on_waitinglist=True
+            )
         elif self.value() == "none":
-            return queryset.filter(waitinglist__isnull=True)
+            waitinglist_exists = WaitingList.objects.filter(person=OuterRef("pk"))
+            return queryset.annotate(on_waitinglist=Exists(waitinglist_exists)).filter(
+                on_waitinglist=False
+            )
         elif self.value() is None:
             return queryset
         else:
-            return queryset.filter(waitinglist__department__pk=self.value())
+            waitinglist_in_dept = WaitingList.objects.filter(
+                person=OuterRef("pk"), department__pk=self.value()
+            )
+            return queryset.annotate(on_waitinglist=Exists(waitinglist_in_dept)).filter(
+                on_waitinglist=True
+            )
 
 
 class VolunteerListFilter(admin.SimpleListFilter):

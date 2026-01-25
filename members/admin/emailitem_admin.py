@@ -151,11 +151,17 @@ class EmailItemAdmin(admin.ModelAdmin):
     ]
 
     date_hierarchy = "created_dtm"
-    search_fields = ("person__name", "family__email", "activity__name", "subject")
+    search_fields = (
+        "person__name",
+        "family__email",
+        "activity__name",
+        "subject",
+    )
     search_help_text = mark_safe(
         "Du kan søge på personnavn, familie-email, afdelingsnavn, aktivitetsnavn eller email emne.<br>Vandret dato-filter er for hvornår emailen er oprettet"
     )
     readonly_fields = ("created_dtm", "send_error", "sent_dtm")
+    autocomplete_fields = ("person", "family", "activity", "department")
 
     def get_queryset(self, request):
         qs = super(EmailItemAdmin, self).get_queryset(request)
