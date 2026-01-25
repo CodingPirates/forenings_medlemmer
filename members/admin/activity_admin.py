@@ -194,7 +194,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def get_list_display(self, request):
         base = [
-            "key_column",
+            "id",
             "activity_link",
             "activitytype",
             "start_end",
@@ -209,10 +209,6 @@ class ActivityAdmin(admin.ModelAdmin):
             base += ["season_fee_short"]
         base += ["union_link", "department_link"]
         return base
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     def season_fee_update_view(self, request):
         # Get selected activity IDs from query params
