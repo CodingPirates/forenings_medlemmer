@@ -115,7 +115,6 @@ class AddressAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "key_column",
         "streetname",
         "housenumber",
         "floor",
@@ -129,7 +128,7 @@ class AddressAdmin(admin.ModelAdmin):
     )
 
     list_display = (
-        "key_column",
+        "id",
         "streetname",
         "housenumber",
         "floor",
@@ -151,10 +150,6 @@ class AddressAdmin(admin.ModelAdmin):
     inlines = [AddressUnionInline, AddressDepartmentInline, AddressActivityInline]
 
     list_filter = (AddressRegionListFilter,)
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     def get_queryset(self, request):
         return Address.get_user_addresses(request.user)

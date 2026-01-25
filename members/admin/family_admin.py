@@ -15,16 +15,12 @@ from .inlines import (
 class FamilyAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         if request.user.has_perm("members.view_family_unique"):
-            return ("key_column", "email", "unique")
+            return ("id", "email", "unique")
         else:
             return (
-                "key_column",
+                "id",
                 "email",
             )
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     search_fields = ("email",)
 

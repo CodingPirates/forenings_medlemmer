@@ -10,14 +10,10 @@ class EquipmentAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_filter = ["department", "union"]
-    list_display = ["key_column", "title", "count", "union_link", "department_link"]
+    list_display = ["id", "title", "count", "union_link", "department_link"]
     search_fields = ("title", "notes")
     raw_id_fields = ("department", "union")
     inlines = (EquipmentLoanInline,)
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.union_id])

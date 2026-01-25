@@ -165,7 +165,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     list_per_page = settings.LIST_PER_PAGE
     list_display = (
-        "key_column",
+        "id",
         "person_link",
         "activity_link",
         "person_age_years",
@@ -197,10 +197,6 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     search_help_text = mark_safe(
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     actions = [
         "export_csv_invitation_info",

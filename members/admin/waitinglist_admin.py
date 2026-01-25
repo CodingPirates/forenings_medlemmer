@@ -219,7 +219,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
-        "key_column",
+        "id",
         "department_link",
         "person_link",
         "person_age_years",
@@ -259,10 +259,6 @@ class WaitingListAdmin(admin.ModelAdmin):
         "delete_many_from_department_waitinglist_action",
         AdminActions.invite_many_to_activity_action,
     ]
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     def get_actions(self, request):
         actions = super().get_actions(request)

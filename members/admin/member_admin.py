@@ -27,16 +27,12 @@ class MemberAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
     date_hierarchy = "member_since"
     list_display = [
-        "key_column",
+        "id",
         "person_link",
         "union_link",
         "member_since",
         "member_until",
     ]
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     list_filter = [
         "person__gender",

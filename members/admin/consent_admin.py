@@ -12,7 +12,7 @@ class ConsentAdmin(admin.ModelAdmin):
     change_form_template = "admin/members/consent/change_form.html"
     list_per_page = settings.LIST_PER_PAGE
     list_display = (
-        "key_column",
+        "id",
         "released_at",
         "title",
         "active",
@@ -28,10 +28,6 @@ class ConsentAdmin(admin.ModelAdmin):
     active.short_description = "Aktiv"
     active.boolean = True
     active.admin_order_field = "is_active"
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     def preview_link(self, obj):
         if obj.id is None:

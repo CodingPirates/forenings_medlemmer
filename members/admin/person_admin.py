@@ -43,7 +43,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
-        "key_column",
+        "id",
         "person_link",
         "membertype",
         "gender_text",
@@ -70,10 +70,6 @@ class PersonAdmin(admin.ModelAdmin):
     )
     search_fields = ("name", "family__email", "notes")
     autocomplete_fields = ["municipality"]
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     actions = [
         AdminActions.invite_many_to_activity_action,

@@ -35,7 +35,7 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
     email_summary.short_description = "Email(s)"
 
     list_display = (
-        "key_column",
+        "id",
         "formatted_created_at",
         "email_summary",
         "created_by",
@@ -44,7 +44,7 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
     list_filter = ("status", CreatedBySlackLogFilter)
     search_fields = ("email", "message")
     readonly_fields = (
-        "key_column",
+        "id",
         "created_at",
         "email_multiline",
         "purpose",
@@ -78,7 +78,3 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
         return obj.created_at.strftime("%Y-%m-%d %H:%M:%S") if obj.created_at else ""
 
     created_at_display.short_description = "Created at"
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk

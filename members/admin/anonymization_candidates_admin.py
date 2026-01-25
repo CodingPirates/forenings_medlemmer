@@ -96,7 +96,7 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
     # Custom list display with requested columns
     list_display = (
-        "key_column",
+        "id",
         "person_link",
         "membertype",
         "gender_text",

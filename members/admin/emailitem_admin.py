@@ -137,17 +137,13 @@ class EmailItemAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = [
-        "key_column",
+        "id",
         "created_dtm",
         "receiver",
         "departmentName",
         "activityName",
         "subject",
     ]
-
-    @admin.display(ordering="pk", description="key")
-    def key_column(self, obj):
-        return obj.pk
 
     list_filter = [
         departmentFilter,
