@@ -16,6 +16,9 @@ class Member(models.Model):
     class Meta:
         verbose_name = "Medlem"
         verbose_name_plural = "Medlemmer"
+        permissions = [
+            ("member_export_address", "Kan eksportere medlemsadresser"),
+        ]
 
     union = models.ForeignKey(
         "Union", on_delete=models.PROTECT, verbose_name="Forening"
