@@ -137,12 +137,14 @@ class EmailItemAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = [
+        "id",
         "created_dtm",
         "receiver",
         "departmentName",
         "activityName",
         "subject",
     ]
+
     list_filter = [
         departmentFilter,
         activityFilter,

@@ -115,7 +115,6 @@ class AddressAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "id",
         "streetname",
         "housenumber",
         "floor",

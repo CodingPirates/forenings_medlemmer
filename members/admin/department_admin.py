@@ -145,6 +145,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     def get_list_display(self, request):
         base = [
+            "id",
             "department_link",
             "address",
             "department_email",

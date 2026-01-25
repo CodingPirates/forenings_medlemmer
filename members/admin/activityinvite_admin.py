@@ -165,7 +165,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     list_per_page = settings.LIST_PER_PAGE
     list_display = (
-        "pk",
+        "id",
         "person_link",
         "activity_link",
         "person_age_years",

@@ -1,9 +1,12 @@
+from glob import escape
 import codecs
 import csv
 from io import StringIO
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from members.models import (
     Union,
@@ -134,8 +137,9 @@ class MemberAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
     date_hierarchy = "member_since"
     list_display = [
-        "person",
-        "union",
+        "id",
+        "person_link",
+        "union_link",
         "member_since",
         "member_until",
     ]
@@ -165,6 +169,22 @@ class MemberAdmin(admin.ModelAdmin):
                 adminuserinformation__user=request.user
             ).values("id")
             return qs.filter(union__in=unions)
+
+    def person_link(self, item):
+        url = reverse("admin:members_person_change", args=[item.person_id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.person.name))
+        return mark_safe(link)
+
+    person_link.short_description = "Person"
+    person_link.admin_order_field = "person__name"
+
+    def union_link(self, item):
+        url = reverse("admin:members_union_change", args=[item.union_id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.union.name))
+        return mark_safe(link)
+
+    union_link.short_description = "Forening"
+    union_link.admin_order_field = "union__name"
 
     def export_csv_member_info(self, request, queryset):
         result_string = generate_member_csv(queryset, include_address=False)

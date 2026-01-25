@@ -219,6 +219,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
+        "id",
         "department_link",
         "person_link",
         "person_age_years",

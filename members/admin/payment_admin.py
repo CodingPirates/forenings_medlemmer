@@ -25,7 +25,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = [
-        "pk",
+        "id",
         "get_added_at_display",
         "payment_type",
         "amount_ore",
