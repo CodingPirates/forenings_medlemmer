@@ -185,6 +185,7 @@ class MemberAdmin(admin.ModelAdmin):
 
     union_link.short_description = "Forening"
     union_link.admin_order_field = "union__name"
+
     def export_csv_member_info(self, request, queryset):
         result_string = generate_member_csv(queryset, include_address=False)
         response = HttpResponse(
