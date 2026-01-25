@@ -134,7 +134,7 @@ class PersonInline(admin.TabularInline):
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
 
-    def admin_link(self, instance):
+    def person_link(self, instance):
         url = reverse(
             "admin:%s_%s_change"
             % (instance._meta.app_label, instance._meta.model_name),
@@ -142,18 +142,26 @@ class PersonInline(admin.TabularInline):
         )
         return format_html('<a href="{}">{}</a>', url, instance.name)
 
-    admin_link.short_description = "Navn"
+    person_link.short_description = "Navn"
 
     model = Person
 
-    def login_email(self, instance):
+    def username(self, instance):
         if instance.user:
             return instance.user.email or "(ingen email)"
         return "—"
 
-    login_email.short_description = "Login E-mail"
+    username.short_description = "Brugernavn"
 
-    fields = ("admin_link", "membertype", "zipcode", "added_at", "notes", "login_email")
+    fields = (
+        "person_link",
+        "membertype",
+        "zipcode",
+        "added_at",
+        "notes",
+        "email",
+        "username",
+    )
     readonly_fields = fields
     can_delete = False
     classes = ["hideheader"]
