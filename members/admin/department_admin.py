@@ -460,7 +460,9 @@ class DepartmentAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = 'attachment; filename="afdelingsinfo.csv"'
         return response
 
-    export_department_info_csv.short_description = "Exporter Afdelingsinfo (CSV)"
+    export_department_info_csv.short_description = (
+        "Eksporter afdelingsinformationer (CSV)"
+    )
 
 
 def GetLastDate(department_id, activity_type):
