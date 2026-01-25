@@ -2,7 +2,9 @@ import codecs
 from django.conf import settings
 from django.contrib import admin
 from django.http import HttpResponse
-from django.utils.html import format_html
+from django.utils.html import format_html, escape
+from django.utils.safestring import mark_safe
+from django.urls import reverse
 
 from members.models import ActivityParticipant
 
@@ -94,10 +96,11 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
 
     # Custom list display with requested columns
     list_display = (
-        "name",
+        "id",
+        "person_link",
         "membertype",
         "gender_text",
-        "family_url",
+        "family_link",
         "age_years",
         "last_active",
         "latest_activity",
@@ -116,6 +119,14 @@ class AnonymizationCandidatesAdmin(PersonAdmin):
         "export_anonymization_candidates_csv",
         "anonymize_persons",
     ]
+
+    def person_link(self, item):
+        url = reverse("admin:members_person_change", args=[item.id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.name))
+        return mark_safe(link)
+
+    person_link.short_description = "Person"
+    person_link.admin_order_field = "name"
 
     # Override title and description
     def changelist_view(self, request, extra_context=None):

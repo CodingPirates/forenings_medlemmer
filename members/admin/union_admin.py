@@ -135,8 +135,10 @@ class AdminUserUnionInline(admin.TabularInline):
 
 
 class UnionAdmin(admin.ModelAdmin):
+    list_per_page = settings.LIST_PER_PAGE
     inlines = [AdminUserUnionInline]
     list_display = (
+        "id",
         "union_link",
         "address",
         "email",
@@ -162,7 +164,14 @@ class UnionAdmin(admin.ModelAdmin):
     search_help_text = "Du kan søge på forening (navn, adresse, email)"
 
     filter_horizontal = ["board_members"]
-    raw_id_fields = ("chairman", "second_chair", "cashier", "secretary")
+
+    autocomplete_fields = (
+        "address",
+        "chairman",
+        "second_chair",
+        "cashier",
+        "secretary",
+    )
 
     actions = ["export_csv_union_info"]
 
@@ -307,7 +316,7 @@ class UnionAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = 'attachment; filename="foreningsoversigt.csv"'
         return response
 
-    export_csv_union_info.short_description = "Exporter Foreningsinformationer"
+    export_csv_union_info.short_description = "Eksporter foreningsinformationer (CSV)"
 
     def has_cvr_number(self, obj):
         return bool(obj.cvr and obj.cvr.strip())

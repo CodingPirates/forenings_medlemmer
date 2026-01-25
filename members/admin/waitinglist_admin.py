@@ -219,6 +219,7 @@ class WaitingListAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
+        "id",
         "department_link",
         "person_link",
         "person_age_years",
@@ -253,6 +254,8 @@ class WaitingListAdmin(admin.ModelAdmin):
         """Du kan søge på forening (navn), afdeling (navn) eller person (navn, postnummer eller kommune).<br>
         'Nummer på venteliste' er relateret til personernes oprettelsestidspunkt"""
     )
+
+    autocomplete_fields = ("department", "person")
 
     actions = [
         "delete_many_from_department_waitinglist_action",

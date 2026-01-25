@@ -4,5 +4,5 @@ from django.contrib import admin
 
 class MunicipalityAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
-    list_display = ("name", "address", "zipcode", "city", "dawa_id")
+    list_display = ("id", "name", "address", "zipcode", "city", "dawa_id")
     search_fields = ("name", "address", "zipcode", "city")
