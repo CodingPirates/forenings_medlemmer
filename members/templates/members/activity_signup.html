@@ -47,7 +47,7 @@
         <div class="col-lg-6">
           <p>
           <strong>Tilmeldingsfrist:</strong><br>
-            {{ activity.signup_closing}} (om {{ activity.signup_closing|timeuntil}})
+            {{ activity.signup_closing }} ({{ signup_closing_text }})
           </p>
         </div>
         <div class="col-lg-6">
@@ -98,6 +98,12 @@
         {% else %}
           {% if signup_closed %}
           <!--and not participating % -->
+            <hr>
+              <div class="alert alert-primary">
+                <p>Tilmeldingsfristen {{ signup_closing }} er desværre overskredet! Det er ikke længere muligt at tilmelde sig.</p>
+              </div>
+            <hr/>
+          {% elif seats_left <= 0 %}
             <hr>
               <div class="alert alert-primary">
                 <p>Aktiviteten er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>

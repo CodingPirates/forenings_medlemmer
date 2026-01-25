@@ -15,6 +15,8 @@ from members.models.payment import Payment
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 from members.utils.user import user_to_person
+from django.utils.timesince import timesince
+from django.utils.timezone import now as dj_now
 
 from members.utils.age_check import check_is_person_too_young
 from members.utils.age_check import check_is_person_too_old
@@ -107,6 +109,22 @@ def ActivitySignup(request, activity_id, person_id=None):
     # signup_closed should default to False
     signup_closed = False
 
+    # Beregn tekst til tilmeldingsfrist
+    signup_closing_text = ""
+    signup_closing_date = activity.signup_closing
+    today = dj_now().date()
+    if signup_closing_date < today:
+        dage_siden = timesince(signup_closing_date, today).split(",")[0]
+        signup_closing_text = f"for {dage_siden} siden"
+    else:
+        dage_til = (signup_closing_date - today).days
+        if dage_til == 0:
+            signup_closing_text = "i dag"
+        elif dage_til == 1:
+            signup_closing_text = "om 1 dag"
+        else:
+            signup_closing_text = f"om {dage_til} dage"
+
     # if activity is closed for signup, you should not be able to sign up
     if activity.signup_closing < timezone.now().date():
         view_only_mode = True  # Activivty closed for signup
@@ -115,7 +133,7 @@ def ActivitySignup(request, activity_id, person_id=None):
     # check if activity is full
     if activity.seats_left() <= 0:
         view_only_mode = True  # activity full
-        signup_closed = True
+    #    signup_closed = True
 
     if invitation is not None:
         price = invitation.price_in_dkk
@@ -279,5 +297,7 @@ def ActivitySignup(request, activity_id, person_id=None):
         "participating": participating,
         "union": union,
         "view_only_mode": view_only_mode,
+        "signup_closing": activity.signup_closing,
+        "signup_closing_text": signup_closing_text,
     }
     return render(request, "members/activity_signup.html", context)
