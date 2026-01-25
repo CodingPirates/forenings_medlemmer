@@ -1,12 +1,14 @@
 # Selenium imports
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # NoSuchElementException import removed (unused)
 import time
+import os
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib import messages
@@ -102,7 +104,52 @@ def slack_invite_approval(request):
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
-            driver = webdriver.Chrome(options=options)
+
+            # Configure binary paths for Docker container
+            # Try common locations for Chromium binary
+            chromium_paths = [
+                "/usr/bin/chromium",
+                "/usr/bin/chromium-browser",
+                "/usr/bin/google-chrome",
+            ]
+            chromium_binary = None
+            for path in chromium_paths:
+                if os.path.exists(path) and os.access(path, os.X_OK):
+                    chromium_binary = path
+                    break
+
+            if chromium_binary:
+                options.binary_location = chromium_binary
+            else:
+                error_msg = (
+                    f"Chromium binary not found in common locations: {chromium_paths}. "
+                    "To troubleshoot in Docker container, run: "
+                    "which chromium chromium-browser && ls -la /usr/bin/chromium*"
+                )
+                raise Exception(error_msg)
+
+            # Try common locations for ChromeDriver
+            chromedriver_paths = [
+                "/usr/bin/chromedriver",
+                "/usr/lib/chromium/chromedriver",
+                "/usr/lib/chromium-browser/chromedriver",
+            ]
+            chromedriver_binary = None
+            for path in chromedriver_paths:
+                if os.path.exists(path) and os.access(path, os.X_OK):
+                    chromedriver_binary = path
+                    break
+
+            if chromedriver_binary:
+                service = Service(chromedriver_binary)
+                driver = webdriver.Chrome(service=service, options=options)
+            else:
+                error_msg = (
+                    f"ChromeDriver not found in common locations: {chromedriver_paths}. "
+                    "To troubleshoot in Docker container, run: "
+                    "which chromedriver && ls -la /usr/bin/chromedriver /usr/lib/chromium*/chromedriver"
+                )
+                raise Exception(error_msg)
 
             step = "loading Slack invite URL"
             driver.get(invite_url)
@@ -268,5 +315,4 @@ def slack_invite_approval(request):
                 "invited_email": emails_raw,
             },
         )
-    return render(request, "members/slack_invite_approval.html")
     return render(request, "members/slack_invite_approval.html")

@@ -4,10 +4,9 @@ WORKDIR /app
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update && apt-get install -y \
     graphviz \
+    chromium \
+    chromium-driver \
     nodejs
-
-RUN apt-get update && apt-get install -y chromium
-RUN apt-get update && apt-get install -y chromium-driver
 
 RUN npm install -g npm
 
@@ -30,11 +29,7 @@ RUN pip install --upgrade pip \
     && pip install poetry \
     && poetry install
 
-
-
-
 EXPOSE 8000
-
 
 COPY entrypoint.sh entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
