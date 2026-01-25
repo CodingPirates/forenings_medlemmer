@@ -235,7 +235,7 @@ class PersonAdmin(admin.ModelAdmin):
 
         return HttpResponse(result_string, content_type="text/plain")
 
-    export_emaillist.short_description = "Exporter e-mail liste"
+    export_emaillist.short_description = "Eksporter familie e-mail liste (CSV)"
 
     def export_csv(self, request, queryset):
         result_string = "Navn;Alder;Køn;Opskrevet;Tlf (barn);Email (barn);"
@@ -286,7 +286,7 @@ class PersonAdmin(admin.ModelAdmin):
             response["Content-Disposition"] = 'attachment; filename="personer.csv"'
         return response
 
-    export_csv.short_description = "CSV Export"
+    export_csv.short_description = "Eksporter personinformationer (CSV)"
 
     def anonymize_persons(self, request, queryset):
         class MassConfirmForm(forms.Form):

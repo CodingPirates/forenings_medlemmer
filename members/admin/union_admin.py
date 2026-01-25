@@ -307,7 +307,7 @@ class UnionAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = 'attachment; filename="foreningsoversigt.csv"'
         return response
 
-    export_csv_union_info.short_description = "Exporter Foreningsinformationer"
+    export_csv_union_info.short_description = "Eksporter foreningsinformationer (CSV)"
 
     def has_cvr_number(self, obj):
         return bool(obj.cvr and obj.cvr.strip())
