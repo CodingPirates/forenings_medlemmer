@@ -59,8 +59,8 @@
             alert.style.display = 'none';
         });
         // Disable fields and button
-        // document.getElementById('emails').setAttribute('disabled', 'disabled');
-        // document.getElementById('purpose').setAttribute('disabled', 'disabled');
+        document.getElementById('emails').setAttribute('readonly', 'readonly');
+        document.getElementById('purpose').setAttribute('readonly', 'readonly');
         var btn = document.querySelector('#invite-form button[type="submit"]');
         if (btn) {
             btn.setAttribute('disabled', 'disabled');
