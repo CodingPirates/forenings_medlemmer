@@ -55,7 +55,6 @@ class SlackInvitationSetupForm(forms.ModelForm):
         return instance
 
 
-
 class SlackInvitationSetupAdmin(admin.ModelAdmin):
     form = SlackInvitationSetupForm
     list_display = ("id", "invite_url", "updated_at", "updated_by")
@@ -69,6 +68,7 @@ class SlackInvitationSetupAdmin(admin.ModelAdmin):
             except Exception as e:
                 return f"[TOTP error: {e}]"
         return "(ingen secret)"
+
     current_totp_code.short_description = "Aktuel TOTP-kode (6 cifre)"
 
     def save_model(self, request, obj, form, change):

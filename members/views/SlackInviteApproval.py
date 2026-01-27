@@ -32,9 +32,11 @@ def slack_invite_approval(request):
     if request.method == "POST":
         start_time = _time.time()
         step_log = []
+
         def log_step(step_name):
-            t = time.strftime('%Y-%m-%d %H:%M:%S')
+            t = time.strftime("%Y-%m-%d %H:%M:%S")
             step_log.append(f"[{t}] {step_name}")
+
         log_step("POST request received - start Slack invite flow")
         emails_raw = request.POST.get("emails", "")
         purpose = request.POST.get("purpose", "")
@@ -180,7 +182,6 @@ def slack_invite_approval(request):
                 EC.presence_of_element_located((By.ID, "email"))
             )
 
-
             step = "entering Slack admin credentials"
             log_step(step)
             time.sleep(random.uniform(1, 2))
@@ -206,7 +207,7 @@ def slack_invite_approval(request):
                         (By.ID, "totp"),
                         (By.NAME, "2fa_code"),
                         (By.NAME, "totp"),
-                        (By.CSS_SELECTOR, "input[type='tel']")
+                        (By.CSS_SELECTOR, "input[type='tel']"),
                     ]:
                         t0 = time.time()
                         try:
@@ -214,17 +215,23 @@ def slack_invite_approval(request):
                                 EC.presence_of_element_located(selector)
                             )
                             dt = round(time.time() - t0, 2)
-                            selector_timings.append(f"Selector {selector} succeeded after {dt}s")
+                            selector_timings.append(
+                                f"Selector {selector} succeeded after {dt}s"
+                            )
                             selector_used = selector
                             break
                         except Exception:
                             dt = round(time.time() - t0, 2)
-                            selector_timings.append(f"Selector {selector} failed after {dt}s")
+                            selector_timings.append(
+                                f"Selector {selector} failed after {dt}s"
+                            )
                             continue
                     for sel_log in selector_timings:
                         log_step(f"2FA selector: {sel_log}")
                     if not twofa_input:
-                        raise Exception("Could not find 2FA input field on Slack login page.")
+                        raise Exception(
+                            "Could not find 2FA input field on Slack login page."
+                        )
                     log_step(f"2FA input field found with selector: {selector_used}")
                     # Menneskelig pause før TOTP-kode genereres og indtastes
                     time.sleep(random.uniform(2, 5))
@@ -238,7 +245,7 @@ def slack_invite_approval(request):
                     log_step(step)
                     for btn_selector in [
                         (By.XPATH, "//button[@type='submit']"),
-                        (By.XPATH, "//button[contains(text(), 'Verify')]")
+                        (By.XPATH, "//button[contains(text(), 'Verify')]"),
                     ]:
                         try:
                             btn = driver.find_element(*btn_selector)
