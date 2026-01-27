@@ -18,6 +18,8 @@ from members.models.slackinvitelog import SlackInviteLog
 # send_mail import removed (imported only where needed)
 
 from django.conf import settings
+import pyotp
+import random
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
@@ -29,6 +31,11 @@ def slack_invite_approval(request):
 
     if request.method == "POST":
         start_time = _time.time()
+        step_log = []
+        def log_step(step_name):
+            t = time.strftime('%Y-%m-%d %H:%M:%S')
+            step_log.append(f"[{t}] {step_name}")
+        log_step("POST request received - start Slack invite flow")
         emails_raw = request.POST.get("emails", "")
         purpose = request.POST.get("purpose", "")
         user = request.user
@@ -36,6 +43,7 @@ def slack_invite_approval(request):
         invite_url = setup.invite_url if setup else None
         admin_username = setup.admin_username if setup else None
         admin_password = setup.admin_password if setup else None
+        totp_secret = setup.totp_secret if setup else None
         # Accept both newlines and spaces as delimiters, but prefer newlines
         emails = []
         for line in emails_raw.splitlines():
@@ -99,6 +107,7 @@ def slack_invite_approval(request):
             return render(request, "members/slack_invite_approval.html")
 
         step = "initializing Chrome"
+        log_step(step)
         try:
             options = webdriver.ChromeOptions()
             options.add_argument("--headless")
@@ -152,11 +161,13 @@ def slack_invite_approval(request):
                 raise Exception(error_msg)
 
             step = "loading Slack invite URL"
+            log_step(step)
             driver.get(invite_url)
 
             # Dismiss cookie banner if present
             try:
                 step = "dismissing cookie banner"
+                log_step(step)
                 WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.ID, "onetrust-reject-all-handler"))
                 ).click()
@@ -164,16 +175,84 @@ def slack_invite_approval(request):
                 pass  # Banner not present, continue
 
             step = "waiting for login form"
+            log_step(step)
             WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.ID, "email"))
             )
 
+
             step = "entering Slack admin credentials"
+            log_step(step)
+            time.sleep(random.uniform(1, 2))
             driver.find_element(By.ID, "email").send_keys(admin_username)
+            time.sleep(random.uniform(2, 3))
             driver.find_element(By.ID, "password").send_keys(admin_password)
+            # Tilføj menneskelig pause før login
+            time.sleep(random.uniform(1, 2))
             driver.find_element(By.XPATH, '//button[@type="submit"]').click()
 
+            # --- 2FA TOTP step ---
+            if totp_secret:
+                try:
+                    # Vent på at 2FA-feltet vises (kan hedde '2fa_code', 'totp', eller lignende)
+                    step = "waiting for 2FA input field"
+                    log_step(step)
+                    twofa_input = None
+                    selector_used = None
+                    selector_timings = []
+                    for selector in [
+                        (By.CSS_SELECTOR, "input[type='text']"),
+                        (By.ID, "2fa_code"),
+                        (By.ID, "totp"),
+                        (By.NAME, "2fa_code"),
+                        (By.NAME, "totp"),
+                        (By.CSS_SELECTOR, "input[type='tel']")
+                    ]:
+                        t0 = time.time()
+                        try:
+                            twofa_input = WebDriverWait(driver, 10).until(
+                                EC.presence_of_element_located(selector)
+                            )
+                            dt = round(time.time() - t0, 2)
+                            selector_timings.append(f"Selector {selector} succeeded after {dt}s")
+                            selector_used = selector
+                            break
+                        except Exception:
+                            dt = round(time.time() - t0, 2)
+                            selector_timings.append(f"Selector {selector} failed after {dt}s")
+                            continue
+                    for sel_log in selector_timings:
+                        log_step(f"2FA selector: {sel_log}")
+                    if not twofa_input:
+                        raise Exception("Could not find 2FA input field on Slack login page.")
+                    log_step(f"2FA input field found with selector: {selector_used}")
+                    # Menneskelig pause før TOTP-kode genereres og indtastes
+                    time.sleep(random.uniform(2, 5))
+                    totp_code = pyotp.TOTP(totp_secret).now()
+                    twofa_input.clear()
+                    step = "entering TOTP code"
+                    log_step(step)
+                    twofa_input.send_keys(totp_code)
+                    # Find og klik på knappen for at fortsætte (kan være 'submit', 'Verify', etc.)
+                    step = "submitting TOTP code"
+                    log_step(step)
+                    for btn_selector in [
+                        (By.XPATH, "//button[@type='submit']"),
+                        (By.XPATH, "//button[contains(text(), 'Verify')]")
+                    ]:
+                        try:
+                            btn = driver.find_element(*btn_selector)
+                            if btn.is_enabled():
+                                btn.click()
+                                break
+                        except Exception:
+                            continue
+                except Exception as e:
+                    step = f"2FA step failed: {e}"
+                    raise
+
             step = "waiting for 'Invite people' button"
+            log_step(step)
             WebDriverWait(driver, 20).until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, '[data-qa="admin_invite_people_btn"]')
@@ -181,6 +260,7 @@ def slack_invite_approval(request):
             ).click()
 
             step = "waiting for invite modal"
+            log_step(step)
             WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located(
                     (By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]')
@@ -188,6 +268,7 @@ def slack_invite_approval(request):
             )
 
             step = "entering emails into invite field"
+            log_step(step)
             invite_input = driver.find_element(
                 By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]'
             )
@@ -199,6 +280,7 @@ def slack_invite_approval(request):
                 time.sleep(0.2)
 
             step = "dismissing modal overlays before sending"
+            log_step(step)
             try:
                 overlays = driver.find_elements(By.CLASS_NAME, "ReactModal__Overlay")
                 for overlay in overlays:
@@ -217,6 +299,7 @@ def slack_invite_approval(request):
                 pass
 
             step = "waiting for Send button to be enabled"
+            log_step(step)
             WebDriverWait(driver, 10).until(
                 lambda d: d.find_element(
                     By.XPATH,
@@ -231,6 +314,7 @@ def slack_invite_approval(request):
             )
 
             step = "clicking Send button"
+            log_step(step)
             send_btn = driver.find_element(
                 By.XPATH,
                 '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
@@ -238,6 +322,7 @@ def slack_invite_approval(request):
             send_btn.click()
 
             step = "waiting for success indicator"
+            log_step(step)
             try:
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located(
@@ -259,19 +344,22 @@ def slack_invite_approval(request):
                         pass
 
             # If no exception was raised during the process, treat as success
+            log_step("flow complete - all steps done")
             log.status = 2
+            log.message = "\n".join(step_log)
             log.save()
             driver.quit()
             processing_time = round(_time.time() - start_time, 2)
 
         except Exception as e:
+            log_step(f"ERROR: {e}")
             log.status = 3
             page_source = ""
             try:
                 page_source = driver.page_source
             except Exception:
                 pass
-            log.message = f"Selenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
+            log.message = f"{'\n'.join(step_log)}\n\nSelenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
             log.save()
             try:
                 driver.quit()
