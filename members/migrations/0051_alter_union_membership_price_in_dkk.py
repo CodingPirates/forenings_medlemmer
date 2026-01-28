@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 default=75,
                 help_text="Medlemskabet skal koste minimum 75 kr. pga. Dansk Ungdoms Fællesråds medlemsdefinition.",
                 max_digits=10,
-                verbose_name="Pris for medlemskab",
+                verbose_name="Kontingent",
             ),
         ),
     ]

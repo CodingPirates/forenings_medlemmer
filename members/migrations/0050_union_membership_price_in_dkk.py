@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
                 decimal_places=2,
                 default=75,
                 max_digits=10,
-                verbose_name="Pris for medlemskab",
+                verbose_name="Kontingent",
             ),
         ),
     ]

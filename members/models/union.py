@@ -87,7 +87,7 @@ class Union(models.Model):
     board_members_old = models.TextField("Menige medlemmer", blank=True)
     help_text = f"Medlemskabet skal koste minimum {settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK} kr. pga. Dansk Ungdoms Fællesråds medlemsdefinition."
     membership_price_in_dkk = models.DecimalField(
-        "Pris for medlemskab",
+        "Kontingent",
         max_digits=10,
         decimal_places=2,
         default=settings.MINIMUM_MEMBERSHIP_PRICE_IN_DKK,
