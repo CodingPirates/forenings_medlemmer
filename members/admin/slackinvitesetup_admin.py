@@ -1,5 +1,8 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.contenttypes.models import ContentType
+from django.utils.html import format_html
 from members.models.slackinvitesetup import SlackInvitationSetup
 import pyotp
 
@@ -57,19 +60,40 @@ class SlackInvitationSetupForm(forms.ModelForm):
 
 class SlackInvitationSetupAdmin(admin.ModelAdmin):
     form = SlackInvitationSetupForm
-    list_display = ("id", "invite_url", "updated_at", "updated_by")
-    readonly_fields = ("updated_at", "updated_by", "current_totp_code")
+    list_display = ("id", "admin_invite_url_link", "updated_at", "updated_by")
 
-    def current_totp_code(self, obj):
-        secret = obj.totp_secret
-        if secret:
-            try:
-                return pyotp.TOTP(secret).now()
-            except Exception as e:
-                return f"[TOTP error: {e}]"
-        return "(ingen secret)"
+    def admin_invite_url_link(self, obj):
+        url = f"/admin/members/slackinvitationsetup/{obj.pk}/change/"
+        return format_html('<a href="{}">{}</a>', url, obj.invite_url)
+    admin_invite_url_link.short_description = "Slack Admin Invite URL"
+    actions = ["calculate_totp_code_action"]
 
-    current_totp_code.short_description = "Aktuel TOTP-kode (6 cifre)"
+    def calculate_totp_code_action(self, request, queryset):
+        for obj in queryset:
+            secret = obj.totp_secret
+            if secret:
+                try:
+                    totp_code = pyotp.TOTP(secret).now()
+                except Exception as e:
+                    totp_code = f"[TOTP error: {e}]"
+            else:
+                totp_code = "(ingen secret)"
+            self.message_user(
+                request, f"TOTP-kode for '{obj}': {totp_code}", level=messages.INFO
+            )
+            ct = ContentType.objects.get_for_model(self.model)
+            LogEntry.objects.create(
+                user_id=request.user.pk,
+                content_type=ct,
+                object_id=obj.pk,
+                object_repr=str(obj),
+                action_flag=CHANGE,
+                change_message="Requested TOTP code via admin action.",
+            )
+
+    calculate_totp_code_action.short_description = (
+        "Beregn og vis TOTP-kode for valgte opsætninger"
+    )
 
     def save_model(self, request, obj, form, change):
         obj.updated_by = request.user
