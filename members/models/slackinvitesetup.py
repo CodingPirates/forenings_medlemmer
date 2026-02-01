@@ -40,6 +40,13 @@ class SlackInvitationSetup(models.Model):
         related_name="slack_invite_setups",
     )
 
+    totp_secret_encrypted = models.BinaryField(
+        "Slack Admin TOTP Secret (Encrypted)",
+        blank=True,
+        null=True,
+        help_text="TOTP secret for Slack admin 2FA (encrypted)",
+    )
+
     class Meta:
         verbose_name = "Slack Invitation Setup"
         verbose_name_plural = "Slack Invitation Setup"
@@ -74,3 +81,26 @@ class SlackInvitationSetup(models.Model):
             self.admin_password_encrypted = f.encrypt(value.encode("utf-8"))
         else:
             self.admin_password_encrypted = b""
+
+    @property
+    def totp_secret(self):
+        if not self.totp_secret_encrypted:
+            return ""
+        try:
+            key = self._get_fernet_key()
+            f = Fernet(key)
+            encrypted = self.totp_secret_encrypted
+            if isinstance(encrypted, memoryview):
+                encrypted = encrypted.tobytes()
+            return f.decrypt(encrypted).decode("utf-8")
+        except Exception as e:
+            return f"[decryption error: {e}]"
+
+    @totp_secret.setter
+    def totp_secret(self, value):
+        if value:
+            key = self._get_fernet_key()
+            f = Fernet(key)
+            self.totp_secret_encrypted = f.encrypt(value.encode("utf-8"))
+        else:
+            self.totp_secret_encrypted = b""
