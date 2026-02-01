@@ -32,6 +32,8 @@ def slack_invite_approval(request):
     if request.method == "POST":
         start_time = _time.time()
         step_log = []
+        step = ""
+        driver = None
 
         def log_step(step_name):
             t = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -117,7 +119,6 @@ def slack_invite_approval(request):
             options.add_argument("--disable-dev-shm-usage")
 
             # Configure binary paths for Docker container
-            # Try common locations for Chromium binary
             chromium_paths = [
                 "/usr/bin/chromium",
                 "/usr/bin/chromium-browser",
@@ -139,7 +140,6 @@ def slack_invite_approval(request):
                 )
                 raise Exception(error_msg)
 
-            # Try common locations for ChromeDriver
             chromedriver_paths = [
                 "/usr/bin/chromedriver",
                 "/usr/lib/chromium/chromedriver",
@@ -362,16 +362,18 @@ def slack_invite_approval(request):
             log_step(f"ERROR: {e}")
             log.status = 3
             page_source = ""
-            try:
-                page_source = driver.page_source
-            except Exception:
-                pass
-            log.message = f"{'\n'.join(step_log)}\n\nSelenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
+            if driver:
+                try:
+                    page_source = driver.page_source
+                except Exception:
+                    pass
+            log.message = f"{''.join(step_log)}\n\nSelenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
             log.save()
-            try:
-                driver.quit()
-            except Exception:
-                pass
+            if driver:
+                try:
+                    driver.quit()
+                except Exception:
+                    pass
             # Send email to setup.emails
             if setup and setup.emails:
                 recipients = [
@@ -398,8 +400,6 @@ def slack_invite_approval(request):
                     "purpose": purpose,
                 },
             )
-            driver.quit()
-            processing_time = round(_time.time() - start_time, 2)
         # Always show success to user, even if error occurred
         return render(
             request,
