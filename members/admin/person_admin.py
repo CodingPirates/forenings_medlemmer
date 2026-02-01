@@ -343,7 +343,9 @@ class PersonAdmin(admin.ModelAdmin):
                 context["mass_confirmation_form"] = form
                 for person in queryset:
                     try:
-                        person.anonymize(request)
+                        # from Admin UI, allow anonymizing even if person has been logged in or created recently
+                        # likely this is by request from user
+                        person.anonymize(request, relaxed=True)
                     except Exception as e:
                         self.message_user(
                             request,
