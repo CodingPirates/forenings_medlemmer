@@ -65,6 +65,7 @@ class SlackInvitationSetupAdmin(admin.ModelAdmin):
     def admin_invite_url_link(self, obj):
         url = f"/admin/members/slackinvitationsetup/{obj.pk}/change/"
         return format_html('<a href="{}">{}</a>', url, obj.invite_url)
+
     admin_invite_url_link.short_description = "Slack Admin Invite URL"
     actions = ["calculate_totp_code_action"]
 
