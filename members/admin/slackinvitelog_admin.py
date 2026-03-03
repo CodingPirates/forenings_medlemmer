@@ -23,6 +23,62 @@ class CreatedBySlackLogFilter(admin.SimpleListFilter):
 
 
 class SlackInviteLogAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "id",
+                    "created_at",
+                    "email_multiline",
+                    "purpose",
+                    "invite_url",
+                    "created_by",
+                    "status",
+                    "message",
+                ),
+                "description": "Log for Slack invitation og evt. fejl.",
+            },
+        ),
+        (
+            "Løsningsstatus",
+            {
+                "fields": ("resolved", "resolved_at", "resolved_by", "resolution_note"),
+                "description": "Marker og dokumentér hvis fejlen er håndteret/løst.",
+            },
+        ),
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        ro = list(self.readonly_fields)
+        ro += ["resolved_by", "resolved_at"]
+        # resolved skal være readonly hvis status ikke er 3
+        if obj and obj.status != 3:
+            ro.append("resolved")
+        return ro
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # resolved kun redigerbar hvis status=3
+        if obj and obj.status != 3 and "resolved" in form.base_fields:
+            form.base_fields["resolved"].disabled = True
+        return form
+
+    def save_model(self, request, obj, form, change):
+        # Hvis resolved markeres, sæt resolved_by og resolved_at og status=4
+        if "resolved" in form.changed_data and obj.resolved:
+            obj.resolved_by = request.user
+            from django.utils import timezone
+            obj.resolved_at = timezone.now()
+            obj.status = 4
+        # Hvis status sættes til 2, marker resolved
+        if "status" in form.changed_data and obj.status == 2:
+            obj.resolved = True
+            obj.resolved_by = request.user
+            from django.utils import timezone
+            obj.resolved_at = timezone.now()
+        super().save_model(request, obj, form, change)
+
     def formatted_created_at(self, obj):
         return obj.created_at.strftime("%Y-%m-%d %H:%M:%S") if obj.created_at else ""
 

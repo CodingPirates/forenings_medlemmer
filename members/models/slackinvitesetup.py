@@ -10,28 +10,28 @@ User = get_user_model()
 
 class SlackInvitationSetup(models.Model):
     invite_url = models.URLField(
-        "Slack Admin Invite URL",
+        "Slack admin invitation URL",
         blank=True,
-        help_text="URL for Slack admin invite page, e.g. https://yourteam.slack.com/sign_in_with_password?redir=%2Fadmin%2Finvites",
+        help_text="URL til Slack admin invitation-siden, fx https://yourteam.slack.com/sign_in_with_password?redir=%2Fadmin%2Finvites",
     )
     emails = models.TextField(
-        "Notifikations Email Addresser",
-        help_text="Space-separated list of allowed email addresses.",
+        "Notifikations-emailadresser",
+        help_text="Skriv én emailadresse per linje.",
         blank=True,
     )
 
     admin_username = models.EmailField(
-        "Slack Admin Username",
+        "Slack admin brugernavn",
         blank=True,
-        help_text="Email address of the Slack admin user to log in as.",
+        help_text="Emailadressen på Slack admin-brugeren der skal logges ind som.",
     )
     admin_password_encrypted = models.BinaryField(
-        "Slack Admin Password (Encrypted)",
+        "Slack admin adgangskode (krypteret)",
         blank=True,
         null=True,
-        help_text="Password for the Slack admin user (encrypted).",
+        help_text="Adgangskode til Slack admin-brugeren (krypteret).",
     )
-    updated_at = models.DateTimeField("Last Updated", auto_now=True)
+    updated_at = models.DateTimeField("Sidst opdateret", auto_now=True)
     updated_by = models.ForeignKey(
         User,
         null=True,
@@ -41,15 +41,18 @@ class SlackInvitationSetup(models.Model):
     )
 
     totp_secret_encrypted = models.BinaryField(
-        "Slack Admin TOTP Secret (Encrypted)",
+        "Slack admin TOTP hemmelighed (krypteret)",
         blank=True,
         null=True,
-        help_text="TOTP secret for Slack admin 2FA (encrypted)",
+        help_text="TOTP-hemmelighed til Slack admin 2FA (krypteret)",
     )
 
     class Meta:
         verbose_name = "Slack Invitation Setup"
         verbose_name_plural = "Slack Invitation Setup"
+        permissions = [
+            ("can_approve_slack_invites", "Can approve Slack invites"),
+        ]
 
     def __str__(self):
         return f"Slack Invitation Setup (Last updated: {self.updated_at})"

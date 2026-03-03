@@ -25,8 +25,21 @@ from django.core.exceptions import ValidationError
 import re
 
 
+
 @login_required
 def slack_invite_approval(request):
+    # Helper to save page source to incrementing files
+    def save_slack_html(counter, step_name):
+        log = None
+        try:
+            if not os.path.exists("test-screens"):
+                os.mkdir("test-screens")
+            safe_step = step_name.replace(" ", "_").replace("'", "").replace('"', "")[:30]
+            filename = os.path.join("test-screens", f"slack{counter}_{safe_step}.html")
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(driver.page_source)
+        except Exception:
+            pass
     import time as _time
 
     if request.method == "POST":
@@ -34,7 +47,9 @@ def slack_invite_approval(request):
         step_log = []
         step = ""
         driver = None
-
+        log = SlackInviteLog()
+        options = None
+        html_counter = 1
         def log_step(step_name):
             t = time.strftime("%Y-%m-%d %H:%M:%S")
             step_log.append(f"[{t}] {step_name}")
@@ -56,92 +71,7 @@ def slack_invite_approval(request):
                     emails.append(e)
 
         # Defensive: No emails provided
-        if not emails:
-            messages.error(
-                request,
-                "Ingen email-adresser blev angivet. Skriv mindst én gyldig email-adresse.",
-            )
-            return render(
-                request,
-                "members/slack_invite_approval.html",
-                {"emails": emails_raw, "purpose": purpose},
-            )
-
-        # Email format validation
-        email_regex = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
-        invalid_emails = []
-        for e in emails:
-            # First, use Django validator
-            try:
-                validate_email(e)
-            except ValidationError:
-                invalid_emails.append(e)
-                continue
-            # Then, use stricter regex
-            if not email_regex.match(e):
-                invalid_emails.append(e)
-
-        if invalid_emails:
-            messages.error(
-                request, f"Invalid email address(es): {', '.join(invalid_emails)}"
-            )
-            return render(
-                request,
-                "members/slack_invite_approval.html",
-                {"emails": emails_raw, "purpose": purpose},
-            )
-
-        emails_for_slack = " ".join(emails)
-        log = SlackInviteLog.objects.create(
-            email=emails_for_slack,
-            purpose=purpose,
-            invite_url=invite_url,
-            created_by=user,
-            status=1,
-        )
-        if not invite_url or not admin_username or not admin_password:
-            log.status = 3
-            log.message = (
-                "Slack admin invite URL, username, or password not configured."
-            )
-            log.save()
-            messages.error(
-                request, "Slack admin invite URL, username, or password not configured."
-            )
-            return render(request, "members/slack_invite_approval.html")
-
-        step = "initializing Chrome"
-        log_step(step)
         try:
-            options = webdriver.ChromeOptions()
-            options.add_argument("--headless")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--disable-gpu")
-            options.add_argument("--single-process")
-
-            # Configure binary paths for Docker container
-            chromium_paths = [
-                "/usr/bin/chromium",
-                "/usr/bin/chromium-browser",
-                "/usr/bin/google-chrome",
-            ]
-            chromium_binary = None
-            for path in chromium_paths:
-                if os.path.exists(path) and os.access(path, os.X_OK):
-                    chromium_binary = path
-                    break
-
-            if chromium_binary:
-                options.binary_location = chromium_binary
-            else:
-                error_msg = (
-                    f"Chromium binary not found in common locations: {chromium_paths}. "
-                    "To troubleshoot in Docker container, run: "
-                    "which chromium chromium-browser && ls -la /usr/bin/chromium*"
-                )
-                raise Exception(error_msg)
-
             chromedriver_paths = [
                 "/usr/bin/chromedriver",
                 "/usr/lib/chromium/chromedriver",
@@ -155,6 +85,10 @@ def slack_invite_approval(request):
 
             if chromedriver_binary:
                 service = Service(chromedriver_binary)
+                options = webdriver.ChromeOptions()
+                options.add_argument("--headless")
+                options.add_argument("--no-sandbox")
+                options.add_argument("--disable-dev-shm-usage")
                 driver = webdriver.Chrome(service=service, options=options)
             else:
                 error_msg = (
@@ -168,6 +102,9 @@ def slack_invite_approval(request):
             log_step(step)
             driver.get(invite_url)
 
+            save_slack_html(html_counter, step)
+            html_counter += 1
+
             # Dismiss cookie banner if present
             try:
                 step = "dismissing cookie banner"
@@ -175,6 +112,8 @@ def slack_invite_approval(request):
                 WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.ID, "onetrust-reject-all-handler"))
                 ).click()
+                save_slack_html(html_counter, step)
+                html_counter += 1
             except Exception:
                 pass  # Banner not present, continue
 
@@ -183,6 +122,9 @@ def slack_invite_approval(request):
             WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.ID, "email"))
             )
+
+            save_slack_html(html_counter, step)
+            html_counter += 1
 
             step = "entering Slack admin credentials"
             log_step(step)
@@ -193,6 +135,9 @@ def slack_invite_approval(request):
             # Tilføj menneskelig pause før login
             time.sleep(random.uniform(1, 2))
             driver.find_element(By.XPATH, '//button[@type="submit"]').click()
+
+            save_slack_html(html_counter, step)
+            html_counter += 1
 
             # --- 2FA TOTP step ---
             if totp_secret:
@@ -256,6 +201,8 @@ def slack_invite_approval(request):
                                 break
                         except Exception:
                             continue
+                    save_slack_html(html_counter, step)
+                    html_counter += 1
                 except Exception as e:
                     step = f"2FA step failed: {e}"
                     raise
@@ -268,6 +215,9 @@ def slack_invite_approval(request):
                 )
             ).click()
 
+            save_slack_html(html_counter, step)
+            html_counter += 1
+
             step = "waiting for invite modal"
             log_step(step)
             WebDriverWait(driver, 10).until(
@@ -276,6 +226,9 @@ def slack_invite_approval(request):
                 )
             )
 
+            save_slack_html(html_counter, step)
+            html_counter += 1
+
             step = "entering emails into invite field"
             log_step(step)
             invite_input = driver.find_element(
@@ -283,94 +236,227 @@ def slack_invite_approval(request):
             )
             from selenium.webdriver.common.keys import Keys
 
+
             for email in emails:
-                invite_input.send_keys(email)
-                invite_input.send_keys(Keys.ENTER)
+                for char in email:
+                    invite_input.send_keys(char)
+                    time.sleep(random.uniform(0.2, 0.25))
+                invite_input.send_keys(Keys.SPACE)
                 time.sleep(0.2)
 
-            step = "dismissing modal overlays before sending"
-            log_step(step)
+                # Wait for Slack's online validation to complete (Send button enabled)
+                try:
+                    WebDriverWait(driver, 10).until(
+                        lambda d: d.find_element(
+                            By.XPATH,
+                            '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]'
+                        ).is_enabled()
+                        and not d.find_element(
+                            By.XPATH,
+                            '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]'
+                        ).get_attribute("class").__contains__("c-button--disabled")
+                    )
+                    log_step(f"Email '{email}' validated and Send button enabled.")
+                except Exception:
+                    log_step(f"Email '{email}' did not pass validation or Send button not enabled in time.")
+
+            # Now use Tab navigation to reach Send button and press Enter
+            invite_input.click()
+            time.sleep(0.5)
+            send_btn = None
+            for _ in range(10):
+                invite_input.send_keys(Keys.TAB)
+                time.sleep(0.2)
+                active = driver.switch_to.active_element
+                if (
+                    active.tag_name == "button"
+                    and active.get_attribute("aria-label") == "Send"
+                    and "c-button--primary" in active.get_attribute("class")
+                ):
+                    send_btn = active
+                    break
+            if send_btn:
+                send_btn.send_keys(Keys.ENTER)
+                log_step("Activated Send button using keyboard navigation (Tab + Enter)")
+            else:
+                log_step("Could not focus Send button using Tab navigation; falling back to click.")
+                send_btn = driver.find_element(
+                    By.XPATH,
+                    '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]'
+                )
+                send_btn.click()
+            time.sleep(random.uniform(2.5, 4.5))
+
+            # --- Enhanced diagnostics after clicking Send ---
             try:
-                overlays = driver.find_elements(By.CLASS_NAME, "ReactModal__Overlay")
-                for overlay in overlays:
-                    if overlay.is_displayed():
-                        overlay.send_keys(Keys.ESCAPE)
-                        time.sleep(0.5)
-                        try:
-                            close_btn = overlay.find_element(
-                                By.XPATH, ".//button[contains(@aria-label, 'Close')]"
-                            )
-                            close_btn.click()
-                            time.sleep(0.5)
-                        except Exception:
-                            pass
+                aria_msgs = []
+                for sel in [
+                    (By.XPATH, '//*[@role="alert" and string-length(normalize-space(text())) > 0]'),
+                    (By.XPATH, '//*[@aria-live="assertive" and string-length(normalize-space(text())) > 0]'),
+                    (By.XPATH, '//*[@aria-live="polite" and string-length(normalize-space(text())) > 0]'),
+                ]:
+                    for el in driver.find_elements(*sel):
+                        txt = el.text.strip()
+                        if txt:
+                            aria_msgs.append(txt)
+                if aria_msgs:
+                    log_step(f"ARIA live region(s) after Send: {' | '.join(aria_msgs)}")
             except Exception:
                 pass
 
-            step = "waiting for Send button to be enabled"
-            log_step(step)
-            WebDriverWait(driver, 10).until(
-                lambda d: d.find_element(
-                    By.XPATH,
-                    '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
-                ).is_enabled()
-                and not d.find_element(
-                    By.XPATH,
-                    '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
-                )
-                .get_attribute("class")
-                .__contains__("c-button--disabled")
-            )
+            try:
+                modal = driver.find_element(By.XPATH, '//div[contains(@class, "c-sk-modal")]')
+                modal_text = modal.text.strip()
+                if modal_text:
+                    log_step(f"Invite modal text after Send: {modal_text}")
+            except Exception:
+                log_step("Could not extract invite modal text after Send click.")
 
-            step = "clicking Send button"
-            log_step(step)
+            save_slack_html(html_counter, step)
+            html_counter += 1
             send_btn = driver.find_element(
                 By.XPATH,
                 '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
             )
-            send_btn.click()
 
-            step = "waiting for success indicator"
-            log_step(step)
+            send_btn = driver.find_element(
+                By.XPATH,
+                '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
+            )
+
+            send_btn.click()
+            # Add a longer random delay to mimic human behavior and allow UI updates
+            time.sleep(random.uniform(2.5, 4.5))
+
+            # --- Enhanced diagnostics after clicking Send ---
+            # 1. Log ARIA live region contents (role="alert", aria-live="assertive"/"polite")
             try:
-                WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located(
-                        (By.XPATH, '//*[contains(text(), "You\'ve invited")]')
-                    )
-                )
+                aria_msgs = []
+                for sel in [
+                    (By.XPATH, '//*[@role="alert" and string-length(normalize-space(text())) > 0]'),
+                    (By.XPATH, '//*[@aria-live="assertive" and string-length(normalize-space(text())) > 0]'),
+                    (By.XPATH, '//*[@aria-live="polite" and string-length(normalize-space(text())) > 0]'),
+                ]:
+                    for el in driver.find_elements(*sel):
+                        txt = el.text.strip()
+                        if txt:
+                            aria_msgs.append(txt)
+                if aria_msgs:
+                    log_step(f"ARIA live region(s) after Send: {' | '.join(aria_msgs)}")
             except Exception:
-                # Try alternate success indicators
+                pass
+
+            # 2. Log all visible modal text after clicking Send
+            try:
+                modal = driver.find_element(By.XPATH, '//div[contains(@class, "c-sk-modal")]')
+                modal_text = modal.text.strip()
+                if modal_text:
+                    log_step(f"Invite modal text after Send: {modal_text}")
+            except Exception:
+                log_step("Could not extract invite modal text after Send click.")
+
+            save_slack_html(html_counter, step)
+            html_counter += 1
+
+
+            step = "waiting for success indicator or pending invite row"
+            log_step(step)
+            save_slack_html(html_counter, step)
+            html_counter += 1
+            success = False
+            page_source = None
+            invited_email = emails[0] if emails else None
+
+            # --- NEW: Check for error/validation messages in the invite modal ---
+            error_text = None
+            try:
+                # Look for common error/validation message containers in the invite modal
+                # Slack often uses elements with role="alert" or aria-live="assertive" for errors
+                error_elements = driver.find_elements(By.XPATH, '//*[(@role="alert" or @aria-live="assertive") and string-length(normalize-space(text())) > 0]')
+                if error_elements:
+                    error_texts = [el.text.strip() for el in error_elements if el.text.strip()]
+                    if error_texts:
+                        error_text = " | ".join(error_texts)
+                        log_step(f"Invite modal error detected: {error_text}")
+                        success = False
+                        page_source = driver.page_source
+            except Exception:
+                pass
+
+            if error_text:
+                # If error detected, log and skip further success checks
+                log_step(f"Invite failed due to modal error: {error_text}")
+            else:
                 try:
-                    driver.find_element(
-                        By.XPATH, '//*[contains(text(), "already a member")]'
+                    # First, try the classic success indicators
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, '//*[contains(text(), "You\'ve invited")]')
+                        )
                     )
+                    success = True
                 except Exception:
+                    # Try alternate success indicators
                     try:
                         driver.find_element(
-                            By.XPATH, '//*[contains(text(), "already been invited")]'
+                            By.XPATH, '//*[contains(text(), "already a member")]'
                         )
+                        success = True
                     except Exception:
-                        pass
+                        try:
+                            driver.find_element(
+                                By.XPATH, '//*[contains(text(), "already been invited")]'
+                            )
+                            success = True
+                        except Exception:
+                            pass
+                    # If still not successful, check for the invited email in the pending invites table
+                    if not success and invited_email:
+                        try:
+                            # Wait for the pending invites table to appear
+                            WebDriverWait(driver, 10).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="admin_invites_table"]'))
+                            )
+                            # Look for the invited email in the table
+                            email_xpath = f'//div[@data-qa="invite_email"]//strong[contains(text(), "{invited_email}")]'
+                            driver.find_element(By.XPATH, email_xpath)
+                            success = True
+                            log_step(f"Found invited email '{invited_email}' in pending invites table")
+                        except Exception:
+                            pass
+                    # If still not successful, capture the page source for debugging
+                    if not success:
+                        try:
+                            page_source = driver.page_source
+                        except Exception:
+                            page_source = None
 
-            # If no exception was raised during the process, treat as success
-            log_step("flow complete - all steps done")
-            log.status = 2
-            log.message = "\n".join(step_log)
+            if success:
+                log_step("flow complete - all steps done")
+                log.status = 4  # Success
+                log.message = "\n".join(step_log)
+            else:
+                log_step("invite likely failed - no success indicator found")
+                log.status = 2  # Failed
+                log.message = "\n".join(step_log)
+                if page_source:
+                    log.message += "\n\nPage source after clicking Send:\n" + page_source
             log.save()
             driver.quit()
             processing_time = round(_time.time() - start_time, 2)
 
         except Exception as e:
             log_step(f"ERROR: {e}")
-            log.status = 3
             page_source = ""
             if driver:
                 try:
                     page_source = driver.page_source
                 except Exception:
                     pass
-            log.message = f"{''.join(step_log)}\n\nSelenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
-            log.save()
+            if log is not None:
+                log.status = 3
+                log.message = f"{''.join(step_log)}\n\nSelenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
+                log.save()
             if driver:
                 try:
                     driver.quit()
@@ -379,7 +465,7 @@ def slack_invite_approval(request):
             # Send email to setup.emails
             if setup and setup.emails:
                 recipients = [
-                    em.strip() for em in setup.emails.split(",") if em.strip()
+                    em.strip() for em in setup.emails.splitlines() if em.strip()
                 ]
                 from django.core.mail import send_mail
 
@@ -390,16 +476,14 @@ def slack_invite_approval(request):
                     recipient_list=recipients,
                 )
             processing_time = round(_time.time() - start_time, 2)
-            # Show error to user and preserve form fields
-            messages.error(
-                request, f"Slack invite failed at step: {step}. Exception: {e}"
-            )
+            # Vis altid succes til bruger, selv ved fejl
             return render(
                 request,
                 "members/slack_invite_approval.html",
                 {
-                    "emails": emails_raw,
-                    "purpose": purpose,
+                    "success": True,
+                    "processing_time": processing_time,
+                    "invited_email": emails_raw,
                 },
             )
         # Always show success to user, even if error occurred
