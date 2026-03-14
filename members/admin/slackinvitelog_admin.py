@@ -69,6 +69,7 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
         if "resolved" in form.changed_data and obj.resolved:
             obj.resolved_by = request.user
             from django.utils import timezone
+
             obj.resolved_at = timezone.now()
             obj.status = 4
         # Hvis status sættes til 2, marker resolved
@@ -76,6 +77,7 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
             obj.resolved = True
             obj.resolved_by = request.user
             from django.utils import timezone
+
             obj.resolved_at = timezone.now()
         super().save_model(request, obj, form, change)
 
@@ -98,7 +100,7 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
         "status",
     )
     list_filter = ("status", CreatedBySlackLogFilter)
-    search_fields = ("email", "message")
+    search_fields = ("emails", "message")
     readonly_fields = (
         "id",
         "created_at",
@@ -111,7 +113,7 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
     )
 
     def email_multiline(self, obj):
-        emails = obj.email.split()
+        emails = obj.emails.split()
         return mark_safe("<br>".join(emails))
 
     email_multiline.short_description = "Email(s)"

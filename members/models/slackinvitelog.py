@@ -12,7 +12,7 @@ class SlackInviteLog(models.Model):
         (4, "Slack invitation udført"),
     ]
 
-    email = models.EmailField()
+    emails = models.TextField(blank=True)
     purpose = models.CharField(max_length=255, blank=True)
     invite_url = models.URLField("Invite URL", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -60,21 +60,21 @@ class SlackInviteLog(models.Model):
         from django.core.validators import validate_email
         from django.core.exceptions import ValidationError
 
-        emails = self.email.split()
+        emails = self.emails.split()
         for e in emails:
             try:
                 validate_email(e)
             except ValidationError:
-                raise ValidationError({"email": f"Ugyldig emailadresse: {e}"})
+                raise ValidationError({"emails": f"Ugyldig emailadresse: {e}"})
 
     def email_summary(self):
-        emails = self.email.split()
+        emails = self.emails.split()
         if len(emails) == 1:
             return emails[0]
         return f"{len(emails)} emails"
 
     def __str__(self):
-        emails = self.email.split()
+        emails = self.emails.split()
         if len(emails) == 1:
             return f"{emails[0]} - {self.get_status_display()}"
         return f"{len(emails)} emails - {self.get_status_display()}"

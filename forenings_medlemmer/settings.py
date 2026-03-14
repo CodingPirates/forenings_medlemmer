@@ -190,14 +190,16 @@ MANAGERS = ADMINS
 SITE_CONTACT = "Coding Pirates <kontakt@codingpirates.dk>"
 EMAIL_SUBJECT_PREFIX = "[Coding Pirates Medlemsdatabase] "
 email = env.dj_email_url("EMAIL_URL")
-EMAIL_BACKEND = email["EMAIL_BACKEND"]
-EMAIL_HOST = email["EMAIL_HOST"]
-EMAIL_HOST_USER = email["EMAIL_HOST_USER"]
-EMAIL_HOST_PASSWORD = email["EMAIL_HOST_PASSWORD"]
+EMAIL_BACKEND = email.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = email.get("EMAIL_HOST", "")
+EMAIL_HOST_USER = email.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = email.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_FILE_PATH = BASE_DIR
 SERVER_EMAIL = "hostmaster@members.codingpirates.dk"
-EMAIL_PORT = email["EMAIL_PORT"]
-EMAIL_USE_SSL = email["EMAIL_USE_SSL"]
+EMAIL_PORT = email.get("EMAIL_PORT", 25)
+EMAIL_USE_SSL = email.get("EMAIL_USE_SSL", False)
 DEFAULT_FROM_EMAIL = "kontakt@codingpirates.dk"
 EMAIL_TIMEOUT = 30
 
