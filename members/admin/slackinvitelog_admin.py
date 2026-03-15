@@ -52,16 +52,13 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         ro = list(self.readonly_fields)
         ro += ["resolved_by", "resolved_at"]
-        # resolved skal være readonly hvis status ikke er 3
-        if obj and obj.status != 3:
-            ro.append("resolved")
+        # 'resolved' must remain editable so admins can mark logs as handled.
         return ro
 
     def get_form(self, request, obj=None, **kwargs):
+        # Use the default form; 'resolved' is editable, while 'resolved_by' and
+        # 'resolved_at' are controlled via save_model.
         form = super().get_form(request, obj, **kwargs)
-        # resolved kun redigerbar hvis status=3
-        if obj and obj.status != 3 and "resolved" in form.base_fields:
-            form.base_fields["resolved"].disabled = True
         return form
 
     def save_model(self, request, obj, form, change):
