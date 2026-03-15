@@ -1,737 +1,997 @@
-# Selenium imports
+"""Slack invite approval flow.
 
+Flow summary:
+- Log into Slack admin using configured credentials.
+- Complete TOTP if configured.
+- Open the invite modal.
+- Add each email as ``<email> `` so Slack validates token-by-token.
+- If Slack marks a token as duplicate/member, click ``Remove duplicate``.
+- If Slack marks a token as invalid, click ``Remove all items with errors``.
+- After valid emails have been collected, click ``Send`` once.
+- Save HTML snapshots and log HTML without embedded ``<script>`` tags.
+"""
+
+import os
+import random
+import re
+import time
+
+import pyotp
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.shortcuts import render
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-# NoSuchElementException import removed (unused)
-import time
-import os
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.core.mail import send_mail
-from members.models.slackinvitesetup import SlackInvitationSetup
 from members.models.slackinvitelog import SlackInviteLog
+from members.models.slackinvitesetup import SlackInvitationSetup
 
 
-# send_mail import removed (imported only where needed)
+BROWSER_SELECTION = 2  # 1=Chrome, 2=Firefox
 
-from django.conf import settings
-import pyotp
-import random
+
+def strip_script_tags(html):
+    return re.sub(r"<script[\s\S]*?</script>", "", html or "", flags=re.IGNORECASE)
+
+
+def save_slack_html(driver, counter, step_name):
+    try:
+        if not driver:
+            return
+        if not os.path.exists("test-screens"):
+            os.mkdir("test-screens")
+        safe_step = step_name.replace(" ", "_").replace("'", "").replace('"', "")[:30]
+        filename = os.path.join("test-screens", f"slack{counter:03d}_{safe_step}.html")
+        with open(filename, "w", encoding="utf-8") as handle:
+            handle.write(strip_script_tags(driver.page_source))
+    except Exception:
+        pass
+
+
+def parse_emails(emails_raw):
+    emails = []
+    for line in (emails_raw or "").splitlines():
+        for email in line.strip().split():
+            if email:
+                emails.append(email)
+    return emails
+
+
+def normalize_email_text(value):
+    return (value or "").strip().lower()
+
+
+def text_contains_exact_email(text, email):
+    normalized_text = normalize_email_text(text)
+    normalized_email = normalize_email_text(email)
+    if not normalized_text or not normalized_email:
+        return False
+    pattern = rf"(?<![a-z0-9_.+\-]){re.escape(normalized_email)}(?![a-z0-9_.+\-])"
+    return re.search(pattern, normalized_text) is not None
+
+
+def robust_click(driver, element):
+    try:
+        driver.execute_script(
+            "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});",
+            element,
+        )
+    except Exception:
+        pass
+
+    try:
+        element.click()
+        return True
+    except Exception:
+        pass
+
+    try:
+        ActionChains(driver).move_to_element(element).pause(0.1).click().perform()
+        return True
+    except Exception:
+        pass
+
+    try:
+        driver.execute_script(
+            """
+            const el = arguments[0];
+            ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(type => {
+                el.dispatchEvent(new MouseEvent(type, {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window,
+                }));
+            });
+            """,
+            element,
+        )
+        return True
+    except Exception:
+        return False
+
+
+def click_visible_action(driver, labels):
+    for label in labels:
+        xpaths = [
+            f'//button[contains(normalize-space(.), "{label}")]',
+            f'//a[contains(normalize-space(.), "{label}")]',
+            f'//*[@role="button" and contains(normalize-space(.), "{label}")]',
+            f'//span[contains(normalize-space(.), "{label}")]/ancestor::*[self::button or self::a or @role="button"][1]',
+        ]
+        for xpath in xpaths:
+            for element in driver.find_elements(By.XPATH, xpath):
+                try:
+                    if element.is_displayed() and element.is_enabled():
+                        if robust_click(driver, element):
+                            return label
+                except Exception:
+                    continue
+    return None
+
+
+def focus_invite_input(driver):
+    input_element = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]')
+        )
+    )
+    try:
+        driver.execute_script("arguments[0].focus();", input_element)
+    except Exception:
+        pass
+    return input_element
+
+
+def clear_invite_query(driver):
+    try:
+        input_element = focus_invite_input(driver)
+        query_text = driver.execute_script(
+            """
+            const root = arguments[0];
+            const query = root.querySelector('.c-multi_select_input__filter_query');
+            return query ? query.textContent || '' : '';
+            """,
+            input_element,
+        )
+        if query_text:
+            for _ in range(len(query_text) + 2):
+                input_element.send_keys(Keys.BACKSPACE)
+                time.sleep(0.02)
+    except Exception:
+        pass
+
+
+def invite_modal_is_open(driver):
+    try:
+        elements = driver.find_elements(
+            By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]'
+        )
+        return any(element.is_displayed() for element in elements)
+    except Exception:
+        return False
+
+
+def get_invite_tokens(driver):
+    tokens = []
+    try:
+        wrappers = driver.find_elements(
+            By.CSS_SELECTOR, '[data-qa="multi_select_token_wrapper"]'
+        )
+    except Exception:
+        return tokens
+
+    for wrapper in wrappers:
+        try:
+            plain_labels = wrapper.find_elements(
+                By.CSS_SELECTOR, '[data-qa="token_plain_label"]'
+            )
+            error_labels = wrapper.find_elements(
+                By.CSS_SELECTOR, '[data-qa="token_error"]'
+            )
+            label = ""
+            is_error = False
+
+            if error_labels:
+                label = error_labels[0].text.strip()
+                is_error = True
+            elif plain_labels:
+                label = plain_labels[0].text.strip()
+
+            if not label:
+                label = wrapper.text.strip()
+
+            tokens.append(
+                {
+                    "label": label,
+                    "normalized": normalize_email_text(label),
+                    "error": is_error
+                    or "c-token--error" in (wrapper.get_attribute("class") or ""),
+                }
+            )
+        except Exception:
+            continue
+
+    return tokens
+
+
+def get_token_state(driver, email):
+    normalized_email = normalize_email_text(email)
+    for token in get_invite_tokens(driver):
+        if token["normalized"] == normalized_email:
+            return "invalid" if token["error"] else "accepted"
+    return None
+
+
+def remove_token_by_email(driver, email):
+    normalized_email = normalize_email_text(email)
+    for wrapper in driver.find_elements(
+        By.CSS_SELECTOR, '[data-qa="multi_select_token_wrapper"]'
+    ):
+        try:
+            plain_labels = wrapper.find_elements(
+                By.CSS_SELECTOR, '[data-qa="token_plain_label"]'
+            )
+            error_labels = wrapper.find_elements(
+                By.CSS_SELECTOR, '[data-qa="token_error"]'
+            )
+            label = ""
+            if error_labels:
+                label = error_labels[0].text.strip()
+            elif plain_labels:
+                label = plain_labels[0].text.strip()
+            else:
+                label = wrapper.text.strip()
+
+            if normalize_email_text(label) != normalized_email:
+                continue
+
+            remove_icon = wrapper.find_element(
+                By.CSS_SELECTOR, '[data-qa="token_remove_icon"]'
+            )
+            if not robust_click(driver, remove_icon):
+                continue
+            time.sleep(0.2)
+            return wait_for_token_removed(driver, email, timeout=2)
+        except Exception:
+            continue
+    return False
+
+
+def wait_for_token_removed(driver, email, timeout=3):
+    normalized_email = normalize_email_text(email)
+
+    def _removed(_driver):
+        return get_token_state(_driver, normalized_email) is None
+
+    try:
+        WebDriverWait(driver, timeout).until(_removed)
+        return True
+    except Exception:
+        return False
+
+
+def remove_last_token_with_backspace(driver, email, attempts=3):
+    for _ in range(attempts):
+        try:
+            input_element = focus_invite_input(driver)
+            clear_invite_query(driver)
+            input_element = focus_invite_input(driver)
+            input_element.send_keys(Keys.BACKSPACE)
+            time.sleep(0.8)
+            if wait_for_token_removed(driver, email, timeout=1.5):
+                return True
+        except Exception:
+            continue
+    return False
+
+
+def remove_invalid_tokens(driver, preferred_email=None):
+    removed_labels = []
+    initial_error_labels = [
+        token["label"] for token in get_invite_tokens(driver) if token["error"]
+    ]
+
+    clicked_bulk_action = click_visible_action(driver, ["Remove all items with errors"])
+    if clicked_bulk_action:
+        time.sleep(1.2)
+        for label in initial_error_labels:
+            if wait_for_token_removed(driver, label, timeout=2):
+                removed_labels.append(label)
+
+    for token in list(get_invite_tokens(driver)):
+        if not token["error"]:
+            continue
+        label = token["label"]
+        if remove_token_by_email(driver, label):
+            removed_labels.append(label)
+
+    if preferred_email and get_token_state(driver, preferred_email) == "invalid":
+        if remove_last_token_with_backspace(driver, preferred_email):
+            removed_labels.append(preferred_email)
+
+    clear_invite_query(driver)
+    return list(dict.fromkeys(removed_labels))
+
+
+def email_exists_in_pending_table(driver, email):
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, '[data-qa="admin_invites_table"]')
+            )
+        )
+        driver.find_element(
+            By.XPATH,
+            f'//div[@data-qa="invite_email"]//strong[normalize-space(text())="{email}"]',
+        )
+        return True
+    except Exception:
+        return False
+
+
+def wait_for_token_settle(driver, timeout=5):
+    def _settled(_driver):
+        try:
+            input_element = _driver.find_element(
+                By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]'
+            )
+            query = input_element.find_element(
+                By.CSS_SELECTOR, ".c-multi_select_input__filter_query"
+            ).text.strip()
+            return query == ""
+        except Exception:
+            return False
+
+    try:
+        WebDriverWait(driver, timeout).until(_settled)
+        return True
+    except Exception:
+        return False
+
+
+def get_visible_validation_texts(driver):
+    texts = []
+    selectors = [
+        (
+            By.XPATH,
+            '//div[contains(@class, "c-popover__content")]//*[normalize-space(text()) != ""]',
+        ),
+        (By.XPATH, '//*[@role="alert" and normalize-space(text()) != ""]'),
+        (
+            By.XPATH,
+            '//*[@data-qa="invite_modal_select-options-list"]//*[normalize-space(text()) != ""]',
+        ),
+    ]
+    for selector in selectors:
+        try:
+            for element in driver.find_elements(*selector):
+                text = element.text.strip()
+                if text and text not in texts:
+                    texts.append(text)
+        except Exception:
+            continue
+    return texts
+
+
+def classify_validation_state(driver, email):
+    matched_texts = [
+        text
+        for text in get_visible_validation_texts(driver)
+        if text_contains_exact_email(text, email)
+    ]
+    combined_text = " | ".join(matched_texts).lower()
+    email_lower = email.lower()
+    if email_lower in combined_text:
+        duplicate_markers = [
+            "already in this workspace",
+            "already a member",
+            "already been invited",
+            "already invited",
+            "existing member",
+        ]
+        invalid_markers = [
+            "not a valid email",
+            "isn't a valid email",
+            "is not a valid email",
+            "invalid email",
+            "error",
+        ]
+        if any(marker in combined_text for marker in duplicate_markers):
+            return "duplicate", combined_text
+        if any(marker in combined_text for marker in invalid_markers):
+            return "invalid", combined_text
+    return None, combined_text
+
+
+def build_driver():
+    if BROWSER_SELECTION == 1:
+        chromedriver_paths = [
+            "/usr/bin/chromedriver",
+            "/usr/lib/chromium/chromedriver",
+            "/usr/lib/chromium-browser/chromedriver",
+        ]
+        chromedriver_binary = next(
+            (
+                path
+                for path in chromedriver_paths
+                if os.path.exists(path) and os.access(path, os.X_OK)
+            ),
+            None,
+        )
+        if not chromedriver_binary:
+            raise Exception(
+                "ChromeDriver not found in common locations: " f"{chromedriver_paths}."
+            )
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        return webdriver.Chrome(service=Service(chromedriver_binary), options=options)
+
+    if BROWSER_SELECTION == 2:
+        from selenium.webdriver.firefox.options import Options as FirefoxOptions
+        from selenium.webdriver.firefox.service import Service as FirefoxService
+
+        geckodriver_paths = ["/usr/bin/geckodriver", "/usr/local/bin/geckodriver"]
+        geckodriver_binary = next(
+            (
+                path
+                for path in geckodriver_paths
+                if os.path.exists(path) and os.access(path, os.X_OK)
+            ),
+            None,
+        )
+        if not geckodriver_binary:
+            raise Exception(
+                "GeckoDriver not found in common locations: " f"{geckodriver_paths}."
+            )
+        options = FirefoxOptions()
+        options.add_argument("--headless")
+        return webdriver.Firefox(
+            service=FirefoxService(geckodriver_binary), options=options
+        )
+
+    raise Exception(f"Invalid BROWSER_SELECTION value: {BROWSER_SELECTION}")
 
 
 @login_required
 def slack_invite_approval(request):
-    # Helper to save page source to incrementing files
-    def save_slack_html(counter, step_name):
-        try:
-            if not os.path.exists("test-screens"):
-                os.mkdir("test-screens")
-            safe_step = (
-                step_name.replace(" ", "_").replace("'", "").replace('"', "")[:30]
-            )
-            filename = os.path.join("test-screens", f"slack{counter}_{safe_step}.html")
-            with open(filename, "w", encoding="utf-8") as f:
-                f.write(driver.page_source)
-        except Exception:
-            pass
+    if request.method != "POST":
+        return render(request, "members/slack_invite_approval.html")
 
-    if request.method == "POST":
-        start_time = time.time()
-        step_log = []
-        step = ""
-        driver = None
-        options = None
-        html_counter = 1
-        success = False
+    start_time = time.time()
+    processing_time = 0
+    step = ""
+    step_log = []
+    driver = None
+    html_counter = 1
+    success = False
+    log = None
+    page_source = None
+    removed_existing = []
+    removed_invalid = []
+    invited_emails = []
+    result_message = ""
+    error_message = None
 
-        emails_raw = request.POST.get("emails", "")
-        purpose = request.POST.get("purpose", "")
-        setup = SlackInvitationSetup.objects.order_by("-updated_at").first()
-        invite_url = setup.invite_url if setup else None
-        admin_username = setup.admin_username if setup else None
-        admin_password = setup.admin_password if setup else None
-        totp_secret = setup.totp_secret if setup else None
-        # Accept both newlines and spaces as delimiters, but prefer newlines
-        emails = []
-        for line in emails_raw.splitlines():
-            for e in line.strip().split():
-                if e:
-                    emails.append(e)
+    emails_raw = request.POST.get("emails", "")
+    purpose = request.POST.get("purpose", "")
+    emails = parse_emails(emails_raw)
 
-        # Defensive: No emails provided
+    setup = SlackInvitationSetup.objects.order_by("-updated_at").first()
+    invite_url = setup.invite_url if setup else None
+    admin_username = setup.admin_username if setup else None
+    admin_password = setup.admin_password if setup else None
+    totp_secret = setup.totp_secret if setup else None
 
-        # Create log entry at start and keep reference for update
-        log = SlackInviteLog()
-        log.status = 1  # Oprettet
-        log.purpose = purpose
-        log.invite_url = invite_url
-        log.created_by = request.user
-        if emails:
-            log.emails = "\n".join(emails)
-        else:
-            log.emails = emails_raw
+    log = SlackInviteLog.objects.create(
+        status=1,
+        purpose=purpose,
+        invite_url=invite_url or "",
+        created_by=request.user,
+        emails="\n".join(emails) if emails else emails_raw,
+    )
+
+    def log_step(message):
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        step_log.append(f"[{timestamp}] {message}")
+
+    def finish(current_success, status=None, extra_html=None):
+        nonlocal processing_time
+        processing_time = round(time.time() - start_time, 2)
+        log.status = status if status is not None else (4 if current_success else 2)
+        log.message = "\n".join(step_log)
+        if extra_html:
+            log.message += "\n\nPage source:\n" + strip_script_tags(extra_html)
+        log.emails = "\n".join(emails) if emails else emails_raw
         log.save()
-
-        def log_step(step_name):
-            t = time.strftime("%Y-%m-%d %H:%M:%S")
-            step_log.append(f"[{t}] {step_name}")
-
-        log_step("POST request received - start Slack invite flow")
-        emails_raw = request.POST.get("emails", "")
-        purpose = request.POST.get("purpose", "")
-        setup = SlackInvitationSetup.objects.order_by("-updated_at").first()
-        invite_url = setup.invite_url if setup else None
-        admin_username = setup.admin_username if setup else None
-        admin_password = setup.admin_password if setup else None
-        totp_secret = setup.totp_secret if setup else None
-        # Accept both newlines and spaces as delimiters, but prefer newlines
-        emails = []
-        for line in emails_raw.splitlines():
-            for e in line.strip().split():
-                if e:
-                    emails.append(e)
-
-        # Defensive: No emails provided
-
-        # --- Browser selection: 1=Chrome, 2=Firefox ---
-        BROWSER_SELECTION = 2  # 1=Chrome, 2=Firefox
-        # Optionally, make this configurable via environment variable:
-        # BROWSER_SELECTION = int(os.environ.get("BROWSER_SELECTION", "1"))
-
-        try:
-            if BROWSER_SELECTION == 1:
-                chromedriver_paths = [
-                    "/usr/bin/chromedriver",
-                    "/usr/lib/chromium/chromedriver",
-                    "/usr/lib/chromium-browser/chromedriver",
-                ]
-                chromedriver_binary = None
-                for path in chromedriver_paths:
-                    if os.path.exists(path) and os.access(path, os.X_OK):
-                        chromedriver_binary = path
-                        break
-                if chromedriver_binary:
-                    service = Service(chromedriver_binary)
-                    options = webdriver.ChromeOptions()
-                    options.add_argument("--headless")
-                    options.add_argument("--no-sandbox")
-                    options.add_argument("--disable-dev-shm-usage")
-                    driver = webdriver.Chrome(service=service, options=options)
-                else:
-                    error_msg = (
-                        f"ChromeDriver not found in common locations: {chromedriver_paths}. "
-                        "To troubleshoot in Docker container, run: "
-                        "which chromedriver && ls -la /usr/bin/chromedriver /usr/lib/chromium*/chromedriver"
-                    )
-                    raise Exception(error_msg)
-            elif BROWSER_SELECTION == 2:
-                from selenium.webdriver.firefox.service import Service as FirefoxService
-
-                geckodriver_paths = [
-                    "/usr/bin/geckodriver",
-                    "/usr/local/bin/geckodriver",
-                ]
-                geckodriver_binary = None
-                for path in geckodriver_paths:
-                    if os.path.exists(path) and os.access(path, os.X_OK):
-                        geckodriver_binary = path
-                        break
-                if geckodriver_binary:
-                    firefox_service = FirefoxService(geckodriver_binary)
-                    from selenium.webdriver.firefox.options import (
-                        Options as FirefoxOptions,
-                    )
-
-                    firefox_options = FirefoxOptions()
-                    firefox_options.add_argument("--headless")
-                    driver = webdriver.Firefox(
-                        service=firefox_service, options=firefox_options
-                    )
-                else:
-                    error_msg = (
-                        f"GeckoDriver not found in common locations: {geckodriver_paths}. "
-                        "To troubleshoot in Docker container, run: "
-                        "which geckodriver && ls -la /usr/bin/geckodriver /usr/local/bin/geckodriver"
-                    )
-                    raise Exception(error_msg)
-            else:
-                raise Exception(
-                    f"Invalid BROWSER_SELECTION value: {BROWSER_SELECTION}. Use 1 for Chrome, 2 for Firefox."
-                )
-
-            step = "loading Slack invite URL"
-            log_step(step)
-            driver.get(invite_url)
-
-            save_slack_html(html_counter, step)
-            html_counter += 1
-
-            # Dismiss cookie banner if present
+        if driver:
             try:
-                step = "dismissing cookie banner"
-                log_step(step)
-                WebDriverWait(driver, 5).until(
-                    EC.element_to_be_clickable((By.ID, "onetrust-reject-all-handler"))
-                ).click()
-                save_slack_html(html_counter, step)
-                html_counter += 1
-            except Exception:
-                pass  # Banner not present, continue
-
-            step = "waiting for login form"
-            log_step(step)
-            WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.ID, "email"))
-            )
-
-            save_slack_html(html_counter, step)
-            html_counter += 1
-
-            step = "entering Slack admin credentials"
-            log_step(step)
-            time.sleep(random.uniform(1, 2))
-            driver.find_element(By.ID, "email").send_keys(admin_username)
-            time.sleep(random.uniform(2, 3))
-            driver.find_element(By.ID, "password").send_keys(admin_password)
-            # Tilføj menneskelig pause før login
-            time.sleep(random.uniform(1, 2))
-            driver.find_element(By.XPATH, '//button[@type="submit"]').click()
-
-            save_slack_html(html_counter, step)
-            html_counter += 1
-
-            # --- 2FA TOTP step ---
-            if totp_secret:
-                try:
-                    step = "waiting for 2FA input field"
-                    log_step(step)
-                    twofa_input = None
-                    selector_used = None
-                    selector_timings = []
-                    for selector in [
-                        (By.CSS_SELECTOR, "input[type='text']"),
-                        (By.ID, "2fa_code"),
-                        (By.ID, "totp"),
-                        (By.NAME, "2fa_code"),
-                        (By.NAME, "totp"),
-                        (By.CSS_SELECTOR, "input[type='tel']"),
-                    ]:
-                        t0 = time.time()
-                        try:
-                            twofa_input = WebDriverWait(driver, 10).until(
-                                EC.presence_of_element_located(selector)
-                            )
-                            dt = round(time.time() - t0, 2)
-                            selector_timings.append(
-                                f"Selector {selector} succeeded after {dt}s"
-                            )
-                            selector_used = selector
-                            break
-                        except Exception:
-                            dt = round(time.time() - t0, 2)
-                            selector_timings.append(
-                                f"Selector {selector} failed after {dt}s"
-                            )
-                            continue
-                    for sel_log in selector_timings:
-                        log_step(f"2FA selector: {sel_log}")
-                    if not twofa_input:
-                        log_step(
-                            "Could not find 2FA input field on Slack login page. Aborting flow."
-                        )
-                        log.status = 2
-                        log.message = "\n".join(step_log)
-                        log.save()
-                        driver.quit()
-                        processing_time = round(time.time() - start_time, 2)
-                        return render(
-                            request,
-                            "members/slack_invite_approval.html",
-                            {
-                                "success": False,
-                                "processing_time": processing_time,
-                                "invited_email": emails_raw,
-                            },
-                        )
-                    log_step(f"2FA input field found with selector: {selector_used}")
-                    time.sleep(random.uniform(2, 5))
-                    totp_code = pyotp.TOTP(totp_secret).now()
-                    if twofa_input.is_enabled():
-                        twofa_input.clear()
-                        step = "entering TOTP code"
-                        log_step(step)
-                        twofa_input.send_keys(totp_code)
-                    else:
-                        log_step(
-                            "2FA input field is disabled, skipping TOTP entry. Aborting flow."
-                        )
-                        log.status = 2
-                        log.message = "\n".join(step_log)
-                        log.save()
-                        driver.quit()
-                        processing_time = round(time.time() - start_time, 2)
-                        return render(
-                            request,
-                            "members/slack_invite_approval.html",
-                            {
-                                "success": False,
-                                "processing_time": processing_time,
-                                "invited_email": emails_raw,
-                            },
-                        )
-                    step = "submitting TOTP code"
-                    log_step(step)
-                    for btn_selector in [
-                        (By.XPATH, "//button[@type='submit']"),
-                        (By.XPATH, "//button[contains(text(), 'Verify')]"),
-                    ]:
-                        try:
-                            btn = driver.find_element(*btn_selector)
-                            if btn.is_enabled():
-                                btn.click()
-                                break
-                        except Exception:
-                            continue
-                    save_slack_html(html_counter, step)
-                    html_counter += 1
-                except Exception as e:
-                    step = f"2FA step failed: {e}"
-                    log_step(step)
-                    log.status = 2
-                    log.message = "\n".join(step_log)
-                    log.save()
-                    if driver:
-                        driver.quit()
-                    processing_time = round(time.time() - start_time, 2)
-                    return render(
-                        request,
-                        "members/slack_invite_approval.html",
-                        {
-                            "success": False,
-                            "processing_time": processing_time,
-                            "invited_email": emails_raw,
-                        },
-                    )
-
-            step = "waiting for 'Invite people' button"
-            log_step(step)
-            try:
-                WebDriverWait(driver, 20).until(
-                    EC.element_to_be_clickable(
-                        (By.CSS_SELECTOR, '[data-qa="admin_invite_people_btn"]')
-                    )
-                ).click()
-                save_slack_html(html_counter, step)
-                html_counter += 1
-            except Exception as e:
-                log_step(
-                    f"Could not find or click 'Invite people' button: {e}. Aborting flow."
-                )
-                log.status = 2
-                log.message = "\n".join(step_log)
-                log.save()
-                if driver:
-                    driver.quit()
-                processing_time = round(time.time() - start_time, 2)
-                return render(
-                    request,
-                    "members/slack_invite_approval.html",
-                    {
-                        "success": False,
-                        "processing_time": processing_time,
-                        "invited_email": emails_raw,
-                    },
-                )
-
-            step = "waiting for invite modal"
-            log_step(step)
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located(
-                    (By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]')
-                )
-            )
-
-            save_slack_html(html_counter, step)
-            html_counter += 1
-
-            step = "entering emails into invite field"
-            log_step(step)
-            invite_input = driver.find_element(
-                By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]'
-            )
-            invite_input.click()
-            # Send all emails at once, separated by spaces
-            bulk_email_str = " ".join(emails)
-            time.sleep(0.3)
-            invite_input.send_keys(bulk_email_str)
-            invite_input.send_keys(Keys.SPACE)
-            time.sleep(2.5)
-
-            # Wait for Slack's validation to complete (Send button enabled or popover appears)
-            removed_emails = []
-            popover_text = ""
-            try:
-                WebDriverWait(driver, 10).until(
-                    lambda d: d.find_element(
-                        By.XPATH,
-                        '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
-                    ).is_enabled()
-                    and not d.find_element(
-                        By.XPATH,
-                        '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
-                    )
-                    .get_attribute("class")
-                    .__contains__("c-button--disabled")
-                )
-                log_step("Bulk emails validated and Send button enabled.")
-            except Exception:
-                # Check for popover overlay and extract text
-                try:
-                    overlay = driver.find_element(
-                        By.XPATH,
-                        '//div[contains(@class, "ReactModal__Overlay") and contains(@class, "c-popover")]',
-                    )
-                    if overlay and overlay.is_displayed():
-                        popover_text = overlay.text.strip()
-                        log_step(
-                            f"Popover overlay after bulk email input: {popover_text}"
-                        )
-                        # Try to parse removed emails from popover text
-                        for email in emails:
-                            if email in popover_text:
-                                removed_emails.append(email)
-                except Exception:
-                    log_step("No popover overlay detected after bulk email input.")
-
-            # If all emails removed, treat as valid outcome
-            if popover_text:
-                log_step("Slack validation feedback:")
-                log_step(popover_text)
-            if removed_emails:
-                log_step("The following emails were removed by Slack validation:")
-                for email in removed_emails:
-                    log_step(f"- {email}")
-            if len(removed_emails) == len(emails):
-                log_step(
-                    "All emails were removed by Slack validation. No invites sent."
-                )
-
-            # Now use Tab navigation to reach Send button and press Enter
-            # Check for popover overlay before any further interaction
-            overlay_present = False
-            try:
-                overlay = driver.find_element(
-                    By.XPATH,
-                    '//div[contains(@class, "ReactModal__Overlay") and contains(@class, "c-popover")]',
-                )
-                if overlay and overlay.is_displayed():
-                    overlay_present = True
-                    popover_text = overlay.text.strip()
-                    log_step(
-                        f"Popover overlay detected after bulk email input: {popover_text}"
-                    )
-            except Exception:
-                overlay_present = False
-
-            if overlay_present:
-                log_step("Skipping further interaction due to popover overlay.")
-            else:
-                invite_input.click()
-                time.sleep(0.5)
-                send_btn = None
-                try:
-                    send_btn = driver.find_element(
-                        By.XPATH,
-                        '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
-                    )
-                    send_btn_class = send_btn.get_attribute("class")
-                    if "c-button--disabled" in send_btn_class:
-                        log_step("Send button is disabled. Not attempting to click.")
-                        # Extract validation feedback from modal or popover
-                        try:
-                            overlay = driver.find_element(
-                                By.XPATH,
-                                '//div[contains(@class, "ReactModal__Overlay") and contains(@class, "c-popover")]',
-                            )
-                            if overlay and overlay.is_displayed():
-                                popover_text = overlay.text.strip()
-                                log_step(f"Slack validation feedback: {popover_text}")
-                        except Exception:
-                            log_step(
-                                "No popover overlay detected for validation feedback."
-                            )
-                        # Optionally, extract modal text
-                        try:
-                            modal = driver.find_element(
-                                By.XPATH, '//div[contains(@class, "c-sk-modal")]'
-                            )
-                            modal_text = modal.text.strip()
-                            if modal_text:
-                                log_step(f"Slack modal feedback: {modal_text}")
-                        except Exception:
-                            log_step("No modal feedback detected.")
-                        # Do not attempt to click
-                    else:
-                        send_btn.click()
-                        log_step("Clicked Send button.")
-                        time.sleep(random.uniform(2.5, 4.5))
-                except Exception as e:
-                    log_step(f"Could not locate or click Send button. Exception: {e}")
-
-            # --- Enhanced diagnostics after clicking Send ---
-            try:
-                aria_msgs = []
-                for sel in [
-                    (
-                        By.XPATH,
-                        '//*[@role="alert" and string-length(normalize-space(text())) > 0]',
-                    ),
-                    (
-                        By.XPATH,
-                        '//*[@aria-live="assertive" and string-length(normalize-space(text())) > 0]',
-                    ),
-                    (
-                        By.XPATH,
-                        '//*[@aria-live="polite" and string-length(normalize-space(text())) > 0]',
-                    ),
-                ]:
-                    for el in driver.find_elements(*sel):
-                        txt = el.text.strip()
-                        if txt:
-                            aria_msgs.append(txt)
-                if aria_msgs:
-                    log_step(f"ARIA live region(s) after Send: {' | '.join(aria_msgs)}")
+                driver.quit()
             except Exception:
                 pass
-
-            # Log ARIA live region contents (role="alert", aria-live="assertive"/"polite")
-            try:
-                aria_msgs = []
-                for sel in [
-                    (
-                        By.XPATH,
-                        '//*[@role="alert" and string-length(normalize-space(text())) > 0]',
-                    ),
-                    (
-                        By.XPATH,
-                        '//*[@aria-live="assertive" and string-length(normalize-space(text())) > 0]',
-                    ),
-                    (
-                        By.XPATH,
-                        '//*[@aria-live="polite" and string-length(normalize-space(text())) > 0]',
-                    ),
-                ]:
-                    for el in driver.find_elements(*sel):
-                        txt = el.text.strip()
-                        if txt:
-                            aria_msgs.append(txt)
-                if aria_msgs:
-                    log_step(f"ARIA live region(s) after Send: {' | '.join(aria_msgs)}")
-            except Exception:
-                pass
-
-            # Log visible modal text after clicking Send (only once)
-            try:
-                modal = driver.find_element(
-                    By.XPATH, '//div[contains(@class, "c-sk-modal")]'
-                )
-                modal_text = modal.text.strip()
-                if modal_text:
-                    log_step(f"Invite modal text after Send: {modal_text}")
-                    # Parse modal text for per-email feedback
-                    accepted_emails = []
-                    duplicate_emails = []
-                    failed_emails = []
-                    for email in emails:
-                        if f"{email} is already a member" in modal_text:
-                            duplicate_emails.append(email)
-                        elif f"{email} has already been invited" in modal_text:
-                            duplicate_emails.append(email)
-                        elif "Invited as" in modal_text and email in modal_text:
-                            accepted_emails.append(email)
-                        else:
-                            # If not found, treat as failed
-                            failed_emails.append(email)
-                    # Build feedback summary
-                    feedback_lines = []
-                    if accepted_emails:
-                        feedback_lines.append("Accepted/Invited emails:")
-                        feedback_lines.extend([f"  - {e}" for e in accepted_emails])
-                    if duplicate_emails:
-                        feedback_lines.append("Already member or previously invited:")
-                        feedback_lines.extend([f"  - {e}" for e in duplicate_emails])
-                    if failed_emails:
-                        feedback_lines.append("Failed/Unknown status emails:")
-                        feedback_lines.extend([f"  - {e}" for e in failed_emails])
-                    if feedback_lines:
-                        log_step("\n".join(feedback_lines))
-                    # Treat any accepted as success
-                    if accepted_emails:
-                        success = True
-            except Exception:
-                log_step("Could not extract invite modal text after Send click.")
-
-            save_slack_html(html_counter, step)
-            html_counter += 1
-
-            step = "waiting for success indicator or pending invite row"
-            log_step(step)
-            save_slack_html(html_counter, step)
-            html_counter += 1
-            # Only set success = False if not already True from modal text check
-            if not success:
-                success = False
-            page_source = None
-            invited_email = emails[0] if emails else None
-
-            # --- NEW: Check for error/validation messages in the invite modal ---
-            error_text = None
-            try:
-                # Look for common error/validation message containers in the invite modal
-                # Slack often uses elements with role="alert" or aria-live="assertive" for errors
-                error_elements = driver.find_elements(
-                    By.XPATH,
-                    '//*[(@role="alert" or @aria-live="assertive") and string-length(normalize-space(text())) > 0]',
-                )
-                if error_elements:
-                    error_texts = [
-                        el.text.strip() for el in error_elements if el.text.strip()
-                    ]
-                    if error_texts:
-                        error_text = " | ".join(error_texts)
-                        log_step(f"Invite modal error detected: {error_text}")
-                        success = False
-                        page_source = driver.page_source
-            except Exception:
-                pass
-
-            if error_text:
-                # If error detected, log and skip further success checks
-                log_step(f"Invite failed due to modal error: {error_text}")
-            else:
-                try:
-                    # First, try the classic success indicators
-                    WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located(
-                            (By.XPATH, '//*[contains(text(), "You\'ve invited")]')
-                        )
-                    )
-                    success = True
-                except Exception:
-                    # Try alternate success indicators
-                    try:
-                        driver.find_element(
-                            By.XPATH, '//*[contains(text(), "already a member")]'
-                        )
-                        success = True
-                    except Exception:
-                        try:
-                            driver.find_element(
-                                By.XPATH,
-                                '//*[contains(text(), "already been invited")]',
-                            )
-                            success = True
-                        except Exception:
-                            pass
-                    # If still not successful, check for the invited email in the pending invites table
-                    if not success and invited_email:
-                        try:
-                            # Wait for the pending invites table to appear
-                            WebDriverWait(driver, 10).until(
-                                EC.presence_of_element_located(
-                                    (By.CSS_SELECTOR, '[data-qa="admin_invites_table"]')
-                                )
-                            )
-                            # Look for the invited email in the table
-                            email_xpath = f'//div[@data-qa="invite_email"]//strong[contains(text(), "{invited_email}")]'
-                            driver.find_element(By.XPATH, email_xpath)
-                            success = True
-                            log_step(
-                                f"Found invited email '{invited_email}' in pending invites table"
-                            )
-                        except Exception:
-                            pass
-                    # If still not successful, capture the page source for debugging
-                    if not success:
-                        try:
-                            page_source = driver.page_source
-                        except Exception:
-                            page_source = None
-
-            if success:
-                log_step("flow complete - all steps done")
-                log.status = 4  # Success
-                # Improve log readability: join with newline
-                log.message = "\n".join(step_log)
-            else:
-                log_step("invite likely failed - no success indicator found")
-                log.status = 2  # Failed
-                log.message = "\n".join(step_log)
-                if page_source:
-                    log.message += (
-                        "\n\nPage source after clicking Send:\n" + page_source
-                    )
-            # Update log entry with final status, message, and emails
-            log.emails = "\n".join(emails) if emails else emails_raw
-            log.status = log.status  # Already set above, but will be updated below
-            log.message = "\n".join(step_log)
-            log.save()
-            driver.quit()
-            processing_time = round(time.time() - start_time, 2)
-
-        except Exception as e:
-            log_step(f"ERROR: {e}")
-            page_source = ""
-            if driver:
-                try:
-                    page_source = driver.page_source
-                except Exception:
-                    pass
-            if log is not None:
-                log.status = 3
-                log.message = f"{'\n'.join(step_log)}\n\nSelenium error at step: {step}\nException: {e}\n\nPage source:\n{page_source}"
-                log.save()
-            if driver:
-                try:
-                    driver.quit()
-                except Exception:
-                    pass
-            # Send email to setup.emails
-            if setup and setup.emails:
-                recipients = [
-                    em.strip() for em in setup.emails.splitlines() if em.strip()
-                ]
-
-                send_mail(
-                    subject="Slack Invite Failure",
-                    message=f"Slack invite failed for: {emails_raw}\nPurpose: {purpose}\nStep: {step}\nError: {e}\n\nSee SlackInviteLog for details.",
-                    from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
-                    recipient_list=recipients,
-                )
-            processing_time = round(time.time() - start_time, 2)
-            # Vis altid succes til bruger, selv ved fejl
-            return render(
-                request,
-                "members/slack_invite_approval.html",
-                {
-                    "success": True,
-                    "processing_time": processing_time,
-                    "invited_email": emails_raw,
-                },
-            )
-        # Always show success to user, even if error occurred
         return render(
             request,
             "members/slack_invite_approval.html",
             {
-                "success": True,
+                "success": current_success,
                 "processing_time": processing_time,
                 "invited_email": emails_raw,
+                "emails": emails_raw,
+                "purpose": purpose,
+                "removed_existing": removed_existing,
+                "removed_invalid": removed_invalid,
+                "invited_emails": invited_emails,
+                "result_message": result_message,
+                "error": (
+                    None
+                    if current_success
+                    else (
+                        error_message
+                        or result_message
+                        or "Slack-invitationen blev ikke gennemført."
+                    )
+                ),
             },
         )
-    return render(request, "members/slack_invite_approval.html")
+
+    try:
+        if not emails:
+            log_step("No emails were provided.")
+            error_message = "Der blev ikke angivet nogen email-adresser."
+            return finish(False, status=2)
+
+        if not invite_url or not admin_username or not admin_password:
+            log_step("Slack invite setup is incomplete.")
+            error_message = "Slack invitation setup mangler nødvendige oplysninger."
+            return finish(False, status=2)
+
+        driver = build_driver()
+
+        step = "loading Slack invite URL"
+        log_step(step)
+        driver.get(invite_url)
+        save_slack_html(driver, html_counter, step)
+        html_counter += 1
+
+        try:
+            step = "dismissing cookie banner"
+            log_step(step)
+            WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.ID, "onetrust-reject-all-handler"))
+            ).click()
+            save_slack_html(driver, html_counter, step)
+            html_counter += 1
+        except Exception:
+            pass
+
+        step = "waiting for login form"
+        log_step(step)
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.ID, "email"))
+        )
+        save_slack_html(driver, html_counter, step)
+        html_counter += 1
+
+        step = "entering Slack admin credentials"
+        log_step(step)
+        driver.find_element(By.ID, "email").send_keys(admin_username)
+        time.sleep(random.uniform(1, 2))
+        driver.find_element(By.ID, "password").send_keys(admin_password)
+        time.sleep(random.uniform(1, 2))
+        driver.find_element(By.XPATH, '//button[@type="submit"]').click()
+        save_slack_html(driver, html_counter, step)
+        html_counter += 1
+
+        if totp_secret:
+            step = "waiting for 2FA input field"
+            log_step(step)
+            twofa_input = None
+            selector_used = None
+            selector_timings = []
+            for selector in [
+                (By.CSS_SELECTOR, "input[type='text']"),
+                (By.ID, "2fa_code"),
+                (By.ID, "totp"),
+                (By.NAME, "2fa_code"),
+                (By.NAME, "totp"),
+                (By.CSS_SELECTOR, "input[type='tel']"),
+            ]:
+                t0 = time.time()
+                try:
+                    twofa_input = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located(selector)
+                    )
+                    selector_used = selector
+                    selector_timings.append(
+                        f"Selector {selector} succeeded after {round(time.time() - t0, 2)}s"
+                    )
+                    break
+                except Exception:
+                    selector_timings.append(
+                        f"Selector {selector} failed after {round(time.time() - t0, 2)}s"
+                    )
+            for item in selector_timings:
+                log_step(f"2FA selector: {item}")
+            if not twofa_input:
+                log_step("Could not find 2FA input field on Slack login page.")
+                return finish(False, status=2)
+
+            log_step(f"2FA input field found with selector: {selector_used}")
+            if not twofa_input.is_enabled():
+                log_step("2FA input field is disabled.")
+                return finish(False, status=2)
+
+            step = "entering TOTP code"
+            log_step(step)
+            twofa_input.clear()
+            twofa_input.send_keys(pyotp.TOTP(totp_secret).now())
+
+            step = "submitting TOTP code"
+            log_step(step)
+            for btn_selector in [
+                (By.XPATH, "//button[@type='submit']"),
+                (By.XPATH, "//button[contains(text(), 'Verify')]"),
+            ]:
+                try:
+                    button = driver.find_element(*btn_selector)
+                    if button.is_enabled():
+                        button.click()
+                        break
+                except Exception:
+                    continue
+            save_slack_html(driver, html_counter, step)
+            html_counter += 1
+
+        step = "waiting for invite people button"
+        log_step(step)
+        WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, '[data-qa="admin_invite_people_btn"]')
+            )
+        ).click()
+        save_slack_html(driver, html_counter, step)
+        html_counter += 1
+
+        step = "waiting for invite modal"
+        log_step(step)
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '[data-qa="invite_modal_select-input"]')
+            )
+        )
+        save_slack_html(driver, html_counter, step)
+        html_counter += 1
+
+        accepted_emails = []
+
+        focus_invite_input(driver)
+
+        for email in emails:
+            step = f"adding email token: {email}"
+            log_step(step)
+            if not invite_modal_is_open(driver):
+                raise Exception(
+                    "Slack invite modal closed unexpectedly during email entry."
+                )
+            invite_input = focus_invite_input(driver)
+            invite_input.send_keys(email)
+            invite_input.send_keys(" ")
+            time.sleep(0.6)
+
+            if not wait_for_token_settle(driver, timeout=2):
+                try:
+                    invite_input = focus_invite_input(driver)
+                    invite_input.send_keys(Keys.ENTER)
+                    time.sleep(0.4)
+                except Exception:
+                    pass
+
+            if not wait_for_token_settle(driver, timeout=1):
+                try:
+                    invite_input = focus_invite_input(driver)
+                    invite_input.send_keys(Keys.TAB)
+                    time.sleep(0.4)
+                except Exception:
+                    pass
+
+            token_state = get_token_state(driver, email)
+            if token_state == "invalid":
+                removed_invalid.append(email)
+                log_step(
+                    f"Slack rendered {email} as an invalid/error token; removing token."
+                )
+                removed_labels = remove_invalid_tokens(driver, preferred_email=email)
+                if removed_labels:
+                    log_step(
+                        f"Slack removed invalid/error token(s): {', '.join(removed_labels)}"
+                    )
+                elif get_token_state(driver, email) == "invalid":
+                    log_step(
+                        f"Slack still shows invalid/error token for {email} after removal attempt."
+                    )
+                continue
+            if token_state == "accepted":
+                accepted_emails.append(email)
+                log_step(f"Accepted token for {email}.")
+                focus_invite_input(driver)
+                continue
+
+            action = click_visible_action(
+                driver,
+                ["Remove duplicate", "Remove all items with errors"],
+            )
+            if action == "Remove duplicate":
+                removed_existing.append(email)
+                log_step(f"Slack rejected {email} as duplicate/member; removed token.")
+                time.sleep(0.5)
+                clear_invite_query(driver)
+                continue
+            if action == "Remove all items with errors":
+                removed_invalid.append(email)
+                log_step(f"Slack rejected {email} as invalid; removed token.")
+                time.sleep(0.5)
+                removed_labels = remove_invalid_tokens(driver, preferred_email=email)
+                if removed_labels:
+                    log_step(
+                        f"Slack removed invalid/error token(s): {', '.join(removed_labels)}"
+                    )
+                elif get_token_state(driver, email) == "invalid":
+                    log_step(
+                        f"Slack still shows invalid/error token for {email} after removal attempt."
+                    )
+                continue
+
+            classification, validation_text = classify_validation_state(driver, email)
+            if classification == "duplicate":
+                removed_existing.append(email)
+                log_step(
+                    f"Slack validation marked {email} as existing/already invited: {validation_text}"
+                )
+                clear_invite_query(driver)
+                continue
+            if classification == "invalid":
+                removed_invalid.append(email)
+                log_step(
+                    f"Slack validation marked {email} as invalid: {validation_text}"
+                )
+                removed_labels = remove_invalid_tokens(driver, preferred_email=email)
+                if removed_labels:
+                    log_step(
+                        f"Slack removed invalid/error token(s): {', '.join(removed_labels)}"
+                    )
+                elif get_token_state(driver, email) == "invalid":
+                    log_step(
+                        f"Slack still shows invalid/error token for {email} after removal attempt."
+                    )
+                continue
+
+            wait_for_token_settle(driver, timeout=2)
+            token_state = get_token_state(driver, email)
+            if token_state == "invalid":
+                removed_invalid.append(email)
+                log_step(
+                    f"Slack left {email} as an invalid/error token after validation; removing token."
+                )
+                removed_labels = remove_invalid_tokens(driver, preferred_email=email)
+                if removed_labels:
+                    log_step(
+                        f"Slack removed invalid/error token(s): {', '.join(removed_labels)}"
+                    )
+                elif get_token_state(driver, email) == "invalid":
+                    log_step(
+                        f"Slack still shows invalid/error token for {email} after removal attempt."
+                    )
+                continue
+
+            accepted_emails.append(email)
+            log_step(f"Accepted token for {email}.")
+            focus_invite_input(driver)
+
+        if removed_existing:
+            log_step("Duplicate/member emails removed:")
+            for email in removed_existing:
+                log_step(f"- {email}")
+        if removed_invalid:
+            log_step("Invalid emails removed:")
+            for email in removed_invalid:
+                log_step(f"- {email}")
+
+        if not accepted_emails:
+            log_step("No valid emails remained after Slack validation.")
+            result_message = "Ingen adresser kunne inviteres. Alle adresser blev enten genkendt som eksisterende eller afvist som ugyldige."
+            return finish(True, status=4)
+
+        step = "clicking Send button"
+        log_step(step)
+        send_btn = driver.find_element(
+            By.XPATH,
+            '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
+        )
+        send_btn_class = send_btn.get_attribute("class") or ""
+        send_btn_aria_disabled = send_btn.get_attribute("aria-disabled")
+        log_step(
+            f"Send button state: class='{send_btn_class}', aria-disabled='{send_btn_aria_disabled}'"
+        )
+        if "c-button--disabled" in send_btn_class or send_btn_aria_disabled == "true":
+            log_step("Send button remained disabled after validation.")
+            token_snapshot = [
+                f"{token['label']} ({'error' if token['error'] else 'ok'})"
+                for token in get_invite_tokens(driver)
+            ]
+            if token_snapshot:
+                log_step("Token snapshot before retry: " + ", ".join(token_snapshot))
+            leftover_error_tokens = [
+                token["label"] for token in get_invite_tokens(driver) if token["error"]
+            ]
+            if leftover_error_tokens:
+                for token_label in leftover_error_tokens:
+                    if token_label not in removed_invalid:
+                        removed_invalid.append(token_label)
+                    if token_label in accepted_emails:
+                        accepted_emails.remove(token_label)
+                    log_step(
+                        f"Removing leftover invalid/error token before retrying Send: {token_label}"
+                    )
+
+                removed_labels = remove_invalid_tokens(
+                    driver, preferred_email=leftover_error_tokens[0]
+                )
+                if removed_labels:
+                    log_step(
+                        f"Slack removed leftover invalid/error token(s): {', '.join(removed_labels)}"
+                    )
+
+            if leftover_error_tokens:
+                time.sleep(0.5)
+                token_snapshot = [
+                    f"{token['label']} ({'error' if token['error'] else 'ok'})"
+                    for token in get_invite_tokens(driver)
+                ]
+                if token_snapshot:
+                    log_step(
+                        "Token snapshot after retry cleanup: "
+                        + ", ".join(token_snapshot)
+                    )
+                send_btn = driver.find_element(
+                    By.XPATH,
+                    '//button[@aria-label="Send" and @type="button" and contains(@class, "c-button--primary")]',
+                )
+                send_btn_class = send_btn.get_attribute("class") or ""
+                send_btn_aria_disabled = send_btn.get_attribute("aria-disabled")
+                log_step(
+                    "Send button state after removing leftover error tokens: "
+                    f"class='{send_btn_class}', aria-disabled='{send_btn_aria_disabled}'"
+                )
+
+            for email in list(accepted_emails):
+                classification, validation_text = classify_validation_state(
+                    driver, email
+                )
+                if classification == "duplicate" and email not in removed_existing:
+                    removed_existing.append(email)
+                    accepted_emails.remove(email)
+                    log_step(
+                        f"Reclassified {email} as existing/already invited: {validation_text}"
+                    )
+                elif classification == "invalid" and email not in removed_invalid:
+                    removed_invalid.append(email)
+                    accepted_emails.remove(email)
+                    log_step(f"Reclassified {email} as invalid: {validation_text}")
+            if not accepted_emails:
+                result_message = "Ingen adresser kunne inviteres. Alle adresser blev enten genkendt som eksisterende eller afvist som ugyldige."
+                return finish(True, status=4)
+            if (
+                "c-button--disabled" not in send_btn_class
+                and send_btn_aria_disabled != "true"
+            ):
+                send_btn.click()
+                time.sleep(random.uniform(2.5, 4.0))
+                save_slack_html(driver, html_counter, step)
+                html_counter += 1
+            else:
+                page_source = driver.page_source
+                error_message = "Slack holdt Send-knappen deaktiveret efter validering."
+                result_message = "Slack holdt Send-knappen deaktiveret, selv om nogle adresser så gyldige ud."
+                return finish(False, status=2, extra_html=page_source)
+        else:
+            send_btn.click()
+            time.sleep(random.uniform(2.5, 4.0))
+            save_slack_html(driver, html_counter, step)
+            html_counter += 1
+
+        step = "reading confirmation modal"
+        log_step(step)
+        confirmation_text = ""
+        try:
+            modal = WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, '//div[contains(@class, "c-sk-modal")]')
+                )
+            )
+            confirmation_text = modal.text.strip()
+            if confirmation_text:
+                log_step(f"Invite modal text after Send: {confirmation_text}")
+        except Exception:
+            log_step("Could not read confirmation modal after clicking Send.")
+
+        confirmed_emails = [
+            email for email in accepted_emails if email in confirmation_text
+        ]
+        if confirmed_emails:
+            invited_emails[:] = confirmed_emails
+            log_step("Confirmed invited emails:")
+            for email in confirmed_emails:
+                log_step(f"- {email}")
+        elif accepted_emails and "Sent" in confirmation_text:
+            invited_emails[:] = accepted_emails
+
+        finish_button = click_visible_action(driver, ["Finished", "Done", "Close"])
+        if finish_button:
+            log_step(f"Closed confirmation modal using '{finish_button}'.")
+
+        invited_from_table = []
+        for email in accepted_emails:
+            if email_exists_in_pending_table(driver, email):
+                invited_from_table.append(email)
+
+        if invited_from_table:
+            invited_emails[:] = invited_from_table
+            log_step("Verified invited emails from pending invites table:")
+            for email in invited_from_table:
+                log_step(f"- {email}")
+
+        success = bool(confirmed_emails) or (
+            "Sent" in confirmation_text and bool(accepted_emails)
+        )
+        if invited_from_table:
+            success = True
+        if invited_emails:
+            result_message = f"{len(invited_emails)} adresse(r) blev inviteret."
+        elif removed_existing or removed_invalid:
+            result_message = (
+                "Slack behandlede adresserne, men ingen nye invitationer blev sendt."
+            )
+        if not success:
+            page_source = driver.page_source
+            error_message = "Slack gennemførte ikke invitationen fuldt ud."
+
+        return finish(
+            success,
+            status=4 if success else 2,
+            extra_html=None if success else page_source,
+        )
+
+    except Exception as exc:
+        log_step(f"ERROR: {exc}")
+        error_message = f"Der opstod en fejl under Slack-invitationen: {exc}"
+        try:
+            page_source = driver.page_source if driver else ""
+        except Exception:
+            page_source = ""
+
+        if setup and setup.emails:
+            recipients = [
+                email.strip() for email in setup.emails.splitlines() if email.strip()
+            ]
+            if recipients:
+                send_mail(
+                    subject="Slack Invite Failure",
+                    message=(
+                        f"Slack invite failed for: {emails_raw}\n"
+                        f"Purpose: {purpose}\n"
+                        f"Step: {step}\n"
+                        f"Error: {exc}\n\n"
+                        "See SlackInviteLog for details."
+                    ),
+                    from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                    recipient_list=recipients,
+                )
+
+        return finish(False, status=3, extra_html=page_source)

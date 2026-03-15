@@ -14,7 +14,38 @@
 {% if success or error %}
     {% if success %}
         <div class="alert alert-success">
-            Invitation for <b>{{ invited_name }}</b> ({{ invited_email }}) blev sendt til Slack.<br>
+            {% if result_message %}
+                {{ result_message }}<br>
+            {% else %}
+                Slack-behandlingen blev gennemført.<br>
+            {% endif %}
+            {% if invited_emails %}
+                <br>
+                <b>Inviteret:</b>
+                <ul>
+                    {% for email in invited_emails %}
+                        <li>{{ email }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if removed_existing %}
+                <br>
+                <b>Fjernet, fordi de allerede findes:</b>
+                <ul>
+                    {% for email in removed_existing %}
+                        <li>{{ email }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if removed_invalid %}
+                <br>
+                <b>Fjernet som ugyldige:</b>
+                <ul>
+                    {% for email in removed_invalid %}
+                        <li>{{ email }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <br>
             <b>Tid:</b> {{ processing_time }} sekunder.<br>
             <form method="get">
@@ -24,10 +55,40 @@
     {% else %}
         <div class="alert alert-danger">
             {{ error }}<br>
+            {% if result_message %}
+                <br>{{ result_message }}<br>
+            {% endif %}
+            {% if removed_existing %}
+                <br>
+                <b>Fjernet, fordi de allerede findes:</b>
+                <ul>
+                    {% for email in removed_existing %}
+                        <li>{{ email }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if removed_invalid %}
+                <br>
+                <b>Fjernet som ugyldige:</b>
+                <ul>
+                    {% for email in removed_invalid %}
+                        <li>{{ email }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if invited_emails %}
+                <br>
+                <b>Inviteret:</b>
+                <ul>
+                    {% for email in invited_emails %}
+                        <li>{{ email }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <br>
             <b>Tid:</b> {{ processing_time }} sekunder.<br>
             <form method="get">
-                <button type="submit" class="btn btn-primary mt-3">Continue</button>
+                <button type="submit" class="btn btn-primary mt-3">Fortsæt</button>
             </form>
         </div>
     {% endif %}
@@ -43,7 +104,7 @@
             <label for="purpose">Formål</label>
             <input type="text" name="purpose" id="purpose" required class="form-control" placeholder="Formål" value="{{ purpose|default:'' }}" />
         </div>
-        <button type="submit" class="btn btn-success">Invite</button>
+        <button type="submit" class="btn btn-success">Inviter</button>
     </form>
     <div id="progress-indicator" style="display:none; margin-top:20px;">
         <div class="spinner-border text-primary" role="status">
