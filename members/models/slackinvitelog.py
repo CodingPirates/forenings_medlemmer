@@ -6,12 +6,15 @@ User = get_user_model()
 
 class SlackInviteLog(models.Model):
     STATUS_CHOICES = [
-        (1, "Created"),
+        (1, "Oprettet"),
         (2, "Invite used"),
         (3, "URL failed/email sent"),
+        (4, "Slack invitation udført"),
+        (5, "Invitation fejlede"),
+        (6, "Fejl håndteret"),
     ]
 
-    email = models.EmailField()
+    emails = models.TextField(blank=True)
     purpose = models.CharField(max_length=255, blank=True)
     invite_url = models.URLField("Invite URL", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,34 +27,50 @@ class SlackInviteLog(models.Model):
     )
     status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     message = models.TextField(blank=True)
+    resolved_at = models.DateTimeField(
+        "Løst tidspunkt",
+        null=True,
+        blank=True,
+        help_text="Tidspunkt hvor fejlen blev løst.",
+    )
+    resolved_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="slack_invite_logs_resolved",
+        verbose_name="Løst af",
+        help_text="Bruger der har markeret fejlen som løst.",
+    )
+    resolution_note = models.TextField(
+        "Løsningsnote", blank=True, help_text="Evt. kommentar eller note til løsningen."
+    )
 
     class Meta:
-        verbose_name = "Slack Invite Log"
-        verbose_name_plural = "Slack Invite Logs"
+        verbose_name = "Slack Invitation Log"
+        verbose_name_plural = "Slack Invitation Logs"
         ordering = ["-created_at"]
-        permissions = [
-            ("can_approve_slack_invites", "Can approve Slack invites"),
-        ]
+        # Permission flyttes til SlackInvitationSetup for at matche ønsket placering
 
     def clean(self):
         from django.core.validators import validate_email
         from django.core.exceptions import ValidationError
 
-        emails = self.email.split()
+        emails = self.emails.split()
         for e in emails:
             try:
                 validate_email(e)
             except ValidationError:
-                raise ValidationError({"email": f"Invalid email address: {e}"})
+                raise ValidationError({"emails": f"Ugyldig emailadresse: {e}"})
 
     def email_summary(self):
-        emails = self.email.split()
+        emails = self.emails.split()
         if len(emails) == 1:
             return emails[0]
         return f"{len(emails)} emails"
 
     def __str__(self):
-        emails = self.email.split()
+        emails = self.emails.split()
         if len(emails) == 1:
             return f"{emails[0]} - {self.get_status_display()}"
         return f"{len(emails)} emails - {self.get_status_display()}"
