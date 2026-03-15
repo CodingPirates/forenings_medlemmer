@@ -20,6 +20,8 @@ import pyotp
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.shortcuts import render
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -606,6 +608,37 @@ def slack_invite_approval(request):
             log_step("No emails were provided.")
             error_message = "Der blev ikke angivet nogen email-adresser."
             return finish(False, status=2)
+
+        # Validate and de-duplicate email addresses before starting automation.
+        validated_emails = []
+        seen_emails = set()
+        invalid_emails = []
+        for raw_email in emails:
+            email = (raw_email or "").strip()
+            if not email:
+                continue
+            if email in seen_emails:
+                continue
+            try:
+                validate_email(email)
+            except ValidationError:
+                invalid_emails.append(email)
+                continue
+            seen_emails.add(email)
+            validated_emails.append(email)
+
+        if invalid_emails:
+            log_step(
+                "Invalid email addresses provided: "
+                + ", ".join(invalid_emails)
+            )
+            error_message = (
+                "En eller flere email-adresser er ugyldige: "
+                + ", ".join(invalid_emails)
+            )
+            return finish(False, status=2)
+
+        emails = validated_emails
 
         if not invite_url or not admin_username or not admin_password:
             log_step("Slack invite setup is incomplete.")
