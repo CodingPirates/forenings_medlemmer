@@ -1,7 +1,9 @@
 from django.contrib import admin
-from members.models.slackinvitelog import SlackInviteLog
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.utils.safestring import mark_safe
+
+from members.models.slackinvitelog import SlackInviteLog
 
 
 class CreatedBySlackLogFilter(admin.SimpleListFilter):
@@ -43,8 +45,8 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
         (
             "Løsningsstatus",
             {
-                "fields": ("resolved", "resolved_at", "resolved_by", "resolution_note"),
-                "description": "Marker og dokumentér hvis fejlen er håndteret/løst.",
+                "fields": ("resolved_at", "resolved_by", "resolution_note"),
+                "description": "Dokumentér hvem der håndterede fejlen og hvornår.",
             },
         ),
     )
@@ -52,20 +54,14 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         ro = list(self.readonly_fields)
         ro += ["resolved_by", "resolved_at"]
-        # 'resolved' must remain editable so admins can mark logs as handled.
         return ro
 
     def get_form(self, request, obj=None, **kwargs):
-        # Use the default form; 'resolved' is editable, while 'resolved_by' and
-        # 'resolved_at' are controlled via save_model.
         form = super().get_form(request, obj, **kwargs)
         return form
 
     def save_model(self, request, obj, form, change):
-        from django.utils import timezone
-
-        # Hvis resolved markeres, sæt resolved_by og resolved_at
-        if "resolved" in form.changed_data and obj.resolved:
+        if obj.status == 6 and ("status" in form.changed_data or not change):
             obj.resolved_by = request.user
             obj.resolved_at = timezone.now()
 
@@ -98,7 +94,6 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
         "purpose",
         "invite_url",
         "created_by",
-        "status",
         "message",
     )
 

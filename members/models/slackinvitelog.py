@@ -27,12 +27,6 @@ class SlackInviteLog(models.Model):
     )
     status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     message = models.TextField(blank=True)
-
-    resolved = models.BooleanField(
-        "Løst/håndteret",
-        default=False,
-        help_text="Marker hvis fejlen er håndteret/løst. Sættes automatisk hvis status er 'Invite used' eller 'Error handled'.",
-    )
     resolved_at = models.DateTimeField(
         "Løst tidspunkt",
         null=True,
