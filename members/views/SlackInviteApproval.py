@@ -15,6 +15,7 @@ import os
 import random
 import re
 import time
+import tempfile
 
 import pyotp
 from django.conf import settings
@@ -70,16 +71,32 @@ def get_sanitized_page_source(driver, max_chars=None):
 
 
 def save_slack_html(driver, counter, step_name):
+    # Only write Slack HTML snapshots when DEBUG is enabled to avoid leaking
+    # potentially sensitive admin data and unbounded disk usage in production.
+    if not getattr(settings, "DEBUG", False):
+        return
+
     try:
         if not driver:
             return
-        if not os.path.exists("test-screens"):
-            os.mkdir("test-screens")
+
+        # Allow overriding the snapshot directory via settings; otherwise use
+        # a subdirectory of the system temporary directory.
+        base_dir = getattr(settings, "SLACK_HTML_SNAPSHOT_DIR", None)
+        if not base_dir:
+            base_dir = os.path.join(tempfile.gettempdir(), "slack-snapshots")
+
+        os.makedirs(base_dir, exist_ok=True)
+
         safe_step = step_name.replace(" ", "_").replace("'", "").replace('"', "")[:30]
-        filename = os.path.join("test-screens", f"slack{counter:03d}_{safe_step}.html")
+        timestamp_ms = int(time.time() * 1000)
+        filename = os.path.join(
+            base_dir, f"slack{counter:03d}_{safe_step}_{timestamp_ms}.html"
+        )
         with open(filename, "w", encoding="utf-8") as handle:
             handle.write(get_sanitized_page_source(driver, MAX_SNAPSHOT_HTML_CHARS))
     except Exception:
+        # Snapshotting should never break the main flow.
         pass
 
 
