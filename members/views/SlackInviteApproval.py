@@ -37,9 +37,14 @@ BROWSER_SELECTION = 1  # 1=Chrome, 2=Firefox
 MAX_SNAPSHOT_HTML_CHARS = 250_000
 MAX_LOG_HTML_CHARS = 150_000
 
+SCRIPT_TAG_RE = re.compile(
+    r"<script\b[^>]*>[\s\S]*?</script\b[^>]*>",
+    flags=re.IGNORECASE,
+)
+
 
 def strip_script_tags(html):
-    return re.sub(r"<script[\s\S]*?</script>", "", html or "", flags=re.IGNORECASE)
+    return SCRIPT_TAG_RE.sub("", html or "")
 
 
 def limit_html_size(html, max_chars):
