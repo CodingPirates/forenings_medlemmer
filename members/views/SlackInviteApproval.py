@@ -1090,4 +1090,4 @@ def slack_invite_approval(request):
                     recipient_list=recipients,
                 )
 
-        return finish(False, status=3, extra_html=page_source)
+        return finish(False, status=2, extra_html=page_source)
