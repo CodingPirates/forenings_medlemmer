@@ -462,7 +462,9 @@ def build_driver():
         options.add_argument("--disable-backgrounding-occluded-windows")
         options.add_argument("--disable-sync")
         options.add_argument("--mute-audio")
-        options.add_argument("--disable-features=Translate,MediaRouter,OptimizationHints,AutofillServerCommunication")
+        options.add_argument(
+            "--disable-features=Translate,MediaRouter,OptimizationHints,AutofillServerCommunication"
+        )
         options.add_argument("--blink-settings=imagesEnabled=false")
         options.add_experimental_option(
             "prefs",
@@ -559,7 +561,9 @@ def slack_invite_approval(request):
         log.status = status if status is not None else (4 if current_success else 2)
         log.message = "\n".join(step_log)
         if extra_html:
-            log.message += "\n\nPage source:\n" + limit_html_size(strip_script_tags(extra_html), MAX_LOG_HTML_CHARS)
+            log.message += "\n\nPage source:\n" + limit_html_size(
+                strip_script_tags(extra_html), MAX_LOG_HTML_CHARS
+            )
         log.emails = "\n".join(emails) if emails else emails_raw
         log.save()
         if driver:
