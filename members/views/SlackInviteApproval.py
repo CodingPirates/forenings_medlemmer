@@ -18,7 +18,7 @@ import time
 
 import pyotp
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.mail import send_mail
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -521,6 +521,7 @@ def build_driver():
 
 
 @login_required
+@permission_required("members.can_approve_slack_invites", raise_exception=True)
 def slack_invite_approval(request):
     if request.method != "POST":
         return render(request, "members/slack_invite_approval.html")
