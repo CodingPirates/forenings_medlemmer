@@ -7,9 +7,11 @@ User = get_user_model()
 class SlackInviteLog(models.Model):
     STATUS_CHOICES = [
         (1, "Oprettet"),
-        (2, "Invitation fejlede"),
-        (3, "Fejl håndteret"),
+        (2, "Invite used"),
+        (3, "URL failed/email sent"),
         (4, "Slack invitation udført"),
+        (5, "Invitation fejlede"),
+        (6, "Fejl håndteret"),
     ]
 
     emails = models.TextField(blank=True)
