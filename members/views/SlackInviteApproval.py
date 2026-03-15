@@ -646,13 +646,9 @@ def slack_invite_approval(request):
             validated_emails.append(email)
 
         if invalid_emails:
-            log_step(
-                "Invalid email addresses provided: "
-                + ", ".join(invalid_emails)
-            )
-            error_message = (
-                "En eller flere email-adresser er ugyldige: "
-                + ", ".join(invalid_emails)
+            log_step("Invalid email addresses provided: " + ", ".join(invalid_emails))
+            error_message = "En eller flere email-adresser er ugyldige: " + ", ".join(
+                invalid_emails
             )
             return finish(False, status=2)
 
