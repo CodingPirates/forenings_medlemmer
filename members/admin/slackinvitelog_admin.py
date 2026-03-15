@@ -62,20 +62,13 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
         return form
 
     def save_model(self, request, obj, form, change):
-        # Hvis resolved markeres, sæt resolved_by og resolved_at og status=4
+        from django.utils import timezone
+
+        # Hvis resolved markeres, sæt resolved_by og resolved_at
         if "resolved" in form.changed_data and obj.resolved:
             obj.resolved_by = request.user
-            from django.utils import timezone
-
             obj.resolved_at = timezone.now()
-            obj.status = 4
-        # Hvis status sættes til 2, marker resolved
-        if "status" in form.changed_data and obj.status == 2:
-            obj.resolved = True
-            obj.resolved_by = request.user
-            from django.utils import timezone
 
-            obj.resolved_at = timezone.now()
         super().save_model(request, obj, form, change)
 
     def formatted_created_at(self, obj):
