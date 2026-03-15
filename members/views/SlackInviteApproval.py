@@ -33,11 +33,33 @@ from members.models.slackinvitelog import SlackInviteLog
 from members.models.slackinvitesetup import SlackInvitationSetup
 
 
-BROWSER_SELECTION = 2  # 1=Chrome, 2=Firefox
+BROWSER_SELECTION = 1  # 1=Chrome, 2=Firefox
+MAX_SNAPSHOT_HTML_CHARS = 250_000
+MAX_LOG_HTML_CHARS = 150_000
 
 
 def strip_script_tags(html):
     return re.sub(r"<script[\s\S]*?</script>", "", html or "", flags=re.IGNORECASE)
+
+
+def limit_html_size(html, max_chars):
+    html = html or ""
+    if len(html) <= max_chars:
+        return html
+    omitted = len(html) - max_chars
+    return html[:max_chars] + f"\n<!-- truncated {omitted} chars -->"
+
+
+def get_sanitized_page_source(driver, max_chars=None):
+    html = ""
+    try:
+        html = driver.page_source if driver else ""
+    except Exception:
+        html = ""
+    sanitized = strip_script_tags(html)
+    if max_chars is not None:
+        sanitized = limit_html_size(sanitized, max_chars)
+    return sanitized
 
 
 def save_slack_html(driver, counter, step_name):
@@ -49,7 +71,7 @@ def save_slack_html(driver, counter, step_name):
         safe_step = step_name.replace(" ", "_").replace("'", "").replace('"', "")[:30]
         filename = os.path.join("test-screens", f"slack{counter:03d}_{safe_step}.html")
         with open(filename, "w", encoding="utf-8") as handle:
-            handle.write(strip_script_tags(driver.page_source))
+            handle.write(get_sanitized_page_source(driver, MAX_SNAPSHOT_HTML_CHARS))
     except Exception:
         pass
 
@@ -429,9 +451,29 @@ def build_driver():
                 "ChromeDriver not found in common locations: " f"{chromedriver_paths}."
             )
         options = webdriver.ChromeOptions()
+        options.page_load_strategy = "eager"
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-background-networking")
+        options.add_argument("--disable-background-timer-throttling")
+        options.add_argument("--disable-renderer-backgrounding")
+        options.add_argument("--disable-backgrounding-occluded-windows")
+        options.add_argument("--disable-sync")
+        options.add_argument("--mute-audio")
+        options.add_argument("--disable-features=Translate,MediaRouter,OptimizationHints,AutofillServerCommunication")
+        options.add_argument("--blink-settings=imagesEnabled=false")
+        options.add_experimental_option(
+            "prefs",
+            {
+                "profile.managed_default_content_settings.images": 2,
+                "profile.default_content_setting_values.notifications": 2,
+                "profile.default_content_setting_values.geolocation": 2,
+                "profile.default_content_setting_values.media_stream": 2,
+                "disk-cache-size": 1,
+            },
+        )
         return webdriver.Chrome(service=Service(chromedriver_binary), options=options)
 
     if BROWSER_SELECTION == 2:
@@ -453,6 +495,15 @@ def build_driver():
             )
         options = FirefoxOptions()
         options.add_argument("--headless")
+        options.page_load_strategy = "eager"
+        options.set_preference("permissions.default.image", 2)
+        options.set_preference("dom.webnotifications.enabled", False)
+        options.set_preference("media.autoplay.default", 5)
+        options.set_preference("browser.cache.disk.enable", False)
+        options.set_preference("browser.cache.memory.enable", True)
+        options.set_preference("browser.cache.memory.capacity", 16384)
+        options.set_preference("browser.sessionhistory.max_total_viewers", 0)
+        options.set_preference("toolkit.cosmeticAnimations.enabled", False)
         return webdriver.Firefox(
             service=FirefoxService(geckodriver_binary), options=options
         )
@@ -508,7 +559,7 @@ def slack_invite_approval(request):
         log.status = status if status is not None else (4 if current_success else 2)
         log.message = "\n".join(step_log)
         if extra_html:
-            log.message += "\n\nPage source:\n" + strip_script_tags(extra_html)
+            log.message += "\n\nPage source:\n" + limit_html_size(strip_script_tags(extra_html), MAX_LOG_HTML_CHARS)
         log.emails = "\n".join(emails) if emails else emails_raw
         log.save()
         if driver:
@@ -896,7 +947,7 @@ def slack_invite_approval(request):
                 save_slack_html(driver, html_counter, step)
                 html_counter += 1
             else:
-                page_source = driver.page_source
+                page_source = get_sanitized_page_source(driver, MAX_LOG_HTML_CHARS)
                 error_message = "Slack holdt Send-knappen deaktiveret efter validering."
                 result_message = "Slack holdt Send-knappen deaktiveret, selv om nogle adresser så gyldige ud."
                 return finish(False, status=2, extra_html=page_source)
@@ -959,7 +1010,7 @@ def slack_invite_approval(request):
                 "Slack behandlede adresserne, men ingen nye invitationer blev sendt."
             )
         if not success:
-            page_source = driver.page_source
+            page_source = get_sanitized_page_source(driver, MAX_LOG_HTML_CHARS)
             error_message = "Slack gennemførte ikke invitationen fuldt ud."
 
         return finish(
@@ -972,7 +1023,7 @@ def slack_invite_approval(request):
         log_step(f"ERROR: {exc}")
         error_message = f"Der opstod en fejl under Slack-invitationen: {exc}"
         try:
-            page_source = driver.page_source if driver else ""
+            page_source = get_sanitized_page_source(driver, MAX_LOG_HTML_CHARS)
         except Exception:
             page_source = ""
 
