@@ -1063,7 +1063,10 @@ def slack_invite_approval(request):
 
     except Exception as exc:
         log_step(f"ERROR: {exc}")
-        error_message = f"Der opstod en fejl under Slack-invitationen: {exc}"
+        error_message = (
+            "Der opstod en uventet fejl under Slack-invitationen. "
+            "Administratoren er blevet informeret."
+        )
         try:
             page_source = get_sanitized_page_source(driver, MAX_LOG_HTML_CHARS)
         except Exception:
