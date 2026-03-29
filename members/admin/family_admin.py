@@ -1,10 +1,13 @@
 from uuid import uuid4
+
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
+from django.utils.html import format_html
 
 from members.models import Department
 
+from .filters.common_filters import AnonymizedFilter
 from .inlines import (
     EmailItemInline,
     PersonInline,
@@ -13,6 +16,8 @@ from .inlines import (
 
 
 class FamilyAdmin(admin.ModelAdmin):
+    list_filter = (AnonymizedFilter,)
+
     def get_list_display(self, request):
         if request.user.has_perm("members.view_family_unique"):
             return ("id", "email", "unique")
@@ -31,8 +36,19 @@ class FamilyAdmin(admin.ModelAdmin):
     ]  # new UUID gets used accidentially
     # actions = ['resend_link_email']
     list_per_page = settings.LIST_PER_PAGE
-    fields = ("email", "dont_send_mails", "confirmed_at")
-    readonly_fields = ("confirmed_at",)
+    fields = ("anonymization_status", "email", "dont_send_mails", "confirmed_at")
+    readonly_fields = ("anonymization_status", "confirmed_at")
+
+    @admin.display(description="Anonymisering")
+    def anonymization_status(self, obj):
+        if not obj or not obj.pk:
+            return ""
+        if obj.anonymized:
+            return format_html(
+                "<p><strong>Denne familie er anonymiseret.</strong> "
+                "E-mail og andre personlige oplysninger er erstattet eller fjernet.</p>"
+            )
+        return "Denne familie er ikke anonymiseret."
 
     def create_new_uuid(self, request, queryset):
         for family in queryset:
