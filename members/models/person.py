@@ -136,6 +136,11 @@ class Person(models.Model):
         verbose_name="Samtykke givet af",
     )
     consent_at = models.DateTimeField("Samtykke dato", null=True, blank=True)
+    consent_reminder_sent_at = models.DateTimeField(
+        "Samtykke-/inaktivitetspåmindelse sendt",
+        null=True,
+        blank=True,
+    )
     REGION_CHOICES = (
         ("Region Syddanmark", "Syddanmark"),
         ("Region Hovedstaden", "Hovedstaden"),
@@ -265,6 +270,55 @@ class Person(models.Model):
 
         # otherwise, the person can be anonymized
         return True, ""
+
+    @classmethod
+    def get_consent_reminder_queryset(cls):
+        """
+        Persons who should receive the consent/inactivity reminder email.
+
+        Criteria match ``is_anonymization_candidate`` / admin anonymization filters,
+        but with the 2-year activity window replaced by ~1 year 11 months
+        (30 days before the 2×365-day boundary), i.e. about one month before the
+        person would typically become an anonymization candidate.
+
+        Payment rules are unchanged (no payments in the last 5 full fiscal years).
+
+        A reminder is due if none was sent yet, or the last one was more than
+        one calendar year ago (365 days).
+        """
+        from django.db.models import Q
+
+        now = timezone.now()
+        reminder_threshold = now - timedelta(days=2 * 365 - 30)
+        one_year_ago = now - timedelta(days=365)
+        today = now.date()
+        five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
+
+        login_ok = (
+            Q(user__isnull=True)
+            | Q(user__last_login__lt=reminder_threshold)
+            | Q(user__last_login__isnull=True)
+        )
+
+        reminder_due = Q(consent_reminder_sent_at__isnull=True) | Q(
+            consent_reminder_sent_at__lt=one_year_ago
+        )
+
+        return (
+            cls.objects.filter(anonymized=False)
+            .filter(reminder_due)
+            .filter(family__dont_send_mails=False)
+            .filter(added_at__lt=reminder_threshold)
+            .filter(login_ok)
+            .filter(
+                ~Q(
+                    activityparticipant__activity__end_date__gte=reminder_threshold.date()
+                )
+            )
+            .filter(~Q(payment__added_at__gte=five_full_fiscal_years))
+            .filter(~Q(family__payment__added_at__gte=five_full_fiscal_years))
+            .distinct()
+        )
 
     def update_dawa_data(self, force=False, save=True):
         if self.address_invalid and not force:

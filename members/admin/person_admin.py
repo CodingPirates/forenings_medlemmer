@@ -189,6 +189,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "birthday",
                         "has_certificate",
                         "added_at",
+                        "consent_reminder_sent_at",
                         "user",
                         "gender",
                     ),
@@ -247,6 +248,7 @@ class PersonAdmin(admin.ModelAdmin):
         # Add consent fields to readonly
         readonly_fields += [
             "anonymization_status",
+            "consent_reminder_sent_at",
             "consent",
             "consent_by",
             "consent_at",
