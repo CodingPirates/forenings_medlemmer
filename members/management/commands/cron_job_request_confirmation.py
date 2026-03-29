@@ -2,8 +2,8 @@ import datetime
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.models import F, Q
 from django.utils import timezone
-from django.db.models import Q, F
 
 from members.models import (
     EmailTemplate,
@@ -26,10 +26,10 @@ class Command(BaseCommand):
             Q(confirmed_at__lt=outdated_dtm) | Q(confirmed_at=None)
         ).exclude(
             Q(notification__update_info_dtm__gt=F("confirmed_at"))
-            | Q(~Q(notification__update_info_dtm=None), confirmed_at=None)
-        )[
-            :10
-        ]
+            | Q(~Q(notification__update_info_dtm=None), confirmed_at=None).exclude(
+                anonymized=True
+            )
+        )[:10]
 
         # send notification to all families asking them to update
         # their family details
