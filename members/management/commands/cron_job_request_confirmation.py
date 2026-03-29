@@ -15,23 +15,36 @@ from members.models import (
 class Command(BaseCommand):
     help = "Ask families to confirm their details"
 
-    def handle(self, *args, **options):
-        # Find all Families, which has an updated_dtm older than the specified time for updates from today.
-        # Exclude the families which has already received a notification after they updated last.
-        # (to avoid sending again)
-        outdated_dtm = timezone.now() - datetime.timedelta(
-            days=settings.REQUEST_FAMILY_VALIDATION_PERIOD
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--family_id",
+            type=int,
+            help="ID of the family to confirm",
         )
-        unconfirmed_families = Family.objects.filter(
-            Q(confirmed_at__lt=outdated_dtm) | Q(confirmed_at=None)
-        ).exclude(
-            Q(notification__update_info_dtm__gt=F("confirmed_at"))
-            | Q(~Q(notification__update_info_dtm=None), confirmed_at=None).exclude(
-                anonymized=True
+
+        return super().add_arguments(parser)
+
+    def handle(self, *args, **options):
+        family_id = options["family_id"]
+        if family_id:
+            unconfirmed_families = Family.objects.filter(id=family_id)
+        else:
+            # Find all Families, which has an updated_dtm older than the specified time for updates from today.
+            # Exclude the families which has already received a notification after they updated last.
+            # (to avoid sending again)
+            outdated_dtm = timezone.now() - datetime.timedelta(
+                days=settings.REQUEST_FAMILY_VALIDATION_PERIOD
             )
-        )[
-            :10
-        ]
+            unconfirmed_families = Family.objects.filter(
+                Q(confirmed_at__lt=outdated_dtm) | Q(confirmed_at=None)
+            ).exclude(
+                Q(notification__update_info_dtm__gt=F("confirmed_at"))
+                | Q(~Q(notification__update_info_dtm=None), confirmed_at=None).exclude(
+                    anonymized=True
+                )
+            )[
+                :10
+            ]
 
         # send notification to all families asking them to update
         # their family details
