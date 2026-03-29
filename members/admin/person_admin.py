@@ -16,8 +16,8 @@ from members.models import (
     Person,
 )
 
+from .filters.common_filters import AnonymizedFilter
 from .filters.person_admin_filters import (
-    AnonymizedFilter,
     MunicipalityFilter,
     PersonInvitedListFilter,
     PersonParticipantActiveListFilter,
@@ -129,6 +129,7 @@ class PersonAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request, person=None):
         if request.user.has_perm("members.view_full_address"):
             contact_fields = (
+                "anonymization_status",
                 "name",
                 "streetname",
                 "housenumber",
@@ -144,9 +145,23 @@ class PersonAdmin(admin.ModelAdmin):
             )
         else:
             if person.membertype == Person.CHILD:
-                contact_fields = ("name", "city", "zipcode", "family")
+                contact_fields = (
+                    "anonymization_status",
+                    "name",
+                    "city",
+                    "zipcode",
+                    "family",
+                )
             else:
-                contact_fields = ("name", "city", "zipcode", "email", "phone", "family")
+                contact_fields = (
+                    "anonymization_status",
+                    "name",
+                    "city",
+                    "zipcode",
+                    "email",
+                    "phone",
+                    "family",
+                )
         if request.user.has_perm("members.view_consent_information") or request:
             consent_fields = (
                 "Samtykke",
@@ -196,6 +211,17 @@ class PersonAdmin(admin.ModelAdmin):
 
     consent_preview_link.short_description = "Privatlivspolitik"
 
+    @admin.display(description="Anonymisering")
+    def anonymization_status(self, obj):
+        if not obj or not obj.pk:
+            return ""
+        if obj.anonymized:
+            return format_html(
+                "<p><strong>Denne person er anonymiseret.</strong> "
+                "Navn, kontaktoplysninger og noter er erstattet eller fjernet.</p>"
+            )
+        return "Denne person er ikke anonymiseret."
+
     def get_readonly_fields(self, request, obj=None):
         if type(obj) is Person and not request.user.is_superuser:
             readonly_fields = [
@@ -220,6 +246,7 @@ class PersonAdmin(admin.ModelAdmin):
             readonly_fields = []
         # Add consent fields to readonly
         readonly_fields += [
+            "anonymization_status",
             "consent",
             "consent_by",
             "consent_at",
