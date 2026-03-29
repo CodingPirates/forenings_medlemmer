@@ -154,7 +154,23 @@ class MemberAdmin(admin.ModelAdmin):
 
     autocomplete_fields = ("union", "person")
 
-    actions = ["export_csv_member_info", "export_csv_member_address"]
+    actions = ["export_csv_member_info"]
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        # Tilføj kun export_csv_member_address hvis brugeren har rettigheden eller er superuser
+        if request.user.is_superuser or request.user.has_perm(
+            "members.member_export_address"
+        ):
+            actions["export_csv_member_address"] = (
+                self.export_csv_member_address,
+                "export_csv_member_address",
+                self.export_csv_member_address.short_description,
+            )
+        else:
+            # Hvis den er der (f.eks. fra arvet konfiguration), fjern den
+            actions.pop("export_csv_member_address", None)
+        return actions
 
     def get_queryset(self, request):
         qs = super(MemberAdmin, self).get_queryset(request)
@@ -200,7 +216,8 @@ class MemberAdmin(admin.ModelAdmin):
     def export_csv_member_address(self, request, queryset):
         # Sikkerhedstjek: kun superuser eller brugere med 'members.export_address' permission
         if not (
-            request.user.is_superuser or request.user.has_perm("members.export_address")
+            request.user.is_superuser
+            or request.user.has_perm("members.member_export_address")
         ):
             self.message_user(
                 request, "Du har ikke adgang til at eksportere adresser.", level="error"
