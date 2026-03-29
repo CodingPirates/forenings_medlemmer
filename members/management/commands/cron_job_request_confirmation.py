@@ -29,7 +29,9 @@ class Command(BaseCommand):
             | Q(~Q(notification__update_info_dtm=None), confirmed_at=None).exclude(
                 anonymized=True
             )
-        )[:10]
+        )[
+            :10
+        ]
 
         # send notification to all families asking them to update
         # their family details
