@@ -1,42 +1,40 @@
 import codecs
+
 from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 
-from django.urls import reverse
-
+from members.admin.admin_actions import AdminActions
 from members.models import (
     Department,
     Person,
 )
 
+from .filters.common_filters import AnonymizedFilter
 from .filters.person_admin_filters import (
+    MunicipalityFilter,
     PersonInvitedListFilter,
     PersonParticipantActiveListFilter,
     PersonParticipantCurrentYearListFilter,
     PersonParticipantLastYearListFilter,
     PersonParticipantListFilter,
     PersonWaitinglistListFilter,
-    VolunteerListFilter,
-    MunicipalityFilter,
     RegionFilter,
-    AnonymizedFilter,
+    VolunteerListFilter,
 )
-
 from .inlines import (
     ActivityInviteInline,
+    EmailItemInline,
     PaymentInline,
     VolunteerInline,
     WaitingListInline,
-    EmailItemInline,
 )
-
-from members.admin.admin_actions import AdminActions
 
 
 class PersonAdmin(admin.ModelAdmin):
@@ -131,6 +129,7 @@ class PersonAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request, person=None):
         if request.user.has_perm("members.view_full_address"):
             contact_fields = (
+                "anonymization_status",
                 "name",
                 "streetname",
                 "housenumber",
@@ -146,9 +145,23 @@ class PersonAdmin(admin.ModelAdmin):
             )
         else:
             if person.membertype == Person.CHILD:
-                contact_fields = ("name", "city", "zipcode", "family")
+                contact_fields = (
+                    "anonymization_status",
+                    "name",
+                    "city",
+                    "zipcode",
+                    "family",
+                )
             else:
-                contact_fields = ("name", "city", "zipcode", "email", "phone", "family")
+                contact_fields = (
+                    "anonymization_status",
+                    "name",
+                    "city",
+                    "zipcode",
+                    "email",
+                    "phone",
+                    "family",
+                )
         if request.user.has_perm("members.view_consent_information") or request:
             consent_fields = (
                 "Samtykke",
@@ -198,6 +211,17 @@ class PersonAdmin(admin.ModelAdmin):
 
     consent_preview_link.short_description = "Privatlivspolitik"
 
+    @admin.display(description="Anonymisering")
+    def anonymization_status(self, obj):
+        if not obj or not obj.pk:
+            return ""
+        if obj.anonymized:
+            return format_html(
+                "<p><strong>Denne person er anonymiseret.</strong> "
+                "Navn, kontaktoplysninger og noter er erstattet eller fjernet.</p>"
+            )
+        return "Denne person er ikke anonymiseret."
+
     def get_readonly_fields(self, request, obj=None):
         if type(obj) is Person and not request.user.is_superuser:
             readonly_fields = [
@@ -222,6 +246,7 @@ class PersonAdmin(admin.ModelAdmin):
             readonly_fields = []
         # Add consent fields to readonly
         readonly_fields += [
+            "anonymization_status",
             "consent",
             "consent_by",
             "consent_at",
@@ -246,7 +271,7 @@ class PersonAdmin(admin.ModelAdmin):
 
         return HttpResponse(result_string, content_type="text/plain")
 
-    export_emaillist.short_description = "Eksporter familie e-mail liste (CSV)"
+    export_emaillist.short_description = "Eksporter familie e-mail liste"
 
     def export_csv(self, request, queryset):
         result_string = "Navn;Alder;Køn;Opskrevet;Tlf (barn);Email (barn);"
@@ -291,7 +316,7 @@ class PersonAdmin(admin.ModelAdmin):
                 + "\n"
             )
             response = HttpResponse(
-                f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+                f"{codecs.BOM_UTF8.decode('utf-8')}{result_string}",
                 content_type="text/csv; charset=utf-8",
             )
             response["Content-Disposition"] = 'attachment; filename="personer.csv"'

@@ -255,22 +255,6 @@ class MunicipalityFilter(admin.SimpleListFilter):
             return queryset.filter(municipality_id=self.value())
 
 
-class AnonymizedFilter(admin.SimpleListFilter):
-    title = "Anonymiseret"
-    parameter_name = "anonymized"
-
-    def lookups(self, request, model_admin):
-        return [("yes", "Anonymiseret"), ("no", "Ikke anonymiseret")]
-
-    def queryset(self, request, queryset):
-        if self.value() == "yes":
-            return queryset.filter(anonymized=True)
-        elif self.value() == "no":
-            return queryset.filter(anonymized=False)
-        else:
-            return queryset
-
-
 class RegionFilter(admin.SimpleListFilter):
     title = "Region"
     parameter_name = "region"

@@ -404,18 +404,19 @@ class Person(models.Model):
             activity_item.save()
 
         # anonymize Django user if exists
-        try:
-            user = User.objects.get(pk=self.user.pk)
-            user.username = f"anonymized-{user.id}"
-            user.first_name = "Anonymiseret"
-            user.last_name = ""
-            user.email = f"anonymized-{user.id}@localhost"
-            user.is_superuser = False
-            user.is_staff = False
-            user.is_active = False
-            user.save()
-        except User.DoesNotExist:
-            pass  # no user account found for this person, nothing to update then
+        if self.user is not None:
+            try:
+                user = User.objects.get(pk=self.user.pk)
+                user.username = f"anonymized-{user.id}"
+                user.first_name = "Anonymiseret"
+                user.last_name = ""
+                user.email = f"anonymized-{user.id}@localhost"
+                user.is_superuser = False
+                user.is_staff = False
+                user.is_active = False
+                user.save()
+            except User.DoesNotExist:
+                pass  # no user account found for this person, nothing to update then
 
     firstname.admin_order_field = "name"
     firstname.short_description = "Fornavn"

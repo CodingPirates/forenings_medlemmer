@@ -107,6 +107,11 @@ class Payment(models.Model):
             self.rejected_message = None
             self.save()
 
+        # If payment was for a membership, set membership.paid_at
+        if self.member:
+            self.member.paid_at = timezone.now()
+            self.member.save()
+
     def set_rejected(self, message):
         if self.rejected_at is None:
             self.confirmed_at = None
