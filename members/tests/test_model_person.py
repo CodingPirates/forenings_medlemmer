@@ -484,3 +484,15 @@ class TestModelPerson(TestCase):
         # In relaxed mode, should pass because creation date check is skipped
         # (assuming no payments and no recent activity)
         self.assertTrue(person.is_anonymization_candidate(relaxed=True)[0])
+
+    def test_can_anonymize_person_with_no_user(self):
+        """Person with no user can be anonymized."""
+        # Create person 6 years ago
+        six_years_ago = timezone.now() - timedelta(days=6 * 365)
+        with freeze_time(six_years_ago):
+            person = PersonFactory(user=None)
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person.anonymize(request)
+
+        self.assertTrue(person.anonymized)
