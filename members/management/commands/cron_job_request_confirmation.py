@@ -39,7 +39,9 @@ class Command(BaseCommand):
                 Q(confirmed_at__lt=outdated_dtm) | Q(confirmed_at=None)
             ).exclude(
                 Q(notification__update_info_dtm__gt=F("confirmed_at"))
-                | Q(~Q(notification__update_info_dtm=None), confirmed_at=None)
+                | Q(~Q(notification__update_info_dtm=None), confirmed_at=None).exclude(
+                    anonymized=True
+                )
             )[
                 :10
             ]
