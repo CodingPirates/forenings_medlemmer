@@ -40,7 +40,9 @@ class Command(BaseCommand):
             ).exclude(
                 Q(notification__update_info_dtm__gt=F("confirmed_at"))
                 | Q(~Q(notification__update_info_dtm=None), confirmed_at=None)
-            )[:10]
+            )[
+                :10
+            ]
 
         # send notification to all families asking them to update
         # their family details
