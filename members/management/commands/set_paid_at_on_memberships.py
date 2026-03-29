@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from members.models.payment import Payment
 
@@ -15,5 +14,5 @@ class Command(BaseCommand):
             member__isnull=True
         )
         for payment in payments:
-            payment.member.paid_at = timezone.now()
+            payment.member.paid_at = payment.confirmed_at
             payment.member.save()
