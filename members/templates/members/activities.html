@@ -97,7 +97,7 @@
                       Tilmeld {{ invite.person.firstname }}
                     </a>
                     <a class="button-danger"
-                      href="{% url 'invitation_decline' family.unique invite.id %}">
+                      href="{% url 'invitation_decline' invite.decline_uuid invite.id %}">
                       Afslå invitation
                     </a>
                   </td>

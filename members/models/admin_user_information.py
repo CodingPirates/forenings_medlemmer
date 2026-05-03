@@ -27,4 +27,7 @@ class AdminUserInformation(models.Model):
         if user.is_superuser or user.has_perm("members.view_all_unions"):
             return Union.objects.all()
         else:
-            return Union.objects.filter(adminuserinformation__user=user)
+            return Union.objects.filter(
+                models.Q(adminuserinformation__user=user)
+                | models.Q(department__adminuserinformation__user=user)
+            ).distinct()

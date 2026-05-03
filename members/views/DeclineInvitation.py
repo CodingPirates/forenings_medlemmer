@@ -1,7 +1,6 @@
-import uuid
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
-from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 from members.forms import ActivivtyInviteDeclineForm
@@ -9,13 +8,9 @@ from members.models.activityinvite import ActivityInvite
 from members.models.activityparticipant import ActivityParticipant
 
 
-def DeclineInvitation(request, unique, invitation_id):
-    try:
-        unique = uuid.UUID(unique)
-    except ValueError:
-        return HttpResponseBadRequest("Familie id er ugyldigt")
+def DeclineInvitation(request, decline_uuid, invitation_id):
     activity_invite = get_object_or_404(
-        ActivityInvite, pk=invitation_id, person__family__unique=unique
+        ActivityInvite, pk=invitation_id, decline_uuid=decline_uuid
     )
 
     is_participating = ActivityParticipant.objects.filter(
