@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(
                 blank=True,
                 null=True,
-                verbose_name="Samtykke-/inaktivitetspåmindelse sendt",
+                verbose_name="Samtykke-påmindelse sendt",
             ),
         ),
     ]

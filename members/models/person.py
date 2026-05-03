@@ -137,7 +137,7 @@ class Person(models.Model):
     )
     consent_at = models.DateTimeField("Samtykke dato", null=True, blank=True)
     consent_reminder_sent_at = models.DateTimeField(
-        "Samtykke-/inaktivitetspåmindelse sendt",
+        "Samtykke-påmindelse sendt",
         null=True,
         blank=True,
     )
