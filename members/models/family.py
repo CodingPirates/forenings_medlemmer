@@ -1,5 +1,3 @@
-import uuid
-
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.urls import reverse
@@ -13,14 +11,7 @@ class Family(models.Model):
     class Meta:
         verbose_name = "Familie"
         verbose_name_plural = "Familier"
-        permissions = (
-            (
-                "view_family_unique",
-                "Can view family UUID field (password) - gives access to address",
-            ),
-        )
 
-    unique = models.UUIDField(default=uuid.uuid4, unique=True)
     email = models.EmailField(unique=True)
     referer = models.CharField(
         "Hvor hørte du om Coding Pirates?", max_length=255, blank=True, null=True
