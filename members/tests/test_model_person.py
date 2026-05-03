@@ -511,9 +511,7 @@ class TestGetConsentReminderQueryset(TestCase):
         person = self._create_old_person_no_user()
         with freeze_time(self.ref_now):
             self.assertTrue(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_excludes_person_added_too_recently(self):
@@ -521,9 +519,7 @@ class TestGetConsentReminderQueryset(TestCase):
             person = PersonFactory(user=None)
         with freeze_time(self.ref_now):
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_excludes_person_with_recent_login(self):
@@ -534,9 +530,7 @@ class TestGetConsentReminderQueryset(TestCase):
             person.user.save()
             person.save()
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_excludes_person_with_recent_activity(self):
@@ -548,9 +542,7 @@ class TestGetConsentReminderQueryset(TestCase):
             )
             ActivityParticipantFactory(person=person, activity=activity)
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_excludes_person_with_payment_in_five_fiscal_years_window(self):
@@ -562,9 +554,7 @@ class TestGetConsentReminderQueryset(TestCase):
                 added_at=timezone.make_aware(datetime(2024, 6, 1)),
             )
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_excludes_when_other_family_member_has_recent_payment(self):
@@ -578,9 +568,7 @@ class TestGetConsentReminderQueryset(TestCase):
                 added_at=timezone.make_aware(datetime(2024, 6, 1)),
             )
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=parent.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=parent.pk).exists()
             )
 
     def test_excludes_family_opted_out_of_mail(self):
@@ -589,9 +577,7 @@ class TestGetConsentReminderQueryset(TestCase):
         person.family.save()
         with freeze_time(self.ref_now):
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_excludes_anonymized_person(self):
@@ -600,9 +586,7 @@ class TestGetConsentReminderQueryset(TestCase):
         person.save()
         with freeze_time(self.ref_now):
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_excludes_when_reminder_sent_within_last_year(self):
@@ -611,9 +595,7 @@ class TestGetConsentReminderQueryset(TestCase):
             person.consent_reminder_sent_at = timezone.now() - timedelta(days=180)
             person.save()
             self.assertFalse(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
 
     def test_includes_when_last_reminder_more_than_one_year_ago(self):
@@ -622,7 +604,5 @@ class TestGetConsentReminderQueryset(TestCase):
             person.consent_reminder_sent_at = timezone.now() - timedelta(days=400)
             person.save()
             self.assertTrue(
-                Person.get_consent_reminder_queryset()
-                .filter(pk=person.pk)
-                .exists()
+                Person.get_consent_reminder_queryset().filter(pk=person.pk).exists()
             )
