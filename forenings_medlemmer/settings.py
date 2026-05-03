@@ -176,7 +176,7 @@ DATE_INPUT_FORMATS = ("%d/%m/%Y", "%Y-%m-%d")
 # How many days is Family data considered valid.
 # After this period an E-mail asking for information
 # Checkup is sent to the Family.
-REQUEST_FAMILY_VALIDATION_PERIOD = 180
+REQUEST_FAMILY_VALIDATION_PERIOD = 365
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
