@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.contrib.auth.models import User
 from members.models.person import Person
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -484,6 +484,23 @@ class TestModelPerson(TestCase):
         # In relaxed mode, should pass because creation date check is skipped
         # (assuming no payments and no recent activity)
         self.assertTrue(person.is_anonymization_candidate(relaxed=True)[0])
+
+    def test_is_anonymization_candidate_as_of_date_before_one_month_window(self):
+        """as_of_date shifts the 2-year window (e.g. consent reminder ~1 month ahead)."""
+        d1 = date(2026, 6, 1)
+        created_dt = timezone.make_aware(
+            # 700 days = ~1 year, 11 months, i.e. just inside the 2-year window
+            datetime.combine(d1 - timedelta(days=700), datetime.min.time())
+        )
+
+        # person is not anonymization candidate today, but will be in 31 days
+        with freeze_time(created_dt):
+            person = PersonFactory(user=None)
+        self.assertFalse(person.is_anonymization_candidate(as_of_date=d1)[0])
+
+        # person is anonymization candidate in 31 days
+        d_future = d1 + timedelta(days=31)
+        self.assertTrue(person.is_anonymization_candidate(as_of_date=d_future)[0])
 
     def test_can_anonymize_person_with_no_user(self):
         """Person with no user can be anonymized."""
