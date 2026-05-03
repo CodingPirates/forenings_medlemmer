@@ -1,4 +1,8 @@
+from collections import defaultdict
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.utils import timezone
 
 from members.models.emailtemplate import EmailTemplate
@@ -24,43 +28,69 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
-        candidates = Person.get_consent_reminder_queryset()
-        family_ids = candidates.values_list("family_id", flat=True).distinct()
+
+        # send reminder if no reminder in last year, and will be anonymized in 30 days
+        now = timezone.now()
+        one_year_ago = now - timedelta(days=365)
+        as_of_reminder = timezone.now().date() + timedelta(days=30)
+
+        eligible_family_ids = Family.objects.filter(
+            anonymized=False, dont_send_mails=False
+        ).values_list("pk", flat=True)
+
+        reminder_due = Q(consent_reminder_sent_at__isnull=True) | Q(
+            consent_reminder_sent_at__lt=one_year_ago
+        )
+
+        person_base = (
+            Person.objects.filter(
+                anonymized=False,
+                family_id__in=eligible_family_ids,
+            )
+            .filter(reminder_due)
+            .select_related("user", "family")
+        )
+
+        candidate_persons = [
+            p
+            for p in person_base.iterator(chunk_size=500)
+            if p.is_anonymization_candidate(as_of_date=as_of_reminder)[0]
+        ]
+
+        by_family = defaultdict(list)
+        for p in candidate_persons:
+            by_family[p.family_id].append(p)
 
         template = EmailTemplate.objects.get(idname="CONSENT_REMINDER")
         sent_families = 0
         marked_persons = 0
 
-        for family_id in family_ids:
+        for family_id, family_candidates in by_family.items():
             family = Family.objects.get(pk=family_id)
-            family_candidates = candidates.filter(family_id=family_id)
             context_person = Person.objects.filter(
                 email=family.email, family=family
             ).first()
             if context_person is None:
-                context_person = family_candidates.first()
-            if context_person is None:
-                context_person = (
-                    family.get_first_parent() or family.get_persons().first()
-                )
+                context_person = family_candidates[0]
 
             if dry_run:
                 self.stdout.write(
-                    f"Would send to family {family.email} (person ids: "
-                    f"{list(family_candidates.values_list('id', flat=True))})"
+                    f"Would send to family #{family.id} (person ids: "
+                    f"{[p.pk for p in family_candidates]})"
                 )
                 sent_families += 1
-                marked_persons += family_candidates.count()
+                marked_persons += len(family_candidates)
                 continue
 
-            self.stdout.write(f"Sending consent reminder to {family.email}")
+            self.stdout.write(f"Sending consent reminder to family #{family.id}")
             template.makeEmail(
                 [family],
                 {"person": context_person},
                 allow_multiple_emails=True,
             )
-            now = timezone.now()
-            updated = family_candidates.update(consent_reminder_sent_at=now)
+            updated = Person.objects.filter(
+                pk__in=[p.pk for p in family_candidates]
+            ).update(consent_reminder_sent_at=now)
             sent_families += 1
             marked_persons += updated
 

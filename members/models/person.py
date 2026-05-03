@@ -1,5 +1,5 @@
 import random
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, time
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -202,7 +202,7 @@ class Person(models.Model):
         else:
             return "N/A"
 
-    def is_anonymization_candidate(self, relaxed=False):
+    def is_anonymization_candidate(self, relaxed=False, as_of_date=None):
         """
         Determine if person is a candidate for anonymization.
         We cannot anonymize if there is a payment in the last 5 full fiscal years.
@@ -210,6 +210,9 @@ class Person(models.Model):
         Args:
             relaxed: If True, only checks for financial transactions. Allows anonymization
                     even if person has been logged in or created recently.
+            as_of_date: Evaluate rules as of this calendar date (default: same boundaries
+                    as ``timezone.now()``). Use e.g. ``timezone.now().date() + timedelta(days=30)``
+                    for consent reminders (~one month before typical candidacy).
 
         Returns: Tuple (is_candidate, reason):
         - is_candidate: False if e.g. latest_activity
@@ -218,13 +221,19 @@ class Person(models.Model):
 
         # we operate with two date boundaries:
         # - 2 years for login or participation in activities
-        two_years_ago = timezone.now() - timedelta(days=2 * 365)
+        if as_of_date is None:
+            now = timezone.now()
+            two_years_ago = now - timedelta(days=2 * 365)
+            today = now.date()
+        else:
+            today = as_of_date
+            ref_start = timezone.make_aware(datetime.combine(as_of_date, time.min))
+            two_years_ago = ref_start - timedelta(days=2 * 365)
 
         # - January 1st of the year before 5 years ago, i.e. at least 5 full years,
         # for financial transactions
         #
         # current date 2025-09-27 => 2020-01-01
-        today = timezone.now().date()
         five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
 
         # If person has participated in activities within the last 2 years, then cannot be anonymized
@@ -270,55 +279,6 @@ class Person(models.Model):
 
         # otherwise, the person can be anonymized
         return True, ""
-
-    @classmethod
-    def get_consent_reminder_queryset(cls):
-        """
-        Persons who should receive the consent/inactivity reminder email.
-
-        Criteria match ``is_anonymization_candidate`` / admin anonymization filters,
-        but with the 2-year activity window replaced by ~1 year 11 months
-        (30 days before the 2×365-day boundary), i.e. about one month before the
-        person would typically become an anonymization candidate.
-
-        Payment rules are unchanged (no payments in the last 5 full fiscal years).
-
-        A reminder is due if none was sent yet, or the last one was more than
-        one calendar year ago (365 days).
-        """
-        from django.db.models import Q
-
-        now = timezone.now()
-        reminder_threshold = now - timedelta(days=2 * 365 - 30)
-        one_year_ago = now - timedelta(days=365)
-        today = now.date()
-        five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
-
-        login_ok = (
-            Q(user__isnull=True)
-            | Q(user__last_login__lt=reminder_threshold)
-            | Q(user__last_login__isnull=True)
-        )
-
-        reminder_due = Q(consent_reminder_sent_at__isnull=True) | Q(
-            consent_reminder_sent_at__lt=one_year_ago
-        )
-
-        return (
-            cls.objects.filter(anonymized=False)
-            .filter(reminder_due)
-            .filter(family__dont_send_mails=False)
-            .filter(added_at__lt=reminder_threshold)
-            .filter(login_ok)
-            .filter(
-                ~Q(
-                    activityparticipant__activity__end_date__gte=reminder_threshold.date()
-                )
-            )
-            .filter(~Q(payment__added_at__gte=five_full_fiscal_years))
-            .filter(~Q(family__payment__added_at__gte=five_full_fiscal_years))
-            .distinct()
-        )
 
     def update_dawa_data(self, force=False, save=True):
         if self.address_invalid and not force:
