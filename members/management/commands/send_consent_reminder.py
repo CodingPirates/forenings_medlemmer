@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import timedelta
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.utils import timezone
@@ -29,10 +30,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
 
-        # send reminder if no reminder in last year, and will be anonymized in 30 days
+        # send reminder if no reminder in last year, and will be anonymized soon
         now = timezone.now()
         one_year_ago = now - timedelta(days=365)
-        as_of_reminder = timezone.now().date() + timedelta(days=30)
+        as_of_reminder = timezone.now().date() + timedelta(
+            days=settings.CONSENT_REMINDER_LOOKAHEAD_DAYS
+        )
 
         eligible_family_ids = Family.objects.filter(
             anonymized=False, dont_send_mails=False
