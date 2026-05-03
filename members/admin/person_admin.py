@@ -256,9 +256,6 @@ class PersonAdmin(admin.ModelAdmin):
         ]
         return readonly_fields
 
-    def unique(self, item):
-        return item.family.unique if item.family is not None else ""
-
     def export_emaillist(self, request, queryset):
         result_string = "kopier denne liste direkte ind i dit email program (Husk at bruge Bcc!)\n\n"
         family_email = []
