@@ -291,7 +291,7 @@ class Person(models.Model):
             or force
         ):
             try:
-                url = f"https://api.dataforsyningen.dk/adresser?q={quote_plus(self.addressWithZip())}"
+                url = f"{settings.DATAFORSYNINGEN_BASE_URL}/adresser?q={quote_plus(self.addressWithZip())}"
                 response = requests.get(url)
                 if response.status_code != 200:
                     self.address_invalid = True

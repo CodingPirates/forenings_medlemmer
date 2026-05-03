@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import user_passes_test
 from members.utils.user import is_not_logged_in_and_has_person
 
 import requests
+from django.conf import settings
 
 
 @user_passes_test(is_not_logged_in_and_has_person, "/admin_signup/")
@@ -26,9 +27,7 @@ def DepartmentSignup(request):
             if person.dawa_id == "":
                 user_region = ""
             else:
-                dawa_req = (
-                    f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
-                )
+                dawa_req = f"{settings.DATAFORSYNINGEN_BASE_URL}/adresser/{person.dawa_id}?format=geojson"
                 try:
                     dawa_reply = requests.get(dawa_req).json()
                     user_region = dawa_reply["properties"]["regionsnavn"]

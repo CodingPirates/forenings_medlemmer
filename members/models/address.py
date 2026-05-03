@@ -70,7 +70,7 @@ class Address(models.Model):
         if self.dawa_id == "":
             wash_resp = requests.request(
                 "GET",
-                "https://dawa.aws.dk/datavask/adresser",
+                f"{settings.DATAFORSYNINGEN_BASE_URL}/datavask/adresser",
                 params={"betegnelse": str(self)},
             )
             _category = wash_resp.json()["kategori"]
@@ -83,7 +83,7 @@ class Address(models.Model):
 
         data_resp = requests.request(
             "GET",
-            f"https://dawa.aws.dk/adresser/{self.dawa_id}",
+            f"{settings.DATAFORSYNINGEN_BASE_URL}/adresser/{self.dawa_id}",
             params={"format": "geojson"},
         )
         if data_resp.status_code != 200:

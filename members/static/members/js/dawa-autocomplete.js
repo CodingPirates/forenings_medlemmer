@@ -1,7 +1,7 @@
 $.widget("dawa.dawaautocomplete", {
 	options: {
 		jsonp: !("withCredentials" in (new XMLHttpRequest())),
-		baseUrl: 'https://dawa.aws.dk',
+		baseUrl: typeof DATAFORSYNINGEN_BASE_URL !== 'undefined' ? DATAFORSYNINGEN_BASE_URL : 'https://api.dataforsyningen.dk',
 		minLength: 2,
 		delay: 0,
 		adgangsadresserOnly: false,

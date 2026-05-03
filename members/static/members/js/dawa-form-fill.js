@@ -6,6 +6,7 @@ $(function() {
         language: 'da'
     });
     $('#search-address').dawaautocomplete({
+        baseUrl: DATAFORSYNINGEN_BASE_URL,
         select: function(event, adresse) {
             // denne funktion bliver kaldt når brugeren vælger en adresse.
             // Udfyld adressefelterne
