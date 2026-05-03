@@ -84,8 +84,8 @@ class Command(BaseCommand):
 
             self.stdout.write(f"Sending consent reminder to family #{family.id}")
             template.makeEmail(
-                [family],
-                {"person": context_person},
+                receivers=[family],
+                context={"person": context_person},
                 allow_multiple_emails=True,
             )
             updated = Person.objects.filter(
