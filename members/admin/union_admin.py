@@ -282,7 +282,19 @@ class UnionAdmin(admin.ModelAdmin):
             "members.view_all_unions"
         ):
             return qs
-        return qs.filter(adminuserinformation__user=request.user)
+        return qs.filter(
+            pk__in=AdminUserInformation.get_unions_admin(request.user).values("pk")
+        )
+
+    def has_view_permission(self, request, obj=None):
+        if super().has_view_permission(request, obj):
+            return True
+
+        accessible_unions = AdminUserInformation.get_unions_admin(request.user)
+        if obj is None:
+            return accessible_unions.exists()
+
+        return accessible_unions.filter(pk=obj.pk).exists()
 
     def union_link(self, item):
         url = reverse("admin:members_union_change", args=[item.id])
