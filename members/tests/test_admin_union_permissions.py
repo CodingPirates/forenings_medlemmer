@@ -1,4 +1,5 @@
 from django.contrib.admin import AdminSite
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import RequestFactory, TestCase
 
@@ -22,6 +23,16 @@ class UnionAdminPermissionsTest(TestCase):
             user=self.department_admin
         )
 
+        self.union_admin = User.objects.create_user(
+            username="union-admin",
+            password="password",
+            email="union-admin@example.com",
+            is_staff=True,
+        )
+        self.union_admin_info = AdminUserInformation.objects.create(
+            user=self.union_admin
+        )
+
         self.address = Address.objects.create(
             streetname="Adminvej",
             city="København",
@@ -37,6 +48,7 @@ class UnionAdminPermissionsTest(TestCase):
             union=self.visible_union,
         )
         self.admin_info.departments.add(self.department)
+        self.union_admin_info.unions.add(self.visible_union)
 
     def test_get_unions_admin_includes_unions_from_admin_departments(self):
         unions = AdminUserInformation.get_unions_admin(self.department_admin)
@@ -69,4 +81,103 @@ class UnionAdminPermissionsTest(TestCase):
         )
         self.assertFalse(
             self.model_admin.has_view_permission(request, obj=self.hidden_union)
+        )
+
+    def test_department_only_user_hides_sensitive_info_fields(self):
+        permission_codenames = [
+            "show_ledger_account",
+            "show_new_membership_model",
+        ]
+        self.department_admin.user_permissions.add(
+            *Permission.objects.filter(codename__in=permission_codenames)
+        )
+
+        request = self.factory.get(
+            f"/admin/members/union/{self.visible_union.pk}/change/"
+        )
+        request.user = self.department_admin
+
+        fieldsets = self.model_admin.get_fieldsets(request, obj=self.visible_union)
+        info_fieldset = next(opts for title, opts in fieldsets if title == "Info")
+
+        self.assertEqual(
+            tuple(info_fieldset["fields"]),
+            (
+                "statues",
+                "founded_at",
+                "closed_at",
+                "membership_price_in_dkk",
+            ),
+        )
+
+    def test_direct_union_access_keeps_sensitive_info_fields(self):
+        permission_codenames = [
+            "change_union",
+            "show_ledger_account",
+            "show_new_membership_model",
+        ]
+        self.union_admin.user_permissions.add(
+            *Permission.objects.filter(codename__in=permission_codenames)
+        )
+
+        request = self.factory.get(
+            f"/admin/members/union/{self.visible_union.pk}/change/"
+        )
+        request.user = self.union_admin
+
+        fieldsets = self.model_admin.get_fieldsets(request, obj=self.visible_union)
+        info_fieldset = next(opts for title, opts in fieldsets if title == "Info")
+
+        self.assertEqual(
+            tuple(info_fieldset["fields"]),
+            (
+                "bank_main_org",
+                "bank_account",
+                "statues",
+                "founded_at",
+                "closed_at",
+                "memberships_allowed_at",
+                "membership_price_in_dkk",
+                "gl_account",
+                "new_membership_model_activated_at",
+            ),
+        )
+
+    def test_readonly_user_gets_readonly_union_help_text(self):
+        request = self.factory.get(
+            f"/admin/members/union/{self.visible_union.pk}/change/"
+        )
+        request.user = self.department_admin
+
+        fieldsets = self.model_admin.get_fieldsets(request, obj=self.visible_union)
+        name_fieldset = next(
+            opts for title, opts in fieldsets if title == "Navn og Adresse"
+        )
+
+        self.assertEqual(
+            name_fieldset["description"],
+            "<p>Du har ikke adgang til at ændre denne siden. "
+            "Du skal sidde i bestyrelsen for foreningen og derefter "
+            "kontakte kontakt@codingpirates.dk<p>",
+        )
+
+    def test_change_user_keeps_original_union_help_text(self):
+        self.union_admin.user_permissions.add(
+            Permission.objects.get(codename="change_union")
+        )
+
+        request = self.factory.get(
+            f"/admin/members/union/{self.visible_union.pk}/change/"
+        )
+        request.user = self.union_admin
+
+        fieldsets = self.model_admin.get_fieldsets(request, obj=self.visible_union)
+        name_fieldset = next(
+            opts for title, opts in fieldsets if title == "Navn og Adresse"
+        )
+
+        self.assertEqual(
+            name_fieldset["description"],
+            "<p>Udfyld navnet på foreningen (f.eks København, \
+                        vestjylland) og adressen<p>",
         )

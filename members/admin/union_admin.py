@@ -175,36 +175,84 @@ class UnionAdmin(admin.ModelAdmin):
 
     actions = ["export_csv_union_info"]
 
+    def _has_direct_union_access(self, user, obj=None):
+        if user.is_superuser or user.has_perm("members.view_all_unions"):
+            return True
+
+        if obj is None:
+            return False
+
+        return self.model.objects.filter(
+            pk=obj.pk, adminuserinformation__user=user
+        ).exists()
+
+    def _has_department_only_union_access(self, user, obj=None):
+        if obj is None:
+            return False
+
+        return AdminUserInformation.get_unions_admin(user).filter(
+            pk=obj.pk
+        ).exists() and not self._has_direct_union_access(user, obj)
+
+    def _has_readonly_union_access(self, request, obj=None):
+        return (
+            obj is not None
+            and self.has_view_permission(request, obj)
+            and not self.has_change_permission(request, obj)
+        )
+
     def get_fieldsets(self, request, obj=None):
         # 20241113: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
 
+        has_department_only_access = self._has_department_only_union_access(
+            request.user, obj
+        )
+
         info_fields = [
-            "bank_main_org",
-            "bank_account",
             "statues",
             "founded_at",
             "closed_at",
-            "memberships_allowed_at",
             "membership_price_in_dkk",
         ]
 
-        if request.user.is_superuser or request.user.has_perm(
-            "members.show_ledger_account"
+        if not has_department_only_access:
+            info_fields = [
+                "bank_main_org",
+                "bank_account",
+                "statues",
+                "founded_at",
+                "closed_at",
+                "memberships_allowed_at",
+                "membership_price_in_dkk",
+            ]
+
+        if not has_department_only_access and (
+            request.user.is_superuser
+            or request.user.has_perm("members.show_ledger_account")
         ):
             info_fields.append("gl_account")
 
-        if request.user.is_superuser or request.user.has_perm(
-            "members.show_new_membership_model"
+        if not has_department_only_access and (
+            request.user.is_superuser
+            or request.user.has_perm("members.show_new_membership_model")
         ):
             info_fields.append("new_membership_model_activated_at")
+
+        name_and_address_description = "<p>Udfyld navnet på foreningen (f.eks København, \
+                        vestjylland) og adressen<p>"
+        if self._has_readonly_union_access(request, obj):
+            name_and_address_description = (
+                "<p>Du har ikke adgang til at ændre denne siden. "
+                "Du skal sidde i bestyrelsen for foreningen og derefter "
+                "kontakte kontakt@codingpirates.dk<p>"
+            )
 
         return [
             (
                 "Navn og Adresse",
                 {
                     "fields": ("name", "cvr", "email", "address"),
-                    "description": "<p>Udfyld navnet på foreningen (f.eks København, \
-                        vestjylland) og adressen<p>",
+                    "description": name_and_address_description,
                 },
             ),
             (
