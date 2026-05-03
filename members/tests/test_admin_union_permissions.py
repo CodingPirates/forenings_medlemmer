@@ -156,9 +156,9 @@ class UnionAdminPermissionsTest(TestCase):
 
         self.assertEqual(
             name_fieldset["description"],
-            "<p>Du har ikke adgang til at ændre denne siden. "
+            "<p>Du har ikke adgang til at ændre denne side. "
             "Du skal sidde i bestyrelsen for foreningen og derefter "
-            "kontakte kontakt@codingpirates.dk<p>",
+            'kontakte <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a><p>',
         )
 
     def test_change_user_keeps_original_union_help_text(self):
