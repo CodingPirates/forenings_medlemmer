@@ -1,5 +1,3 @@
-import uuid
-
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.urls import reverse
