@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from django.conf import settings
 from django.contrib import admin
 from django.db.models import Q
@@ -10,8 +8,8 @@ from members.models import Department
 from .filters.common_filters import AnonymizedFilter
 from .inlines import (
     EmailItemInline,
-    PersonInline,
     PaymentInline,
+    PersonInline,
 )
 
 
@@ -19,22 +17,14 @@ class FamilyAdmin(admin.ModelAdmin):
     list_filter = (AnonymizedFilter,)
 
     def get_list_display(self, request):
-        if request.user.has_perm("members.view_family_unique"):
-            return ("id", "email", "unique")
-        else:
-            return (
-                "id",
-                "email",
-            )
+        return (
+            "id",
+            "email",
+        )
 
     search_fields = ("email",)
 
     inlines = [PersonInline, PaymentInline, EmailItemInline]
-    actions = [
-        "create_new_uuid",
-        "resend_link_email",
-    ]  # new UUID gets used accidentially
-    # actions = ['resend_link_email']
     list_per_page = settings.LIST_PER_PAGE
     fields = ("anonymization_status", "email", "dont_send_mails", "confirmed_at")
     readonly_fields = ("anonymization_status", "confirmed_at")
@@ -49,29 +39,6 @@ class FamilyAdmin(admin.ModelAdmin):
                 "E-mail og andre personlige oplysninger er erstattet eller fjernet.</p>"
             )
         return "Denne familie er ikke anonymiseret."
-
-    def create_new_uuid(self, request, queryset):
-        for family in queryset:
-            family.unique = uuid4()
-            family.save()
-        if queryset.count() == 1:
-            message_bit = "1 familie"
-        else:
-            message_bit = "%s familier" % queryset.count()
-        self.message_user(request, "%s fik nyt UUID." % message_bit)
-
-    create_new_uuid.short_description = "Generer nyt password"
-
-    def resend_link_email(self, request, queryset):
-        for family in queryset:
-            family.send_link_email()
-        if queryset.count() == 1:
-            message_bit = "1 familie"
-        else:
-            message_bit = "%s familier" % queryset.count()
-        self.message_user(request, "%s fik fik tilsendt link e-mail." % message_bit)
-
-    resend_link_email.short_description = "Gensend link e-mail"
 
     # Only view familys related to users department (via participant, waitinglist & invites)
     def get_queryset(self, request):

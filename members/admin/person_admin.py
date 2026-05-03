@@ -189,6 +189,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "birthday",
                         "has_certificate",
                         "added_at",
+                        "consent_reminder_sent_at",
                         "user",
                         "gender",
                     ),
@@ -247,15 +248,13 @@ class PersonAdmin(admin.ModelAdmin):
         # Add consent fields to readonly
         readonly_fields += [
             "anonymization_status",
+            "consent_reminder_sent_at",
             "consent",
             "consent_by",
             "consent_at",
             "consent_preview_link",
         ]
         return readonly_fields
-
-    def unique(self, item):
-        return item.family.unique if item.family is not None else ""
 
     def export_emaillist(self, request, queryset):
         result_string = "kopier denne liste direkte ind i dit email program (Husk at bruge Bcc!)\n\n"
