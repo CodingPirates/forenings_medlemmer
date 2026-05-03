@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from datetime import timedelta
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
+
 import members.models.emailtemplate
 import members.models.waitinglist
-from django.core.exceptions import ValidationError
-from datetime import timedelta
-from django.utils import timezone
 
 
 # Calculate a day 14 days in the future
@@ -50,6 +52,9 @@ class ActivityInvite(models.Model):
     price_note = models.TextField("Note om særpris", blank=True)
     extra_email_info = models.TextField("Ekstra email info", blank=True)
     reminder_sent_at = models.DateField("Påmindet", blank=True, null=True)
+    invitation_decline_uuid = models.UUIDField(
+        "UUID til at afvise invitationen", blank=True, null=True
+    )
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
