@@ -2,10 +2,12 @@ from glob import escape
 import codecs
 import csv
 from io import StringIO
+from decimal import Decimal
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import admin
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from members.models import (
@@ -129,7 +131,51 @@ def generate_member_csv(member_queryset, include_address=False):
     return output.getvalue()
 
 
+class MemberPaymentInline(admin.TabularInline):
+    class Media:
+        css = {"all": ("members/css/custom_admin.css",)}
+
+    model = Payment
+    fields = (
+        "payment_admin_link",
+        "added_at",
+        "payment_type",
+        "accepted_at",
+        "confirmed_at",
+        "rejected_at",
+        "formatted_amount",
+    )
+    readonly_fields = fields
+    can_delete = False
+    extra = 0
+    ordering = ("-added_at",)
+    verbose_name = "Betaling"
+    verbose_name_plural = "Betalinger"
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def payment_admin_link(self, obj):
+        if not obj or not obj.pk:
+            return ""
+
+        url = reverse("admin:members_payment_change", args=[obj.pk])
+        return format_html('<a href="{}" title="Åbn betaling">🔗</a>', url)
+
+    payment_admin_link.short_description = ""
+
+    def formatted_amount(self, obj):
+        if obj.amount_ore is None:
+            return ""
+
+        return f"{Decimal(obj.amount_ore) / Decimal('100'):.2f}"
+
+    formatted_amount.short_description = "Beløb"
+    formatted_amount.admin_order_field = "amount_ore"
+
+
 class MemberAdmin(admin.ModelAdmin):
+    exclude = ("paid_at",)
     search_fields = [
         "person__name",
         "person__email",
@@ -153,6 +199,7 @@ class MemberAdmin(admin.ModelAdmin):
     ]
 
     autocomplete_fields = ("union", "person")
+    inlines = [MemberPaymentInline]
 
     actions = ["export_csv_member_info"]
 
