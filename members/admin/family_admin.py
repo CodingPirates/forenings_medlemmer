@@ -17,13 +17,10 @@ class FamilyAdmin(admin.ModelAdmin):
     list_filter = (AnonymizedFilter,)
 
     def get_list_display(self, request):
-        if request.user.has_perm("members.view_family_unique"):
-            return ("id", "email", "unique")
-        else:
-            return (
-                "id",
-                "email",
-            )
+        return (
+            "id",
+            "email",
+        )
 
     search_fields = ("email",)
 

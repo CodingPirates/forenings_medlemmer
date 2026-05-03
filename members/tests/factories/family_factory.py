@@ -9,7 +9,6 @@ class FamilyFactory(DjangoModelFactory):
     class Meta:
         model = Family
 
-    unique = Faker("uuid4")
     email = Faker("email")
     # dont_send_mails = Faker("boolean")
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)

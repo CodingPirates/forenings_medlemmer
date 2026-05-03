@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
@@ -52,8 +53,12 @@ class ActivityInvite(models.Model):
     price_note = models.TextField("Note om særpris", blank=True)
     extra_email_info = models.TextField("Ekstra email info", blank=True)
     reminder_sent_at = models.DateField("Påmindet", blank=True, null=True)
-    invitation_decline_uuid = models.UUIDField(
-        "UUID til at afvise invitationen", blank=True, null=True
+    decline_uuid = models.UUIDField(
+        "UUID til at afvise invitationen",
+        blank=True,
+        null=True,
+        default=uuid.uuid4,
+        unique=True,
     )
 
     def clean(self):
