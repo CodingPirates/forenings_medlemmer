@@ -5,7 +5,6 @@ from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from members.forms import vol_signupForm
-from members.models.department import Department
 from members.models.family import Family
 from members.models.person import Person
 from members.models.volunteer import Volunteer
@@ -105,6 +104,7 @@ def volunteerSignup(request):
                     phone=vol_signup.cleaned_data["volunteer_phone"],
                     birthday=vol_signup.cleaned_data["volunteer_birthday"],
                     gender=vol_signup.cleaned_data["volunteer_gender"],
+                    municipality=None,
                     family=family,
                     user=user,
                     consent=latest_consent,  # Set the consent
@@ -114,9 +114,7 @@ def volunteerSignup(request):
                 volunteer.save()
 
                 # send email to department leader
-                department = Department.objects.get(
-                    name=vol_signup.cleaned_data["volunteer_department"]
-                )
+                department = vol_signup.cleaned_data["volunteer_department"]
                 vol_obj = Volunteer.objects.create(
                     person=volunteer, department=department
                 )

@@ -18,7 +18,10 @@ def consent_page(request):
     consent_at = ""
     viewonly = True
     if request.user.is_authenticated:
-        person = Person.objects.get(user=request.user)
+        person = Person.objects.filter(user=request.user).first()
+        if person is None:
+            return redirect(reverse("admin_signup"))
+
         if person.consent is not None:
             has_consented = person.consent == latest_consent
         consent_at = person.consent_at
