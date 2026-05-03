@@ -49,10 +49,8 @@ class Command(BaseCommand):
             context = {
                 "activity": invite.activity,
                 "activity_invite": invite,
-                "invite": invite,
                 "person": invite.person,
                 "family": invite.person.family,
-                "union": invite.activity.department.union,
             }
             print(
                 f"Sending reminder for activity '{invite.activity.department.name}/{invite.activity.name}' "
