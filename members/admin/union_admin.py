@@ -242,9 +242,9 @@ class UnionAdmin(admin.ModelAdmin):
                         vestjylland) og adressen<p>"
         if self._has_readonly_union_access(request, obj):
             name_and_address_description = (
-                "<p>Du har ikke adgang til at ændre denne siden. "
+                "<p>Du har ikke adgang til at ændre denne side. "
                 "Du skal sidde i bestyrelsen for foreningen og derefter "
-                "kontakte kontakt@codingpirates.dk<p>"
+                'kontakte <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a><p>'
             )
 
         return [
