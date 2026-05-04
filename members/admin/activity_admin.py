@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.http import QueryDict
 from django.shortcuts import redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
@@ -19,8 +20,6 @@ from members.models import (
     Union,
 )
 from members.models.activitytype import ActivityType
-
-from .inlines import EmailItemInline
 
 
 class ActivityParticipantInline(admin.TabularInline):
@@ -283,6 +282,7 @@ class ActivityAdmin(admin.ModelAdmin):
             "participants",
             "activity_url",
             "addressregion",
+            "emails",
         ]
         # Only allow users with 'members.change_season_fee' to edit the field and reason
         if not (
@@ -339,7 +339,7 @@ class ActivityAdmin(admin.ModelAdmin):
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
         js = ("members/js/copy_to_clipboard.js",)
 
-    inlines = [ActivityParticipantInline, EmailItemInline]
+    inlines = [ActivityParticipantInline]
 
     def start_end(self, obj):
         return str(obj.start_date) + " - " + str(obj.end_date)
@@ -423,6 +423,26 @@ class ActivityAdmin(admin.ModelAdmin):
         return mark_safe(link)
 
     activity_url.short_description = "Link til aktivitet"
+
+    def emails(self, obj):
+        if obj.id is None:
+            return "-"
+
+        email_count = obj.emailitem_set.count()
+        email_list_url = reverse("admin:members_emailitem_changelist")
+        query_string = QueryDict(mutable=True)
+        query_string["activity"] = obj.pk
+        email_label = "afsendt email" if email_count == 1 else "afsendte emails"
+
+        return format_html(
+            '{} {} – <a href="{}?{}">Se listen</a>',
+            email_count,
+            email_label,
+            email_list_url,
+            query_string.urlencode(),
+        )
+
+    emails.short_description = "Emails"
 
     def activity_link(self, item):
         url = reverse("admin:members_activity_change", args=[item.id])
@@ -603,6 +623,12 @@ class ActivityAdmin(admin.ModelAdmin):
                         "max_age",
                     ),
                 ),
+            },
+        ),
+        (
+            "Emails",
+            {
+                "fields": ("emails",),
             },
         ),
     ]
