@@ -14,6 +14,6 @@ class Command(BaseCommand):
 
         for invite in invites:
             invite.decline_uuid = uuid.uuid4()
+            invite.save()
 
-        ActivityInvite.objects.bulk_update(invites, ["decline_uuid"])
         self.stdout.write(self.style.SUCCESS(f"Updated {count} invites"))
