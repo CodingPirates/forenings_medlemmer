@@ -13,7 +13,6 @@ class Command(BaseCommand):
     help = "Send activity invite reminders"
 
     def handle(self, *args, **options):
-        print("Sending activity invite reminders")
         template_name = "ACT_INVITE"
         try:
             template = EmailTemplate.objects.get(idname=template_name)
@@ -52,10 +51,6 @@ class Command(BaseCommand):
                 "person": invite.person,
                 "family": invite.person.family,
             }
-            print(
-                f"Sending reminder for activity '{invite.activity.department.name}/{invite.activity.name}' "
-                f"to invite id {invite.id}"
-            )
             template.makeEmail(
                 [invite.person.family], context, allow_multiple_emails=True
             )
