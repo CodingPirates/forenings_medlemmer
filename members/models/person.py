@@ -9,6 +9,7 @@ from members.models.municipality import Municipality
 from members.models.consent import Consent
 from django.core.exceptions import PermissionDenied, ValidationError
 from members.models.payment import Payment
+from members.models.union import Union
 from members.utils.address import format_address
 import logging
 
@@ -384,6 +385,16 @@ class Person(models.Model):
         for waiting_list in self.waitinglist_set.all():
             waiting_list.delete()
 
+        # Remove department/union relationships
+        self.department_set.clear()
+        self.union_set.clear()
+
+        # Remove union roles
+        Union.objects.filter(chairman=self).update(chairman=None)
+        Union.objects.filter(second_chair=self).update(second_chair=None)
+        Union.objects.filter(cashier=self).update(cashier=None)
+        Union.objects.filter(secretary=self).update(secretary=None)
+
         self.family.anonymize_if_all_persons_anonymized(request)
 
         # anonymize sent emails
@@ -412,6 +423,7 @@ class Person(models.Model):
                 user.is_superuser = False
                 user.is_staff = False
                 user.is_active = False
+                user.groups.clear()
                 user.save()
             except User.DoesNotExist:
                 pass  # no user account found for this person, nothing to update then
