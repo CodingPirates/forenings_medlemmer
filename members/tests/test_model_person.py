@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from members.models.person import Person
+from members.models import Volunteer
 from datetime import date, datetime, timedelta
 from django.utils import timezone
 from freezegun import freeze_time
@@ -11,6 +12,7 @@ from members.tests.factories import (
     ActivityParticipantFactory,
     ActivityFactory,
     PaymentFactory,
+    UnionFactory,
 )
 from members.tests.factories.department_factory import DepartmentFactory
 from members.tests.factories.factory_helpers import TIMEZONE
@@ -243,6 +245,74 @@ class TestModelPerson(TestCase):
         self.assertEqual(email.subject, "Anonymiseret")
         self.assertEqual(email.body_text, "")
         self.assertEqual(email.receiver, "")
+
+    def test_anonymize_person_removes_department_union_and_group_relations(self):
+        """Anonymizing removes department, union and group relationships."""
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person = PersonFactory()
+
+        # department relationships: leader role + volunteer membership
+        department = DepartmentFactory()
+        department.department_leaders.add(person)
+        volunteer = Volunteer.objects.create(person=person, department=department)
+
+        # union relationships: officer roles + board membership
+        union = UnionFactory()
+        union.chairman = person
+        union.second_chair = person
+        union.cashier = person
+        union.secretary = person
+        union.save()
+        union.board_members.add(person)
+
+        # group membership on the linked user, e.g. "Afdelingsleder"
+        user = User.objects.create_user(
+            username=person.name, email=person.email, password="password"
+        )
+        group = Group.objects.create(name="Afdelingsleder")
+        user.groups.add(group)
+        person.user = user
+        person.save()
+
+        # sanity check that the relationships exist before anonymizing
+        self.assertEqual(person.department_set.count(), 1)
+        self.assertEqual(person.volunteer_set.count(), 1)
+        self.assertEqual(person.union_set.count(), 1)
+        self.assertEqual(user.groups.count(), 1)
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person.anonymize(request)
+
+        self.assertTrue(person.anonymized)
+
+        # department relationships removed
+        self.assertEqual(
+            person.department_set.count(),
+            0,
+            "Person should have no departments after anonymization",
+        )
+        self.assertFalse(
+            Volunteer.objects.filter(pk=volunteer.pk).exists(),
+            "Volunteer relationship should be deleted after anonymization",
+        )
+
+        # union relationships removed
+        self.assertEqual(
+            person.union_set.count(),
+            0,
+            "Person should have no unions after anonymization",
+        )
+        union.refresh_from_db()
+        self.assertIsNone(
+            union.chairman, "Union chairman should be None after anonymization"
+        )
+        self.assertIsNone(union.second_chair)
+        self.assertIsNone(union.cashier)
+        self.assertIsNone(union.secretary)
+
+        # group membership removed from the linked user
+        user = User.objects.get(pk=person.user.pk)
+        self.assertEqual(user.groups.count(), 0)
 
     ############################################################
     # Tests for is_anonymization_candidate()
