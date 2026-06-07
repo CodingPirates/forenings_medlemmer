@@ -21,6 +21,9 @@ class LoggedInVolunteerRequestForm(BaseVolunteerRequestForm):
     def __init__(self, user=None, *args, **kwargs):
         super(LoggedInVolunteerRequestForm, self).__init__(*args, **kwargs)
 
+        self.fields.pop("allow_contact_from_cpdk", None)
+        self.fields.pop("allow_contact_from_other", None)
+
         # Set up the person queryset based on the user's family
         family = None
         if user and user.is_authenticated:

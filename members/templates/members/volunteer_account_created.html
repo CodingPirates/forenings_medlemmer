@@ -12,39 +12,39 @@
             <div class="card-header">
                 <h3 class="text-success">
                     <i class="fa fa-check-circle"></i>
-                    {% trans "Welcome! Your Account Has Been Created" %}
+                    {% trans "Velkommen! Din konto er blevet oprettet" %}
                 </h3>
             </div>
             <div class="card-body">
                 <div class="alert alert-success">
-                    <p class="lead">{% trans "Congratulations! Your volunteer account has been successfully created." %}</p>
+                    <p class="lead">{% trans "Tillykke! Din frivilligkonto er blevet oprettet." %}</p>
                 </div>
                 
                 <div class="mb-4">
-                    <h5>{% trans "What happens next?" %}</h5>
+                    <h5>{% trans "Hvad sker der nu?" %}</h5>
                     <ul class="list-unstyled">
-                        <li><i class="fa fa-check text-success"></i> {% trans "Your volunteer registration has been confirmed" %}</li>
-                        <li><i class="fa fa-check text-success"></i> {% trans "You now have access to volunteer activities" %}</li>
-                        <li><i class="fa fa-check text-success"></i> {% trans "You can log in with your new account credentials" %}</li>
+                        <li><i class="fa fa-check text-success"></i> {% trans "Din frivilligregistrering er blevet bekræftet" %}</li>
+                        <li><i class="fa fa-check text-success"></i> {% trans "Du har nu adgang til frivillige aktiviteter" %}</li>
+                        <li><i class="fa fa-check text-success"></i> {% trans "Du kan logge ind med dine nye kontooplysninger" %}</li>
                     </ul>
                 </div>
 
                 <div class="mb-4">
-                    <h5>{% trans "Account Details" %}</h5>
+                    <h5>{% trans "Kontodetaljer" %}</h5>
                     {% if user.is_authenticated %}
-                        <p>{% trans "Username:" %} <strong>{{ user.username }}</strong></p>
+                        <p>{% trans "Brugernavn:" %} <strong>{{ user.username }}</strong></p>
                         <p>{% trans "Email:" %} <strong>{{ user.email }}</strong></p>
                     {% endif %}
                 </div>
 
                 <div class="text-center">
-                    <a href="{% url 'members:login' %}" class="btn btn-primary btn-lg">
+                    <a href="{% url 'person_login' %}" class="btn btn-primary btn-lg">
                         <i class="fa fa-sign-in-alt"></i>
-                        {% trans "Log In to Your Account" %}
+                        {% trans "Log ind på din konto" %}
                     </a>
                     <a href="/" class="btn btn-outline-secondary btn-lg ml-3">
                         <i class="fa fa-home"></i>
-                        {% trans "Go to Homepage" %}
+                        {% trans "Gå til startsiden" %}
                     </a>
                 </div>
             </div>

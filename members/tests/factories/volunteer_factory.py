@@ -13,7 +13,6 @@ class VolunteerFactory(DjangoModelFactory):
 
     person = SubFactory(PersonFactory)
     department = SubFactory(DepartmentFactory)
-    allow_cpdk_contact = Faker("boolean")
 
     added_at = Faker("date_time", tzinfo=TIMEZONE)
     confirmed = LazyAttribute(lambda d: datetime_after(d.added_at))

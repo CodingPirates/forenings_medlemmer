@@ -118,7 +118,8 @@ class signupForm(forms.Form):
             Fieldset(
                 "Frivillig information",
                 Div(
-                    Div(Field("allow_cpdk_contact"), css_class="col-md-12"),
+                    Div(Field("allow_contact_from_cpdk"), css_class="col-md-12"),
+                    Div(Field("allow_contact_from_other"), css_class="col-md-12"),
                     Div(Field("volunteer_info_reference"), css_class="col-md-12"),
                     Div(Field("volunteer_info_whishes"), css_class="col-md-12"),
                     css_class="row volunteer-info-section",
@@ -245,7 +246,11 @@ class signupForm(forms.Form):
             attrs={"rows": 3, "placeholder": "Beskriv dine ønsker og forventninger..."}
         ),
     )
-    allow_cpdk_contact = forms.BooleanField(
+    allow_contact_from_cpdk = forms.BooleanField(
         label="Må Coding Pirates Denmark kontakte mig?",
+        required=False,
+    )
+    allow_contact_from_other = forms.BooleanField(
+        label="Må andre afdelinger kontakte mig?",
         required=False,
     )

@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.urls import reverse
 import os
 import random
-from datetime import datetime
+from datetime import timedelta
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from members.forms import (
@@ -18,7 +18,8 @@ from members.models.volunteerrequest import VolunteerRequest
 from members.models.volunteerrequestitem import VolunteerRequestItem
 from members.models.volunteer import Volunteer
 from members.utils.user import user_to_person
-from members.utils.admin_log import log_volunteer_contact_preference_change
+from members.utils.admin_log import log_person_contact_preference_change
+from members.utils.volunteer_confirmation import log_volunteer_user_confirmation_change
 from members.models.emailtemplate import EmailTemplate
 
 
@@ -134,7 +135,7 @@ def send_volunteer_notification_emails(volunteer_request, departments, activitie
     template = ensure_volunteer_request_template()
 
     # Create unique timestamp for this batch of emails
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Send emails for activities
     for activity in activities:
@@ -208,27 +209,90 @@ def volunteerSignup(request):
     if request.user.is_authenticated:
         # Simplified logic for authenticated users - just create volunteer request
         if request.method == "POST":
+            if request.POST.get("form_id") == "volunteer_user_confirmation":
+                try:
+                    family = user_to_person(request.user).family
+                    volunteer = Volunteer.objects.select_related(
+                        "person", "department", "activity"
+                    ).get(
+                        pk=request.POST.get("volunteer_id"),
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        removed__isnull=True,
+                        user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+                    )
+                except (Volunteer.DoesNotExist, AttributeError):
+                    return HttpResponseForbidden(
+                        "Du kan kun bekræfte frivilligroller for din egen familie."
+                    )
+
+                action = request.POST.get("confirmation_action")
+                if action == "accept":
+                    new_status = Volunteer.UserConfirmationStatus.APPROVED_BY_USER
+                elif action == "reject":
+                    new_status = Volunteer.UserConfirmationStatus.REJECTED_BY_USER
+                else:
+                    return HttpResponseForbidden("Ugyldig handling.")
+
+                old_status = volunteer.get_user_confirmation_status_display()
+                volunteer.user_confirmation_status = new_status
+                volunteer.save(update_fields=["user_confirmation_status"])
+                log_volunteer_user_confirmation_change(
+                    request,
+                    volunteer,
+                    old_status,
+                    volunteer.get_user_confirmation_status_display(),
+                )
+
+                return HttpResponseRedirect(reverse("volunteer_signup"))
+
             if request.POST.get("form_id") == "volunteer_contact_preference":
                 try:
                     family = user_to_person(request.user).family
-                    volunteer = Volunteer.objects.select_related("person__family").get(
-                        pk=request.POST.get("volunteer_id"),
-                        person__family=family,
-                        removed__isnull=True,
+                    person = Person.objects.get(
+                        pk=request.POST.get("person_id"),
+                        family=family,
+                        deleted_dtm__isnull=True,
                     )
-                except (Person.DoesNotExist, Volunteer.DoesNotExist, AttributeError):
+                except (Person.DoesNotExist, AttributeError):
                     return HttpResponseForbidden(
                         "Du kan kun redigere kontaktindstillinger for dine egne frivillige roller."
                     )
 
-                original_allow_cpdk_contact = volunteer.allow_cpdk_contact
-                volunteer.allow_cpdk_contact = (
-                    request.POST.get("allow_cpdk_contact") == "on"
+                if not Volunteer.objects.filter(
+                    person=person,
+                    removed__isnull=True,
+                ).exists():
+                    return HttpResponseForbidden(
+                        "Du kan kun redigere kontaktindstillinger for dine egne frivillige roller."
+                    )
+
+                changed_fields = []
+                new_allow_contact_from_cpdk = (
+                    request.POST.get("allow_contact_from_cpdk") == "on"
+                )
+                new_allow_contact_from_other = (
+                    request.POST.get("allow_contact_from_other") == "on"
                 )
 
-                if volunteer.allow_cpdk_contact != original_allow_cpdk_contact:
-                    volunteer.save(update_fields=["allow_cpdk_contact"])
-                    log_volunteer_contact_preference_change(request, volunteer)
+                if person.allow_contact_from_cpdk != new_allow_contact_from_cpdk:
+                    person.allow_contact_from_cpdk = new_allow_contact_from_cpdk
+                    changed_fields.append("Må Coding Pirates Denmark kontakte mig?")
+
+                if person.allow_contact_from_other != new_allow_contact_from_other:
+                    person.allow_contact_from_other = new_allow_contact_from_other
+                    changed_fields.append("Må andre afdelinger kontakte mig?")
+
+                if changed_fields:
+                    person.save(
+                        update_fields=[
+                            "allow_contact_from_cpdk",
+                            "allow_contact_from_other",
+                        ]
+                    )
+                    log_person_contact_preference_change(
+                        request, person, changed_fields
+                    )
 
                 return HttpResponseRedirect(reverse("volunteer_signup"))
 
@@ -236,9 +300,13 @@ def volunteerSignup(request):
                 user=request.user, data=request.POST
             )
             if logged_in_form.is_valid():
+                selected_person = logged_in_form.cleaned_data["person"]
+
                 # Create volunteer request with selected person
                 volunteer_request = VolunteerRequest.objects.create(
-                    person=logged_in_form.cleaned_data["person"],
+                    person=selected_person,
+                    allow_contact_from_cpdk=selected_person.allow_contact_from_cpdk,
+                    allow_contact_from_other=selected_person.allow_contact_from_other,
                     info_reference=logged_in_form.cleaned_data["info_reference"],
                     info_whishes=logged_in_form.cleaned_data["info_whishes"],
                 )
@@ -268,7 +336,7 @@ def volunteerSignup(request):
                 return render(
                     request,
                     "members/volunteer_request_success.html",
-                    {"name": logged_in_form.cleaned_data["person"].name},
+                    {"name": selected_person.name},
                 )
             else:
                 return render(
@@ -286,6 +354,8 @@ def volunteerSignup(request):
         # Get volunteer overview data for the user's family
         overview_data = {
             "current_volunteers": [],
+            "pending_volunteer_confirmations": [],
+            "contact_people": [],
             "volunteer_requests": [],
             "family_members": [],
         }
@@ -314,6 +384,18 @@ def volunteerSignup(request):
                         volunteer_request.person = person
                         volunteer_request.finished = timezone.now()
                         volunteer_request.save()
+                        person.allow_contact_from_cpdk = (
+                            volunteer_request.allow_contact_from_cpdk
+                        )
+                        person.allow_contact_from_other = (
+                            volunteer_request.allow_contact_from_other
+                        )
+                        person.save(
+                            update_fields=[
+                                "allow_contact_from_cpdk",
+                                "allow_contact_from_other",
+                            ]
+                        )
 
                         # Create volunteer record and set status to ACTIVE
                         try:
@@ -368,15 +450,37 @@ def volunteerSignup(request):
                         person__family=family,
                         person__deleted_dtm__isnull=True,
                         removed__isnull=True,
+                        user_confirmation_status=Volunteer.UserConfirmationStatus.APPROVED_BY_USER,
                     )
                     .select_related("person", "department", "activity")
                     .order_by("-added_at")
                 )
 
-                # Get volunteer requests for family members (last 12 months)
-                from datetime import datetime, timedelta
+                overview_data["pending_volunteer_confirmations"] = (
+                    Volunteer.objects.filter(
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        removed__isnull=True,
+                        user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+                    )
+                    .select_related("person", "department", "activity")
+                    .order_by("-added_at")
+                )
 
-                one_year_ago = datetime.now() - timedelta(days=365)
+                overview_data["contact_people"] = (
+                    Person.objects.filter(
+                        family=family,
+                        deleted_dtm__isnull=True,
+                        volunteer__isnull=False,
+                        volunteer__removed__isnull=True,
+                        volunteer__user_confirmation_status=Volunteer.UserConfirmationStatus.APPROVED_BY_USER,
+                    )
+                    .distinct()
+                    .order_by("name")
+                )
+
+                # Get volunteer requests for family members (last 12 months)
+                one_year_ago = timezone.now() - timedelta(days=365)
 
                 overview_data["volunteer_requests"] = (
                     VolunteerRequest.objects.filter(
@@ -458,6 +562,12 @@ def volunteerSignup(request):
                         phone=form_data.get("phone"),
                         age=form_data.get("age") or None,
                         zip=form_data.get("zip"),
+                        allow_contact_from_cpdk=form_data.get(
+                            "allow_contact_from_cpdk", False
+                        ),
+                        allow_contact_from_other=form_data.get(
+                            "allow_contact_from_other", False
+                        ),
                         info_reference=form_data.get("info_reference", ""),
                         info_whishes=form_data.get("info_whishes", ""),
                     )
@@ -534,6 +644,12 @@ def volunteerSignup(request):
                         "phone": cd.get("phone"),
                         "age": cd.get("age"),
                         "zip": cd.get("zip"),
+                        "allow_contact_from_cpdk": cd.get(
+                            "allow_contact_from_cpdk", False
+                        ),
+                        "allow_contact_from_other": cd.get(
+                            "allow_contact_from_other", False
+                        ),
                         "info_reference": cd.get("info_reference"),
                         "info_whishes": cd.get("info_whishes"),
                     }

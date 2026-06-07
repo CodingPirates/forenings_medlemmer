@@ -37,7 +37,7 @@ class VolunteerRequestItemListFilter(admin.SimpleListFilter):
         if self.value() is None:
             return queryset
         else:
-            return queryset.filter(department__pk=self.value)
+            return queryset.filter(department__pk=self.value())
 
 
 class VolunteerRequestItemAdminForm(forms.ModelForm):
@@ -163,6 +163,18 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
         "fix_waiting_with_existing_person",
     ]
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_all_departments"
+        ):
+            return queryset
+
+        return queryset.filter(
+            department__in=AdminUserInformation.get_departments_admin(request.user)
+        )
+
     def reject_request(self, request, queryset):
         """Set status to REJECTED for selected items"""
         updated = queryset.filter(status="NEW").update(
@@ -196,6 +208,18 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                 # If this item is for a department (without specific activity), create volunteer for department only
                 if obj.activity:
                     # This is an activity-specific volunteer request
+                    obj.volunteer_request.person.allow_contact_from_cpdk = (
+                        obj.volunteer_request.allow_contact_from_cpdk
+                    )
+                    obj.volunteer_request.person.allow_contact_from_other = (
+                        obj.volunteer_request.allow_contact_from_other
+                    )
+                    obj.volunteer_request.person.save(
+                        update_fields=[
+                            "allow_contact_from_cpdk",
+                            "allow_contact_from_other",
+                        ]
+                    )
                     volunteer = Volunteer.objects.create(
                         person=obj.volunteer_request.person,
                         department=obj.activity.department,  # Use the activity's department
@@ -212,6 +236,18 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                         pass  # Fields don't exist yet
                 else:
                     # This is a department-level volunteer request (no specific activity)
+                    obj.volunteer_request.person.allow_contact_from_cpdk = (
+                        obj.volunteer_request.allow_contact_from_cpdk
+                    )
+                    obj.volunteer_request.person.allow_contact_from_other = (
+                        obj.volunteer_request.allow_contact_from_other
+                    )
+                    obj.volunteer_request.person.save(
+                        update_fields=[
+                            "allow_contact_from_cpdk",
+                            "allow_contact_from_other",
+                        ]
+                    )
                     volunteer = Volunteer.objects.create(
                         person=obj.volunteer_request.person,
                         department=obj.department,
@@ -285,6 +321,18 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                 # Link the volunteer request to the person
                 obj.volunteer_request.person = person
                 obj.volunteer_request.save()
+                person.allow_contact_from_cpdk = (
+                    obj.volunteer_request.allow_contact_from_cpdk
+                )
+                person.allow_contact_from_other = (
+                    obj.volunteer_request.allow_contact_from_other
+                )
+                person.save(
+                    update_fields=[
+                        "allow_contact_from_cpdk",
+                        "allow_contact_from_other",
+                    ]
+                )
 
                 # Create volunteer record
                 if obj.activity:

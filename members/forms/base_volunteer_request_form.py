@@ -71,7 +71,12 @@ class BaseVolunteerRequestForm(forms.ModelForm):
 
     class Meta:
         model = VolunteerRequest
-        fields = ["info_reference", "info_whishes"]
+        fields = [
+            "info_reference",
+            "info_whishes",
+            "allow_contact_from_cpdk",
+            "allow_contact_from_other",
+        ]
         widgets = {
             "info_reference": forms.Textarea(attrs={"rows": 3}),
             "info_whishes": forms.Textarea(attrs={"rows": 5}),
@@ -125,6 +130,14 @@ class BaseVolunteerRequestForm(forms.ModelForm):
         """Override in subclasses to define the basic information fieldset"""
         return Fieldset(
             "Frivillig oplysninger",
+            Div(
+                Field("allow_contact_from_cpdk"),
+                css_class="col-md-12",
+            ),
+            Div(
+                Field("allow_contact_from_other"),
+                css_class="col-md-12",
+            ),
             Div(
                 Field("info_reference"),
                 css_class="col-md-12",

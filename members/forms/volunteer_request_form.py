@@ -14,6 +14,8 @@ class VolunteerRequestForm(BaseVolunteerRequestForm):
             "phone",
             "age",
             "zip",
+            "allow_contact_from_cpdk",
+            "allow_contact_from_other",
             "info_reference",
             "info_whishes",
         ]
@@ -49,6 +51,14 @@ class VolunteerRequestForm(BaseVolunteerRequestForm):
                 Div(Field("age"), css_class="col-md-4"),
                 Div(Field("zip"), css_class="col-md-4"),
                 css_class="row",
+            ),
+            Div(
+                Field("allow_contact_from_cpdk"),
+                css_class="col-md-12",
+            ),
+            Div(
+                Field("allow_contact_from_other"),
+                css_class="col-md-12",
             ),
             Div(
                 Field("info_reference"),

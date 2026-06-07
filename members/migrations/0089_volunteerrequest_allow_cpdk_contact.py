@@ -4,12 +4,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("members", "0087_merge_20260329_1335"),
+        ("members", "0088_person_allow_cpdk_contact"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="person",
+            model_name="volunteerrequest",
             name="allow_contact_from_cpdk",
             field=models.BooleanField(
                 default=False,
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="person",
+            model_name="volunteerrequest",
             name="allow_contact_from_other",
             field=models.BooleanField(
                 default=False,

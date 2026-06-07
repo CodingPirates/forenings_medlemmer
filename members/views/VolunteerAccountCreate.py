@@ -125,6 +125,12 @@ def VolunteerAccountCreate(request, token):
                 placename=signup.cleaned_data["placename"],
                 email=signup.cleaned_data["parent_email"],
                 phone=signup.cleaned_data["parent_phone"],
+                allow_contact_from_cpdk=signup.cleaned_data.get(
+                    "allow_contact_from_cpdk", False
+                ),
+                allow_contact_from_other=signup.cleaned_data.get(
+                    "allow_contact_from_other", False
+                ),
                 birthday=signup.cleaned_data["parent_birthday"],
                 gender=signup.cleaned_data["parent_gender"],
                 family=family,
@@ -171,9 +177,6 @@ def VolunteerAccountCreate(request, token):
                             person=person,
                             department=item.activity.department,
                             activity=item.activity,
-                            allow_cpdk_contact=signup.cleaned_data.get(
-                                "allow_cpdk_contact", False
-                            ),
                             start_date=timezone.now().date(),
                             end_date=item.activity.end_date,
                         )
@@ -183,9 +186,6 @@ def VolunteerAccountCreate(request, token):
                             person=person,
                             department=item.department,
                             activity=None,
-                            allow_cpdk_contact=signup.cleaned_data.get(
-                                "allow_cpdk_contact", False
-                            ),
                             start_date=timezone.now().date(),
                             end_date=None,
                         )
@@ -241,6 +241,8 @@ def VolunteerAccountCreate(request, token):
         "parent_email": volunteer_request.email,
         "parent_phone": volunteer_request.phone,
         "zipcode": volunteer_request.zip,
+        "allow_contact_from_cpdk": volunteer_request.allow_contact_from_cpdk,
+        "allow_contact_from_other": volunteer_request.allow_contact_from_other,
         "volunteer_info_reference": volunteer_request.info_reference,
         "volunteer_info_whishes": volunteer_request.info_whishes,
     }

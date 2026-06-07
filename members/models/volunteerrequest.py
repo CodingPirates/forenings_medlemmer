@@ -29,6 +29,12 @@ class VolunteerRequest(models.Model):
         max_length=1024,
         help_text="Hvilke ønsker har du til at være frivillig hos Coding Pirates ?",
     )
+    allow_contact_from_cpdk = models.BooleanField(
+        "Må Coding Pirates Denmark kontakte mig?", default=False
+    )
+    allow_contact_from_other = models.BooleanField(
+        "Må andre afdelinger kontakte mig?", default=False
+    )
     token = models.UUIDField(default=uuid.uuid4, null=False)
     created = models.DateTimeField(
         "Oprettet",
