@@ -46,10 +46,10 @@ class VolunteerTest(StaticLiveServerTestCase):
     def test_volunteer_signup(self):
         self.browser.get(f"{self.live_server_url}/volunteer")
 
-        options_texts = [
+        department_labels = [
             e.text
             for e in self.browser.find_elements(
-                By.XPATH, "//*/select[@id='id_volunteer_department']/option"
+                By.XPATH, "//div[@id='div_id_departments']//label"
             )
         ]
         # Save HTML file
@@ -60,9 +60,9 @@ class VolunteerTest(StaticLiveServerTestCase):
 
         self.assertIn(
             "Åben afdeling",
-            options_texts,
+            " ".join(department_labels),
         )
         self.assertNotIn(
             "Lukket afdeling",
-            options_texts,
+            " ".join(department_labels),
         )

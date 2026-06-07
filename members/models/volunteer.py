@@ -31,5 +31,23 @@ class Volunteer(models.Model):
     start_date = models.DateField("Startdato", blank=True, null=True, default=None)
     end_date = models.DateField("Slutdato", blank=True, null=True, default=None)
 
+    info_reference = models.TextField(
+        "Reference",
+        help_text="Hvor har du hørt om Coding Pirates (SoMe, Facebook, Instagram, LinkedIn, en ven, en kollega, etc)?",
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+    info_whishes = models.TextField(
+        "Ønsker",
+        help_text="Hvilke ønsker har du til at være frivillig hos Coding Pirates?",
+        max_length=1024,
+        blank=True,
+        null=True,
+    )
+    allow_cpdk_contact = models.BooleanField(
+        "Må Coding Pirates Denmark kontakte mig?", default=False
+    )
+
     def __str__(self):
         return self.person.__str__()

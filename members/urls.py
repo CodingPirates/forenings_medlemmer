@@ -1,6 +1,8 @@
 from django.urls import re_path
 from members.views import (
     AccountCreate,
+    VolunteerAccountCreate,
+    VolunteerAccountCreated,
     Activities,
     ActivitySignup,
     AdminSignup,
@@ -32,6 +34,11 @@ urlpatterns = [
     re_path(r"^$", EntryPage, name="entry_page"),
     re_path(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     re_path(r"^account/create/$", AccountCreate, name="account_create"),
+    re_path(
+        r"^account/create/volunteer/(?P<token>[0-9a-f-]+)/$",
+        VolunteerAccountCreate,
+        name="account_create_from_volunteer",
+    ),
     re_path(
         r"^account/login/$",
         auth_views.LoginView.as_view(template_name="members/login.html"),
@@ -78,6 +85,11 @@ urlpatterns = [
     re_path(r"^membership/$", Membership, name="membership"),
     re_path(r"^support_membership/$", SupportMembership, name="support_membership"),
     re_path(r"^volunteer$", volunteerSignup, name="volunteer_signup"),
+    re_path(
+        r"^volunteer_account_created/$",
+        VolunteerAccountCreated,
+        name="volunteer_account_created",
+    ),
     re_path(r"^user_created/$", userCreated, name="user_created"),
     re_path(r"^admin_signup/$", AdminSignup, name="admin_signup"),
     re_path(r"^family/$", FamilyDetails, name="family_detail"),

@@ -110,30 +110,56 @@ class signupForm(forms.Form):
                         ),
                         css_class="col-md-5",
                     ),
-                    Div(
-                        Div(
-                            Field("referer", id="referer"),
-                            css_class="col-md-6",
-                        )
-                    ),
                     Div(Field("consent"), css_class="col-md-12"),
                     Hidden("dawa_id", "", id="id_dawa_id"),
                     css_class="row",
                 ),
             ),
+            Fieldset(
+                "Frivillig information",
+                Div(
+                    Div(Field("allow_cpdk_contact"), css_class="col-md-12"),
+                    Div(Field("volunteer_info_reference"), css_class="col-md-12"),
+                    Div(Field("volunteer_info_whishes"), css_class="col-md-12"),
+                    css_class="row volunteer-info-section",
+                ),
+                css_class="volunteer-fieldset d-none",
+            ),
             Submit("submit", "Opret", css_class="btn-success"),
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        child_name = cleaned_data.get("child_name")
+        child_gender = cleaned_data.get("child_gender")
+        child_birthday = cleaned_data.get("child_birthday")
+
+        if child_name:
+            if not child_gender:
+                self.add_error(
+                    "child_gender",
+                    "Du skal vælge køn, når du opretter et barn.",
+                )
+            if "child_birthday" not in self.errors and not child_birthday:
+                self.add_error(
+                    "child_birthday",
+                    "Du skal angive fødselsdato, når du opretter et barn.",
+                )
+
+        return cleaned_data
+
     child_gender = forms.ChoiceField(
-        label="Køn", required=True, choices=Person.MEMBER_GENDER_CHOICES
+        label="Køn", required=False, choices=Person.MEMBER_GENDER_CHOICES
     )
     child_name = forms.CharField(
-        label="Barns fulde navn", required=True, max_length=200
+        label="Barns fulde navn", required=False, max_length=200
     )
     child_email = forms.EmailField(label="Barns email", required=False)
     child_phone = forms.CharField(label="Barns telefon", required=False, max_length=50)
     child_birthday = forms.DateField(
         label="Barns fødselsdato",
+        required=False,
         input_formats=(settings.DATE_INPUT_FORMATS),
         widget=forms.DateInput(attrs={"type": "date"}),
         error_messages={"invalid": "Indtast en gyldig dato"},
@@ -198,4 +224,28 @@ class signupForm(forms.Form):
     )
     referer = forms.CharField(
         label="Hvor hørte du om Coding Pirates?", required=False, max_length=255
+    )
+
+    # Volunteer-specific fields (optional for regular signup, but used for volunteer account creation)
+    volunteer_info_reference = forms.CharField(
+        label="Hvor har du hørt om Coding Pirates?",
+        help_text="SoMe, Facebook, Instagram, LinkedIn, en ven, en kollega, etc",
+        required=False,
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={"placeholder": "Facebook, LinkedIn, en ven, etc."}
+        ),
+    )
+    volunteer_info_whishes = forms.CharField(
+        label="Ønsker til frivilligt arbejde",
+        help_text="Hvilke ønsker har du til at være frivillig hos Coding Pirates?",
+        required=False,
+        max_length=1024,
+        widget=forms.Textarea(
+            attrs={"rows": 3, "placeholder": "Beskriv dine ønsker og forventninger..."}
+        ),
+    )
+    allow_cpdk_contact = forms.BooleanField(
+        label="Må Coding Pirates Denmark kontakte mig?",
+        required=False,
     )

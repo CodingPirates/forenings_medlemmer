@@ -2,12 +2,12 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="alert alert-info">
-        <h1>Bekræft din email adresse</h1>
+        <h1>Tjek din email</h1>
         <p>
-            Vi har sendt en verifikationskode til <strong>{{ email }}</strong>
+            Hvis det er muligt at fortsætte med emailadressen <strong>{{ email }}</strong>, har vi sendt en email med næste trin.
         </p>
         <p>
-            Tjek din email og indtast den 6-cifrede kode herunder for at bekræfte din ansøgning om at blive frivillig.
+            Hvis du har modtaget en 6-cifret verifikationskode, kan du indtaste den herunder for at fortsætte din frivillig-anmodning.
         </p>
         {% if error %}
             <div class="alert alert-danger mt-3">
@@ -33,9 +33,9 @@
                         required
                         autocomplete="one-time-code"
                     >
-                    <div class="form-text">Indtast den 6-cifrede kode du modtog på email</div>
+                    <div class="form-text">Indtast koden hvis din email indeholdt en verifikationskode</div>
                 </div>
-                <button type="submit" class="btn btn-primary">Bekræft email</button>
+                <button type="submit" class="btn btn-primary">Fortsæt</button>
                 <a href="{% url 'volunteer_signup' %}" class="btn btn-secondary">Start forfra</a>
             </form>
         </div>

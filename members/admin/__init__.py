@@ -45,6 +45,19 @@ from .emailitem_admin import EmailItemAdmin
 from .volunteer_admin import VolunteerAdmin
 from .volunteerrequest_admin import VolunteerRequestAdmin
 from .volunteerrequestitem_admin import VolunteerRequestItemAdmin
+from .notifications import get_admin_notifications
+
+
+default_each_context = admin.site.each_context
+
+
+def members_admin_each_context(request):
+    context = default_each_context(request)
+    context["admin_notifications"] = get_admin_notifications(request)
+    return context
+
+
+admin.site.each_context = members_admin_each_context
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"

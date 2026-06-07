@@ -97,6 +97,7 @@ class VolunteerAdmin(admin.ModelAdmin):
         "get_person_email",
         "department",
         "get_activity_name",
+        "allow_cpdk_contact",
         "start_date",
         "end_date",
     )
@@ -158,6 +159,7 @@ class VolunteerAdmin(admin.ModelAdmin):
                     "fields": (
                         "department",
                         "activity",
+                        "allow_cpdk_contact",
                         "start_date",
                         "end_date",
                     )

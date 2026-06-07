@@ -1,5 +1,5 @@
 from django import forms
-from crispy_forms.layout import Fieldset, Div, Field
+from crispy_forms.layout import Fieldset, Div, Field, Layout, HTML, Submit
 
 from members.models.person import Person
 from members.models.family import Family
@@ -73,13 +73,48 @@ class LoggedInVolunteerRequestForm(BaseVolunteerRequestForm):
                 Field("person"),
                 css_class="col-md-12",
             ),
-            "Frivillig oplysninger",
-            Div(
-                Field("info_reference"),
-                css_class="col-md-12",
+        )
+
+    def get_layout(self):
+        """Get the complete form layout for authenticated users"""
+        return Layout(
+            self.get_basic_fieldset(),
+            Fieldset(
+                "Frivillig oplysninger",
+                Div(
+                    Field("info_reference"),
+                    css_class="col-md-12",
+                ),
+                Div(
+                    Field("info_whishes"),
+                    css_class="col-md-12",
+                ),
             ),
-            Div(
-                Field("info_whishes"),
-                css_class="col-md-12",
+            Fieldset(
+                "Interesse områder",
+                HTML(
+                    """
+                    <div class="mb-3">
+                        <label for="search-filter" class="form-label">Søg efter afdeling eller aktivitet:</label>
+                        <input
+                            type="text"
+                            id="search-filter"
+                            class="form-control"
+                            onkeyup="filter_volunteer_checkboxes()"
+                            placeholder="Søg efter afdelingsnavn, aktivitetsnavn, by, postnummer, gade..."
+                        />
+                    </div>
+                """
+                ),
+                Div(
+                    Field("departments"),
+                    css_class="col-md-6",
+                ),
+                Div(
+                    Field("activities"),
+                    css_class="col-md-6",
+                ),
+                css_class="row",
             ),
+            Submit("submit", "Send anmodning", css_class="btn-success"),
         )

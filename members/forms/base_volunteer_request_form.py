@@ -20,33 +20,25 @@ class ActivityCheckboxWidget(forms.CheckboxSelectMultiple):
             name, value, label, selected, index, subindex, attrs
         )
 
-        # Debug: Print to console what we're working with
-        print(f"ActivityCheckboxWidget - value: {value}, label: {label}")
+        raw_value = getattr(value, "value", value)
 
-        if value and str(value).isdigit():
+        if raw_value and str(raw_value).isdigit():
             try:
-                # Convert value to int if it's not already
-                activity_id = int(value)
+                activity_id = int(raw_value)
                 activity = Activity.objects.get(pk=activity_id)
                 activity_url = reverse(
                     "activity_view", kwargs={"activity_id": activity.id}
                 )
-
-                print(f"Creating link for activity {activity_id}: {activity_url}")
 
                 # Use the existing label text but wrap it in a link
                 if option["label"]:
                     label_text = str(option["label"])
                     link_html = f'<a href="{activity_url}" target="_blank" rel="noopener noreferrer">{label_text}</a>'
                     option["label"] = mark_safe(link_html)
-                    print(f"Final label: {option['label']}")
 
-            except (Activity.DoesNotExist, ValueError, TypeError) as e:
+            except (Activity.DoesNotExist, ValueError, TypeError):
                 # Fall back to the original label if there's any issue
-                print(f"Error creating activity link: {e}")
                 pass
-        else:
-            print(f"Skipping value: {value} (not digit or empty)")
 
         return option
 
@@ -68,10 +60,9 @@ class ActivityWithAddressAndLinkChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
         """Custom label that includes activity name, department, and address"""
         address = obj.address
-        activity_url = reverse("activity_view", kwargs={"activity_id": obj.id})
-        display_text = f"{obj.department.name}: {obj.name} ({address.streetname} {address.housenumber}, {address.zipcode} {address.city})"
-        return mark_safe(
-            f'<a href="{activity_url}" target="_blank" rel="noopener noreferrer">{display_text}</a>'
+        return (
+            f"{obj.department.name}: {obj.name} "
+            f"({address.streetname} {address.housenumber}, {address.zipcode} {address.city})"
         )
 
 

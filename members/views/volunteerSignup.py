@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.utils import timezone
+from django.urls import reverse
 import os
 import random
 from datetime import datetime
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from members.forms import (
     VolunteerRequestForm,
@@ -13,6 +16,9 @@ from members.models.activity import Activity
 from members.models.person import Person
 from members.models.volunteerrequest import VolunteerRequest
 from members.models.volunteerrequestitem import VolunteerRequestItem
+from members.models.volunteer import Volunteer
+from members.utils.user import user_to_person
+from members.utils.admin_log import log_volunteer_contact_preference_change
 from members.models.emailtemplate import EmailTemplate
 
 
@@ -202,6 +208,30 @@ def volunteerSignup(request):
     if request.user.is_authenticated:
         # Simplified logic for authenticated users - just create volunteer request
         if request.method == "POST":
+            if request.POST.get("form_id") == "volunteer_contact_preference":
+                try:
+                    family = user_to_person(request.user).family
+                    volunteer = Volunteer.objects.select_related("person__family").get(
+                        pk=request.POST.get("volunteer_id"),
+                        person__family=family,
+                        removed__isnull=True,
+                    )
+                except (Person.DoesNotExist, Volunteer.DoesNotExist, AttributeError):
+                    return HttpResponseForbidden(
+                        "Du kan kun redigere kontaktindstillinger for dine egne frivillige roller."
+                    )
+
+                original_allow_cpdk_contact = volunteer.allow_cpdk_contact
+                volunteer.allow_cpdk_contact = (
+                    request.POST.get("allow_cpdk_contact") == "on"
+                )
+
+                if volunteer.allow_cpdk_contact != original_allow_cpdk_contact:
+                    volunteer.save(update_fields=["allow_cpdk_contact"])
+                    log_volunteer_contact_preference_change(request, volunteer)
+
+                return HttpResponseRedirect(reverse("volunteer_signup"))
+
             logged_in_form = LoggedInVolunteerRequestForm(
                 user=request.user, data=request.POST
             )
@@ -244,18 +274,133 @@ def volunteerSignup(request):
                 return render(
                     request,
                     "members/logged_in_volunteer_request.html",
-                    {"logged_in_form": logged_in_form},
+                    {
+                        "logged_in_form": logged_in_form,
+                        "show_overview": False,  # Don't show overview when there are form errors
+                    },
                 )
 
         # initial load for authenticated users
         logged_in_form = LoggedInVolunteerRequestForm(user=request.user)
 
+        # Get volunteer overview data for the user's family
+        overview_data = {
+            "current_volunteers": [],
+            "volunteer_requests": [],
+            "family_members": [],
+        }
+
+        try:
+            person = user_to_person(request.user)
+            if person and person.family:
+                family = person.family
+
+                # Auto-fix any WAITING volunteer requests for existing family members
+                # Check for WAITING requests where the email matches a family member
+                family_people = Person.objects.filter(
+                    family=family, deleted_dtm__isnull=True
+                )
+
+                for person in family_people:
+                    waiting_requests = VolunteerRequestItem.objects.filter(
+                        volunteer_request__email__iexact=person.email,
+                        status="WAITING",
+                        volunteer_request__person__isnull=True,
+                    )
+
+                    for waiting_item in waiting_requests:
+                        # Link the volunteer request to the existing person
+                        volunteer_request = waiting_item.volunteer_request
+                        volunteer_request.person = person
+                        volunteer_request.finished = timezone.now()
+                        volunteer_request.save()
+
+                        # Create volunteer record and set status to ACTIVE
+                        try:
+                            if waiting_item.activity:
+                                # Activity-specific volunteer
+                                volunteer = Volunteer.objects.create(
+                                    person=person,
+                                    department=waiting_item.activity.department,
+                                    activity=waiting_item.activity,
+                                    start_date=timezone.now().date(),
+                                    end_date=waiting_item.activity.end_date,
+                                )
+                            else:
+                                # Department-level volunteer
+                                volunteer = Volunteer.objects.create(
+                                    person=person,
+                                    department=waiting_item.department,
+                                    activity=None,
+                                    start_date=timezone.now().date(),
+                                    end_date=None,
+                                )
+
+                            # Try to set info fields if they exist
+                            try:
+                                volunteer.info_reference = (
+                                    volunteer_request.info_reference
+                                )
+                                volunteer.info_whishes = volunteer_request.info_whishes
+                                volunteer.save()
+                            except AttributeError:
+                                # Fields don't exist yet, skip
+                                pass
+
+                        except Exception as e:
+                            # Log the error but continue
+                            print(f"Error creating volunteer record: {e}")
+                            continue
+
+                        # Update status to ACTIVE
+                        waiting_item.status = "ACTIVE"
+                        waiting_item.finished = timezone.now()
+                        waiting_item.save()
+
+                # Get all family members
+                overview_data["family_members"] = Person.objects.filter(
+                    family=family, deleted_dtm__isnull=True
+                ).order_by("name")
+
+                # Get current volunteer records for family members
+                overview_data["current_volunteers"] = (
+                    Volunteer.objects.filter(
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        removed__isnull=True,
+                    )
+                    .select_related("person", "department", "activity")
+                    .order_by("-added_at")
+                )
+
+                # Get volunteer requests for family members (last 12 months)
+                from datetime import datetime, timedelta
+
+                one_year_ago = datetime.now() - timedelta(days=365)
+
+                overview_data["volunteer_requests"] = (
+                    VolunteerRequest.objects.filter(
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        created__gte=one_year_ago,
+                    )
+                    .prefetch_related(
+                        "volunteerrequestitem_set__department",
+                        "volunteerrequestitem_set__activity",
+                    )
+                    .order_by("-created")
+                )
+
+        except (AttributeError, Person.DoesNotExist):
+            pass
+
         # Debug information to help troubleshoot
+        person = user_to_person(request.user)
         debug_info = {
             "user_email": request.user.email,
-            "user_has_person": hasattr(request.user, "person"),
+            "user_has_person": person is not None,
             "person_count": None,
-            "family_email": None,
+            "family_email": person.family.email if person and person.family else None,
         }
 
         # Get some debug info about the user's setup
@@ -271,7 +416,12 @@ def volunteerSignup(request):
         return render(
             request,
             "members/logged_in_volunteer_request.html",
-            {"logged_in_form": logged_in_form, "debug_info": debug_info},
+            {
+                "logged_in_form": logged_in_form,
+                "debug_info": debug_info,
+                "overview_data": overview_data,
+                "show_overview": True,  # Flag to show overview section
+            },
         )
 
     else:
