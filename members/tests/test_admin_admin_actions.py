@@ -1,21 +1,19 @@
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
-from django.test import TestCase, RequestFactory, override_settings
+from dateutil.relativedelta import relativedelta
 from django.contrib import admin, messages
 from django.contrib.auth.models import User
+from django.test import RequestFactory, TestCase, override_settings
 
+from members.admin.admin_actions import AdminActions
 from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.emailtemplate import EmailTemplate
-from members.models.person import Person
 from members.models.family import Family
+from members.models.person import Person
 from members.models.waitinglist import WaitingList
-from members.admin.admin_actions import AdminActions
 
-from .factories import UnionFactory
-from .factories import DepartmentFactory
-from .factories import ActivityFactory
+from .factories import ActivityFactory, DepartmentFactory, UnionFactory
 
 
 # set MESSAGE_STORAGE to CookieStorage to support django messaging framework
@@ -43,7 +41,6 @@ class TestAdminActions(TestCase):
             min_age=7,
             max_age=17,
             department=self.department,
-            union=self.union,
         )
         self.activity_starting_in_two_days.save()
 
@@ -54,7 +51,6 @@ class TestAdminActions(TestCase):
             min_age=7,
             max_age=17,
             department=self.department,
-            union=self.union,
         )
         self.activity_started_two_days_ago.save()
 

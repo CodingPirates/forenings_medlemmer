@@ -1,12 +1,16 @@
 from datetime import date, datetime
+
 from django.test import TestCase
+
 from members.models.person import Person
 
-from .factories import UnionFactory
-from .factories import DepartmentFactory
-from .factories import FamilyFactory
-from .factories import ActivityFactory
-from .factories import MemberFactory
+from .factories import (
+    ActivityFactory,
+    DepartmentFactory,
+    FamilyFactory,
+    MemberFactory,
+    UnionFactory,
+)
 
 
 class TestModelMember(TestCase):
@@ -18,7 +22,6 @@ class TestModelMember(TestCase):
             start_date=date(datetime.now().year, 1, 1),
             end_date=date(datetime.now().year, 6, 1),
             department=self.department,
-            union=self.union,
         )
         self.activity.save()
 

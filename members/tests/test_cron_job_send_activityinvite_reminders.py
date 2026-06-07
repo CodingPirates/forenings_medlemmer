@@ -30,7 +30,6 @@ class TestCronJobSendActivityInviteReminders(TestCase):
             min_age=5,
             max_age=17,
             department=self.department,
-            union=self.union,
         )
         self.activity.save()
 

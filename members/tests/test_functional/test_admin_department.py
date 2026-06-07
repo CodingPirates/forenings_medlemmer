@@ -133,7 +133,6 @@ class DepartmentAdminTest(StaticLiveServerTestCase):
         self.activity1 = Activity.objects.create(
             name="Activity1",
             department=self.department1,
-            union=self.union,
             activitytype=self.activity_type1,
             start_date=date(2023, 1, 1),
             end_date=date(2023, 1, 1),
@@ -142,7 +141,6 @@ class DepartmentAdminTest(StaticLiveServerTestCase):
         self.activity2 = Activity.objects.create(
             name="Activity2",
             department=self.department1,
-            union=self.union,
             activitytype=self.activity_type2,
             start_date=date(2023, 2, 1),
             end_date=date(2023, 2, 1),
@@ -151,7 +149,6 @@ class DepartmentAdminTest(StaticLiveServerTestCase):
         self.activity3 = Activity.objects.create(
             name="Activity3",
             department=self.department1,
-            union=self.union,
             activitytype=self.activity_type3,
             start_date=date(2023, 3, 1),
             end_date=date(2023, 3, 1),
@@ -160,7 +157,6 @@ class DepartmentAdminTest(StaticLiveServerTestCase):
         self.activity4 = Activity.objects.create(
             name="Activity4",
             department=self.department1,
-            union=self.union,
             activitytype=self.activity_type4,
             start_date=date(2023, 4, 1),
             end_date=date(2023, 4, 1),

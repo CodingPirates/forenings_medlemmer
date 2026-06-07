@@ -65,7 +65,6 @@ class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
         self.activity = ActivityFactory(
             name="Activity1",
             department=self.department,
-            union=self.union,
             activitytype=self.activity_type,
             start_date=datetime.now() - relativedelta(months=1),
             end_date=datetime.now() + relativedelta(months=1),
