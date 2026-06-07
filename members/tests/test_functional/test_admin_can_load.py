@@ -66,9 +66,9 @@ class SignUpTest(StaticLiveServerTestCase):
             self.fail("Was not redirected to the admin signup form")
 
         # Fill out the captain's (admin) signup form
-        Select(
-            self.browser.find_element(By.ID, "id_volunteer_gender")
-        ).select_by_value(Person.MALE)
+        Select(self.browser.find_element(By.ID, "id_volunteer_gender")).select_by_value(
+            Person.MALE
+        )
         self.browser.find_element(By.ID, "id_volunteer_name").send_keys(
             "Kaptajn Testperson"
         )
