@@ -10,6 +10,7 @@ from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 
 # from members.admin.admin_actions import export_participants_csv
+from forenings_medlemmer.settings import MINIMUM_SEASON_PRICE_IN_DKK
 from members.admin.admin_actions import AdminActions
 from members.forms.season_fee_update_form import SeasonFeeUpdateForm
 from members.models import (
@@ -297,7 +298,7 @@ class ActivityAdmin(admin.ModelAdmin):
         # Only set season_fee to default if no override reason is given
         if not obj.season_fee_change_reason:
             if obj.activitytype_id == "FORLØB":
-                obj.season_fee = 150
+                obj.season_fee = MINIMUM_SEASON_PRICE_IN_DKK
             else:
                 obj.season_fee = 0
         # else: keep the user-set value (with reason)
