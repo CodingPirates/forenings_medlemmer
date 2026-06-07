@@ -1,5 +1,6 @@
 import requests
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from members.models.activity import Activity
@@ -80,7 +81,7 @@ class Command(BaseCommand):
 
                 wash_response = requests.request(
                     "GET",
-                    "https://dawa.aws.dk/datavask/adresser",
+                    f"{settings.DATAFORSYNINGEN_BASE_URL}/datavask/adresser",
                     params={"betegnelse": text},
                 )
                 _category = wash_response.json()["kategori"]

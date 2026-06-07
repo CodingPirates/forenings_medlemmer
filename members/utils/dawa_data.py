@@ -1,17 +1,13 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import json
-import requests
+from members.utils.address_lookup import get_address_by_id, parse_address_data
 
 
 def get_user_region(person):
-    dawa_req = f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
+    if not person.dawa_id:
+        return None
     try:
-        dawa_reply = json.loads(requests.get(dawa_req).text)
-        user_region = dawa_reply["properties"]["regionsnavn"]
+        data = get_address_by_id(person.dawa_id)
+        if not data:
+            return None
+        return parse_address_data(data)["region"] or None
     except Exception:
-        user_region = None
-        # and we simply skip the region, and sorting will be as default
-
-    return user_region
+        return None

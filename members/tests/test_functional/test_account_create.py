@@ -106,9 +106,17 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys("Kochsgade 31D, 5000")
         try:
             address = WebDriverWait(self.browser, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
+                EC.presence_of_element_located(
+                    (By.CLASS_NAME, "adressevaelger-suggestion")
+                )
             )
             address.click()
+            # Wait for async Adressevælger lookup to complete (dawa_id populated = callback ran)
+            WebDriverWait(self.browser, 10).until(
+                lambda d: bool(
+                    d.find_element(By.ID, "id_dawa_id").get_attribute("value")
+                )
+            )
         except Exception:
             self.fail("Autocomplete not working")
 
