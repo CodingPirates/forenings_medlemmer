@@ -92,7 +92,7 @@ class Person(models.Model):
         on_delete=models.RESTRICT,
         blank=True,
         null=True,  # allow blank/null values since we don't have addresses for all persons
-        default="",
+        default=None,
     )
     longitude = models.DecimalField(
         "Længdegrad", blank=True, null=True, max_digits=9, decimal_places=6
@@ -162,6 +162,9 @@ class Person(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        if self.municipality_id == "":
+            self.municipality = None
+
         if not settings.TESTING:
             updated = self.update_dawa_data(force=True, save=False)
             if updated is not None:

@@ -8,12 +8,11 @@ class ConsentMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request):
-        # Bypass consent check for the consent page itself and other exceptions
-        exempt_paths = [reverse("consent_page"), "/account/logout/"]
-        if request.path in exempt_paths:
-            return self.get_response(request)
+    @staticmethod
+    def _remember_original_url(request):
+        request.session.setdefault("original_url", request.get_full_path())
 
+    def __call__(self, request):
         # Ignore static/media/favicon requests for original_url
         if (
             request.path.startswith("/static/")
@@ -23,7 +22,20 @@ class ConsentMiddleware:
             return self.get_response(request)
 
         if request.user.is_authenticated:
+            admin_signup_path = reverse("admin_signup")
+            consent_page_path = reverse("consent_page")
+            exempt_paths = [admin_signup_path, consent_page_path, "/account/logout/"]
+
             person = Person.objects.filter(user=request.user).first()
+            if not person:
+                if request.path not in exempt_paths:
+                    self._remember_original_url(request)
+                    return redirect(admin_signup_path)
+                return self.get_response(request)
+
+            if request.path in exempt_paths:
+                return self.get_response(request)
+
             if person:
                 latest_consent = (
                     Consent.objects.filter(
@@ -38,8 +50,8 @@ class ConsentMiddleware:
                         not person.consent
                         or person.consent.released_at < latest_consent.released_at
                     ):
-                        # Store the original URL in the session
-                        request.session["original_url"] = request.path
+                        # Store the original URL in the session unless one already exists
+                        self._remember_original_url(request)
                         return redirect(reverse("consent_page"))
 
         response = self.get_response(request)

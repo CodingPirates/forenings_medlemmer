@@ -33,11 +33,23 @@ class LoadWhenNoFamilyTest(TestCase):
         logged_in = self.client.login(username="user", password=self.password)
         self.assertTrue(logged_in)
 
-        # Check for redirect
+        # Middleware should force profile/family creation globally
         self.assertRedirects(
-            self.client.get("/department_signup"),
-            "/admin_signup/?next=/department_signup",
+            self.client.get("/"),
+            "/admin_signup/",
         )
+
+        session = self.client.session
+        session.pop("original_url", None)
+        session.save()
+
+        # Check for redirect
+        response = self.client.get("/department_signup")
+        self.assertRedirects(
+            response,
+            "/admin_signup/",
+        )
+        self.assertEqual(self.client.session.get("original_url"), "/department_signup")
 
         # Log into user with person
         self.client.logout()
