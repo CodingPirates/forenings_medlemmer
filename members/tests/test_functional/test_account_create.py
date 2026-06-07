@@ -4,6 +4,7 @@ import time
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -163,6 +164,12 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.find_element(By.XPATH, "//input[@type='submit']").click()
 
         # Check that we were redirectet to front page
+        try:
+            WebDriverWait(self.browser, 10).until(
+                EC.url_to_be(f"{self.live_server_url}/")
+            )
+        except TimeoutException:
+            pass  # fall through so assertEqual gives a clear url diff
         self.assertEqual(f"{self.live_server_url}/", self.browser.current_url)
 
     def test_account_create_without_redirect(self):
