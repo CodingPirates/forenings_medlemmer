@@ -1,5 +1,6 @@
 import factory
 import random
+from forenings_medlemmer.settings import MINIMUM_SEASON_PRICE_IN_DKK
 from members.tests.factories.factory_helpers import TIMEZONE, LOCALE
 from members.tests.factories.providers import DanishProvider, CodingPiratesProvider
 from members.models import Activity
@@ -49,7 +50,7 @@ class ActivityFactory(DjangoModelFactory):
     )
     updated_dtm = Faker("date_time", tzinfo=TIMEZONE)
     open_invite = Faker("boolean")
-    price_in_dkk = Faker("random_number", digits=4)
+    price_in_dkk = Faker("random_int", min=MINIMUM_SEASON_PRICE_IN_DKK, max=9999)
     max_participants = Faker("random_number")
     min_age = Faker("random_int", min=5, max=18)
     max_age = LazyAttribute(lambda a: a.min_age + random.randint(10, 80))
