@@ -291,10 +291,6 @@ class TestModelPerson(TestCase):
             0,
             "Person should have no departments after anonymization",
         )
-        self.assertFalse(
-            Volunteer.objects.filter(pk=volunteer.pk).exists(),
-            "Volunteer relationship should be deleted after anonymization",
-        )
 
         # union relationships removed
         self.assertEqual(

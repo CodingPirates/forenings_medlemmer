@@ -406,7 +406,6 @@ class Person(models.Model):
 
         # Remove department/union relationships
         self.department_set.clear()
-        self.volunteer_set.all().delete()
         self.union_set.clear()
 
         # Remove union roles
