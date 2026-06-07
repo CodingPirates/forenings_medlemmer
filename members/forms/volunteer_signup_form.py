@@ -10,6 +10,21 @@ from members.models.person import Person
 from django.contrib.auth.password_validation import validate_password
 
 
+class SafeModelChoiceField(forms.ModelChoiceField):
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+
+        try:
+            return super().to_python(value)
+        except (ValueError, TypeError):
+            raise forms.ValidationError(
+                self.error_messages["invalid_choice"],
+                code="invalid_choice",
+                params={"value": value},
+            )
+
+
 class vol_signupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         consent_url = kwargs.pop("consent_url", "/consent/")
@@ -118,7 +133,7 @@ class vol_signupForm(forms.Form):
         error_messages={"invalid": "Indtast en gyldig dato."},
         widget=forms.DateInput(attrs={"type": "date"}),
     )
-    volunteer_department = forms.ModelChoiceField(
+    volunteer_department = SafeModelChoiceField(
         queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
         required=True,
         label="Afdeling",
