@@ -1,14 +1,12 @@
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 from django.utils import timezone
 
+from members.models import Person
 from members.models.activity import Activity
 from members.models.activityparticipant import ActivityParticipant
-from members.models import Person
-from members.utils.user import user_to_family
-
-from django.contrib.auth.decorators import user_passes_test
-from members.utils.user import is_not_logged_in_and_has_person
+from members.utils.user import is_not_logged_in_and_has_person, user_to_family
 
 
 @user_passes_test(is_not_logged_in_and_has_person, "/admin_signup/")
@@ -48,7 +46,7 @@ def SupportMembership(request):
                     {
                         "id": curActivity.id,
                         "name": curActivity.name,
-                        "union": curActivity.union,
+                        "union": curActivity.department.union,
                         "persons": applicablePersons,
                         "price_in_dkk": curActivity.price_in_dkk,
                     }

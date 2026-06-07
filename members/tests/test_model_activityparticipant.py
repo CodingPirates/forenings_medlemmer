@@ -1,15 +1,19 @@
-from django.test import TestCase
 from datetime import datetime, timedelta
-from members.models.person import Person
-from members.models.waitinglist import WaitingList
-from members.models.activityparticipant import ActivityParticipant
+
+from django.test import TestCase
 from django.utils import timezone
 
-from .factories import UnionFactory
-from .factories import DepartmentFactory
-from .factories import FamilyFactory
-from .factories import ActivityFactory
-from .factories import ActivityParticipantFactory
+from members.models.activityparticipant import ActivityParticipant
+from members.models.person import Person
+from members.models.waitinglist import WaitingList
+
+from .factories import (
+    ActivityFactory,
+    ActivityParticipantFactory,
+    DepartmentFactory,
+    FamilyFactory,
+    UnionFactory,
+)
 
 
 class TestModelActivityParticipant(TestCase):
@@ -23,7 +27,6 @@ class TestModelActivityParticipant(TestCase):
             end_date=datetime.now()
             + timedelta(days=365),  # Has to be long enough to be a season
             department=self.department,
-            union=self.union,
         )
         self.activity.save()
         self.assertTrue(self.activity.is_season())  # If this fail increase the end_date
