@@ -9,9 +9,8 @@ from members.models.municipality import Municipality
 from members.models.consent import Consent
 from django.core.exceptions import PermissionDenied, ValidationError
 from members.models.payment import Payment
+from members.models.union import Union
 from members.utils.address import format_address
-from urllib.parse import quote_plus
-import requests
 import logging
 
 logger = logging.getLogger(__name__)
@@ -294,47 +293,30 @@ class Person(models.Model):
             or force
         ):
             try:
-                url = f"https://api.dataforsyningen.dk/adresser?q={quote_plus(self.addressWithZip())}"
-                response = requests.get(url)
-                if response.status_code != 200:
+                from members.utils.address_lookup import (
+                    search_address,
+                    get_address_by_id,
+                    parse_address_data,
+                    apply_address_data,
+                )
+
+                id_lokalid = self.dawa_id or search_address(self.addressWithZip())
+                if not id_lokalid:
                     self.address_invalid = True
                     if save:
                         self.save()
                     return self
 
-                data = response.json()
+                data = get_address_by_id(id_lokalid)
                 if not data:
                     self.address_invalid = True
                     if save:
                         self.save()
                     return self
 
-                # DAWA returns result with address and "adgangsadresse". Address has fields "etage" and "dør",
-                # whereas "adgangsadresse" has all the shared address fields (e.g. for an apartment building)
-                address = data[0]
-                access_address = address["adgangsadresse"]
-
-                if address["etage"] is None:
-                    address["etage"] = ""
-                if address["dør"] is None:
-                    address["dør"] = ""
-                if access_address["supplerendebynavn"] is None:
-                    access_address["supplerendebynavn"] = ""
-
-                self.zipcode = access_address["postnummer"]["nr"]
-                self.city = access_address["postnummer"]["navn"]
-                self.streetname = access_address["vejstykke"]["navn"]
-                self.housenumber = access_address["husnr"]
-                self.floor = address["etage"]
-                self.door = address["dør"]
-                self.placename = access_address["supplerendebynavn"]
-                self.latitude = access_address["vejpunkt"]["koordinater"][1]
-                self.longitude = access_address["vejpunkt"]["koordinater"][0]
-                self.municipality = Municipality.objects.get(
-                    dawa_id=access_address["kommune"]["kode"]
-                )
-                self.region = access_address["region"]["navn"]
-                self.dawa_id = address["id"]
+                parsed = parse_address_data(data)
+                apply_address_data(self, parsed)
+                self.municipality = parsed["municipality_obj"]
                 if save:
                     self.save()
                 return self
@@ -403,6 +385,16 @@ class Person(models.Model):
         for waiting_list in self.waitinglist_set.all():
             waiting_list.delete()
 
+        # Remove department/union relationships
+        self.department_set.clear()
+        self.union_set.clear()
+
+        # Remove union roles
+        Union.objects.filter(chairman=self).update(chairman=None)
+        Union.objects.filter(second_chair=self).update(second_chair=None)
+        Union.objects.filter(cashier=self).update(cashier=None)
+        Union.objects.filter(secretary=self).update(secretary=None)
+
         self.family.anonymize_if_all_persons_anonymized(request)
 
         # anonymize sent emails
@@ -431,6 +423,7 @@ class Person(models.Model):
                 user.is_superuser = False
                 user.is_staff = False
                 user.is_active = False
+                user.groups.clear()
                 user.save()
             except User.DoesNotExist:
                 pass  # no user account found for this person, nothing to update then

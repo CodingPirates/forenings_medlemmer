@@ -33,6 +33,10 @@ logger = logging.getLogger(__name__)
 TESTING = os.path.basename(sys.argv[1]) == "test"
 USE_DAWA_ON_SAVE = not TESTING
 
+DATAFORSYNINGEN_BASE_URL = "https://api.dataforsyningen.dk"
+
+DATAFORDELER_API_KEY = env.str("DATAFORDELER_API_KEY", default="")
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TEMPLATES = [

@@ -22,6 +22,8 @@
     <script src="{% static "members/js/tablesearch.js" %}"></script>
     {% if request.path == "/" or request.path == "/volunteer" or "/family/Person/" or "/admin_signup/" in request.path %}
         {% load crispy_forms_tags %}
+        <script>const DATAFORSYNINGEN_BASE_URL = "{{ DATAFORSYNINGEN_BASE_URL }}";</script>
+        <link rel="stylesheet" type="text/css" href="{% static 'members/css/adressevaelger.css' %}" />
         <script src="{% static "members/js/dawa-autocomplete.js" %}"></script>
         <script src="{% static "members/js/dawa-form-fill.js" %}"></script>
     {% endif %}
