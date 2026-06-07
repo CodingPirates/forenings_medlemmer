@@ -81,7 +81,11 @@ class Address(models.Model):
                 self.dawa_id = wash_resp.json()["resultater"][0]["adresse"]["id"]
                 self.dawa_category = _category
 
-        from members.utils.address_lookup import get_address_by_id, parse_address_data, apply_address_data
+        from members.utils.address_lookup import (
+            get_address_by_id,
+            parse_address_data,
+            apply_address_data,
+        )
 
         data = get_address_by_id(self.dawa_id)
         if data is None:

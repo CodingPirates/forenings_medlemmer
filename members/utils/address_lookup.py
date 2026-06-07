@@ -8,6 +8,7 @@ _BASE_URL = "https://adressevaelger.dk"
 @lru_cache(maxsize=1)
 def _get_transformer():
     from pyproj import Transformer
+
     return Transformer.from_crs("EPSG:25832", "EPSG:4326", always_xy=True)
 
 
