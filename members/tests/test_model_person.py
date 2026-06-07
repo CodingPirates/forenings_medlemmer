@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.contrib.auth.models import User, Group
 from members.models.person import Person
-from members.models import Volunteer
 from datetime import date, datetime, timedelta
 from django.utils import timezone
 from freezegun import freeze_time
@@ -251,10 +250,9 @@ class TestModelPerson(TestCase):
         with freeze_time(timezone.now() - timedelta(days=3 * 365)):
             person = PersonFactory()
 
-        # department relationships: leader role + volunteer membership
+        # department relationships: leader role membership
         department = DepartmentFactory()
         department.department_leaders.add(person)
-        volunteer = Volunteer.objects.create(person=person, department=department)
 
         # union relationships: officer roles + board membership
         union = UnionFactory()
@@ -276,7 +274,6 @@ class TestModelPerson(TestCase):
 
         # sanity check that the relationships exist before anonymizing
         self.assertEqual(person.department_set.count(), 1)
-        self.assertEqual(person.volunteer_set.count(), 1)
         self.assertEqual(person.union_set.count(), 1)
         self.assertEqual(user.groups.count(), 1)
 
