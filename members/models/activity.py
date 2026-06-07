@@ -43,7 +43,7 @@ class Activity(models.Model):
         default=None,
         null=True,
         blank=True,
-        help_text="""Standard er 150 kr for sæson/forløb, 0 kr for Arrangementer og Støttemedlemskaber.<br>Beregnes automatisk ved oprettelse af aktiviteten.""",
+        help_text=f"""Standard er {ACTIVITY_MIN_AMOUNT} kr for sæson/forløb, 0 kr for Arrangementer og Støttemedlemskaber.<br>Beregnes automatisk ved oprettelse af aktiviteten.""",
     )
     season_fee_change_reason = models.CharField(
         "Begrundelse for ændring af sæsonbidrag",
@@ -190,7 +190,7 @@ class Activity(models.Model):
                 errors["end_date"] = "Et arrangement kan maksimalt vare 14 dage."
 
         if self.activitytype and self.activitytype.id == "FORLØB":
-            default_fee = 150
+            default_fee = settings.MINIMUM_SEASON_PRICE_IN_DKK
         else:
             default_fee = 0
 
