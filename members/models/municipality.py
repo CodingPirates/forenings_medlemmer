@@ -7,6 +7,7 @@ class Municipality(models.Model):
     zipcode = models.CharField(max_length=10, verbose_name="Postnr")
     city = models.CharField(max_length=100, verbose_name="By")
     dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
+    region = models.CharField("Region", max_length=30, blank=True)
 
     def __str__(self):
         return f"{self.name}, {self.zipcode} {self.city}"

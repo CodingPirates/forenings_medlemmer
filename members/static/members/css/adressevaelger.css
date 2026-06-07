@@ -1,0 +1,53 @@
+.autocomplete-container {
+  position: relative;
+  width: 100%;
+  max-width: 30em;
+}
+
+.autocomplete-container input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Anchor the dropdown to the Bootstrap form group wrapping #search-address */
+.mb-3:has(#search-address),
+.form-group:has(#search-address) {
+  position: relative;
+}
+
+.adressevaelger-suggestions {
+  margin: 0;
+  padding: 2px;
+  text-align: left;
+  border-radius: 0;
+  background: #ffffff;
+  border: 1px solid #aaaaaa;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  overflow-y: auto;
+  max-height: 300px;
+  box-sizing: border-box;
+  font-size: 1em;
+  font-family: inherit;
+}
+
+.adressevaelger-suggestions .adressevaelger-suggestion {
+  margin: 0;
+  list-style: none;
+  cursor: pointer;
+  padding: .2em .4em;
+  color: #222;
+  border: none;
+  line-height: 1.5;
+  font-weight: normal;
+}
+
+.adressevaelger-suggestions .adressevaelger-suggestion.dawa-selected,
+.adressevaelger-suggestions .adressevaelger-suggestion:hover,
+.adressevaelger-suggestions .adressevaelger-suggestion:focus {
+  background: linear-gradient(to bottom, #e8e8e8 25%, #d0d0d0 75%);
+  color: #212121;
+  outline: none;
+}

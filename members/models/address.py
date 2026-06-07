@@ -81,29 +81,16 @@ class Address(models.Model):
                 self.dawa_id = wash_resp.json()["resultater"][0]["adresse"]["id"]
                 self.dawa_category = _category
 
-        data_resp = requests.request(
-            "GET",
-            f"{settings.DATAFORSYNINGEN_BASE_URL}/adresser/{self.dawa_id}",
-            params={"format": "geojson"},
-        )
-        if data_resp.status_code != 200:
+        from members.utils.address_lookup import get_address_by_id, parse_address_data, apply_address_data
+
+        data = get_address_by_id(self.dawa_id)
+        if data is None:
             self.dawa_id = ""
             return False
 
-        dawa_data = data_resp.json()["properties"]
-        for key in dawa_data.keys():
-            dawa_data[key] = "" if dawa_data[key] is None else dawa_data[key]
-        self.streetname = dawa_data["vejnavn"]
-        self.housenumber = dawa_data["husnr"]
-        self.floor = dawa_data["etage"]
-        self.door = dawa_data["dør"]
-        self.placename = dawa_data["supplerendebynavn"]
-        self.city = dawa_data["postnrnavn"]
-        self.zipcode = dawa_data["postnr"]
-        self.municipality = dawa_data["kommunenavn"]
-        self.longitude = dawa_data["wgs84koordinat_længde"]
-        self.latitude = dawa_data["wgs84koordinat_bredde"]
-        self.region = dawa_data["regionsnavn"]
+        parsed = parse_address_data(data)
+        apply_address_data(self, parsed)
+        self.municipality = parsed["municipality_name"]
         return True
 
     @staticmethod

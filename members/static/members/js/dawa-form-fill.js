@@ -5,21 +5,28 @@ $(function() {
         weekStart: 1,
         language: 'da'
     });
-    $('#search-address').dawaautocomplete({
-        baseUrl: DATAFORSYNINGEN_BASE_URL,
-        select: function(event, adresse) {
-            // denne funktion bliver kaldt når brugeren vælger en adresse.
-            // Udfyld adressefelterne
-            $("#id_streetname").val(adresse.adresse.vejnavn);
-            $("#id_housenumber").val(adresse.adresse.husnr);
-            $("#id_floor").val(adresse.adresse.etage);
-            $("#id_door").val(adresse.adresse.dør);
-            $("#id_placename").val(adresse.adresse.supplerendebynavn);
-            $("#id_zipcode").val(adresse.adresse.postnr);
-            $("#id_city").val(adresse.adresse.postnrnavn);
-            $("#id_dawa_id").val(adresse.adresse.id);
-        }
-    });
+
+    const searchInput = document.getElementById('search-address');
+    if (searchInput) {
+        adressevaelger.adressevaelger(searchInput, {
+            // KDS recommends "adressevaelger123" until proper user management is introduced
+            // TODO December 2026: check if KDS has launched user management and replace this token
+            token: "adressevaelger123",
+            select: function(selected) {
+                const adr = selected.adresse;
+                $("#id_streetname").val(adr.husnummer.vejnavn);
+                $("#id_housenumber").val(adr.husnummer.husnummertekst);
+                $("#id_floor").val(adr.etagebetegnelse);
+                $("#id_door").val(adr.doerbetegnelse);
+                $("#id_placename").val(adr.husnummer.supplerendebynavn?.navn ?? '');
+                $("#id_zipcode").val(adr.husnummer.postnummer.postnr);
+                $("#id_city").val(adr.husnummer.postnummer.navn);
+                $("#id_dawa_id").val(adr.id_lokalid);
+                searchInput.value = `${adr.husnummer.vejnavn} ${adr.husnummer.husnummertekst}, ${adr.husnummer.postnummer.postnr} ${adr.husnummer.postnummer.navn}`;
+            }
+        });
+    }
+
     $("#manual-entry").click(function() {
         $("#id_streetname").val('');
         $("#id_housenumber").val('');
