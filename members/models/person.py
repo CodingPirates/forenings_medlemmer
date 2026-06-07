@@ -1,5 +1,5 @@
 import random
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, time
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -136,6 +136,11 @@ class Person(models.Model):
         verbose_name="Samtykke givet af",
     )
     consent_at = models.DateTimeField("Samtykke dato", null=True, blank=True)
+    consent_reminder_sent_at = models.DateTimeField(
+        "Samtykke-påmindelse sendt",
+        null=True,
+        blank=True,
+    )
     REGION_CHOICES = (
         ("Region Syddanmark", "Syddanmark"),
         ("Region Hovedstaden", "Hovedstaden"),
@@ -200,7 +205,7 @@ class Person(models.Model):
         else:
             return "N/A"
 
-    def is_anonymization_candidate(self, relaxed=False):
+    def is_anonymization_candidate(self, relaxed=False, as_of_date=None):
         """
         Determine if person is a candidate for anonymization.
         We cannot anonymize if there is a payment in the last 5 full fiscal years.
@@ -208,6 +213,9 @@ class Person(models.Model):
         Args:
             relaxed: If True, only checks for financial transactions. Allows anonymization
                     even if person has been logged in or created recently.
+            as_of_date: Evaluate rules as of this calendar date (default: same boundaries
+                    as ``timezone.now()``). Use e.g. ``timezone.now().date() + timedelta(days=30)``
+                    for consent reminders (~one month before typical candidacy).
 
         Returns: Tuple (is_candidate, reason):
         - is_candidate: False if e.g. latest_activity
@@ -216,13 +224,19 @@ class Person(models.Model):
 
         # we operate with two date boundaries:
         # - 2 years for login or participation in activities
-        two_years_ago = timezone.now() - timedelta(days=2 * 365)
+        if as_of_date is None:
+            now = timezone.now()
+            two_years_ago = now - timedelta(days=2 * 365)
+            today = now.date()
+        else:
+            today = as_of_date
+            ref_start = timezone.make_aware(datetime.combine(as_of_date, time.min))
+            two_years_ago = ref_start - timedelta(days=2 * 365)
 
         # - January 1st of the year before 5 years ago, i.e. at least 5 full years,
         # for financial transactions
         #
         # current date 2025-09-27 => 2020-01-01
-        today = timezone.now().date()
         five_full_fiscal_years = timezone.make_aware(datetime(today.year - 5, 1, 1))
 
         # If person has participated in activities within the last 2 years, then cannot be anonymized
