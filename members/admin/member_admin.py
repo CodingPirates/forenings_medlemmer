@@ -163,9 +163,9 @@ class MemberAdmin(admin.ModelAdmin):
             "members.member_export_address"
         ):
             actions["export_csv_member_address"] = (
-                self.export_csv_member_address,
+                MemberAdmin.export_csv_member_address,
                 "export_csv_member_address",
-                self.export_csv_member_address.short_description,
+                MemberAdmin.export_csv_member_address.short_description,
             )
         else:
             # Hvis den er der (f.eks. fra arvet konfiguration), fjern den
