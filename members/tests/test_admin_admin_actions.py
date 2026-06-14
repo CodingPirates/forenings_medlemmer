@@ -10,9 +10,14 @@ from members.models.activity import Activity
 from members.models.activityinvite import ActivityInvite
 from members.models.emailtemplate import EmailTemplate
 from members.models.family import Family
+from members.models.volunteer import Volunteer
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 
+from .factories import UnionFactory
+from .factories import DepartmentFactory
+from .factories import ActivityFactory
+from .factories import VolunteerFactory
 from .factories import ActivityFactory, DepartmentFactory, UnionFactory
 
 
@@ -243,5 +248,27 @@ class TestAdminActions(TestCase):
             invitations.filter(
                 person=self.person_became_min_age_yesterday,
                 activity=self.activity_started_two_days_ago,
+            ).exists()
+        )
+
+    def test_invite_many_to_activity_accepts_volunteer_queryset(self):
+        volunteer = VolunteerFactory(
+            person=self.person_within_age_range,
+            department=self.department,
+            removed=None,
+        )
+        request = self.create_mock_request_object(
+            activity=self.activity_starting_in_two_days
+        )
+
+        self.admin.invite_many_to_activity_action(
+            request,
+            Volunteer.objects.filter(pk=volunteer.pk),
+        )
+
+        self.assertTrue(
+            ActivityInvite.objects.filter(
+                person=self.person_within_age_range,
+                activity=self.activity_starting_in_two_days,
             ).exists()
         )

@@ -22,6 +22,9 @@ from members.models import (
     Union,
     WaitingList,
     EmailItem,
+    Volunteer,
+    VolunteerRequest,
+    VolunteerRequestItem,
     SlackInviteLog,
     SlackInvitationSetup,
 )
@@ -43,6 +46,22 @@ from .union_admin import UnionAdmin
 from .user_admin import UserAdmin
 from .waitinglist_admin import WaitingListAdmin
 from .emailitem_admin import EmailItemAdmin
+from .volunteer_admin import VolunteerAdmin
+from .volunteerrequest_admin import VolunteerRequestAdmin
+from .volunteerrequestitem_admin import VolunteerRequestItemAdmin
+from .notifications import get_admin_notifications
+
+
+default_each_context = admin.site.each_context
+
+
+def members_admin_each_context(request):
+    context = default_each_context(request)
+    context["admin_notifications"] = get_admin_notifications(request)
+    return context
+
+
+admin.site.each_context = members_admin_each_context
 from .slackinvitelog_admin import SlackInviteLogAdmin
 from .slackinvitesetup_admin import SlackInvitationSetupAdmin
 
@@ -66,6 +85,9 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Union, UnionAdmin)
 admin.site.register(WaitingList, WaitingListAdmin)
 admin.site.register(EmailItem, EmailItemAdmin)
+admin.site.register(Volunteer, VolunteerAdmin)
+admin.site.register(VolunteerRequest, VolunteerRequestAdmin)
+admin.site.register(VolunteerRequestItem, VolunteerRequestItemAdmin)
 admin.site.register(SlackInviteLog, SlackInviteLogAdmin)
 admin.site.register(SlackInvitationSetup, SlackInvitationSetupAdmin)
 admin.site.unregister(User)

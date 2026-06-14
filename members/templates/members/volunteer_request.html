@@ -1,0 +1,53 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="alert alert-secondary">
+        <h1>Interesseret i at blive frivillig?</h1>
+        <p>
+            Udfyld formularen herunder, så kontakter vi dig hurtigst muligt med information om, hvordan du kan blive frivillig hos Coding Pirates.
+        </p>
+        <p>
+            Du skal vælge mindst én afdeling eller aktivitet du er interesseret i at hjælpe med.
+        </p>
+        <p>
+            Hvis du allerede har en konto i systemet, kan du <a href="{% url 'person_login' %}?next={{request.path}}">logge ind her</a> for at få adgang til den fulde tilmeldingsformular.
+        </p>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            {% crispy volunteer_request_form %}
+        </div>
+    </div>
+    
+    <script>
+        // Add some visual styling to help users understand they need to select at least one option
+        document.addEventListener('DOMContentLoaded', function() {
+            const departmentCheckboxes = document.querySelectorAll('input[name="departments"]');
+            const activityCheckboxes = document.querySelectorAll('input[name="activities"]');
+            
+            function updateSelectionStatus() {
+                const anyDepartmentSelected = Array.from(departmentCheckboxes).some(cb => cb.checked);
+                const anyActivitySelected = Array.from(activityCheckboxes).some(cb => cb.checked);
+                
+                if (anyDepartmentSelected || anyActivitySelected) {
+                    // Remove any previous error highlighting
+                    document.querySelector('#div_id_departments').classList.remove('border-warning');
+                    document.querySelector('#div_id_activities').classList.remove('border-warning');
+                } else {
+                    // Add warning highlighting if no selections
+                    document.querySelector('#div_id_departments').classList.add('border-warning');
+                    document.querySelector('#div_id_activities').classList.add('border-warning');
+                }
+            }
+            
+            // Add event listeners to all checkboxes
+            [...departmentCheckboxes, ...activityCheckboxes].forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectionStatus);
+            });
+            
+            // Initial check
+            updateSelectionStatus();
+        });
+    </script>
+{% endblock %}
