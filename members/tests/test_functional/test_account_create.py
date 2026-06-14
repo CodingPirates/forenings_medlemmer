@@ -1,12 +1,14 @@
-import socket
 import os
+import socket
 import time
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
 """
 This test goes to the root signup page and creates a child and parent.
@@ -104,9 +106,17 @@ class AccountCreateTest(StaticLiveServerTestCase):
         field.send_keys("Kochsgade 31D, 5000")
         try:
             address = WebDriverWait(self.browser, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
+                EC.presence_of_element_located(
+                    (By.CLASS_NAME, "adressevaelger-suggestion")
+                )
             )
             address.click()
+            # Wait for async Adressevælger lookup to complete (dawa_id populated = callback ran)
+            WebDriverWait(self.browser, 10).until(
+                lambda d: bool(
+                    d.find_element(By.ID, "id_dawa_id").get_attribute("value")
+                )
+            )
         except Exception:
             self.fail("Autocomplete not working")
 
@@ -158,6 +168,12 @@ class AccountCreateTest(StaticLiveServerTestCase):
         self.browser.find_element(By.XPATH, "//input[@type='submit']").click()
 
         # Check that we were redirectet to front page
+        try:
+            WebDriverWait(self.browser, 10).until(
+                EC.url_to_be(f"{self.live_server_url}/")
+            )
+        except TimeoutException:
+            pass  # fall through so assertEqual gives a clear url diff
         self.assertEqual(f"{self.live_server_url}/", self.browser.current_url)
 
     def test_account_create_without_redirect(self):

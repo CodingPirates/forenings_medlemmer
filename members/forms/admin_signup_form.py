@@ -7,6 +7,21 @@ from members.models.department import Department
 from members.models.person import Person
 
 
+class SafeModelChoiceField(forms.ModelChoiceField):
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+
+        try:
+            return super().to_python(value)
+        except (ValueError, TypeError):
+            raise forms.ValidationError(
+                self.error_messages["invalid_choice"],
+                code="invalid_choice",
+                params={"value": value},
+            )
+
+
 class adminSignupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(adminSignupForm, self).__init__(*args, **kwargs)
@@ -96,7 +111,7 @@ class adminSignupForm(forms.Form):
         widget=forms.DateInput(attrs={"type": "date"}),
         error_messages={"invalid": "Indtast en gyldig dato."},
     )
-    volunteer_department = forms.ModelChoiceField(
+    volunteer_department = SafeModelChoiceField(
         queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
         required=True,
         label="Afdeling",

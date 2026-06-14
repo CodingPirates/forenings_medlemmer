@@ -35,10 +35,14 @@ def MembershipSignup(request, union_id, person_id=None):
 
     family_members = []  # participants from current family
     if family:
+        current_year = datetime.now().year
+        member_until = (
+            datetime.now().date().replace(year=current_year, month=12, day=31)
+        )
         family_members = [
-            (member.person.id)
+            member.person.id
             for member in Member.objects.filter(
-                union_id=union.id, person__family=family
+                union_id=union.id, person__family=family, member_until=member_until
             )
         ]
 

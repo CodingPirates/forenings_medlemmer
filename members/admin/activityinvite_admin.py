@@ -1,20 +1,21 @@
 import codecs
 from datetime import timedelta
+
 from django import forms
 from django.conf import settings
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.admin.widgets import AdminDateWidget
 from django.db import transaction
+from django.db.models import Exists, OuterRef
 from django.db.models.functions import Lower
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import formats, timezone
-from django.utils.safestring import mark_safe
 from django.utils.html import escape
-from django.db.models import Exists, OuterRef
+from django.utils.safestring import mark_safe
 
+from members.admin.admin_actions import AdminActions
 from members.models import (
     Activity,
     ActivityInvite,
@@ -23,8 +24,6 @@ from members.models import (
     Department,
     Person,
 )
-
-from members.admin.admin_actions import AdminActions
 
 
 class ActivityInviteAdminForm(forms.ModelForm):
@@ -62,6 +61,9 @@ class ActivityInviteUnionListFilter(admin.SimpleListFilter):
         ):
             unions.append((str(union.pk), union.name))
 
+        if len(unions) <= 1:
+            return ()
+
         return unions
 
     def queryset(self, request, queryset):
@@ -83,6 +85,10 @@ class ActivityInviteDepartmentListFilter(admin.SimpleListFilter):
             request.user
         ).order_by("name"):
             departments.append((str(department.pk), department.name))
+
+        if len(departments) <= 1:
+            return ()
+
         return departments
 
     def queryset(self, request, queryset):
@@ -99,7 +105,7 @@ class ActivityInviteListCurrentFilter(admin.SimpleListFilter):
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
-        activitys = []
+        activities = []
         for act in (
             Activity.objects.filter(
                 department__in=AdminUserInformation.get_departments_admin(request.user),
@@ -108,8 +114,12 @@ class ActivityInviteListCurrentFilter(admin.SimpleListFilter):
             .order_by("department__name", "-start_date")
             .distinct()
         ):
-            activitys.append((str(act.pk), str(act)))
-        return activitys
+            activities.append((str(act.pk), str(act)))
+
+        if len(activities) <= 1:
+            return ()
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -125,7 +135,7 @@ class ActivityInviteListFinishedFilter(admin.SimpleListFilter):
     parameter_name = "activity"
 
     def lookups(self, request, model_admin):
-        activitys = []
+        activities = []
         for act in (
             Activity.objects.filter(
                 department__in=AdminUserInformation.get_departments_admin(request.user),
@@ -134,8 +144,12 @@ class ActivityInviteListFinishedFilter(admin.SimpleListFilter):
             .order_by("department__name", "-start_date")
             .distinct()
         ):
-            activitys.append((str(act.pk), str(act)))
-        return activitys
+            activities.append((str(act.pk), str(act)))
+
+        if len(activities) <= 1:
+            return ()
+
+        return activities
 
     def queryset(self, request, queryset):
         if self.value() is None:
@@ -151,13 +165,14 @@ class ActivityInviteAdmin(admin.ModelAdmin):
 
     list_per_page = settings.LIST_PER_PAGE
     list_display = (
-        "pk",
+        "id",
         "person_link",
         "activity_link",
         "person_age_years",
         "person_zipcode",
         "invite_dtm",
         "expire_dtm",
+        "reminder_sent_at",
         "rejected_at",
         "price_in_dkk",
         "price_note",
@@ -183,6 +198,8 @@ class ActivityInviteAdmin(admin.ModelAdmin):
     search_help_text = mark_safe(
         "Du kan søge på forening, afdeling, aktivitet eller person. <br>Vandret dato-filter er for aktivitetens startdato."
     )
+
+    autocomplete_fields = ("person", "activity")
 
     actions = [
         "export_csv_invitation_info",
@@ -219,6 +236,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                     "activity",
                     "invite_dtm",
                     "expire_dtm",
+                    "reminder_sent_at",
                     "rejected_at",
                     "price_in_dkk",
                     "price_note",
@@ -357,7 +375,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                 + handle_quote(rejected_date, "\n")
             )
         response = HttpResponse(
-            f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+            f"{codecs.BOM_UTF8.decode('utf-8')}{result_string}",
             content_type="text/csv; charset=utf-8",
         )
         response["Content-Disposition"] = (
@@ -365,7 +383,9 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         )
         return response
 
-    export_csv_invitation_info.short_description = "Exporter Invitationsinformationer"
+    export_csv_invitation_info.short_description = (
+        "Eksporter invitationsinformationer (CSV)"
+    )
 
     def extend_invitations(modelAdmin, request, queryset):
         class ExtendInvitationsForm(forms.Form):

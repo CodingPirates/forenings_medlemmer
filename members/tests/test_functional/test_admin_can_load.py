@@ -7,6 +7,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from django.contrib.auth.models import User
 from members.tests.factories import PersonFactory
+from members.tests.factories.department_factory import DepartmentFactory
+from members.tests.test_functional.helpers import complete_admin_signup
 
 """
 This test creates a super user and checks that the admin interface can be loaded
@@ -24,6 +26,8 @@ class SignUpTest(StaticLiveServerTestCase):
         self.admin = User.objects.create_superuser(
             self.name, "admin@example.com", self.password
         )
+        # An open department is required for the admin signup form
+        self.department = DepartmentFactory.create(closed_dtm=None)
 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--disable-dev-shm-usage")
@@ -52,6 +56,13 @@ class SignUpTest(StaticLiveServerTestCase):
 
         # Submit form
         self.browser.find_element(By.XPATH, "//input[@type='submit']").click()
+
+        # The admin has no person yet, so the consent middleware redirects to
+        # the admin signup form, where an ordinary user must be created.
+        complete_admin_signup(self, self.browser, self.department)
+
+        # Now that the admin has a person, the admin interface can be loaded
+        self.browser.get(f"{self.live_server_url}/admin")
 
         # Check that we are logged in with welcome message in top right
         self.assertGreater(

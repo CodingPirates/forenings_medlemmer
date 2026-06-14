@@ -9,7 +9,7 @@ from members.utils.user import user_to_family
 from django.contrib.auth.decorators import user_passes_test
 from members.utils.user import is_not_logged_in_and_has_person
 
-import requests
+from members.utils.dawa_data import get_user_region
 
 
 @user_passes_test(is_not_logged_in_and_has_person, "/admin_signup/")
@@ -23,18 +23,7 @@ def DepartmentSignup(request):
         family = user_to_family(request.user)
         person = user_to_person(request.user)
         if person:
-            if person.dawa_id == "":
-                user_region = ""
-            else:
-                dawa_req = (
-                    f"https://dawa.aws.dk/adresser/{person.dawa_id}?format=geojson"
-                )
-                try:
-                    dawa_reply = requests.get(dawa_req).json()
-                    user_region = dawa_reply["properties"]["regionsnavn"]
-                except Exception:
-                    user_region = ""
-                    # and we simply skip the region, and sorting will be as default
+            user_region = get_user_region(person) or ""
             children = [
                 {"person": child, "waitinglists": WaitingList.get_by_child(child)}
                 for child in family.get_children().filter(anonymized=False)

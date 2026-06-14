@@ -1,4 +1,5 @@
 import codecs
+
 from django import forms
 from django.conf import settings
 from django.contrib import admin
@@ -9,7 +10,10 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.utils.html import format_html
 from django.urls import reverse
+from django.utils.html import escape, format_html
+from django.utils.safestring import mark_safe
 
+from members.admin.admin_actions import AdminActions
 from members.models import (
     Activity,
     AdminUserInformation,
@@ -18,25 +22,24 @@ from members.models import (
     Volunteer,
 )
 
+from .filters.common_filters import AnonymizedFilter
 from .filters.person_admin_filters import (
+    MunicipalityFilter,
     PersonInvitedListFilter,
     PersonParticipantActiveListFilter,
     PersonParticipantCurrentYearListFilter,
     PersonParticipantLastYearListFilter,
     PersonParticipantListFilter,
     PersonWaitinglistListFilter,
-    VolunteerListFilter,
-    MunicipalityFilter,
     RegionFilter,
-    AnonymizedFilter,
+    VolunteerListFilter,
 )
-
 from .inlines import (
     ActivityInviteInline,
+    EmailItemInline,
     PaymentInline,
     VolunteerInline,
     WaitingListInline,
-    EmailItemInline,
 )
 
 from members.admin.admin_actions import AdminActions
@@ -47,10 +50,11 @@ class PersonAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
 
     list_display = (
-        "name",
+        "id",
+        "person_link",
         "membertype",
         "gender_text",
-        "family_url",
+        "family_link",
         "age_years",
         "zipcode",
         "added_at",
@@ -72,14 +76,14 @@ class PersonAdmin(admin.ModelAdmin):
         AnonymizedFilter,
     )
     search_fields = ("name", "family__email", "notes")
-    autocomplete_fields = ["municipality"]
+
+    autocomplete_fields = ["municipality", "user", "family"]
     actions = [
         AdminActions.invite_many_to_activity_action,
         "create_volunteer_action",
         "export_emaillist",
         "export_csv",
     ]
-    raw_id_fields = ("family", "user")
 
     inlines = [
         PaymentInline,
@@ -103,13 +107,21 @@ class PersonAdmin(admin.ModelAdmin):
 
         return actions
 
-    def family_url(self, item):
+    def person_link(self, item):
+        url = reverse("admin:members_person_change", args=[item.id])
+        link = '<a href="%s">%s</a>' % (url, escape(item.name))
+        return mark_safe(link)
+
+    person_link.short_description = "Person"
+    person_link.admin_order_field = "name"
+
+    def family_link(self, item):
         return format_html(
             '<a href="../family/%d">%s</a>' % (item.family.id, item.family.email)
         )
 
-    family_url.allow_tags = True
-    family_url.short_description = "Familie"
+    family_link.allow_tags = True
+    family_link.short_description = "Familie"
 
     def family_referer(self, item):
         return item.family.referer
@@ -127,6 +139,7 @@ class PersonAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request, person=None):
         if request.user.has_perm("members.view_full_address"):
             contact_fields = (
+                "anonymization_status",
                 "name",
                 "streetname",
                 "housenumber",
@@ -142,9 +155,16 @@ class PersonAdmin(admin.ModelAdmin):
             )
         else:
             if person.membertype == Person.CHILD:
-                contact_fields = ("name", "city", "zipcode", "family")
+                contact_fields = (
+                    "anonymization_status",
+                    "name",
+                    "city",
+                    "zipcode",
+                    "family",
+                )
             else:
                 contact_fields = (
+                    "anonymization_status",
                     "name",
                     "city",
                     "zipcode",
@@ -181,6 +201,7 @@ class PersonAdmin(admin.ModelAdmin):
                         "birthday",
                         "has_certificate",
                         "added_at",
+                        "consent_reminder_sent_at",
                         "user",
                         "gender",
                     ),
@@ -202,6 +223,17 @@ class PersonAdmin(admin.ModelAdmin):
         return "No consent available"
 
     consent_preview_link.short_description = "Privatlivspolitik"
+
+    @admin.display(description="Anonymisering")
+    def anonymization_status(self, obj):
+        if not obj or not obj.pk:
+            return ""
+        if obj.anonymized:
+            return format_html(
+                "<p><strong>Denne person er anonymiseret.</strong> "
+                "Navn, kontaktoplysninger og noter er erstattet eller fjernet.</p>"
+            )
+        return "Denne person er ikke anonymiseret."
 
     def get_readonly_fields(self, request, obj=None):
         if type(obj) is Person and not request.user.is_superuser:
@@ -229,15 +261,14 @@ class PersonAdmin(admin.ModelAdmin):
         readonly_fields += [
             "allow_contact_from_cpdk",
             "allow_contact_from_other",
+            "anonymization_status",
+            "consent_reminder_sent_at",
             "consent",
             "consent_by",
             "consent_at",
             "consent_preview_link",
         ]
         return readonly_fields
-
-    def unique(self, item):
-        return item.family.unique if item.family is not None else ""
 
     def export_emaillist(self, request, queryset):
         result_string = "kopier denne liste direkte ind i dit email program (Husk at bruge Bcc!)\n\n"
@@ -253,7 +284,7 @@ class PersonAdmin(admin.ModelAdmin):
 
         return HttpResponse(result_string, content_type="text/plain")
 
-    export_emaillist.short_description = "Exporter e-mail liste"
+    export_emaillist.short_description = "Eksporter familie e-mail liste"
 
     def export_csv(self, request, queryset):
         result_string = "Navn;Alder;Køn;Opskrevet;Tlf (barn);Email (barn);"
@@ -298,13 +329,13 @@ class PersonAdmin(admin.ModelAdmin):
                 + "\n"
             )
             response = HttpResponse(
-                f'{codecs.BOM_UTF8.decode("utf-8")}{result_string}',
+                f"{codecs.BOM_UTF8.decode('utf-8')}{result_string}",
                 content_type="text/csv; charset=utf-8",
             )
             response["Content-Disposition"] = 'attachment; filename="personer.csv"'
         return response
 
-    export_csv.short_description = "CSV Export"
+    export_csv.short_description = "Eksporter personinformationer (CSV)"
 
     def create_volunteer_action(self, request, queryset):
         accessible_departments = AdminUserInformation.get_departments_admin(
@@ -498,7 +529,9 @@ class PersonAdmin(admin.ModelAdmin):
                 context["mass_confirmation_form"] = form
                 for person in queryset:
                     try:
-                        person.anonymize(request)
+                        # from Admin UI, allow anonymizing even if person has been logged in or created recently
+                        # likely this is by request from user
+                        person.anonymize(request, relaxed=True)
                     except Exception as e:
                         self.message_user(
                             request,

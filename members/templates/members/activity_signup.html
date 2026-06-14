@@ -9,7 +9,7 @@
       <div class="row">
         <div class="col-lg-6">
           <strong>Sted:</strong><br>
-            <address> 
+            <address>
               {%if activity.address.descriptiontext%}{{activity.address.descriptiontext}}<br>{%endif%}
               {{activity.address.streetname}} {{activity.address.housenumber}}
               {%if activity.address.floor or activity.address.door%}, {%endif%}
@@ -47,7 +47,7 @@
         <div class="col-lg-6">
           <p>
           <strong>Tilmeldingsfrist:</strong><br>
-            {{ activity.signup_closing}} (om {{ activity.signup_closing|timeuntil}})
+            {{ activity.signup_closing }} ({{ signup_closing_text }})
           </p>
         </div>
         <div class="col-lg-6">
@@ -100,6 +100,12 @@
           <!--and not participating % -->
             <hr>
               <div class="alert alert-primary">
+                <p>Tilmeldingsfristen {{ signup_closing }} er desværre overskredet! Det er ikke længere muligt at tilmelde sig.</p>
+              </div>
+            <hr/>
+          {% elif seats_left <= 0 %}
+            <hr>
+              <div class="alert alert-primary">
                 <p>Aktiviteten er desværre udsolgt! Det er ikke længere muligt at tilmelde sig.</p>
               </div>
             <hr/>
@@ -107,7 +113,10 @@
             {% if activity.open_invite %}
               {% for person in family.get_persons %}
                 {% if person.id in family_participants %}
-                  {{ person.firstname}} er tilmeldt
+                  <span class="activity-signup-status">
+                    <i class="fas fa-check-circle text-success" aria-hidden="true"></i>
+                    <span>{{ person.firstname }} er tilmeldt</span>
+                  </span>
                 {% else %}
                   {% if activity.min_age <= person.age_years and person.age_years <= activity.max_age %}
                     <a class="button" href="{% url 'activity_signup' activity.id person.id %}">
@@ -134,7 +143,10 @@
                       Opskriv {{ child.firstname }} på venteliste
                     </a>
                   {% else %}
-                    {{ child.firstname }} er tilmeldt
+                    <span class="activity-signup-status">
+                      <i class="fas fa-check-circle text-success" aria-hidden="true"></i>
+                      <span>{{ child.firstname }} er tilmeldt</span>
+                    </span>
                   {% endif %}
                 {% endif %}
               {% endfor %}

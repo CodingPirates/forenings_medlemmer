@@ -1,3 +1,5 @@
+# Ensure ActivityMode admin registration is loaded
+from .activitymode_admin import ActivityModeAdmin  # noqa: F401
 from django.contrib import admin
 
 from django.contrib.auth.models import User
@@ -23,6 +25,8 @@ from members.models import (
     Volunteer,
     VolunteerRequest,
     VolunteerRequestItem,
+    SlackInviteLog,
+    SlackInvitationSetup,
 )
 
 from .activity_admin import ActivityAdmin
@@ -58,6 +62,8 @@ def members_admin_each_context(request):
 
 
 admin.site.each_context = members_admin_each_context
+from .slackinvitelog_admin import SlackInviteLogAdmin
+from .slackinvitesetup_admin import SlackInvitationSetupAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"
@@ -82,6 +88,8 @@ admin.site.register(EmailItem, EmailItemAdmin)
 admin.site.register(Volunteer, VolunteerAdmin)
 admin.site.register(VolunteerRequest, VolunteerRequestAdmin)
 admin.site.register(VolunteerRequestItem, VolunteerRequestItemAdmin)
+admin.site.register(SlackInviteLog, SlackInviteLogAdmin)
+admin.site.register(SlackInvitationSetup, SlackInvitationSetupAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 # admin.site.register(AdminUserInformation, AdminUserInformationAdmin)

@@ -100,6 +100,7 @@ def AccountCreate(request):
                     phone=signup.cleaned_data["parent_phone"],
                     birthday=signup.cleaned_data["parent_birthday"],
                     gender=signup.cleaned_data["parent_gender"],
+                    municipality=None,
                     family=family,
                     user=user,
                     consent=latest_consent,  # Set the consent

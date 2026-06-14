@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from django.db import models
-import members.models.payment
-import members.models.family
-import members.models.person
-import members.models.waitinglist
-import members.models.activity
-from members.models.activityinvite import ActivityInvite
 import pytz
+from django.db import models
 from django.utils import timezone
 from django.utils.html import format_html
+
+import members.models.activity
+import members.models.family
+import members.models.payment
+import members.models.person
+import members.models.waitinglist
+from members.models.activityinvite import ActivityInvite
 
 
 class ActivityParticipant(models.Model):
@@ -180,7 +181,7 @@ class ActivityParticipant(models.Model):
 
             # Case A3: participant with price > 0, payment confirmed
             # Case B3: Payment exists and confirmed
-            if payment.confirmed_at is not None:
+            if payment.accepted_at is not None:
                 continue
 
             # Case A4: participant with price > 0, payment not confirmed

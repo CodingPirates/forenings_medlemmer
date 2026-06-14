@@ -1,18 +1,19 @@
 import datetime
 from random import randint
+
 from django.test import TestCase
 from django.utils import timezone
-from members.models.statistics import (
-    gatherDayliStatistics,
-    DepartmentStatistics,
-)
 
+from members.models.statistics import (
+    DepartmentStatistics,
+    gatherDayliStatistics,
+)
 from members.tests.factories import (
-    DepartmentFactory,
     ActivityFactory,
     ActivityParticipantFactory,
-    WaitingListFactory,
+    DepartmentFactory,
     VolunteerFactory,
+    WaitingListFactory,
 )
 
 
@@ -40,7 +41,6 @@ class TestDepartmentStatistics(TestCase):
             testDepartment["activities"] = [
                 ActivityFactory(
                     department=testDepartment["department"],
-                    union=testDepartment["department"].union,
                     active=active,
                 )
                 for active in testDepartment["isActive"]

@@ -1,5 +1,38 @@
 {% extends 'members/base.html' %} {% load crispy_forms_tags %} {% load static %}
 {% block content %}
+  {% if unpaid_payments %}
+    <div class="alert alert-warning">
+      <b>Der er ikke betalt for følgende:</b>
+      <ul>
+        {% for payment in unpaid_payments %}
+          <li>
+            {% if payment.activity and payment.member %}
+              {{ payment.person.name }}: <b>Aktivitet</b> "{{ payment.activity.name }}" hos Coding Pirates {{ payment.activity.department.name }}<br>
+              &nbsp;&nbsp;+ <b>Medlemskab</b> hos Coding Pirates {{ payment.member.union.name }}
+            {% elif payment.activity %}
+              {{ payment.person.name }}: <b>Aktivitet</b> "{{ payment.activity.name }}" hos Coding Pirates {{ payment.activity.department.name }}
+            {% elif payment.member %}
+              {{ payment.member.person.name }}: <b>Medlemskab</b> hos Coding Pirates {{ payment.member.union.name }}
+            {% else %}
+              {{ payment.person.name }}: Ukendt betaling
+            {% endif %}
+            {# Divide amount_ore by 100 using widthratio, then format as float #}
+            - <b>{{ payment.amount_dkk|stringformat:".2f" }} kr.</b>
+            {% if payment.member %}
+              <a class="button-danger" href="{{ payment.member.get_payment_link }}" style="margin-left:1em;">Betal</a>
+            {% elif payment.activityparticipant %}
+              <a class="button-danger" href="{{ payment.activityparticipant.get_payment_link }}" style="margin-left:1em;">Betal</a>
+            {% else %}
+              <a class="button-danger" href="{{ payment.get_quickpaytransaction.get_link_url }}" style="margin-left:1em;">Betal</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      <div style="margin-top: 1em; font-weight: bold;">
+        Samlet manglende betaling: {{ total_missing_dkk|floatformat:2 }} kr.
+      </div>
+    </div>
+  {% endif %}
 
 {% include 'members/notifications.html' %}
 

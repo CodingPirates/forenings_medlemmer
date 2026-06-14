@@ -20,3 +20,10 @@
     
 }
 
+/* Make Django admin autocomplete fields wider */
+.admin-autocomplete {
+    min-width: 400px !important;
+    width: 400px !important;
+    max-width: 100%;
+}
+

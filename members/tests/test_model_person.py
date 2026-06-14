@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from members.models.person import Person
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -11,6 +11,7 @@ from members.tests.factories import (
     ActivityParticipantFactory,
     ActivityFactory,
     PaymentFactory,
+    UnionFactory,
 )
 from members.tests.factories.department_factory import DepartmentFactory
 from members.tests.factories.factory_helpers import TIMEZONE
@@ -244,6 +245,68 @@ class TestModelPerson(TestCase):
         self.assertEqual(email.body_text, "")
         self.assertEqual(email.receiver, "")
 
+    def test_anonymize_person_removes_department_union_and_group_relations(self):
+        """Anonymizing removes department, union and group relationships."""
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person = PersonFactory()
+
+        # department relationships: leader role membership
+        department = DepartmentFactory()
+        department.department_leaders.add(person)
+
+        # union relationships: officer roles + board membership
+        union = UnionFactory()
+        union.chairman = person
+        union.second_chair = person
+        union.cashier = person
+        union.secretary = person
+        union.save()
+        union.board_members.add(person)
+
+        # group membership on the linked user, e.g. "Afdelingsleder"
+        user = User.objects.create_user(
+            username=person.name, email=person.email, password="password"
+        )
+        group = Group.objects.create(name="Afdelingsleder")
+        user.groups.add(group)
+        person.user = user
+        person.save()
+
+        # sanity check that the relationships exist before anonymizing
+        self.assertEqual(person.department_set.count(), 1)
+        self.assertEqual(person.union_set.count(), 1)
+        self.assertEqual(user.groups.count(), 1)
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person.anonymize(request)
+
+        self.assertTrue(person.anonymized)
+
+        # department relationships removed
+        self.assertEqual(
+            person.department_set.count(),
+            0,
+            "Person should have no departments after anonymization",
+        )
+
+        # union relationships removed
+        self.assertEqual(
+            person.union_set.count(),
+            0,
+            "Person should have no unions after anonymization",
+        )
+        union.refresh_from_db()
+        self.assertIsNone(
+            union.chairman, "Union chairman should be None after anonymization"
+        )
+        self.assertIsNone(union.second_chair)
+        self.assertIsNone(union.cashier)
+        self.assertIsNone(union.secretary)
+
+        # group membership removed from the linked user
+        user = User.objects.get(pk=person.user.pk)
+        self.assertEqual(user.groups.count(), 0)
+
     ############################################################
     # Tests for is_anonymization_candidate()
     def test_person_created_one_year_ago_is_not_anonymization_candidate(self):
@@ -409,7 +472,7 @@ class TestModelPerson(TestCase):
         self,
     ):
         """Person where other family member has payments in the last 5 years cannot be anonymized."""
-        # Create two persons, one 6 years ago
+        # Create two persons, 6 years ago
         six_years_ago = timezone.now() - timedelta(days=6 * 365)
         with freeze_time(six_years_ago):
             parent = PersonFactory()
@@ -424,3 +487,92 @@ class TestModelPerson(TestCase):
 
         # parent cannot be anonymized, since child has payments in the last 5 years
         self.assertFalse(parent.is_anonymization_candidate()[0])
+
+    def test_person_created_over_2_years_with_payments_over_5_years_is_anonymization_candidate(
+        self,
+    ):
+        """Person with payments more than 5 years ago can be anonymized."""
+
+        # assume today's date: 2025-09-27
+        # person created: 2023-09-26 => over 2 years ago
+        # payment: 2019-12-31 => over 5 years ago
+
+        with freeze_time(datetime(2023, 9, 26)):
+            person = PersonFactory()
+
+        # Create payment last day in fiscal year before 5 years ago
+        PaymentFactory(
+            person=person, added_at=timezone.make_aware(datetime(2019, 12, 31))
+        )
+
+        with freeze_time(datetime(2025, 9, 27)):
+            self.assertTrue(person.is_anonymization_candidate()[0])
+
+    def test_person_where_other_family_member_has_payments_over_5_years_is_anonymization_candidate(
+        self,
+    ):
+        """Person where other family member has payments in the last 5 years cannot be anonymized."""
+        # Create two persons, 6 years ago
+
+        # assume today's date: 2025-12-31
+        # person created: 2019-12-31 => 6 years ago
+        # payment: 2019-12-31 => over 5 years ago
+
+        six_years_ago = datetime(2019, 12, 31)
+        with freeze_time(six_years_ago):
+            parent = PersonFactory()
+            child = PersonFactory(family=parent.family)
+
+        # Create payment for child more than 5 years ago
+        PaymentFactory(
+            person=child,
+            family=child.family,
+            added_at=timezone.make_aware(datetime(2019, 12, 31)),
+        )
+
+        # parent cannot be anonymized, since child has payments in the last 5 years
+        with freeze_time(datetime(2025, 12, 31)):
+            self.assertTrue(parent.is_anonymization_candidate()[0])
+
+    def test_person_created_recently_is_anonymization_candidate_in_relaxed_mode(self):
+        """Person created recently can be anonymized in relaxed mode if no payments."""
+        # Create person 1 year ago (recently)
+        one_year_ago = timezone.now() - timedelta(days=1 * 365)
+        with freeze_time(one_year_ago):
+            person = PersonFactory()
+
+        # In normal mode, should fail because created recently
+        self.assertFalse(person.is_anonymization_candidate(relaxed=False)[0])
+
+        # In relaxed mode, should pass because creation date check is skipped
+        # (assuming no payments and no recent activity)
+        self.assertTrue(person.is_anonymization_candidate(relaxed=True)[0])
+
+    def test_is_anonymization_candidate_as_of_date_before_one_month_window(self):
+        """as_of_date shifts the 2-year window (e.g. consent reminder ~1 month ahead)."""
+        d1 = date(2026, 6, 1)
+        created_dt = timezone.make_aware(
+            # 700 days = ~1 year, 11 months, i.e. just inside the 2-year window
+            datetime.combine(d1 - timedelta(days=700), datetime.min.time())
+        )
+
+        # person is not anonymization candidate today, but will be in 31 days
+        with freeze_time(created_dt):
+            person = PersonFactory(user=None)
+        self.assertFalse(person.is_anonymization_candidate(as_of_date=d1)[0])
+
+        # person is anonymization candidate in 31 days
+        d_future = d1 + timedelta(days=31)
+        self.assertTrue(person.is_anonymization_candidate(as_of_date=d_future)[0])
+
+    def test_can_anonymize_person_with_no_user(self):
+        """Person with no user can be anonymized."""
+        # Create person 6 years ago
+        six_years_ago = timezone.now() - timedelta(days=6 * 365)
+        with freeze_time(six_years_ago):
+            person = PersonFactory(user=None)
+
+        request = self.create_request_with_permission("members.anonymize_persons")
+        person.anonymize(request)
+
+        self.assertTrue(person.anonymized)

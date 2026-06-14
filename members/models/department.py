@@ -5,8 +5,16 @@ from members.models.activity import Activity
 from members.models.waitinglist import WaitingList
 from django.utils import timezone
 
+from members.models.activitymode import ActivityMode
+
+
+def get_default_activity_mode():
+    first = ActivityMode.objects.order_by("id").first()
+    return first.pk if first else None
+
 
 class Department(models.Model):
+    # ...existing fields...
     class Meta:
         verbose_name_plural = "Afdelinger"
         verbose_name = "Afdeling"
@@ -57,6 +65,16 @@ class Department(models.Model):
         "Union",
         verbose_name="Lokalforening",
         on_delete=models.PROTECT,
+    )
+
+    activity_mode = models.ForeignKey(
+        ActivityMode,
+        on_delete=models.PROTECT,
+        verbose_name="Aktivitetsform",
+        help_text="Angiv hvilken type aktiviteter afdelingen tilbyder",
+        null=True,
+        blank=True,
+        default=get_default_activity_mode,
     )
 
     def __str__(self):
