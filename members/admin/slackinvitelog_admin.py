@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from members.models.slackinvitelog import SlackInviteLog
@@ -99,7 +100,7 @@ class SlackInviteLogAdmin(admin.ModelAdmin):
 
     def email_multiline(self, obj):
         emails = obj.emails.split()
-        return mark_safe("<br>".join(emails))
+        return mark_safe("<br>".join(escape(e) for e in emails))
 
     email_multiline.short_description = "Email(s)"
 
