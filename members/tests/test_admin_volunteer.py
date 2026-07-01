@@ -329,7 +329,7 @@ class TestVolunteerAdmin(TestCase):
         request = self.make_request({"visibility": "shared_other"})
         queryset = self.admin.get_queryset(request)
         visibility_filter = VolunteerVisibilityListFilter(
-            request, {"visibility": "shared_other"}, Volunteer, self.admin
+            request, request.GET.copy(), Volunteer, self.admin
         )
 
         filtered_queryset = visibility_filter.queryset(request, queryset)
@@ -346,7 +346,7 @@ class TestVolunteerAdmin(TestCase):
         request = self.make_request({"visibility": "shared_cpdk"})
         queryset = self.admin.get_queryset(request)
         visibility_filter = VolunteerVisibilityListFilter(
-            request, {"visibility": "shared_cpdk"}, Volunteer, self.admin
+            request, request.GET.copy(), Volunteer, self.admin
         )
 
         filtered_queryset = visibility_filter.queryset(request, queryset)

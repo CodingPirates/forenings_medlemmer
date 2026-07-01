@@ -75,7 +75,7 @@ class TestVolunteerRequestItemAdmin(TestCase):
         )
         department_filter = VolunteerRequestItemListFilter(
             request,
-            {"department": str(self.direct_department.pk)},
+            request.GET.copy(),
             VolunteerRequestItem,
             self.admin,
         )
