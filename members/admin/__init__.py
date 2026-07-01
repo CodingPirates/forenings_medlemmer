@@ -50,6 +50,8 @@ from .volunteer_admin import VolunteerAdmin
 from .volunteerrequest_admin import VolunteerRequestAdmin
 from .volunteerrequestitem_admin import VolunteerRequestItemAdmin
 from .notifications import get_admin_notifications
+from .slackinvitelog_admin import SlackInviteLogAdmin
+from .slackinvitesetup_admin import SlackInvitationSetupAdmin
 
 
 default_each_context = admin.site.each_context
@@ -62,8 +64,6 @@ def members_admin_each_context(request):
 
 
 admin.site.each_context = members_admin_each_context
-from .slackinvitelog_admin import SlackInviteLogAdmin
-from .slackinvitesetup_admin import SlackInvitationSetupAdmin
 
 admin.site.site_header = "Coding Pirates Medlemsdatabase"
 admin.site.index_title = "Afdelings admin"

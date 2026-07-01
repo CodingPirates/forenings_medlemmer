@@ -160,17 +160,19 @@ class UserAdmin(UserAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
-        
+
         # Debugging check to see what is happening in the logs
         if obj:
-            print(f"DEBUG: Active User Is Superuser? {request.user.is_superuser} | Target User Is Superuser? {obj.is_superuser}")
+            print(
+                f"DEBUG: Active User Is Superuser? {request.user.is_superuser} | Target User Is Superuser? {obj.is_superuser}"
+            )
 
         if obj and not request.user.is_superuser and obj.is_superuser:
             # We cast to tuple to safely append
             return tuple(readonly_fields) + ("username", "email")
-            
+
         return readonly_fields
-    
+
     def get_fieldsets(self, request, obj=None):
         if not obj:
             return self.add_fieldsets
@@ -186,7 +188,7 @@ class UserAdmin(UserAdmin):
             )
         else:
             perm_fields = ("is_active", "is_staff", "groups")
-        
+
         # 2. Dynamic top row: Hide password link if non-superuser edits a superuser
         if obj and not request.user.is_superuser and obj.is_superuser:
             first_section_fields = ("username",)  # "password" is removed completely
