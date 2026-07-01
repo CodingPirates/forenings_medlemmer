@@ -14,9 +14,6 @@ from members.models.volunteer import Volunteer
 from members.models.person import Person
 from members.models.waitinglist import WaitingList
 
-from .factories import UnionFactory
-from .factories import DepartmentFactory
-from .factories import ActivityFactory
 from .factories import VolunteerFactory
 from .factories import ActivityFactory, DepartmentFactory, UnionFactory
 

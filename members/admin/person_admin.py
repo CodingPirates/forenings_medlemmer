@@ -8,7 +8,6 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
-from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
@@ -42,7 +41,6 @@ from .inlines import (
     WaitingListInline,
 )
 
-from members.admin.admin_actions import AdminActions
 from members.utils.volunteer_confirmation import send_volunteer_user_confirmation_email
 
 
