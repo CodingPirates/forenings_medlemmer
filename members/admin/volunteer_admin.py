@@ -31,6 +31,10 @@ class VolunteerVisibilityListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         lookups = []
+
+        if request.user.is_superuser:
+            lookups.append(("all", "Alle Frivillige"))
+
         for department in (
             Department.objects.filter(adminuserinformation__user=request.user)
             .order_by("name")
@@ -53,6 +57,11 @@ class VolunteerVisibilityListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() is None:
+            if request.user.is_superuser or request.user.has_perm(
+                "members.view_all_departments"
+            ):
+                return queryset
+
             default_department = self.get_default_department(request)
             if default_department is not None:
                 return queryset.filter(department=default_department)
@@ -66,6 +75,9 @@ class VolunteerVisibilityListFilter(admin.SimpleListFilter):
 
         if self.value() == "shared_cpdk":
             return queryset.filter(person__allow_contact_from_cpdk=True)
+
+        if self.value() == "all":
+            return queryset
 
         return queryset
 

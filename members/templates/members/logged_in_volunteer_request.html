@@ -259,21 +259,7 @@
             {% crispy logged_in_form %}
         </div>
     </div>
-    
-    {% if debug_info %}
-    <div class="card mt-3">
-        <div class="card-header">
-            <h6>Debug Information</h6>
-        </div>
-        <div class="card-body">
-            <p><strong>User Email:</strong> {{ debug_info.user_email }}</p>
-            <p><strong>User has person record:</strong> {{ debug_info.user_has_person }}</p>
-            <p><strong>Family Email:</strong> {{ debug_info.family_email|default:"Not found" }}</p>
-            <p><strong>Person Count in Family:</strong> {{ debug_info.person_count|default:"Unknown" }}</p>
-        </div>
-    </div>
-    {% endif %}
-    
+  
     <script>
         // Add some visual styling to help users understand they need to select at least one option
         document.addEventListener('DOMContentLoaded', function() {
