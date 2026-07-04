@@ -232,6 +232,10 @@ class Person(models.Model):
             ref_start = timezone.make_aware(datetime.combine(as_of_date, time.min))
             two_years_ago = ref_start - timedelta(days=2 * 365)
 
+        # consent within last 2 years?
+        if self.consent_at and self.consent_at.date() >= two_years_ago.date():
+            return False, "Har givet samtykke indenfor seneste 2 år."
+
         # - January 1st of the year before 5 years ago, i.e. at least 5 full years,
         # for financial transactions
         #
