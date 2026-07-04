@@ -131,6 +131,9 @@
                   <a class="button" href="{% url 'activity_signup' activity.id child.id %}">
                     Tilmeld {{ child.firstname }}
                   </a>
+                  <!-- Link til decline invite her? -->
+                   
+                  <!-- ---- -->
                 {% elif child.id in family_subscriptions %}
                   {{ child.firstname }} er opskrevet&nbsp;&nbsp;
                 {% elif child.id in family_invites %}

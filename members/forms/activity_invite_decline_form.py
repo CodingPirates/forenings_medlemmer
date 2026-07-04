@@ -1,7 +1,7 @@
 from django import forms
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, HTML
+from crispy_forms.layout import Layout, Submit, Field, HTML
 
 
 class ActivivtyInviteDeclineForm(forms.Form):
@@ -12,6 +12,8 @@ class ActivivtyInviteDeclineForm(forms.Form):
         self.helper.form_action = ""
         self.helper.html5_required = True
         self.helper.layout = Layout(
+            Field("decline_reason"),
             Submit("submit", "Afslå invitationen", css_class="button-danger"),
             HTML('<a class="button" href="{% url "activities" %}">Tilbage</a>'),
         )
+    decline_reason = forms.CharField(label="Hvorfor afslår du invitationen?", required=False)
