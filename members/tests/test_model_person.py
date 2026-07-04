@@ -565,6 +565,34 @@ class TestModelPerson(TestCase):
         d_future = d1 + timedelta(days=31)
         self.assertTrue(person.is_anonymization_candidate(as_of_date=d_future)[0])
 
+    def test_person_with_consent_within_2_years_is_not_anonymization_candidate(self):
+        """Person with consent within last 2 years cannot be anonymized."""
+        # Create person 6 years ago
+        six_years_ago = timezone.now() - timedelta(days=6 * 365)
+        with freeze_time(six_years_ago):
+            person = PersonFactory(user=None)
+
+        # Set consent date to 2 years ago
+        two_years_ago = timezone.now() - timedelta(days=2 * 365)
+        person.consent_at = two_years_ago
+        person.save()
+
+        self.assertFalse(person.is_anonymization_candidate()[0])
+
+    def test_person_with_consent_over_2_years_is_anonymization_candidate(self):
+        """Person with consent over 2 years ago can be anonymized."""
+        # Create person 6 years ago
+        six_years_ago = timezone.now() - timedelta(days=6 * 365)
+        with freeze_time(six_years_ago):
+            person = PersonFactory(user=None)
+
+        # Set consent date to 2 years and one day ago
+        over_two_years_ago = timezone.now() - timedelta(days=2 * 365 + 1)
+        person.consent_at = over_two_years_ago
+        person.save()
+
+        self.assertTrue(person.is_anonymization_candidate()[0])
+
     def test_can_anonymize_person_with_no_user(self):
         """Person with no user can be anonymized."""
         # Create person 6 years ago
