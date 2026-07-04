@@ -1,0 +1,49 @@
+{% load cookie_consent_tags %}
+
+<div class="cookie-group">
+    <h3>{{ cookie_group.name }}</h3>
+
+    {% if not cookie_group.is_required %}
+        <div class="cookie-group-form">
+            {% if request|cookie_group_accepted:cookie_group.varname %}
+                <span class="cookie-consent-accepted">Accepteret</span>
+            {% else %}
+                <form class="cookie-consent-accept" action="{% url "cookie_consent_accept" %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="cookie_groups" value="{{ cookie_group.varname }}">
+                    <button type="submit" class="button">Accepter</button>
+                </form>
+            {% endif %}
+
+            {% if request|cookie_group_declined:cookie_group.varname %}
+                <span class="cookie-consent-declined">Afvist</span>
+            {% else %}
+                <form class="cookie-consent-decline" action="{% url "cookie_consent_decline" %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="cookie_groups" value="{{ cookie_group.varname }}">
+                    <button type="submit" class="button-outline">Afvis</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <p>{{ cookie_group.description }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Navn</th>
+                <th>Formål</th>
+            </tr>
+        </thead>
+        {% for cookie in cookie_group.cookie_set.all %}
+            <tr>
+                <td data-label="Navn">
+                    {{ cookie.name }}
+                    {% if cookie.domain %}({{ cookie.domain }}){% endif %}
+                </td>
+                <td data-label="Formål">{% if cookie.description %}{{ cookie.description }}{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
