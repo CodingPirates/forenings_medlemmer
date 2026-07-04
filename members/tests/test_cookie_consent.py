@@ -1,3 +1,5 @@
+from io import StringIO
+
 from cookie_consent.models import Cookie, CookieGroup
 from django.core.management import call_command
 from django.test import TestCase
@@ -9,7 +11,7 @@ class CookieDeclarationPageTestCase(TestCase):
         self.group = CookieGroup.objects.create(
             varname="necessary",
             name="Nødvendige cookies",
-            description="Disse cookies er nødvendige for at Medlemssystemet kan fungere.",
+            description="Disse cookies er nødvendige for at medlemssystemet kan fungere.",
             is_required=True,
             is_deletable=False,
         )
@@ -45,7 +47,7 @@ class CookieDeclarationPageTestCase(TestCase):
 
 class SeedCookieConsentCommandTestCase(TestCase):
     def test_command_creates_necessary_group_with_descriptions(self):
-        call_command("seed_cookie_consent")
+        call_command("seed_cookie_consent", stdout=StringIO())
 
         group = CookieGroup.objects.get(varname="necessary")
         self.assertTrue(group.is_required)
@@ -62,8 +64,8 @@ class SeedCookieConsentCommandTestCase(TestCase):
         )
         Cookie.objects.create(cookiegroup=group, name="sessionid", domain="")
 
-        call_command("seed_cookie_consent")
-        call_command("seed_cookie_consent")
+        call_command("seed_cookie_consent", stdout=StringIO())
+        call_command("seed_cookie_consent", stdout=StringIO())
 
         self.assertEqual(CookieGroup.objects.filter(varname="necessary").count(), 1)
         cookie = Cookie.objects.get(cookiegroup=group, name="sessionid")

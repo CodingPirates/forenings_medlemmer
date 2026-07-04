@@ -3,11 +3,11 @@ from django.core.management.base import BaseCommand
 
 _COOKIES = {
     "sessionid": (
-        "Bruges til at holde dig logget ind, mens du bruger Medlemssystemet."
+        "Bruges til at holde dig logget ind, mens du bruger medlemssystemet."
     ),
     "csrftoken": (
         "Bruges til at sikre, at det rent faktisk er dig, der indsender "
-        "formularer på Medlemssystemet, og ikke en anden hjemmeside der "
+        "formularer på medlemssystemet, og ikke en anden hjemmeside der "
         "forsøger at udgive sig for at være dig."
     ),
 }
