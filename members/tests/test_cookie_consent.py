@@ -57,7 +57,9 @@ class SeedCookieConsentCommandTestCase(TestCase):
         self.assertTrue(all(cookies.values()))
 
     def test_command_is_idempotent_and_backfills_descriptions(self):
-        group = CookieGroup.objects.create(varname="necessary", name="Nødvendige cookies")
+        group = CookieGroup.objects.create(
+            varname="necessary", name="Nødvendige cookies"
+        )
         Cookie.objects.create(cookiegroup=group, name="sessionid", domain="")
 
         call_command("seed_cookie_consent")
