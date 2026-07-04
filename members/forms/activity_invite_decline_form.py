@@ -16,4 +16,7 @@ class ActivivtyInviteDeclineForm(forms.Form):
             Submit("submit", "Afslå invitationen", css_class="button-danger"),
             HTML('<a class="button" href="{% url "activities" %}">Tilbage</a>'),
         )
-    decline_reason = forms.CharField(label="Hvorfor afslår du invitationen?", required=False)
+
+    decline_reason = forms.CharField(
+        label="Hvorfor afslår du invitationen?", required=False
+    )
