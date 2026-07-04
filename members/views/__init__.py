@@ -1,5 +1,7 @@
 # flake8: noqa  # ignored since it is being used in the files
 from members.views.AccountCreate import AccountCreate
+from members.views.VolunteerAccountCreate import VolunteerAccountCreate
+from members.views.VolunteerAccountCreated import VolunteerAccountCreated
 from members.views.Activities import Activities
 from members.views.ActivitySignup import ActivitySignup
 from members.views.AdminSignup import AdminSignup

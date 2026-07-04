@@ -158,13 +158,26 @@ class UserAdmin(UserAdmin):
                 AdminUserDepartmentListFilter,
             ]
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(request, obj)
+
+        # Debugging check to see what is happening in the logs
+        if obj:
+            print(
+                f"DEBUG: Active User Is Superuser? {request.user.is_superuser} | Target User Is Superuser? {obj.is_superuser}"
+            )
+
+        if obj and not request.user.is_superuser and obj.is_superuser:
+            # We cast to tuple to safely append
+            return tuple(readonly_fields) + ("username", "email")
+
+        return readonly_fields
+
     def get_fieldsets(self, request, obj=None):
-        # 20230924: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
         if not obj:
             return self.add_fieldsets
 
-        perm_fields = ("is_active", "is_staff", "groups")
-
+        # 1. Handle permissions fields
         if request.user.is_superuser:
             perm_fields = (
                 "is_active",
@@ -173,9 +186,18 @@ class UserAdmin(UserAdmin):
                 "groups",
                 "user_permissions",
             )
+        else:
+            perm_fields = ("is_active", "is_staff", "groups")
 
+        # 2. Dynamic top row: Hide password link if non-superuser edits a superuser
+        if obj and not request.user.is_superuser and obj.is_superuser:
+            first_section_fields = ("username",)  # "password" is removed completely
+        else:
+            first_section_fields = ("username", "password")
+
+        # 3. Return layouts dynamically
         return [
-            (None, {"fields": ("username", "password")}),
+            (None, {"fields": first_section_fields}),
             (("Personal info"), {"fields": ("first_name", "last_name", "email")}),
             (("Permissions"), {"fields": perm_fields}),
             (("Important dates"), {"fields": ("last_login", "date_joined")}),

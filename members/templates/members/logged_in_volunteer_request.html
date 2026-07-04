@@ -1,0 +1,297 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% if show_overview %}
+    <!-- Volunteer Overview Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header text-white" style="background-color: #00aeef;">
+                    <h3><i class="fas fa-hands-helping"></i> Din Familie's Frivillige Aktiviteter</h3>
+                </div>
+                <div class="card-body">
+                    {% if overview_data.pending_volunteer_confirmations %}
+                    <div class="row mb-4" id="pending-volunteer-confirmations">
+                        <div class="col-md-12">
+                            <h5><i class="fas fa-user-clock text-warning"></i> Afventer din godkendelse</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Person</th>
+                                            <th>Afdeling</th>
+                                            <th>Aktivitet</th>
+                                            <th>Start dato</th>
+                                            <th>Handling</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for volunteer in overview_data.pending_volunteer_confirmations %}
+                                            <tr>
+                                                <td><strong>{{ volunteer.person.name }}</strong></td>
+                                                <td>{{ volunteer.department.name }}</td>
+                                                <td>
+                                                    {% if volunteer.activity %}
+                                                        {{ volunteer.activity.name }}
+                                                    {% else %}
+                                                        <em>Generel frivillig</em>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if volunteer.start_date %}
+                                                        {{ volunteer.start_date|date:"d/m/Y" }}
+                                                    {% else %}
+                                                        {{ volunteer.added_at|date:"d/m/Y" }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <form method="post" action="{% url 'volunteer_signup' %}" class="d-flex gap-2 flex-wrap">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_id" value="volunteer_user_confirmation">
+                                                        <input type="hidden" name="volunteer_id" value="{{ volunteer.id }}">
+                                                        <button type="submit" name="confirmation_action" value="accept" class="btn btn-sm btn-success">Godkend</button>
+                                                        <button type="submit" name="confirmation_action" value="reject" class="btn btn-sm btn-outline-danger">Afvis</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    
+                    <!-- Current Volunteers -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5><i class="fas fa-user-check text-success"></i> Aktive Frivillige</h5>
+                            {% if overview_data.current_volunteers %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Person</th>
+                                                <th>Afdeling</th>
+                                                <th>Aktivitet</th>
+                                                <th>Start dato</th>
+                                                <th>Slut dato</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for volunteer in overview_data.current_volunteers %}
+                                            <tr>
+                                                <td><strong>{{ volunteer.person.name }}</strong></td>
+                                                <td>{{ volunteer.department.name }}</td>
+                                                <td>
+                                                    {% if volunteer.activity %}
+                                                        {{ volunteer.activity.name }}
+                                                    {% else %}
+                                                        <em>Generel frivillig</em>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if volunteer.start_date %}
+                                                        {{ volunteer.start_date|date:"d/m/Y" }}
+                                                    {% else %}
+                                                        {{ volunteer.added_at|date:"d/m/Y" }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if volunteer.end_date %}
+                                                        {{ volunteer.end_date|date:"d/m/Y" }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Ingen aktive frivillige roller fundet.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Contact Sharing Preferences -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5><i class="fas fa-address-book text-primary"></i> Kontaktpræferencer</h5>
+                            {% if overview_data.contact_people %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Person</th>
+                                                <th>Kontaktindstillinger</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for person in overview_data.contact_people %}
+                                            <tr>
+                                                <td><strong>{{ person.name }}</strong></td>
+                                                <td>
+                                                    <form method="post" action="{% url 'volunteer_signup' %}" class="d-flex align-items-center gap-2 flex-wrap">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_id" value="volunteer_contact_preference">
+                                                        <input type="hidden" name="person_id" value="{{ person.id }}">
+                                                        <div class="form-check m-0">
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                name="allow_contact_from_cpdk"
+                                                                id="id_allow_contact_from_cpdk_{{ person.id }}"
+                                                                {% if person.allow_contact_from_cpdk %}checked{% endif %}
+                                                            >
+                                                            <label class="form-check-label small" for="id_allow_contact_from_cpdk_{{ person.id }}">
+                                                                Del med CPDK
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check m-0">
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                name="allow_contact_from_other"
+                                                                id="id_allow_contact_from_other_{{ person.id }}"
+                                                                {% if person.allow_contact_from_other %}checked{% endif %}
+                                                            >
+                                                            <label class="form-check-label small" for="id_allow_contact_from_other_{{ person.id }}">
+                                                                Del med andre
+                                                            </label>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary">Gem</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Ingen aktive frivillige personer fundet.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Requests -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5><i class="fas fa-clock text-info"></i> Seneste Anmodninger</h5>
+                            {% if overview_data.volunteer_requests %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Person</th>
+                                                <th>Dato</th>
+                                                <th>Anmodninger</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for request in overview_data.volunteer_requests %}
+                                            <tr>
+                                                <td><strong>{{ request.person.name }}</strong></td>
+                                                <td>{{ request.created|date:"d/m/Y" }}</td>
+                                                <td>
+                                                    <small>
+                                                        {% for item in request.volunteerrequestitem_set.all %}
+                                                            {% if item.activity %}
+                                                                {{ item.activity.name }}
+                                                            {% else %}
+                                                                {{ item.department.name }}
+                                                            {% endif %}
+                                                            {% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    {% if request.finished %}
+                                                        <span class="badge bg-success">Afsluttet</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">Under behandling</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Ingen frivillig anmodninger fundet i de seneste 12 måneder.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- New Request Form -->
+    <div class="alert alert-secondary">
+        <h1>{% if show_overview %}Opret Ny {% endif %}Frivillig Anmodning</h1>
+        <p>
+            Som logget ind bruger kan du oprette en frivillig anmodning for en person i din familie.
+        </p>
+        <p>
+            Vælg den person der skal være frivillig, og angiv hvilke afdelinger eller aktiviteter I er interesserede i.
+        </p>
+        <p>
+            Du skal vælge mindst én afdeling eller aktivitet.
+        </p>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-plus-circle"></i> Ny Frivillig Anmodning</h5>
+        </div>
+        <div class="card-body">
+            {% crispy logged_in_form %}
+        </div>
+    </div>
+  
+    <script>
+        // Add some visual styling to help users understand they need to select at least one option
+        document.addEventListener('DOMContentLoaded', function() {
+            const departmentCheckboxes = document.querySelectorAll('input[name="departments"]');
+            const activityCheckboxes = document.querySelectorAll('input[name="activities"]');
+            
+            function updateSelectionStatus() {
+                const anyDepartmentSelected = Array.from(departmentCheckboxes).some(cb => cb.checked);
+                const anyActivitySelected = Array.from(activityCheckboxes).some(cb => cb.checked);
+                
+                if (anyDepartmentSelected || anyActivitySelected) {
+                    // Remove any previous error highlighting
+                    const deptDiv = document.querySelector('#div_id_departments');
+                    const actDiv = document.querySelector('#div_id_activities');
+                    if (deptDiv) deptDiv.classList.remove('border-warning');
+                    if (actDiv) actDiv.classList.remove('border-warning');
+                } else {
+                    // Add warning highlighting if no selections
+                    const deptDiv = document.querySelector('#div_id_departments');
+                    const actDiv = document.querySelector('#div_id_activities');
+                    if (deptDiv) deptDiv.classList.add('border-warning');
+                    if (actDiv) actDiv.classList.add('border-warning');
+                }
+            }
+            
+            // Add event listeners to all checkboxes
+            [...departmentCheckboxes, ...activityCheckboxes].forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectionStatus);
+            });
+            
+            // Initial check
+            updateSelectionStatus();
+        });
+    </script>
+{% endblock %}

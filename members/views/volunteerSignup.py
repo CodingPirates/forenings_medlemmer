@@ -1,137 +1,704 @@
-from django.urls import reverse
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.utils import timezone
+from django.urls import reverse
+import os
+import random
+from datetime import timedelta
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
-from members.forms import vol_signupForm
-from members.models.family import Family
+from members.forms import (
+    VolunteerRequestForm,
+    LoggedInVolunteerRequestForm,
+)
+from members.models.department import Department
+from members.models.activity import Activity
 from members.models.person import Person
+from members.models.volunteerrequest import VolunteerRequest
+from members.models.volunteerrequestitem import VolunteerRequestItem
 from members.models.volunteer import Volunteer
-from members.models import Consent
-from django.contrib.auth.models import User
+from members.utils.user import user_to_person
+from members.utils.admin_log import log_person_contact_preference_change
+from members.utils.volunteer_confirmation import log_volunteer_user_confirmation_change
+from members.models.emailtemplate import EmailTemplate
+
+
+def ensure_volunteer_request_template():
+    """Ensure the VOLUNTEER_REQUEST email template exists"""
+    template_id = "VOLUNTEER_REQUEST"
+
+    try:
+        template = EmailTemplate.objects.get(idname=template_id)
+    except EmailTemplate.DoesNotExist:
+        # Create the template if it doesn't exist
+        body_html = "<h2>Ny frivillig anmodning</h2>\n"
+        body_html += "<p>En ny person har anmodet om at blive frivillig hos Coding Pirates.</p>\n"
+        body_html += "\n"
+        body_html += "{% if activity %}\n"
+        body_html += "<p><strong>Aktivitet:</strong> {{ activity.name }}<br>\n"
+        body_html += "<strong>Afdeling:</strong> {{ activity.department.name }}</p>\n"
+        body_html += "{% elif department %}\n"
+        body_html += "<p><strong>Afdeling:</strong> {{ department.name }}</p>\n"
+        body_html += "{% endif %}\n"
+        body_html += "\n"
+        body_html += '<p>Log venligst ind på <a href="{{ site }}/admin/">administratorsystemet</a> for at se detaljerne og kontakte personen.</p>\n'
+        body_html += "\n"
+        body_html += "<p>Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.</p>\n"
+        body_html += "\n"
+        body_html += "<p>Med venlig hilsen,<br>\n"
+        body_html += "Coding Pirates Danmark</p>"
+
+        body_text = "Ny frivillig anmodning\n"
+        body_text += "\n"
+        body_text += (
+            "En ny person har anmodet om at blive frivillig hos Coding Pirates.\n"
+        )
+        body_text += "\n"
+        body_text += "{% if activity %}Aktivitet: {{ activity.name }}\n"
+        body_text += "Afdeling: {{ activity.department.name }}\n"
+        body_text += "{% elif department %}Afdeling: {{ department.name }}\n"
+        body_text += "{% endif %}\n"
+        body_text += "\n"
+        body_text += "Log venligst ind på {{ site }}/admin/ for at se detaljerne og kontakte personen.\n"
+        body_text += "\n"
+        body_text += "Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.\n"
+        body_text += "\n"
+        body_text += "Med venlig hilsen,\n"
+        body_text += "Coding Pirates Danmark"
+
+        template = EmailTemplate.objects.create(
+            idname=template_id,
+            name="Ny frivillig anmodning",
+            description="Email til afdelingsledere og aktivitetsansvarlige når der kommer en ny frivillig anmodning",
+            subject="Coding Pirates. Ny frivillig anmodning - {{ timestamp }}",
+            from_address="kontakt@codingpirates.dk",
+            body_html=body_html,
+            body_text=body_text,
+            template_help="Template til notifikation af frivillig anmodning. Tilgængelige variable: activity, department, site, timestamp",
+        )
+
+    return template
+
+
+def ensure_volunteer_verification_template():
+    """Ensure the VOLUNTEER_VERIFICATION email template exists"""
+    template_id = "VOLUNTEER_VERIFICATION"
+
+    try:
+        template = EmailTemplate.objects.get(idname=template_id)
+    except EmailTemplate.DoesNotExist:
+        # Create the template if it doesn't exist
+        body_html = "<h2>Bekræft din email</h2>\n"
+        body_html += "<p>Hej {{ name }},</p>\n"
+        body_html += "\n"
+        body_html += (
+            "<p>Tak for din interesse i at blive frivillig hos Coding Pirates!</p>\n"
+        )
+        body_html += "\n"
+        body_html += "<p>For at bekræfte din email adresse, skal du indtaste følgende verifikationskode:</p>\n"
+        body_html += "<p><strong>{{ verification_code }}</strong></p>\n"
+        body_html += "\n"
+        body_html += "<p>Hvis du ikke har anmodet om at blive frivillig hos Coding Pirates, kan du ignorere denne email.</p>\n"
+        body_html += "\n"
+        body_html += "<p>Med venlig hilsen,<br>\n"
+        body_html += "Coding Pirates Danmark</p>"
+
+        body_text = "Hej {{ name }},\n"
+        body_text += "\n"
+        body_text += "Tak for din interesse i at blive frivillig hos Coding Pirates!\n"
+        body_text += "\n"
+        body_text += "For at bekræfte din email adresse, skal du indtaste følgende verifikationskode: {{ verification_code }}\n"
+        body_text += "\n"
+        body_text += "Hvis du ikke har anmodet om at blive frivillig hos Coding Pirates, kan du ignorere denne email.\n"
+        body_text += "\n"
+        body_text += "Med venlig hilsen,\n"
+        body_text += "Coding Pirates Danmark"
+
+        template = EmailTemplate.objects.create(
+            idname=template_id,
+            name="Email verifikation - Frivillig anmodning",
+            description="Email til verifikation af email adresse ved frivillig anmodning",
+            subject="Bekræft din email - Coding Pirates frivillig",
+            from_address="kontakt@codingpirates.dk",
+            body_html=body_html,
+            body_text=body_text,
+            template_help="Template til email verifikation. Tilgængelige variable: name, verification_code",
+        )
+
+    return template
+
+
+def send_volunteer_notification_emails(volunteer_request, departments, activities):
+    """Send notification emails to activity responsible contacts and department leaders using EmailTemplate"""
+
+    # Ensure the email template exists
+    template = ensure_volunteer_request_template()
+
+    # Create unique timestamp for this batch of emails
+    timestamp = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Send emails for activities
+    for activity in activities:
+        if activity.responsible_contact:
+            try:
+                context = {
+                    "activity": activity,
+                    "department": activity.department,
+                    "volunteer_request": volunteer_request,
+                    "timestamp": timestamp,
+                }
+
+                # Check if responsible_contact is a Person object or email string
+                if isinstance(activity.responsible_contact, str):
+                    # If it's a string email, try to find a Person with that email first
+                    try:
+                        person = Person.objects.get(email=activity.responsible_contact)
+                        template.makeEmail(
+                            [person], context, allow_multiple_emails=True
+                        )
+                    except Person.DoesNotExist:
+                        # No Person found, use the enhanced makeEmail with string email directly
+                        template.makeEmail(
+                            [activity.responsible_contact],
+                            context,
+                            allow_multiple_emails=True,
+                        )
+                else:
+                    # If it's already a Person object, use it directly
+                    template.makeEmail(
+                        [activity.responsible_contact],
+                        context,
+                        allow_multiple_emails=True,
+                    )
+
+            except Exception as e:
+                print(f"Failed to send activity notification email: {e}")
+
+    # Send emails for departments
+    for department in departments:
+        try:
+            context = {
+                "department": department,
+                "volunteer_request": volunteer_request,
+                "timestamp": timestamp,
+            }
+
+            # Create list of recipients
+            recipients = []
+
+            # Add department object to send to department_email
+            if department.department_email:
+                recipients.append(department)
+
+            # Add department leaders as Person objects
+            for leader in department.department_leaders.all():
+                if leader.email:
+                    recipients.append(leader)
+
+            # Send emails using template
+            if recipients:
+                template.makeEmail(recipients, context, allow_multiple_emails=True)
+
+        except Exception as e:
+            print(f"Failed to send department notification email: {e}")
 
 
 @xframe_options_exempt
 def volunteerSignup(request):
-    if request.method == "POST":
-        # figure out which form was filled out.
-        if request.POST["form_id"] == "vol_signup":
-            # signup has been filled
-            vol_signup = vol_signupForm(request.POST)
-            if vol_signup.is_valid():
-                # check if passwords match
-                if (
-                    vol_signup.cleaned_data["password1"]
-                    != vol_signup.cleaned_data["password2"]
-                ):
-                    # Passwords dosent match throw an error
-                    vol_signup.add_error("password2", "Adgangskoder er ikke ens")
-                    return render(
-                        request,
-                        "members/volunteer_signup.html",
-                        {"vol_signupform": vol_signup},
-                    )
-                # Ensure consent is given
-                if not vol_signup.cleaned_data["consent"]:
-                    vol_signup.add_error(
-                        "consent",
-                        "Du skal acceptere privatlivspolitikken for at fortsætte.",
-                    )
-                    return render(
-                        request,
-                        "members/volunteer_signup.html",
-                        {"vol_signupform": vol_signup},
-                    )
-
-                # check if family already exists
+    # Check if user is logged in
+    if request.user.is_authenticated:
+        # Simplified logic for authenticated users - just create volunteer request
+        if request.method == "POST":
+            if request.POST.get("form_id") == "volunteer_user_confirmation":
                 try:
-                    family = Family.objects.get(
-                        email__iexact=request.POST["volunteer_email"],
+                    family = user_to_person(request.user).family
+                    volunteer = Volunteer.objects.select_related(
+                        "person", "department", "activity"
+                    ).get(
+                        pk=request.POST.get("volunteer_id"),
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        removed__isnull=True,
+                        user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
                     )
-                    # family was already created - we can't create this family again
-                    vol_signup.add_error(
-                        "volunteer_email",
-                        "Denne email adresse er allerede oprettet. Log ind ovenfor, for at få adgang.",
+                except (Volunteer.DoesNotExist, AttributeError):
+                    return HttpResponseForbidden(
+                        "Du kan kun bekræfte frivilligroller for din egen familie."
                     )
-                    return render(
-                        request,
-                        "members/volunteer_signup.html",
-                        {"vol_signupform": vol_signup},
+
+                action = request.POST.get("confirmation_action")
+                if action == "accept":
+                    new_status = Volunteer.UserConfirmationStatus.APPROVED_BY_USER
+                elif action == "reject":
+                    new_status = Volunteer.UserConfirmationStatus.REJECTED_BY_USER
+                else:
+                    return HttpResponseForbidden("Ugyldig handling.")
+
+                old_status = volunteer.get_user_confirmation_status_display()
+                volunteer.user_confirmation_status = new_status
+                volunteer.save(update_fields=["user_confirmation_status"])
+                log_volunteer_user_confirmation_change(
+                    request,
+                    volunteer,
+                    old_status,
+                    volunteer.get_user_confirmation_status_display(),
+                )
+
+                return HttpResponseRedirect(reverse("volunteer_signup"))
+
+            if request.POST.get("form_id") == "volunteer_contact_preference":
+                try:
+                    family = user_to_person(request.user).family
+                    person = Person.objects.get(
+                        pk=request.POST.get("person_id"),
+                        family=family,
+                        deleted_dtm__isnull=True,
                     )
-                except:  # noqa: E722
-                    # all is fine - we did not expect any
-                    pass
-                # create new family.
-                family = Family.objects.create(
-                    email=vol_signup.cleaned_data["volunteer_email"],
-                    referer=vol_signup.cleaned_data["referer"],
-                )
-                family.confirmed_at = timezone.now()
-                family.save()
-
-                # create volunteer as user
-                user = User.objects.create_user(
-                    username=vol_signup.cleaned_data["volunteer_email"],
-                    email=vol_signup.cleaned_data["volunteer_email"],
-                )
-                password = vol_signup.cleaned_data["password2"]
-                user.set_password(password)
-                user.save()
-
-                # Get the latest consent
-                latest_consent = (
-                    Consent.objects.filter(
-                        released_at__isnull=False, released_at__lte=timezone.now()
+                except (Person.DoesNotExist, AttributeError):
+                    return HttpResponseForbidden(
+                        "Du kan kun redigere kontaktindstillinger for dine egne frivillige roller."
                     )
-                    .order_by("-released_at")
-                    .first()
+
+                if not Volunteer.objects.filter(
+                    person=person,
+                    removed__isnull=True,
+                ).exists():
+                    return HttpResponseForbidden(
+                        "Du kan kun redigere kontaktindstillinger for dine egne frivillige roller."
+                    )
+
+                changed_fields = []
+                new_allow_contact_from_cpdk = (
+                    request.POST.get("allow_contact_from_cpdk") == "on"
+                )
+                new_allow_contact_from_other = (
+                    request.POST.get("allow_contact_from_other") == "on"
                 )
 
-                # create volunteer
-                volunteer = Person.objects.create(
-                    membertype=Person.PARENT,
-                    name=vol_signup.cleaned_data["volunteer_name"],
-                    zipcode=vol_signup.cleaned_data["zipcode"],
-                    city=vol_signup.cleaned_data["city"],
-                    streetname=vol_signup.cleaned_data["streetname"],
-                    housenumber=vol_signup.cleaned_data["housenumber"],
-                    floor=vol_signup.cleaned_data["floor"],
-                    door=vol_signup.cleaned_data["door"],
-                    dawa_id=vol_signup.cleaned_data["dawa_id"],
-                    placename=vol_signup.cleaned_data["placename"],
-                    email=vol_signup.cleaned_data["volunteer_email"],
-                    phone=vol_signup.cleaned_data["volunteer_phone"],
-                    birthday=vol_signup.cleaned_data["volunteer_birthday"],
-                    gender=vol_signup.cleaned_data["volunteer_gender"],
-                    municipality=None,
-                    family=family,
-                    user=user,
-                    consent=latest_consent,  # Set the consent
-                    consent_by=user,  # Set the user who gave consent
-                    consent_at=timezone.now(),  # Set the timestamp for consent
-                )
-                volunteer.save()
+                if person.allow_contact_from_cpdk != new_allow_contact_from_cpdk:
+                    person.allow_contact_from_cpdk = new_allow_contact_from_cpdk
+                    changed_fields.append("Må Coding Pirates Denmark kontakte mig?")
 
-                # send email to department leader
-                department = vol_signup.cleaned_data["volunteer_department"]
-                vol_obj = Volunteer.objects.create(
-                    person=volunteer, department=department
-                )
-                vol_obj.save()
-                # department.new_volunteer_email(vol_signup.cleaned_data['volunteer_name'])
+                if person.allow_contact_from_other != new_allow_contact_from_other:
+                    person.allow_contact_from_other = new_allow_contact_from_other
+                    changed_fields.append("Må andre afdelinger kontakte mig?")
 
-                # redirect to success
-                return HttpResponseRedirect(reverse("user_created"))
+                if changed_fields:
+                    person.save(
+                        update_fields=[
+                            "allow_contact_from_cpdk",
+                            "allow_contact_from_other",
+                        ]
+                    )
+                    log_person_contact_preference_change(
+                        request, person, changed_fields
+                    )
+
+                return HttpResponseRedirect(reverse("volunteer_signup"))
+
+            logged_in_form = LoggedInVolunteerRequestForm(
+                user=request.user, data=request.POST
+            )
+            if logged_in_form.is_valid():
+                selected_person = logged_in_form.cleaned_data["person"]
+
+                # Create volunteer request with selected person
+                volunteer_request = VolunteerRequest.objects.create(
+                    person=selected_person,
+                    allow_contact_from_cpdk=selected_person.allow_contact_from_cpdk,
+                    allow_contact_from_other=selected_person.allow_contact_from_other,
+                    info_reference=logged_in_form.cleaned_data["info_reference"],
+                    info_whishes=logged_in_form.cleaned_data["info_whishes"],
+                )
+
+                # Create VolunteerRequestItem records for selected departments
+                departments = logged_in_form.cleaned_data.get("departments", [])
+                for department in departments:
+                    VolunteerRequestItem.objects.create(
+                        volunteer_request=volunteer_request, department=department
+                    )
+
+                # Create VolunteerRequestItem records for selected activities
+                activities = logged_in_form.cleaned_data.get("activities", [])
+                for activity in activities:
+                    VolunteerRequestItem.objects.create(
+                        volunteer_request=volunteer_request,
+                        department=activity.department,
+                        activity=activity,
+                    )
+
+                # Send notification emails to responsible contacts and department leaders
+                send_volunteer_notification_emails(
+                    volunteer_request, departments, activities
+                )
+
+                # Redirect to success page
+                return render(
+                    request,
+                    "members/volunteer_request_success.html",
+                    {"name": selected_person.name},
+                )
             else:
                 return render(
                     request,
-                    "members/volunteer_signup.html",
-                    {"vol_signupform": vol_signup},
+                    "members/logged_in_volunteer_request.html",
+                    {
+                        "logged_in_form": logged_in_form,
+                        "show_overview": False,  # Don't show overview when there are form errors
+                    },
                 )
 
-    # initial load (if we did not return above)
-    vol_signup = vol_signupForm()
-    return render(
-        request, "members/volunteer_signup.html", {"vol_signupform": vol_signup}
-    )
+        # initial load for authenticated users
+        logged_in_form = LoggedInVolunteerRequestForm(user=request.user)
+
+        # Get volunteer overview data for the user's family
+        overview_data = {
+            "current_volunteers": [],
+            "pending_volunteer_confirmations": [],
+            "contact_people": [],
+            "volunteer_requests": [],
+            "family_members": [],
+        }
+
+        try:
+            person = user_to_person(request.user)
+            if person and person.family:
+                family = person.family
+
+                # Auto-fix any WAITING volunteer requests for existing family members
+                # Check for WAITING requests where the email matches a family member
+                family_people = Person.objects.filter(
+                    family=family, deleted_dtm__isnull=True
+                )
+
+                for person in family_people:
+                    waiting_requests = VolunteerRequestItem.objects.filter(
+                        volunteer_request__email__iexact=person.email,
+                        status="WAITING",
+                        volunteer_request__person__isnull=True,
+                    )
+
+                    for waiting_item in waiting_requests:
+                        # Link the volunteer request to the existing person
+                        volunteer_request = waiting_item.volunteer_request
+                        volunteer_request.person = person
+                        volunteer_request.finished = timezone.now()
+                        volunteer_request.save()
+                        person.allow_contact_from_cpdk = (
+                            volunteer_request.allow_contact_from_cpdk
+                        )
+                        person.allow_contact_from_other = (
+                            volunteer_request.allow_contact_from_other
+                        )
+                        person.save(
+                            update_fields=[
+                                "allow_contact_from_cpdk",
+                                "allow_contact_from_other",
+                            ]
+                        )
+
+                        # Create volunteer record and set status to ACTIVE
+                        try:
+                            if waiting_item.activity:
+                                # Activity-specific volunteer
+                                volunteer = Volunteer.objects.create(
+                                    person=person,
+                                    department=waiting_item.activity.department,
+                                    activity=waiting_item.activity,
+                                    start_date=timezone.now().date(),
+                                    end_date=waiting_item.activity.end_date,
+                                )
+                            else:
+                                # Department-level volunteer
+                                volunteer = Volunteer.objects.create(
+                                    person=person,
+                                    department=waiting_item.department,
+                                    activity=None,
+                                    start_date=timezone.now().date(),
+                                    end_date=None,
+                                )
+
+                            # Try to set info fields if they exist
+                            try:
+                                volunteer.info_reference = (
+                                    volunteer_request.info_reference
+                                )
+                                volunteer.info_whishes = volunteer_request.info_whishes
+                                volunteer.save()
+                            except AttributeError:
+                                # Fields don't exist yet, skip
+                                pass
+
+                        except Exception as e:
+                            # Log the error but continue
+                            print(f"Error creating volunteer record: {e}")
+                            continue
+
+                        # Update status to ACTIVE
+                        waiting_item.status = "ACTIVE"
+                        waiting_item.finished = timezone.now()
+                        waiting_item.save()
+
+                # Get all family members
+                overview_data["family_members"] = Person.objects.filter(
+                    family=family, deleted_dtm__isnull=True
+                ).order_by("name")
+
+                # Get current volunteer records for family members
+                overview_data["current_volunteers"] = (
+                    Volunteer.objects.filter(
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        removed__isnull=True,
+                        user_confirmation_status=Volunteer.UserConfirmationStatus.APPROVED_BY_USER,
+                    )
+                    .select_related("person", "department", "activity")
+                    .order_by("-added_at")
+                )
+
+                overview_data["pending_volunteer_confirmations"] = (
+                    Volunteer.objects.filter(
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        removed__isnull=True,
+                        user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+                    )
+                    .select_related("person", "department", "activity")
+                    .order_by("-added_at")
+                )
+
+                overview_data["contact_people"] = (
+                    Person.objects.filter(
+                        family=family,
+                        deleted_dtm__isnull=True,
+                        volunteer__isnull=False,
+                        volunteer__removed__isnull=True,
+                        volunteer__user_confirmation_status=Volunteer.UserConfirmationStatus.APPROVED_BY_USER,
+                    )
+                    .distinct()
+                    .order_by("name")
+                )
+
+                # Get volunteer requests for family members (last 12 months)
+                one_year_ago = timezone.now() - timedelta(days=365)
+
+                overview_data["volunteer_requests"] = (
+                    VolunteerRequest.objects.filter(
+                        person__family=family,
+                        person__deleted_dtm__isnull=True,
+                        created__gte=one_year_ago,
+                    )
+                    .prefetch_related(
+                        "volunteerrequestitem_set__department",
+                        "volunteerrequestitem_set__activity",
+                    )
+                    .order_by("-created")
+                )
+
+        except (AttributeError, Person.DoesNotExist):
+            pass
+
+        # Debug information to help troubleshoot
+        person = user_to_person(request.user)
+        debug_info = {
+            "user_email": request.user.email,
+            "user_has_person": person is not None,
+            "person_count": None,
+            "family_email": person.family.email if person and person.family else None,
+        }
+
+        # Get some debug info about the user's setup
+        try:
+            if hasattr(request.user, "person") and request.user.person:
+                debug_info["family_email"] = request.user.person.family.email
+                debug_info["person_count"] = Person.objects.filter(
+                    family=request.user.person.family, deleted_dtm__isnull=True
+                ).count()
+        except (AttributeError, Person.DoesNotExist):
+            pass
+
+        return render(
+            request,
+            "members/logged_in_volunteer_request.html",
+            {
+                "logged_in_form": logged_in_form,
+                "debug_info": debug_info,
+                "overview_data": overview_data,
+                "show_overview": True,  # Flag to show overview section
+            },
+        )
+
+    else:
+        # Logic for non-authenticated users (new simplified form)
+        if request.method == "POST":
+            # Two-step flow: initial form POST -> generate/send code and ask for verification
+            # subsequent POST with 'verification_code' -> verify and create records
+            if "verification_code" in request.POST:
+                # Verification step
+                entered_code = request.POST.get("verification_code", "").strip()
+                session_code = request.session.get("volunteer_verification_code")
+                form_data = request.session.get("volunteer_form_data")
+                departments_ids = request.session.get("volunteer_form_departments", [])
+                activities_ids = request.session.get("volunteer_form_activities", [])
+
+                # Check if the entered code matches either the session code or the env variable code
+                env_code = os.getenv("VOLUNTEER_EMAIL_VERIFICATION_CODE")
+                is_valid_code = (entered_code == session_code) or (
+                    env_code and entered_code == env_code
+                )
+
+                if entered_code and is_valid_code:
+                    # Create VolunteerRequest from stored form data
+                    if not form_data:
+                        return render(
+                            request,
+                            "members/volunteer_request.html",
+                            {"volunteer_request_form": VolunteerRequestForm()},
+                        )
+
+                    volunteer_request = VolunteerRequest.objects.create(
+                        name=form_data.get("name"),
+                        email=form_data.get("email"),
+                        phone=form_data.get("phone"),
+                        age=form_data.get("age") or None,
+                        zip=form_data.get("zip"),
+                        allow_contact_from_cpdk=form_data.get(
+                            "allow_contact_from_cpdk", False
+                        ),
+                        allow_contact_from_other=form_data.get(
+                            "allow_contact_from_other", False
+                        ),
+                        info_reference=form_data.get("info_reference", ""),
+                        info_whishes=form_data.get("info_whishes", ""),
+                    )
+
+                    # Create items and collect them for notification emails
+                    departments = []
+                    activities = []
+
+                    for dept_id in departments_ids:
+                        try:
+                            dept = Department.objects.get(pk=dept_id)
+                            VolunteerRequestItem.objects.create(
+                                volunteer_request=volunteer_request,
+                                department=dept,
+                            )
+                            departments.append(dept)
+                        except Department.DoesNotExist:
+                            pass
+
+                    for act_id in activities_ids:
+                        try:
+                            act = Activity.objects.get(pk=act_id)
+                            VolunteerRequestItem.objects.create(
+                                volunteer_request=volunteer_request,
+                                department=act.department,
+                                activity=act,
+                            )
+                            activities.append(act)
+                        except Activity.DoesNotExist:
+                            pass
+
+                    # Send notification emails to responsible contacts and department leaders
+                    send_volunteer_notification_emails(
+                        volunteer_request, departments, activities
+                    )
+
+                    # Clear session keys
+                    for k in [
+                        "volunteer_verification_code",
+                        "volunteer_form_data",
+                        "volunteer_form_departments",
+                        "volunteer_form_activities",
+                    ]:
+                        if k in request.session:
+                            del request.session[k]
+
+                    return render(
+                        request,
+                        "members/volunteer_request_success.html",
+                        {"name": volunteer_request.name},
+                    )
+                else:
+                    # Invalid code
+                    return render(
+                        request,
+                        "members/volunteer_email_verification.html",
+                        {
+                            "email": request.session.get("volunteer_form_data", {}).get(
+                                "email", ""
+                            ),
+                            "error": "Forkert verifikationskode. Prøv igen.",
+                        },
+                    )
+
+            else:
+                # Initial form submission: validate and send code
+                volunteer_request_form = VolunteerRequestForm(request.POST)
+                if volunteer_request_form.is_valid():
+                    cd = volunteer_request_form.cleaned_data
+                    # store form data in session until verification
+                    request.session["volunteer_form_data"] = {
+                        "name": cd.get("name"),
+                        "email": cd.get("email"),
+                        "phone": cd.get("phone"),
+                        "age": cd.get("age"),
+                        "zip": cd.get("zip"),
+                        "allow_contact_from_cpdk": cd.get(
+                            "allow_contact_from_cpdk", False
+                        ),
+                        "allow_contact_from_other": cd.get(
+                            "allow_contact_from_other", False
+                        ),
+                        "info_reference": cd.get("info_reference"),
+                        "info_whishes": cd.get("info_whishes"),
+                    }
+                    # store selected departments/activities as id lists
+                    request.session["volunteer_form_departments"] = [
+                        d.id for d in cd.get("departments", [])
+                    ]
+                    request.session["volunteer_form_activities"] = [
+                        a.id for a in cd.get("activities", [])
+                    ]
+
+                    # generate code - use environment variable if available, otherwise random
+                    if os.getenv("VOLUNTEER_EMAIL_VERIFICATION_CODE"):
+                        code = os.getenv("VOLUNTEER_EMAIL_VERIFICATION_CODE")
+                    else:
+                        code = f"{random.randint(100000, 999999)}"
+
+                    request.session["volunteer_verification_code"] = code
+
+                    # Send verification email using EmailTemplate
+                    try:
+                        verification_template = ensure_volunteer_verification_template()
+                        context = {
+                            "name": cd.get("name"),
+                            "verification_code": code,
+                        }
+                        verification_template.makeEmail(
+                            [cd.get("email")], context, allow_multiple_emails=True
+                        )
+                    except Exception as e:
+                        # Log the error but continue - in dev environment emails might fail
+                        print(f"Email sending failed: {e}")
+
+                    return render(
+                        request,
+                        "members/volunteer_email_verification.html",
+                        {"email": cd.get("email")},
+                    )
+                else:
+                    return render(
+                        request,
+                        "members/volunteer_request.html",
+                        {"volunteer_request_form": volunteer_request_form},
+                    )
+        else:
+            # Initial load for non-authenticated users
+            volunteer_request_form = VolunteerRequestForm()
+            return render(
+                request,
+                "members/volunteer_request.html",
+                {"volunteer_request_form": volunteer_request_form},
+            )

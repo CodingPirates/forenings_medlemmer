@@ -23,6 +23,7 @@ from members.models import (
     ActivityParticipant,
     Department,
     Person,
+    Volunteer,
     WaitingList,
 )
 
@@ -97,6 +98,10 @@ class AdminActions(admin.ModelAdmin):
             persons = Person.objects.filter(
                 pk__in=queryset.values_list("person_id", flat=True)
             )
+        elif queryset.model is Volunteer:
+            persons = Person.objects.filter(
+                pk__in=queryset.values_list("person_id", flat=True)
+            )
         else:
             persons = queryset
 
@@ -109,6 +114,9 @@ class AdminActions(admin.ModelAdmin):
         context["persons"] = persons
         context["queryset"] = queryset
         context["emailtemplate"] = template
+        context["action_name"] = request.POST.get(
+            "action", "invite_many_to_activity_action"
+        )
 
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
