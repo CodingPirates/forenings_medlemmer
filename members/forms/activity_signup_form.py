@@ -94,7 +94,7 @@ class ActivitySignupForm(forms.Form):
         required=False,
     )
     photo_permission = forms.ChoiceField(
-        label="Må Coding Pirates tage og bruge billeder og videoer af den tilmeldte person på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side)",
+        label="Må Coding Pirates tage og bruge billeder og videoer af den tilmeldte person på aktiviteten? (Billederne lægges typisk på vores hjemmeside og Facebook side, og kan også deles med en evt. samarbejdspartner, vi afholder aktiviteten sammen med)",
         initial="Choose",
         required=True,
         choices=(
