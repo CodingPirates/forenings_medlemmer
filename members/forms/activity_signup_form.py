@@ -77,6 +77,9 @@ class ActivitySignupForm(forms.Form):
                                 "Tilmeld{% if price > 0 %} og betal{% endif %}",
                                 css_class="button-success",
                             ),
+                            HTML(
+                                "<a class='button-danger' href='{% url 'invitation_decline' invitation.decline_uuid invitation.id %}'>Afslå invitation</a>"
+                            ),
                             HTML("<a href='{% url 'family_detail' %}'>Tilbage</a>"),
                         ),
                     ),
