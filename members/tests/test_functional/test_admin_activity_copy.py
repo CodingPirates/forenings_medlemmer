@@ -191,14 +191,21 @@ class AdminActivityCopyTest(StaticLiveServerTestCase):
         with open(f"{self.download_dir}/{name}.html", "w") as f:
             f.write(self.browser.page_source)
 
-    def execute_copy_activity_action(self):
+    def submit_copy_activity_action(self):
+        # Select copy activity from dropdown.
         select_element = Select(
             self.browser.find_element(By.XPATH, '//select[@name="action"]')
         )
         select_element.select_by_visible_text("Kopier én aktiviet")
+        # Click the submit button.
         self.browser.find_element(
             By.XPATH, '//*[@class="actions"]/button[@type="submit"]'
         ).click()
+
+    def select_activities(self, count):
+        for position in range(1, count + 1):
+            xpath = f'//*[@id="result_list"]/tbody/tr[{position}]/td/input[@class="action-select"]'
+            self.browser.find_element(By.XPATH, xpath).click()
 
     # Test for warning if more than one activity is selected when pressing "Udfør" button.
     def test_error_on_multiple_activities(self):
@@ -209,13 +216,10 @@ class AdminActivityCopyTest(StaticLiveServerTestCase):
         self.browser.find_element(By.LINK_TEXT, "Aktiviteter").click()
         # self.save_screenshot_and_html("activity_page")
 
-        # Select 2 activities.
-        for position in range(1, 3):
-            xpath = f'//*[@id="result_list"]/tbody/tr[{position}]/td/input[@class="action-select"]'
-            self.browser.find_element(By.XPATH, xpath).click()
+        self.select_activities(2)
         # self.save_screenshot_and_html("activity_page_items_selected")
 
-        execute_copy_activity_action(self.browser)
+        self.submit_copy_activity_action()
 
         try:
             expected_message = "Du må maks vælge én aktivitet af gangen til kopiering."
@@ -238,12 +242,10 @@ class AdminActivityCopyTest(StaticLiveServerTestCase):
         self.browser.find_element(By.LINK_TEXT, "Aktiviteter").click()
         # self.save_screenshot_and_html("activity_page")
 
-        # Select 1 activity.
-        xpath = f'//*[@id="result_list"]/tbody/tr[1]/td/input[@class="action-select"]'
-        self.browser.find_element(By.XPATH, xpath).click()
+        self.select_activities(1)
         # self.save_screenshot_and_html("activity_page_item_selected")
 
-        execute_copy_activity_action(self.browser)
+        self.submit_copy_activity_action()
 
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("copy_activity"))
