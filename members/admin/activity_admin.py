@@ -19,7 +19,7 @@ from members.models import (
     AdminUserInformation,
     Department,
     Union,
-    Activity
+    Activity,
 )
 from members.models.activitytype import ActivityType
 
@@ -131,8 +131,13 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(department__pk=self.value())
 
+
 class ActivityAdmin(admin.ModelAdmin):
-    actions = [AdminActions.export_participants_csv, "update_season_fee_action", "copy_activity_action"]
+    actions = [
+        AdminActions.export_participants_csv,
+        "update_season_fee_action",
+        "copy_activity_action",
+    ]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -145,8 +150,8 @@ class ActivityAdmin(admin.ModelAdmin):
             path(
                 "copy_activity/",
                 self.admin_site.admin_view(self.copy_activity_view),
-                name="copy_activity"
-            )
+                name="copy_activity",
+            ),
         ]
         return custom_urls + urls
 
@@ -165,8 +170,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def copy_activity_action(self, request, queryset):
         if not (
-            request.user.is_superuser
-            or request.user.has_perm("members.add_activity")
+            request.user.is_superuser or request.user.has_perm("members.add_activity")
         ):
             self.message_user(
                 request,
@@ -190,8 +194,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def copy_activity_view(self, request):
         if not (
-            request.user.is_superuser
-            or request.user.has_perm("members.add_activity")
+            request.user.is_superuser or request.user.has_perm("members.add_activity")
         ):
             self.message_user(
                 request,
