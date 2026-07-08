@@ -229,7 +229,7 @@ class AdminActivityCopyTest(StaticLiveServerTestCase):
                 )
             )
             self.save_screenshot_and_html("expected_error_massage")
-        except:
+        except Exception:
             self.save_screenshot_and_html("missing_error_massage")
             self.fail("Error message not found!")
 
@@ -250,7 +250,7 @@ class AdminActivityCopyTest(StaticLiveServerTestCase):
         try:
             WebDriverWait(self.browser, 10).until(EC.url_contains("copy_activity"))
             self.browser.find_element(By.XPATH, '//*[@id="confirma_action"]').click()
-        except:
+        except Exception:
             self.save_screenshot_and_html("failed_to_reach_copy_activity_page")
             self.fail("Could not reach confirmation page for copy activity!")
 
