@@ -14,12 +14,12 @@ from forenings_medlemmer.settings import MINIMUM_SEASON_PRICE_IN_DKK
 from members.admin.admin_actions import AdminActions
 from members.forms.season_fee_update_form import SeasonFeeUpdateForm
 from members.models import (
+    Activity,
     ActivityParticipant,
     Address,
     AdminUserInformation,
     Department,
     Union,
-    Activity,
 )
 from members.models.activitytype import ActivityType
 
