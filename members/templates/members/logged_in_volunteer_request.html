@@ -39,9 +39,9 @@
                                                 </td>
                                                 <td>
                                                     {% if volunteer.start_date %}
-                                                        {{ volunteer.start_date|date:"d/m/Y" }}
+                                                        {{ volunteer.start_date|date:"Y-m-d" }}
                                                     {% else %}
-                                                        {{ volunteer.added_at|date:"d/m/Y" }}
+                                                        {{ volunteer.added_at|date:"Y-m-d" }}
                                                     {% endif %}
                                                 </td>
                                                 <td>
@@ -93,14 +93,14 @@
                                                 </td>
                                                 <td>
                                                     {% if volunteer.start_date %}
-                                                        {{ volunteer.start_date|date:"d/m/Y" }}
+                                                        {{ volunteer.start_date|date:"Y-m-d" }}
                                                     {% else %}
-                                                        {{ volunteer.added_at|date:"d/m/Y" }}
+                                                        {{ volunteer.added_at|date:"Y-m-d" }}
                                                     {% endif %}
                                                 </td>
                                                 <td>
                                                     {% if volunteer.end_date %}
-                                                        {{ volunteer.end_date|date:"d/m/Y" }}
+                                                        {{ volunteer.end_date|date:"Y-m-d" }}
                                                     {% else %}
                                                         -
                                                     {% endif %}
@@ -199,7 +199,7 @@
                                             {% for request in overview_data.volunteer_requests %}
                                             <tr>
                                                 <td><strong>{{ request.person.name }}</strong></td>
-                                                <td>{{ request.created|date:"d/m/Y" }}</td>
+                                                <td>{{ request.created|date:"Y-m-d" }}</td>
                                                 <td>
                                                     <small>
                                                         {% for item in request.volunteerrequestitem_set.all %}

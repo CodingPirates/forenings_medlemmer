@@ -1,10 +1,12 @@
 from django.contrib import admin
+from django.contrib.auth.models import Permission
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 
 from members.admin.volunteerrequestitem_admin import (
     VolunteerRequestItemAdmin,
-    VolunteerRequestItemListFilter,
+    VolunteerRequestItemDepartmentListFilter,
 )
 from members.models import AdminUserInformation, VolunteerRequest, VolunteerRequestItem
 from members.tests.factories import DepartmentFactory, PersonFactory
@@ -73,7 +75,7 @@ class TestVolunteerRequestItemAdmin(TestCase):
         request = self.make_request(
             params={"department": str(self.direct_department.pk)}
         )
-        department_filter = VolunteerRequestItemListFilter(
+        department_filter = VolunteerRequestItemDepartmentListFilter(
             request,
             request.GET.copy(),
             VolunteerRequestItem,
@@ -91,3 +93,26 @@ class TestVolunteerRequestItemAdmin(TestCase):
             set(filtered_queryset.values_list("id", flat=True)),
             {self.direct_item.id},
         )
+
+    def test_change_page_loads_for_view_only_admin_user(self):
+        viewer = get_user_model().objects.create_user(
+            username="volunteerrequest-viewer",
+            password="password",
+            is_staff=True,
+        )
+        view_permission = Permission.objects.get(codename="view_volunteerrequestitem")
+        viewer.user_permissions.add(view_permission)
+
+        viewer_admin_info = AdminUserInformation.objects.create(user=viewer)
+        viewer_admin_info.departments.add(self.direct_department)
+
+        self.client.force_login(viewer)
+
+        response = self.client.get(
+            reverse(
+                "admin:members_volunteerrequestitem_change",
+                args=[self.direct_item.pk],
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)

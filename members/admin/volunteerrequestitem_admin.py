@@ -12,10 +12,12 @@ from members.models import (
     Volunteer,
 )
 
+from members.models.person import Person
+
 from members.models.emailtemplate import EmailTemplate
 
 
-class VolunteerRequestItemListFilter(admin.SimpleListFilter):
+class VolunteerRequestItemDepartmentListFilter(admin.SimpleListFilter):
     title = "Afdelinger"
     parameter_name = "department"
 
@@ -47,54 +49,24 @@ class VolunteerRequestItemAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        activity_field = self.fields.get("activity")
+        if activity_field is None:
+            return
+
         if "department" in self.data:
             try:
                 department_id = int(self.data.get("department"))
-                self.fields["activity"].queryset = Activity.objects.filter(
+                activity_field.queryset = Activity.objects.filter(
                     department_id=department_id
                 ).order_by("name")
             except (ValueError, TypeError):
-                self.fields["activity"].queryset = Activity.objects.none()
+                activity_field.queryset = Activity.objects.none()
         elif self.instance.pk and self.instance.department:
-            self.fields["activity"].queryset = (
-                self.instance.department.activity_set.order_by("name")
+            activity_field.queryset = self.instance.department.activity_set.order_by(
+                "name"
             )
         else:
-            self.fields["activity"].queryset = Activity.objects.none()
-        # super().__init__(*args, **kwargs)
-        # if "department" in self.data:
-        #     try:
-        #         department_id = int(self.data.get("department"))
-        #         self.fields["activity"].queryset = Activity.objects.filter(
-        #             department_id=department_id
-        #         ).order_by("name")
-        # #     except (ValueError, TypeError):
-        # #         self.fields["activity"].queryset = Activity.objects.none()
-        # # elif self.instance.pk and self.instance.activity is not None:
-        # #     self.fields["activity"].queryset = self.instance.department.activity_set.order_by("name")
-        # # else:
-        # #     self.fields["activity"].queryset = Activity.objects.none()
-
-        # # if "department" in self.data:
-        # #     try:
-        # #         department_id = int(self.data.get("department"))
-        # #         self.fields["activity"].queryset = Activity.objects.filter(
-        # #             department_id=department_id
-        # #         ).order_by("name")
-
-        #     except (ValueError, TypeError):
-        #         pass  # invalid input from the client; ignore and fallback to empty Activity queryset
-        # elif self.instance.pk:
-        #     self.fields["activity"].queryset = (
-        #         self.instance.department.activity_set.order_by("name")
-        #     )
-
-        #     except (ValueError, TypeError):
-        #         self.fields["activity"].queryset = Activity.objects.none()
-        # elif self.instance.pk:
-        #     self.fields["activity"].queryset = self.instance.department.activity_set.order_by("name")
-        # else:
-        #     self.fields["activity"].queryset = Activity.objects.none()
+            activity_field.queryset = Activity.objects.none()
 
 
 class VolunteerRequestItemAdmin(admin.ModelAdmin):
@@ -117,7 +89,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
     readonly_fields = (
         "get_new",
         "department",
-        # "activity",
         "whishes",
         "reference",
         "get_volunteer_request_name",
@@ -127,8 +98,10 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
-        VolunteerRequestItemListFilter,
+        VolunteerRequestItemDepartmentListFilter,
         "status",
+        "created",
+        "finished",
     )
 
     fieldsets = [
@@ -160,7 +133,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
         "reject_request",
         "mark_not_interested",
         "accept_request",
-        "fix_waiting_with_existing_person",
     ]
 
     def get_queryset(self, request):
@@ -202,12 +174,7 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
 
         for obj in queryset.filter(status="NEW"):
             if obj.volunteer_request.person:
-                # Person exists - create Volunteer record and set status to ACTIVE
-                # Create Volunteer record only for the specific item being accepted
-                # If this item is for a specific activity, create volunteer for that activity
-                # If this item is for a department (without specific activity), create volunteer for department only
                 if obj.activity:
-                    # This is an activity-specific volunteer request
                     obj.volunteer_request.person.allow_contact_from_cpdk = (
                         obj.volunteer_request.allow_contact_from_cpdk
                     )
@@ -222,20 +189,18 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                     )
                     volunteer = Volunteer.objects.create(
                         person=obj.volunteer_request.person,
-                        department=obj.activity.department,  # Use the activity's department
+                        department=obj.activity.department,
                         activity=obj.activity,
                         start_date=timezone.now().date(),
                         end_date=obj.activity.end_date,
                     )
-                    # Try to set info fields if they exist
                     try:
                         volunteer.info_reference = obj.volunteer_request.info_reference
                         volunteer.info_whishes = obj.volunteer_request.info_whishes
                         volunteer.save()
                     except AttributeError:
-                        pass  # Fields don't exist yet
+                        pass
                 else:
-                    # This is a department-level volunteer request (no specific activity)
                     obj.volunteer_request.person.allow_contact_from_cpdk = (
                         obj.volunteer_request.allow_contact_from_cpdk
                     )
@@ -255,21 +220,18 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                         start_date=timezone.now().date(),
                         end_date=None,
                     )
-                    # Try to set info fields if they exist
                     try:
                         volunteer.info_reference = obj.volunteer_request.info_reference
                         volunteer.info_whishes = obj.volunteer_request.info_whishes
                         volunteer.save()
                     except AttributeError:
-                        pass  # Fields don't exist yet
+                        pass
 
-                # Update status to ACTIVE
                 obj.status = "ACTIVE"
                 obj.finished = timezone.now()
                 obj.save()
                 accepted_count += 1
 
-                # Check if there are other items for the same request that are still NEW
                 other_new_requests = VolunteerRequestItem.objects.filter(
                     volunteer_request=obj.volunteer_request, status="NEW"
                 )
@@ -277,11 +239,9 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                     obj.volunteer_request.finished = timezone.now()
                     obj.volunteer_request.save()
             else:
-                # Person doesn't exist - set status to WAITING and send account creation email
                 obj.status = "WAITING"
                 obj.save()
 
-                # Send email with link to create user
                 try:
                     self._send_account_creation_email(request, obj)
                     waiting_count += 1
@@ -292,7 +252,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                         level="ERROR",
                     )
 
-        # Provide feedback about what happened
         messages = []
         if accepted_count > 0:
             messages.append(
@@ -314,7 +273,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
         for obj in queryset.filter(status="WAITING"):
             # Try to find existing person with matching email
             try:
-                from members.models.person import Person
 
                 person = Person.objects.get(email__iexact=obj.volunteer_request.email)
 
@@ -334,7 +292,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                     ]
                 )
 
-                # Create volunteer record
                 if obj.activity:
                     volunteer = Volunteer.objects.create(
                         person=person,
@@ -352,7 +309,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                         end_date=None,
                     )
 
-                # Try to set info fields if they exist
                 try:
                     volunteer.info_reference = obj.volunteer_request.info_reference
                     volunteer.info_whishes = obj.volunteer_request.info_whishes
@@ -360,7 +316,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                 except AttributeError:
                     pass
 
-                # Update status to ACTIVE
                 obj.status = "ACTIVE"
                 obj.finished = timezone.now()
                 obj.save()
