@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.test import RequestFactory, TestCase
 
+from members.admin.admin_actions import AdminActions
 from members.admin.volunteer_admin import (
     VolunteerAdmin,
     VolunteerAdminForm,
@@ -527,7 +528,8 @@ class TestVolunteerAdmin(TestCase):
         )
         request = self.make_post_request()
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Volunteer.objects.filter(
                 pk__in=[self.direct_volunteer.pk, self.shared_other_volunteer.pk]
@@ -549,7 +551,8 @@ class TestVolunteerAdmin(TestCase):
             },
         )
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Volunteer.objects.filter(pk=self.direct_volunteer.pk),
         )
@@ -580,7 +583,8 @@ class TestVolunteerAdmin(TestCase):
             },
         )
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Volunteer.objects.filter(pk=self.direct_volunteer.pk),
         )
@@ -631,7 +635,8 @@ class TestVolunteerAdmin(TestCase):
             },
         )
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Volunteer.objects.filter(pk=self.direct_volunteer.pk),
         )

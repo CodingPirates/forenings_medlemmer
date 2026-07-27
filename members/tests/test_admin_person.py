@@ -3,6 +3,7 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 
+from members.admin.admin_actions import AdminActions
 from members.admin.person_admin import PersonAdmin
 from members.models import AdminUserInformation, EmailItem, Person, Volunteer
 from members.tests.factories import ActivityFactory, DepartmentFactory, PersonFactory
@@ -68,7 +69,8 @@ class TestPersonAdmin(TestCase):
     def test_create_volunteer_action_requires_single_person(self):
         request = self.make_post_request(self.user)
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Person.objects.filter(pk__in=[self.person.pk, self.other_person.pk]),
         )
@@ -90,7 +92,8 @@ class TestPersonAdmin(TestCase):
             },
         )
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Person.objects.filter(pk=self.person.pk),
         )
@@ -126,7 +129,8 @@ class TestPersonAdmin(TestCase):
             },
         )
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Person.objects.filter(pk=self.person.pk),
         )
@@ -160,7 +164,8 @@ class TestPersonAdmin(TestCase):
             },
         )
 
-        response = self.admin.create_volunteer_action(
+        response = AdminActions.create_volunteer_action(
+            self.admin,
             request,
             Person.objects.filter(pk=self.person.pk),
         )

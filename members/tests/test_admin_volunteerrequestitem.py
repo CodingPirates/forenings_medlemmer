@@ -103,6 +103,8 @@ class TestVolunteerRequestItemAdmin(TestCase):
         view_permission = Permission.objects.get(codename="view_volunteerrequestitem")
         viewer.user_permissions.add(view_permission)
 
+        PersonFactory(user=viewer, address_invalid=True)
+
         viewer_admin_info = AdminUserInformation.objects.create(user=viewer)
         viewer_admin_info.departments.add(self.direct_department)
 
