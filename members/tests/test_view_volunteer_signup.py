@@ -2,6 +2,7 @@ from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from members.admin.volunteerrequestitem_admin import VolunteerRequestItemAdmin
 from members.forms import LoggedInVolunteerRequestForm
@@ -282,3 +283,23 @@ class TestVolunteerSignupView(TestCase):
         self.assertEqual(created_volunteer.person_id, self.person.pk)
         self.assertTrue(self.person.allow_contact_from_cpdk)
         self.assertTrue(self.person.allow_contact_from_other)
+
+    def test_recent_requests_show_status_from_volunteerrequestitem(self):
+        volunteer_request = VolunteerRequest.objects.create(
+            person=self.person,
+            allow_contact_from_cpdk=True,
+            allow_contact_from_other=False,
+            info_reference="LinkedIn",
+            info_whishes="Jeg vil gerne hjælpe.",
+        )
+        VolunteerRequestItem.objects.create(
+            volunteer_request=volunteer_request,
+            department=self.department,
+            status="CLOSED",
+            finished=timezone.now(),
+        )
+
+        response = self.client.get(reverse("volunteer_signup"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Afdeling er lukket")

@@ -534,7 +534,7 @@ class AdminActions(admin.ModelAdmin):
             context,
         )
 
-    create_volunteer_action.short_description = "Opret frivillig"
+    create_volunteer_action.short_description = "Anmod person om at blive frivillig"
     create_volunteer_action.allowed_permissions = ("view",)
 
     def export_participants_csv(self, request, queryset):

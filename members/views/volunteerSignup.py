@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.utils import timezone
 from django.urls import reverse
+from django.db.models import Prefetch
 import os
 import random
 from datetime import timedelta
@@ -489,11 +490,31 @@ def volunteerSignup(request):
                         created__gte=one_year_ago,
                     )
                     .prefetch_related(
-                        "volunteerrequestitem_set__department",
-                        "volunteerrequestitem_set__activity",
+                        Prefetch(
+                            "volunteerrequestitem_set",
+                            queryset=VolunteerRequestItem.objects.select_related(
+                                "department", "activity"
+                            ).order_by("created", "id"),
+                        )
                     )
                     .order_by("-created")
                 )
+
+                # Prepare per-request helpers for template rendering
+                for volunteer_request in overview_data["volunteer_requests"]:
+                    request_items = list(
+                        volunteer_request.volunteerrequestitem_set.all()
+                    )
+                    volunteer_request.request_items = request_items
+
+                    seen_statuses = set()
+                    unique_status_items = []
+                    for item in request_items:
+                        if item.status in seen_statuses:
+                            continue
+                        seen_statuses.add(item.status)
+                        unique_status_items.append(item)
+                    volunteer_request.unique_status_items = unique_status_items
 
         except (AttributeError, Person.DoesNotExist):
             pass

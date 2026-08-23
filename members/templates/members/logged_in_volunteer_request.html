@@ -7,13 +7,13 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header text-white" style="background-color: #00aeef;">
-                    <h3><i class="fas fa-hands-helping"></i> Din Familie's Frivillige Aktiviteter</h3>
+                    <h3><i class="fas fa-hands-helping"></i> Frivillig oversigt</h3>
                 </div>
                 <div class="card-body">
                     {% if overview_data.pending_volunteer_confirmations %}
                     <div class="row mb-4" id="pending-volunteer-confirmations">
                         <div class="col-md-12">
-                            <h5><i class="fas fa-user-clock text-warning"></i> Afventer din godkendelse</h5>
+                            <h5><i class="fas fa-user-clock text-warning"></i> Anmodninger der afventer din godkendelse</h5>
                             <div class="table-responsive">
                                 <table class="table table-sm table-striped">
                                     <thead>
@@ -149,7 +149,7 @@
                                                                 {% if person.allow_contact_from_cpdk %}checked{% endif %}
                                                             >
                                                             <label class="form-check-label small" for="id_allow_contact_from_cpdk_{{ person.id }}">
-                                                                Del med CPDK
+                                                                Må Coding Pirates Denmark kontakte mig
                                                             </label>
                                                         </div>
                                                         <div class="form-check m-0">
@@ -161,7 +161,7 @@
                                                                 {% if person.allow_contact_from_other %}checked{% endif %}
                                                             >
                                                             <label class="form-check-label small" for="id_allow_contact_from_other_{{ person.id }}">
-                                                                Del med andre
+                                                                Må andre afdelinger kontakte mig?
                                                             </label>
                                                         </div>
                                                         <button type="submit" class="btn btn-sm btn-outline-primary">Gem</button>
@@ -202,7 +202,7 @@
                                                 <td>{{ request.created|date:"Y-m-d" }}</td>
                                                 <td>
                                                     <small>
-                                                        {% for item in request.volunteerrequestitem_set.all %}
+                                                        {% for item in request.request_items %}
                                                             {% if item.activity %}
                                                                 {{ item.activity.name }}
                                                             {% else %}
@@ -213,11 +213,20 @@
                                                     </small>
                                                 </td>
                                                 <td>
-                                                    {% if request.finished %}
-                                                        <span class="badge bg-success">Afsluttet</span>
-                                                    {% else %}
-                                                        <span class="badge bg-warning">Under behandling</span>
-                                                    {% endif %}
+                                                    <small>
+                                                        {% for item in request.unique_status_items %}
+                                                            {% if item.status == "ACTIVE" %}
+                                                                <span class="badge bg-success">{{ item.get_status_display }}</span>
+                                                            {% elif item.status == "CLOSED" or item.status == "REJECTED" or item.status == "NOT_INTERESTED" %}
+                                                                <span class="badge bg-secondary">{{ item.get_status_display }}</span>
+                                                            {% elif item.status == "WAITING" %}
+                                                                <span class="badge bg-info">{{ item.get_status_display }}</span>
+                                                            {% else %}
+                                                                <span class="badge bg-warning">{{ item.get_status_display }}</span>
+                                                            {% endif %}
+                                                            {% if not forloop.last %}&nbsp;{% endif %}
+                                                        {% endfor %}
+                                                    </small>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -239,7 +248,7 @@
 
     <!-- New Request Form -->
     <div class="alert alert-secondary">
-        <h1>{% if show_overview %}Opret Ny {% endif %}Frivillig Anmodning</h1>
+        <h1>{% if show_overview %}Opret ny {% endif %}Frivillig anmodning</h1>
         <p>
             Som logget ind bruger kan du oprette en frivillig anmodning for en person i din familie.
         </p>

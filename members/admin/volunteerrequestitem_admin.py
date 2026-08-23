@@ -74,7 +74,6 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
 
     list_display = (
         "volunteer_request",
-        "get_new",
         "department",
         "get_activity",
         "created",
@@ -95,6 +94,10 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
         "get_volunteer_request_email",
         "get_volunteer_request_phone",
         "get_activity",
+        "created",
+        "finished",
+        "status",
+        "activity",
     )
 
     list_filter = (
