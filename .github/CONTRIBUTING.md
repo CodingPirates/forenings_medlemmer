@@ -2,6 +2,12 @@
 
 You are more than welcome to contribute to the system. This guide documents how to create a local development setup, the tools/frameworks used, and the steps required to get a pull request approved.
 
+## Deleting an existing Postgres database
+
+```
+docker compose down --volumes
+```
+
 ## Getting a local setup
 
 - Installing Docker: Download and install [Docker Compose][docker-guide]. If
@@ -15,8 +21,11 @@ You are more than welcome to contribute to the system. This guide documents how 
 
 - Run `docker compose up` to start your local system.  
 
-- Start by importing municipalities. This step is important, otherwise you might get issues creating users later
-  `docker compose run  web ./manage.py import_municipalities members/management/commands/municipalities.csv`
+- Start by importing municipalities. This step is important, otherwise you will get issues creating users later
+  ```
+  docker compose run  web ./manage.py import_municipalities members/management/commands/municipalities.csv
+  docker compose run web ./manage.py populate_municipality_regions
+  ```
 
 - Optional, run `docker compose run web ./manage.py get_live_data` to download public data and insert it into your local database.
 
