@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
+from django.forms.models import BaseInlineFormSet
 
 from members.models import (
     Activity,
@@ -9,9 +10,25 @@ from members.models import (
 )
 
 
+class ReadOnlyInlineFormSet(BaseInlineFormSet):
+    """Skip validation for unchanged read-only inline rows.
+
+    Address admin only shows related objects for context; they are not editable
+    from this screen. Marking existing inline forms as empty-permitted avoids
+    triggering model validation for unrelated child objects when the address
+    itself is saved.
+    """
+
+    def _construct_form(self, i, **kwargs):
+        form = super()._construct_form(i, **kwargs)
+        form.empty_permitted = True
+        return form
+
+
 class AddressUnionInline(admin.TabularInline):
     # Tabular Inline list of Unions using this address object. Read Only
     model = Union
+    formset = ReadOnlyInlineFormSet
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
@@ -32,6 +49,7 @@ class AddressUnionInline(admin.TabularInline):
 class AddressDepartmentInline(admin.TabularInline):
     # Tabular Inline list of Departments using this address object. Read Only
     model = Department
+    formset = ReadOnlyInlineFormSet
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
@@ -52,6 +70,7 @@ class AddressDepartmentInline(admin.TabularInline):
 class AddressActivityInline(admin.TabularInline):
     # Tabular Inline list of Activities using this address object. Read Only
     model = Activity
+    formset = ReadOnlyInlineFormSet
 
     class Media:
         css = {"all": ("members/css/custom_admin.css",)}  # Include extra css
