@@ -14,6 +14,7 @@ from forenings_medlemmer.settings import MINIMUM_SEASON_PRICE_IN_DKK
 from members.admin.admin_actions import AdminActions
 from members.forms.season_fee_update_form import SeasonFeeUpdateForm
 from members.models import (
+    Activity,
     ActivityParticipant,
     Address,
     AdminUserInformation,
@@ -132,7 +133,11 @@ class ActivityDepartmentListFilter(admin.SimpleListFilter):
 
 
 class ActivityAdmin(admin.ModelAdmin):
-    actions = [AdminActions.export_participants_csv, "update_season_fee_action"]
+    actions = [
+        AdminActions.export_participants_csv,
+        "update_season_fee_action",
+        "copy_activity_action",
+    ]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -141,6 +146,11 @@ class ActivityAdmin(admin.ModelAdmin):
                 "season_fee_update/",
                 self.admin_site.admin_view(self.season_fee_update_view),
                 name="season_fee_update",
+            ),
+            path(
+                "copy_activity/",
+                self.admin_site.admin_view(self.copy_activity_view),
+                name="copy_activity",
             ),
         ]
         return custom_urls + urls
@@ -157,6 +167,58 @@ class ActivityAdmin(admin.ModelAdmin):
         return actions
 
     # --- Custom admin actions ---
+
+    def copy_activity_action(self, request, queryset):
+        if not (
+            request.user.is_superuser or request.user.has_perm("members.add_activity")
+        ):
+            self.message_user(
+                request,
+                "Du har ikke rettigheder til at tilføje/kopier en aktivitet.",
+                level=messages.ERROR,
+            )
+            return
+        if queryset.count() > 1:
+            self.message_user(
+                request,
+                "Du må maks vælge én aktivitet af gangen til kopiering.",
+                level=messages.ERROR,
+            )
+            return
+        if not request.POST.get("confirmation"):
+            activity: Activity = queryset.get()
+            return redirect(f"copy_activity/?id={activity.pk}")
+        return
+
+    copy_activity_action.short_description = "Kopier én aktiviet"
+
+    def copy_activity_view(self, request):
+        if not (
+            request.user.is_superuser or request.user.has_perm("members.add_activity")
+        ):
+            self.message_user(
+                request,
+                "Du har ikke rettigheder til at tilføje/kopier en aktivitet.",
+                level=messages.ERROR,
+            )
+            return redirect("..")
+        copy_id = request.GET.get("id")
+        queryset = self.model.objects.filter(pk__in=[copy_id])
+        if request.method == "POST":
+            activity: Activity = queryset.get()
+            activity.pk = None
+            activity.save()
+            self.message_user(
+                request,
+                f"Aktivitet {activity} blev tilføjet. Du kan redigere den igen herunder.",
+                level=messages.SUCCESS,
+            )
+            return redirect(f"../{activity.pk}/change")
+        return render(
+            request,
+            "admin/copy_activity_form.html",
+            {"queryset": queryset},
+        )
 
     def update_season_fee_action(self, request, queryset):
         if not (

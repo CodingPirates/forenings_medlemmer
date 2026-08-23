@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+{{ form.media }}
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<script type="text/javascript" src="{% static "admin/js/core.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/js/vendor/jquery/jquery.min.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/js/jquery.init.js" %}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' 'members' %}">Members</a>
+&rsaquo; <a href="">Aktiviteter</a>
+</div>
+{% endblock %}
+
+{% block content_title %}<h1>Kopier aktivitet</h1>{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <form action="" method="post">
+    <div>
+      <fieldset class="module aligned">
+        <h2>Bekræft kopiering</h2>
+        <div class="description">
+          <p><b>Du er ved at kopiere aktiviteten:</b></p>
+            <ul>
+              {% for object in queryset.all %}
+                <li>{{ object }}</li>
+              {% endfor %}
+            </ul>
+        </div>
+        {% csrf_token %}
+        <div class="submit-row">
+          <input type="hidden" name="confirmation" value="{{ action }}"/>
+          <p class="deletelink-box"><a href="#" id="abort" style="background-color: rgb(199, 183, 0); color: black; float: right;" class="deletelink">Fortryd</a></p>
+          <p><input id="confirma_action" class="default" style="background-color: green; color: white; float: right;" type="submit" value="Kopier aktivitet"></p>
+        </div>
+      </fieldset>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+    document.getElementById("abort").addEventListener("click", () => {
+        history.back();
+    });
+</script>
+
+{% endblock %}
