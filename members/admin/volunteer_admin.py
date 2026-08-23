@@ -327,9 +327,7 @@ class VolunteerAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        if request.user.is_superuser or request.user.has_perm(
-            "members.view_all_departments"
-        ):
+        if request.user.is_superuser:
             return qs
         else:
             visibility = request.GET.get("visibility")
