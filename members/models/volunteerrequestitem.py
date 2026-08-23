@@ -41,6 +41,7 @@ class VolunteerRequestItem(models.Model):
         ("NOT_INTERESTED", "Person er ikke interesseret"),
         ("WAITING", "Venter på at personen oprettes i systemet"),
         ("ACTIVE", "Aktiv"),
+        ("CLOSED", "Afdeling er lukket"),
     )
 
     status = models.CharField(

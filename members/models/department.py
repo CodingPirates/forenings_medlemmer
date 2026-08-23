@@ -1,5 +1,6 @@
 from datetime import timedelta
 from django.db import models
+from django.core.exceptions import ValidationError
 import members.models.emailtemplate
 from members.models.activity import Activity
 from members.models.waitinglist import WaitingList
@@ -90,6 +91,25 @@ class Department(models.Model):
         )
         context = {"department": self, "volunteer_name": volunteer_name}
         new_vol_email.makeEmail(self, context)
+
+    def clean(self):
+        errors = {}
+
+        if self.pk and self.closed_dtm is not None:
+            has_conflicting_participants = Activity.objects.filter(
+                department=self,
+                end_date__gt=self.closed_dtm,
+                activityparticipant__isnull=False,
+            ).exists()
+
+            if has_conflicting_participants:
+                errors["closed_dtm"] = (
+                    "Afdelingen kan ikke lukkes, fordi der er deltagere på en aktivitet "
+                    "med slutdato efter afdelingens lukkedato."
+                )
+
+        if errors:
+            raise ValidationError(errors)
 
     @staticmethod
     def get_open_departments():
