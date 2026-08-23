@@ -1,0 +1,11 @@
+{% extends 'members/base.html' %}
+{% block content %}
+    <div class="bg-light border p-5 rounded-3">
+        <h1>Tak for din interesse!</h1>
+        <p>Hej {{ name }},</p>
+        <p>Vi har modtaget din anmodning om at blive frivillig hos Coding Pirates.</p>
+        <p>Vi kontakter dig hurtigst muligt med mere information om, hvordan du kan komme i gang som frivillig.</p>
+        <hr />
+        <a class="btn btn-primary" href="{% url 'entry_page' %}">Tilbage til forsiden →</a>
+    </div>
+{% endblock %}

@@ -1,4 +1,5 @@
 import codecs
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import admin, messages
@@ -9,6 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
@@ -18,6 +20,8 @@ from members.models import (
     AdminUserInformation,
     Person,
     Union,
+    Volunteer,
+    VolunteerRequestItem,
 )
 
 
@@ -208,6 +212,154 @@ class DepartmentAdmin(admin.ModelAdmin):
         "export_department_info_csv",
         "update_activity_mode_action",
     ]
+
+    @staticmethod
+    def _get_posted_closed_dtm(request):
+        raw_closed_dtm = request.POST.get("closed_dtm")
+        if not raw_closed_dtm:
+            return None
+
+        parsed = parse_date(raw_closed_dtm)
+        if parsed is not None:
+            return parsed
+
+        for fmt in ("%d-%m-%Y", "%d/%m-%Y"):
+            try:
+                return datetime.strptime(raw_closed_dtm, fmt).date()
+            except ValueError:
+                continue
+
+        return None
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        if (
+            request.method == "POST"
+            and object_id
+            and "_confirm_close_department" not in request.POST
+        ):
+            department = self.get_object(request, object_id)
+            if department is not None:
+                new_closed_dtm = self._get_posted_closed_dtm(request)
+
+                is_new_closing_date = (
+                    new_closed_dtm is not None
+                    and department.closed_dtm != new_closed_dtm
+                )
+                if is_new_closing_date:
+                    has_participant_conflict = Activity.objects.filter(
+                        department=department,
+                        end_date__gt=new_closed_dtm,
+                        activityparticipant__isnull=False,
+                    ).exists()
+                    if has_participant_conflict:
+                        return super().changeform_view(
+                            request,
+                            object_id,
+                            form_url,
+                            extra_context=extra_context,
+                        )
+
+                    open_volunteers = Volunteer.objects.filter(
+                        department=department,
+                        end_date__isnull=True,
+                    ).select_related("person", "activity")
+                    unfinished_request_items = VolunteerRequestItem.objects.filter(
+                        department=department,
+                        finished__isnull=True,
+                    ).select_related("volunteer_request__person", "activity")
+
+                    if open_volunteers.exists() or unfinished_request_items.exists():
+                        hidden_post_items = [
+                            (key, value)
+                            for key, values in request.POST.lists()
+                            for value in values
+                            if key
+                            not in {
+                                "csrfmiddlewaretoken",
+                                "_confirm_close_department",
+                            }
+                        ]
+                        context = {
+                            **self.admin_site.each_context(request),
+                            "opts": self.model._meta,
+                            "original": department,
+                            "department": department,
+                            "new_closed_dtm": new_closed_dtm,
+                            "open_volunteers": open_volunteers.order_by("person__name"),
+                            "unfinished_request_items": unfinished_request_items.order_by(
+                                "created"
+                            ),
+                            "hidden_post_items": hidden_post_items,
+                        }
+                        return render(
+                            request,
+                            "admin/confirm_department_close.html",
+                            context,
+                        )
+
+        return super().changeform_view(
+            request, object_id, form_url, extra_context=extra_context
+        )
+
+    def save_model(self, request, obj, form, change):
+        old_closed_dtm = None
+        if change and obj.pk:
+            old_closed_dtm = (
+                self.model.objects.filter(pk=obj.pk)
+                .values_list("closed_dtm", flat=True)
+                .first()
+            )
+
+        posted_closed_dtm = self._get_posted_closed_dtm(request)
+        if change and posted_closed_dtm is not None and obj.closed_dtm is None:
+            obj.closed_dtm = posted_closed_dtm
+
+        if change and obj.closed_dtm is not None:
+            has_participant_conflict = Activity.objects.filter(
+                department=obj,
+                end_date__gt=obj.closed_dtm,
+                activityparticipant__isnull=False,
+            ).exists()
+            if has_participant_conflict:
+                self.message_user(
+                    request,
+                    "Afdelingen kan ikke lukkes, fordi der er deltagere på en aktivitet med slutdato efter afdelingens lukkedato.",
+                    level=messages.ERROR,
+                )
+                return
+
+        super().save_model(request, obj, form, change)
+
+        is_new_closing_date = (
+            change and obj.closed_dtm is not None and old_closed_dtm != obj.closed_dtm
+        )
+        if is_new_closing_date:
+            updated_count = Volunteer.objects.filter(
+                department=obj,
+                end_date__isnull=True,
+            ).update(end_date=obj.closed_dtm)
+
+            closed_request_count = VolunteerRequestItem.objects.filter(
+                department=obj,
+                finished__isnull=True,
+            ).update(status="CLOSED", finished=timezone.now())
+
+            info_messages = []
+            if updated_count:
+                info_messages.append(
+                    f"Satte slutdato på {updated_count} frivillige til {obj.closed_dtm:%Y-%m-%d}."
+                )
+            if closed_request_count:
+                info_messages.append(
+                    f"Lukkede {closed_request_count} frivillig-anmodning(er) med status 'Afdeling er lukket'."
+                )
+
+            if info_messages:
+                self.message_user(
+                    request,
+                    " ".join(info_messages),
+                    level=messages.INFO,
+                )
 
     def get_urls(self):
         from django.urls import path

@@ -6,7 +6,7 @@ from django.contrib import messages
 
 from django.contrib.admin.widgets import AdminDateWidget
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -21,10 +21,13 @@ from members.models import (
     Activity,
     ActivityInvite,
     ActivityParticipant,
+    AdminUserInformation,
     Department,
     Person,
+    Volunteer,
     WaitingList,
 )
+from members.utils.volunteer_confirmation import send_volunteer_user_confirmation_email
 
 
 class AdminActions(admin.ModelAdmin):
@@ -97,6 +100,10 @@ class AdminActions(admin.ModelAdmin):
             persons = Person.objects.filter(
                 pk__in=queryset.values_list("person_id", flat=True)
             )
+        elif queryset.model is Volunteer:
+            persons = Person.objects.filter(
+                pk__in=queryset.values_list("person_id", flat=True)
+            )
         else:
             persons = queryset
 
@@ -109,6 +116,9 @@ class AdminActions(admin.ModelAdmin):
         context["persons"] = persons
         context["queryset"] = queryset
         context["emailtemplate"] = template
+        context["action_name"] = request.POST.get(
+            "action", "invite_many_to_activity_action"
+        )
 
         if request.method == "POST" and "activity" in request.POST:
             # Post request with data
@@ -363,6 +373,169 @@ class AdminActions(admin.ModelAdmin):
     invite_many_to_activity_action.short_description = (
         "Inviter valgte personer til en aktivitet"
     )
+
+    def create_volunteer_action(modelAdmin, request, queryset):
+        accessible_departments = AdminUserInformation.get_departments_admin(
+            request.user
+        ).order_by("name")
+
+        class CreateVolunteerForm(forms.Form):
+            department = forms.ModelChoiceField(
+                queryset=accessible_departments,
+                label="Afdeling",
+            )
+            activity = forms.ModelChoiceField(
+                queryset=Activity.objects.none(),
+                label="Aktivitet",
+                required=False,
+                empty_label="--- Ingen aktivitet ---",
+            )
+            start_date = forms.DateField(
+                label="Startdato",
+                widget=AdminDateWidget(),
+                initial=timezone.now().date,
+            )
+            end_date = forms.DateField(
+                label="Slutdato",
+                widget=AdminDateWidget(),
+                required=False,
+            )
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fields["activity"].label_from_instance = (
+                    lambda obj: "[{} - {}] {}".format(
+                        obj.start_date.strftime("%Y-%m-%d") if obj.start_date else "-",
+                        obj.end_date.strftime("%Y-%m-%d") if obj.end_date else "-",
+                        obj.name,
+                    )
+                )
+                department_id = None
+
+                if self.is_bound:
+                    department_id = self.data.get("department")
+                else:
+                    department_id = self.initial.get("department")
+
+                if department_id:
+                    try:
+                        department_id = int(department_id)
+                        self.fields["activity"].queryset = Activity.objects.filter(
+                            department_id=department_id,
+                            activitytype__id__in=["FORLØB", "ARRANGEMENT"],
+                        ).order_by("-start_date", "name")
+                    except (TypeError, ValueError):
+                        self.fields["activity"].queryset = Activity.objects.none()
+
+            def clean(self):
+                cleaned_data = super().clean()
+                department = cleaned_data.get("department")
+                activity = cleaned_data.get("activity")
+                start_date = cleaned_data.get("start_date")
+                end_date = cleaned_data.get("end_date")
+
+                if activity and department and activity.department_id != department.id:
+                    self.add_error(
+                        "activity",
+                        "Aktiviteten skal tilhøre den valgte afdeling.",
+                    )
+
+                if start_date and end_date and end_date < start_date:
+                    self.add_error(
+                        "end_date",
+                        "Slutdato må ikke være før startdato.",
+                    )
+
+                return cleaned_data
+
+        if queryset.count() != 1:
+            modelAdmin.message_user(
+                request,
+                "Du må kun vælge én post ad gangen for at oprette en frivillig.",
+                level="error",
+            )
+            return HttpResponseRedirect(request.get_full_path())
+
+        selected_obj = queryset.first()
+        person = getattr(selected_obj, "person", selected_obj)
+
+        if person is None:
+            modelAdmin.message_user(
+                request,
+                "Den valgte post kan ikke bruges til at oprette en frivillig.",
+                level="error",
+            )
+            return HttpResponseRedirect(request.get_full_path())
+
+        context = admin.site.each_context(request)
+        context["person"] = person
+        context["queryset"] = queryset
+        context["action_name"] = "create_volunteer_action"
+
+        initial = {}
+        if hasattr(selected_obj, "start_date"):
+            initial["start_date"] = selected_obj.start_date or timezone.now().date()
+        if hasattr(selected_obj, "end_date"):
+            initial["end_date"] = selected_obj.end_date
+
+        if request.method == "POST" and "department" in request.POST:
+            create_volunteer_form = CreateVolunteerForm(request.POST)
+            context["create_volunteer_form"] = create_volunteer_form
+
+            if request.POST.get("refresh_activity_choices") == "1":
+                return render(
+                    request,
+                    "admin/create_volunteer.html",
+                    context,
+                )
+
+            if create_volunteer_form.is_valid():
+                department = create_volunteer_form.cleaned_data["department"]
+                activity = create_volunteer_form.cleaned_data["activity"]
+
+                if Volunteer.objects.filter(
+                    person=person,
+                    department=department,
+                    activity=activity,
+                    removed__isnull=True,
+                ).exists():
+                    create_volunteer_form.add_error(
+                        None,
+                        "Personen er allerede registreret som aktiv frivillig med denne kombination af afdeling og aktivitet.",
+                    )
+                    return render(
+                        request,
+                        "admin/create_volunteer.html",
+                        context,
+                    )
+
+                volunteer = Volunteer.objects.create(
+                    person=person,
+                    department=department,
+                    activity=activity,
+                    start_date=create_volunteer_form.cleaned_data["start_date"],
+                    end_date=create_volunteer_form.cleaned_data["end_date"],
+                    user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+                )
+
+                send_volunteer_user_confirmation_email(volunteer)
+
+                modelAdmin.message_user(
+                    request,
+                    f"{person.name} er oprettet som frivillig og afventer brugerens godkendelse.",
+                )
+                return HttpResponseRedirect(request.get_full_path())
+        else:
+            context["create_volunteer_form"] = CreateVolunteerForm(initial=initial)
+
+        return render(
+            request,
+            "admin/create_volunteer.html",
+            context,
+        )
+
+    create_volunteer_action.short_description = "Anmod person om at blive frivillig"
+    create_volunteer_action.allowed_permissions = ("view",)
 
     def export_participants_csv(self, request, queryset):
         print(f"queryset:[{queryset}]")

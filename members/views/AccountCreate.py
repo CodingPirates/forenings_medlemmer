@@ -109,26 +109,26 @@ def AccountCreate(request):
                 )
                 parent.save()
 
-                # create child
-                child = Person.objects.create(
-                    membertype=Person.CHILD,
-                    name=signup.cleaned_data["child_name"],
-                    zipcode=signup.cleaned_data["zipcode"],
-                    city=signup.cleaned_data["city"],
-                    streetname=signup.cleaned_data["streetname"],
-                    housenumber=signup.cleaned_data["housenumber"],
-                    floor=signup.cleaned_data["floor"],
-                    door=signup.cleaned_data["door"],
-                    dawa_id=signup.cleaned_data["dawa_id"],
-                    placename=signup.cleaned_data["placename"],
-                    email=signup.cleaned_data["child_email"],
-                    phone=signup.cleaned_data["child_phone"],
-                    birthday=signup.cleaned_data["child_birthday"],
-                    gender=signup.cleaned_data["child_gender"],
-                    municipality=None,
-                    family=family,
-                )
-                child.save()
+                # create child only if child_name is provided
+                if signup.cleaned_data.get("child_name"):
+                    child = Person.objects.create(
+                        membertype=Person.CHILD,
+                        name=signup.cleaned_data["child_name"],
+                        zipcode=signup.cleaned_data["zipcode"],
+                        city=signup.cleaned_data["city"],
+                        streetname=signup.cleaned_data["streetname"],
+                        housenumber=signup.cleaned_data["housenumber"],
+                        floor=signup.cleaned_data["floor"],
+                        door=signup.cleaned_data["door"],
+                        dawa_id=signup.cleaned_data["dawa_id"],
+                        placename=signup.cleaned_data["placename"],
+                        email=signup.cleaned_data["child_email"],
+                        phone=signup.cleaned_data["child_phone"],
+                        birthday=signup.cleaned_data["child_birthday"],
+                        gender=signup.cleaned_data["child_gender"],
+                        family=family,
+                    )
+                    child.save()
 
                 # redirect to success
                 if next_url and next_url != "":

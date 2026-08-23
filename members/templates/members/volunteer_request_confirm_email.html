@@ -1,0 +1,26 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h1>Bekræft din email</h1>
+      <p>Vi har sendt en 6-cifret bekræftelseskode til <strong>{{ email }}</strong>. Indtast koden herunder for at bekræfte din email og fuldføre anmodningen om at blive frivillig.</p>
+
+      {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="verification_code" class="form-label">Bekræftelseskode</label>
+          <input type="text" name="verification_code" id="verification_code" class="form-control" maxlength="6" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Bekræft</button>
+      </form>
+
+      <hr />
+      <p>Hvis du ikke modtog koden, kan du sende formularen igen (tilmelde på ny) for at få en ny kode.</p>
+    </div>
+  </div>
+{% endblock %}
