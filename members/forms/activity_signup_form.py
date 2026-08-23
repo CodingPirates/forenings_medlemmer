@@ -79,7 +79,7 @@ class ActivitySignupForm(forms.Form):
                                     css_class="button-success",
                                 ),
                                 HTML(
-                                    "<a class='button-danger' href='{% url 'invitation_decline' invitation.decline_uuid invitation.id %}'>Afslå invitation</a>"
+                                    "{% if invitation %}<a class='button-danger' href='{% url 'invitation_decline' invitation.decline_uuid invitation.id %}'>Afslå invitation</a>{% endif %}"
                                 ),
                                 style="display: flex; align-items: center;",
                             ),
