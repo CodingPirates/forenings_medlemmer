@@ -178,7 +178,7 @@ class TestVolunteerSignupView(TestCase):
         response = self.client.get(reverse("volunteer_signup"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Afventer din godkendelse")
+        self.assertContains(response, "Anmodninger der afventer din godkendelse")
         self.assertContains(
             response,
             f'name="volunteer_id" value="{pending_volunteer.pk}"',
