@@ -2,7 +2,7 @@
 
 You are more than welcome to contribute to the system. This guide documents how to create a local development setup, the tools/frameworks used, and the steps required to get a pull request approved.
 
-## Deleting a previous database
+## Deleting an existing Postgres database
 
 ```
 docker compose down --volumes
