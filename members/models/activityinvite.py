@@ -60,6 +60,7 @@ class ActivityInvite(models.Model):
         default=uuid.uuid4,
         unique=True,
     )
+    decline_reason = models.TextField("Grund til afslag", blank=True, null=True)
 
     def clean(self):
         # Make sure we are not inviting outside activivty age limit
