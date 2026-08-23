@@ -18,5 +18,6 @@ class ActivivtyInviteDeclineForm(forms.Form):
         )
 
     decline_reason = forms.CharField(
-        label="Evt. yderligere information (ikke påkrævet, men gerne hvis relevant for os at vide)", required=False
+        label="Evt. yderligere information (ikke påkrævet, men gerne hvis relevant for os at vide)",
+        required=False,
     )
