@@ -58,10 +58,6 @@ class AddressAdminTest(StaticLiveServerTestCase):
             season_fee=MINIMUM_SEASON_PRICE_IN_DKK + 1,
         )
 
-        self.download_dir = os.path.join(os.getcwd(), "test-screens/csv")
-        if not os.path.exists(self.download_dir):
-            os.mkdir(self.download_dir)
-
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--disable-dev-shm-usage")
 
