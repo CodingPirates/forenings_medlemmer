@@ -180,6 +180,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         "participating",
         "activity_department_union_link",
         "activity_department_link",
+        "decline_reason",
     )
     list_filter = (
         ActivityInviteUnionListFilter,
@@ -240,6 +241,7 @@ class ActivityInviteAdmin(admin.ModelAdmin):
                     "rejected_at",
                     "price_in_dkk",
                     "price_note",
+                    "decline_reason",
                 ),
             },
         ),

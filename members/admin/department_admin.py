@@ -114,7 +114,6 @@ class UnionDepartmentFilter(admin.SimpleListFilter):
 
 
 class DepartmentAdmin(admin.ModelAdmin):
-
     inlines = [AdminUserDepartmentInline]
 
     autocomplete_fields = ("union", "address")
@@ -152,6 +151,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             "id",
             "department_link",
             "address",
+            "municipality",
             "department_email",
             "isVisible",
             "isOpening",
@@ -174,6 +174,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             "created",
             "closed_dtm",
             "has_waiting_list",
+            "address__municipality",
         ]
         if request.user.is_superuser or request.user.has_perm(
             "members.view_activity_mode"
@@ -541,6 +542,14 @@ class DepartmentAdmin(admin.ModelAdmin):
     department_link.short_description = "Afdeling"
     department_link.admin_order_field = "name"
 
+    def municipality(self, obj):
+        return (
+            obj.address.municipality if obj.address and obj.address.municipality else ""
+        )
+
+    municipality.short_description = "Kommune"
+    municipality.admin_order_field = "address__municipality"
+
     def waitinglist_count_link(self, item):
         admin_url = reverse("admin:members_waitinglist_changelist")
         link = f"""<a
@@ -557,7 +566,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         result_string = '"Forening"; "Afdeling"; "Email"; '
         result_string += '"Afdeling-Startdato"; "Afdeling-lukkedato"; '
         result_string += '"Kaptajn"; "Kaptajn-email"; "Kaptajn-telefon"; '
-        result_string += '"Adresse"; "Post#"; "By"; "Region"; '
+        result_string += '"Adresse"; "Post#"; "By"; "Region"; "Kommune"; '
         result_string += '"Dato-sidste-forløb"; "Dato-sidste-arrangement"; '
         result_string += (
             '"Dato-sidste-foreningsmedlemskab"; "Dato-sidste-støttemedlemskab"\n'
@@ -588,6 +597,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             info2 += d.address.zipcode + ";"
             info2 += d.address.city + ";"
             info2 += d.address.region + ";"
+            info2 += d.address.municipality + ";"
 
             info2 += GetLastDate(d, "FORLØB") + ";"
             info2 += GetLastDate(d, "ARRANGEMENT") + ";"

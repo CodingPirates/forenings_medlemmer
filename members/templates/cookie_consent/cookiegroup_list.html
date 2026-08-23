@@ -1,0 +1,40 @@
+{% extends "members/base.html" %}
+
+{% block content %}
+<h1>Cookies</h1>
+
+<p>
+    Medlemssystemet bruger cookies. En cookie er en lille tekstfil, der
+    gemmes på din enhed, når du besøger vores hjemmeside.
+</p>
+
+<p>
+    Vi bruger udelukkende cookies, der er strengt nødvendige for, at
+    medlemssystemet kan fungere – bl.a. til at holde dig logget ind, mens
+    du bruger systemet, og til at sikre, at det rent faktisk er dig, der
+    indsender formularer i systemet, og ikke en anden hjemmeside der
+    forsøger at udgive sig for at være dig.
+</p>
+
+<p>
+    Vi bruger ikke cookies til statistik, markedsføring eller sporing af
+    din adfærd.
+</p>
+
+<p>
+    Fordi vores cookies er strengt nødvendige for den tjeneste, du selv har
+    bedt om ved at logge ind og bruge medlemssystemet, kræver de efter
+    cookiebekendtgørelsen (bekendtgørelse om krav til information og
+    samtykke ved lagring af og adgang til oplysninger i slutbrugerens
+    terminaludstyr) ikke dit samtykke.
+</p>
+
+<p>
+    Nedenfor kan du se en fuldstændig oversigt over de cookies, vi bruger,
+    og hvad de bruges til.
+</p>
+
+{% for cookie_group in object_list %}
+    {% include "cookie_consent/_cookie_group.html" %}
+{% endfor %}
+{% endblock %}

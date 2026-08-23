@@ -1,0 +1,19 @@
+@use "definitions";
+@use "buttons";
+
+.cookie-group-form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.button-outline {
+    @extend .button;
+    background-color: transparent;
+    color: definitions.$dark-grey;
+    border: 1px solid definitions.$dark-grey;
+
+    &:hover {
+        background-color: definitions.$light-grey;
+        color: definitions.$dark-grey;
+    }
+}

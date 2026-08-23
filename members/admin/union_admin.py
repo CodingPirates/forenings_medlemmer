@@ -1,17 +1,18 @@
 import codecs
 import csv
+from io import StringIO
+
 from django.conf import settings
 from django.contrib import admin
+from django.db.models import Count
 from django.db.models.functions import Upper
 from django.http import HttpResponse
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
-from django.utils.html import escape
-from io import StringIO
-from members.models import Address, Person, Department, AdminUserInformation
 
-from django.db.models import Count
+from members.models import Address, AdminUserInformation, Department, Person
 
 
 def generate_union_csv(queryset):
@@ -24,6 +25,7 @@ def generate_union_csv(queryset):
         "Oprettelsdato",
         "Lukkedato",
         "CVR",
+        "Kommune",
         "formand-navn",
         "formand-email",
         "formand-tlf",
@@ -55,6 +57,11 @@ def generate_union_csv(queryset):
             union.founded_at.strftime("%Y-%m-%d") if union.founded_at else "",
             union.closed_at.strftime("%Y-%m-%d") if union.closed_at else "",
             union.cvr.strip() if union.cvr else "",
+            (
+                union.address.municipality
+                if union.address and union.address.municipality
+                else ""
+            ),
             *person_fields(getattr(union, "chairman", None)),
             *person_fields(getattr(union, "second_chair", None)),
             *person_fields(getattr(union, "cashier", None)),
@@ -141,6 +148,7 @@ class UnionAdmin(admin.ModelAdmin):
         "id",
         "union_link",
         "address",
+        "municipality",
         "email",
         "founded_at",
         "closed_at",
@@ -149,6 +157,7 @@ class UnionAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "address__region",
+        "address__municipality",
         "founded_at",
         "closed_at",
     )
@@ -370,7 +379,7 @@ class UnionAdmin(admin.ModelAdmin):
     def export_csv_union_info(self, request, queryset):
         result_string = generate_union_csv(queryset)
         response = HttpResponse(
-            f'{codecs.BOM_UTF8.decode("UTF-8")}{result_string}',
+            f"{codecs.BOM_UTF8.decode('UTF-8')}{result_string}",
             content_type="text/csv; charset=utf-8",
         )
         response["Content-Disposition"] = 'attachment; filename="foreningsoversigt.csv"'
@@ -384,3 +393,11 @@ class UnionAdmin(admin.ModelAdmin):
     has_cvr_number.boolean = True
     has_cvr_number.short_description = "CVR"
     has_cvr_number.admin_order_field = "cvr"
+
+    def municipality(self, obj):
+        return (
+            obj.address.municipality if obj.address and obj.address.municipality else ""
+        )
+
+    municipality.short_description = "Kommune"
+    municipality.admin_order_field = "address__municipality"
