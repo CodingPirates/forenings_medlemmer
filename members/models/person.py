@@ -275,22 +275,22 @@ class Person(models.Model):
         # and guardians, payments for any family member also prevent anonymization.
         # Children are evaluated individually, so a sibling's payment does not keep
         # an otherwise inactive child in the system.
-        has_recent_payment = Payment.objects.filter(
+        if Payment.objects.filter(
             person=self, added_at__gte=five_full_fiscal_years
-        ).exists()
-        if self.membertype in (self.PARENT, self.GUARDIAN):
-            has_recent_payment = (
-                has_recent_payment
-                or Payment.objects.filter(
-                    family=self.family, added_at__gte=five_full_fiscal_years
-                ).exists()
-            )
-
-        if has_recent_payment:
+        ).exists():
             return (
                 False,
-                "Der eksisterer betaling indenfor seneste 5 fulde regnskabsår.",
+                "Der eksisterer betaling for personen indenfor seneste 5 fulde regnskabsår.",
             )
+
+        if self.membertype in (self.PARENT, self.GUARDIAN):
+            if Payment.objects.filter(
+                family=self.family, added_at__gte=five_full_fiscal_years
+            ).exists():
+                return (
+                    False,
+                    "Der eksisterer betaling indenfor seneste 5 fulde regnskabsår for familien.",
+                )
 
         # otherwise, the person can be anonymized
         return True, ""
