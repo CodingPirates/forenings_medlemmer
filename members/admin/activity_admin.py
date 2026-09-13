@@ -166,6 +166,13 @@ class ActivityAdmin(admin.ModelAdmin):
                 del actions["update_season_fee_action"]
         return actions
 
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        extra_context["show_save_as_new"] = True
+        if request.GET.get("from_copy_activity"):
+            extra_context["show_save_as_new"] = False
+        return super().changeform_view(request, object_id, form_url, extra_context)
+
     # --- Custom admin actions ---
 
     def copy_activity_action(self, request, queryset):
@@ -214,7 +221,7 @@ class ActivityAdmin(admin.ModelAdmin):
                 f"Aktivitet {activity} blev tilføjet. Du kan redigere den igen herunder.",
                 level=messages.SUCCESS,
             )
-            return redirect(f"../{activity.pk}/change")
+            return redirect(f"../{activity.pk}/change/?from_copy_activity=1")
         return render(
             request,
             "admin/copy_activity_form.html",
@@ -395,7 +402,6 @@ class ActivityAdmin(admin.ModelAdmin):
         "address",
         "department",
     )
-    save_as = True
 
     ordering = ("-start_date", "department__name", "name")
 
