@@ -207,6 +207,7 @@ class ActivityAdmin(admin.ModelAdmin):
         if request.method == "POST":
             activity: Activity = queryset.get()
             activity.pk = None
+            activity.name = f"Kopi af {activity.name}"
             activity.save()
             self.message_user(
                 request,
