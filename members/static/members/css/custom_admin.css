@@ -27,3 +27,15 @@
     max-width: 100%;
 }
 
+th.column-get_payment_amount,
+td.field-get_payment_amount {
+    text-align: right;
+    white-space: nowrap;
+}
+
+td.field-get_payment_amount .payment-amount {
+    display: block;
+    width: 100%;
+    text-align: right;
+}
+

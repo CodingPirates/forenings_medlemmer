@@ -7,6 +7,10 @@ import members.models.quickpaytransaction
 
 
 class Payment(models.Model):
+    class Meta:
+        verbose_name = "Betaling"
+        verbose_name_plural = "Betalinger"
+
     CASH = "CA"
     BANKTRANSFER = "BA"
     CREDITCARD = "CC"

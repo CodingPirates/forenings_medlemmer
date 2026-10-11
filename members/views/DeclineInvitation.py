@@ -31,6 +31,7 @@ def DeclineInvitation(request, decline_uuid, invitation_id):
                     f"Invitationen til  {activity_invite.person} for '{activity_invite.activity}' er allerede afvist."
                 )
             else:
+                activity_invite.decline_reason = form.cleaned_data["decline_reason"]
                 activity_invite.rejected_at = timezone.now()
                 activity_invite.save()
             return HttpResponseRedirect(reverse("activities"))
