@@ -193,9 +193,12 @@ class ActivityParticipant(models.Model):
         return missing_payments
 
     def save(self, *args, **kwargs):
-        """On creation if seasonal - clear all waiting lists"""
+        """On creation, clear waiting lists for configured seasonal activities."""
         if not self.id:
-            if self.activity.is_season():
+            if (
+                self.activity.is_season()
+                and self.activity.remove_from_waiting_lists_on_signup
+            ):
                 # remove from all waiting lists
                 members.models.waitinglist.WaitingList.objects.filter(
                     person=self.person

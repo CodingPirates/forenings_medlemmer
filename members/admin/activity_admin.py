@@ -632,4 +632,14 @@ class ActivityAdmin(admin.ModelAdmin):
                 "fields": ("emails",),
             },
         ),
+        (
+            "Yderlige informationer",
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "remove_from_waiting_list_on_invite",
+                    "remove_from_waiting_lists_on_signup",
+                ),
+            },
+        ),
     ]
