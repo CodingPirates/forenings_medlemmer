@@ -15,5 +15,7 @@ class Command(BaseCommand):
             address.get_ext_address_data()
 
         self.stdout.write(
-            self.style.SUCCESS("Successfully updated address information for all addresses")
+            self.style.SUCCESS(
+                "Successfully updated address information for all addresses"
+            )
         )

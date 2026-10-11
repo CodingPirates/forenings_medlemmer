@@ -53,7 +53,9 @@ class Address(models.Model):
         "Overskriv eksterne adresse data", default=False, help_text=help_temp
     )
     ext_address_id = models.CharField("Eksternt adresse id", max_length=200, blank=True)
-    ext_address_accuracy = models.CharField("Ekstern adresse nøjagtighed", max_length=5, blank=True)
+    ext_address_accuracy = models.CharField(
+        "Ekstern adresse nøjagtighed", max_length=5, blank=True
+    )
     created_at = models.DateTimeField(
         "Oprettet", auto_now=False, auto_now_add=True, auto_created=True
     )
@@ -77,10 +79,7 @@ class Address(models.Model):
             wash_resp = requests.request(
                 "GET",
                 f"{settings.ADRESSEVAELGER_BASE_URL}/vask/",
-                params={
-                    "token": settings.ADRESSEVAELGER_TOKEN,
-                    "adresse": str(self)
-                },
+                params={"token": settings.ADRESSEVAELGER_TOKEN, "adresse": str(self)},
             )
             _accuracy = wash_resp.json()["vaskestatus"]["kode"]
             _status = wash_resp.json()["vaskeresultat"]["status"]
@@ -89,7 +88,9 @@ class Address(models.Model):
             if wash_resp.status_code != 200 or _accuracy < 900 or _status != 3:
                 return False
             else:
-                self.ext_address_id = wash_resp.json()["vaskeresultat"]["adresse_id_lokalid"]
+                self.ext_address_id = wash_resp.json()["vaskeresultat"][
+                    "adresse_id_lokalid"
+                ]
                 self.ext_address_accuracy = _accuracy
 
         data = get_address_by_id(self.ext_address_id)
