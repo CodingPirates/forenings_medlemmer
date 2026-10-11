@@ -90,7 +90,7 @@ class Command(BaseCommand):
                         "id"
                     ]
 
-                    print(f"  Checking for existing address w Dawa [{_dawa_id}]")
+                    print(f"  Checking for existing address w Dawa [{_ext_address_id}]")
 
                     address_check = (
                         Address.objects.filter(
