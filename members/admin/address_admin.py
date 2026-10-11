@@ -143,7 +143,7 @@ class AddressAdmin(admin.ModelAdmin):
         "city",
         "region",
         "descriptiontext",
-        "dawa_id",
+        "ext_address_id",
     )
 
     list_display = (
@@ -157,8 +157,8 @@ class AddressAdmin(admin.ModelAdmin):
         "city",
         "region",
         "descriptiontext",
-        "dawa_id",
-        "dawa_category",
+        "ext_address_id",
+        "ext_address_accuracy",
     )
 
     class Media:
@@ -200,17 +200,17 @@ class AddressAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Dawa info",
+            "External address info",
             {
                 "description": """
-                    <p>ID, kategori, længde- og breddegrad fra DAWA.</p>
+                    <p>ID, nøjagtighed, længde- og breddegrad fra Klimadatastyrelsen.</p>
                     <p>Du kan vælge at sætte egne værdier for længde- og breddegrad.</p>""",
                 "fields": (
                     (
-                        "dawa_id",
-                        "dawa_category",
+                        "ext_address_id",
+                        "ext_address_accuracy",
                     ),
-                    "dawa_overwrite",
+                    "ext_address_overwrite",
                     (
                         "longitude",
                         "latitude",

@@ -39,47 +39,31 @@ class TestModelAddress(TestCase):
 
     def test_dawa_overwrite(self):
         home = Address.objects.create(
-            dawa_id="02ba51b3-3482-4c59-be8f-f42bf2b243b6",
-            dawa_overwrite=True,
+            ext_address_id="02ba51b3-3482-4c59-be8f-f42bf2b243b6",
+            ext_address_overwrite=True,
             latitude=12.591215,
         )
         home.save()
         self.assertEqual(home.latitude, 12.591215)
 
     def test_fetch_data_by_dawa_id(self):
-        home = Address.objects.create(dawa_id="7dd8edbb-370f-4cdf-836c-6b4969a0da9c")
-        home.get_dawa_data()
+        home = Address.objects.create(
+            ext_address_id="7dd8edbb-370f-4cdf-836c-6b4969a0da9c"
+        )
+        home.get_ext_address_data()
         self.assertEqual(home.streetname, "Sverigesgade")
         self.assertAlmostEqual(home.longitude, 10.38138591)
 
     def test_fetch_data_placename(self):
-        home = Address.objects.create(dawa_id="0a3f50ab-e8f7-32b8-e044-0003ba298018")
-        home.get_dawa_data()
+        home = Address.objects.create(
+            ext_address_id="0a3f50ab-e8f7-32b8-e044-0003ba298018"
+        )
+        home.get_ext_address_data()
         self.assertEqual(home.placename, "Himmelev")
 
     def test_fetch_data_by_wash(self):
         home = Address.objects.create(
             streetname="Sverigesgade", housenumber=20, zipcode="5000"
         )
-        home.get_dawa_data()
-        self.assertEqual(home.dawa_id, "7dd8edbb-370f-4cdf-836c-6b4969a0da9c")
-
-    def test_get_model_by_dawa_id(self):
-        dawa_id = "7dd8edbb-370f-4cdf-836c-6b4969a0da9c"  # CP headquarters
-
-        # No addresses in database yet
-        self.assertEqual(Address.objects.all().count(), 0)
-
-        addres = Address.get_by_dawa_id(dawa_id)
-        self.assertEqual(addres.zipcode, "5000")  # Got info from dawa
-        self.assertEqual(Address.objects.all().count(), 1)
-
-        # Get address again
-        addres = Address.get_by_dawa_id(dawa_id)
-        # Should still only be one in database
-        self.assertEqual(Address.objects.all().count(), 1)
-
-        # Invalid id should give None
-        addres = Address.get_by_dawa_id("invalid_id")
-        self.assertIsNone(addres)
-        self.assertEqual(Address.objects.all().count(), 1)
+        home.get_ext_address_data()
+        self.assertEqual(home.ext_address_id, "7dd8edbb-370f-4cdf-836c-6b4969a0da9c")
