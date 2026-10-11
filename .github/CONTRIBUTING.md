@@ -23,7 +23,7 @@ docker compose down --volumes
 
 - Start by importing municipalities. This step is important, otherwise you will get issues creating users later
   ```
-  docker compose run  web ./manage.py import_municipalities members/management/commands/municipalities.csv
+  docker compose run  web ./manage.py import_municipalities members/management/commands/assets/municipalities.csv
   docker compose run web ./manage.py populate_municipality_regions
   ```
 
