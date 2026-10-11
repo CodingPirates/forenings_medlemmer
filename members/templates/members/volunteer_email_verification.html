@@ -4,10 +4,10 @@
     <div class="alert alert-info">
         <h1>Tjek din email</h1>
         <p>
-            Hvis det er muligt at fortsætte med emailadressen <strong>{{ email }}</strong>, har vi sendt en email med næste trin.
+            Vi har sendt en email med en 6-cifret verifikationskode til <strong>{{ email }}</strong>.
         </p>
         <p>
-            Hvis du har modtaget en 6-cifret verifikationskode, kan du indtaste den herunder for at fortsætte din frivillig-anmodning.
+            Indtast koden herunder for at fortsætte din frivillig-anmodning. Hvis du allerede har en konto, bliver du logget ind og kan se din anmodning.
         </p>
         {% if error %}
             <div class="alert alert-danger mt-3">
@@ -33,7 +33,7 @@
                         required
                         autocomplete="one-time-code"
                     >
-                    <div class="form-text">Indtast koden hvis din email indeholdt en verifikationskode</div>
+                    <div class="form-text">Indtast koden fra din email</div>
                 </div>
                 <button type="submit" class="btn btn-primary">Fortsæt</button>
                 <a href="{% url 'volunteer_signup' %}" class="btn btn-secondary">Start forfra</a>

@@ -1,0 +1,17 @@
+{% extends 'members/base.html' %}
+{% block content %}
+    <div class="alert alert-danger">
+        <h1>Annullér anmodning?</h1>
+        <p>
+            Du er ved at annullere anmodningen om at blive frivillig for
+            <strong>{{ person.name }}</strong> hos
+            <strong>{% if item.activity %}{{ item.activity.name }} ({{ item.department.name }}){% else %}{{ item.department.name }}{% endif %}</strong>.
+        </p>
+        <p>Afdelingen vil ikke længere behandle anmodningen. Handlingen kan ikke fortrydes, men du kan oprette en ny anmodning senere.</p>
+        <form method="post" class="d-flex gap-2 flex-wrap">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Ja, annullér anmodningen</button>
+            <a class="btn btn-secondary" href="{% url 'volunteer_signup' %}">Nej, behold anmodningen</a>
+        </form>
+    </div>
+{% endblock %}

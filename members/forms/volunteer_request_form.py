@@ -1,4 +1,6 @@
 from django import forms
+from django.utils.safestring import mark_safe
+
 from crispy_forms.layout import Fieldset, Div, Field
 
 from .base_volunteer_request_form import BaseVolunteerRequestForm
@@ -16,6 +18,7 @@ class VolunteerRequestForm(BaseVolunteerRequestForm):
             "zip",
             "allow_contact_from_cpdk",
             "allow_contact_from_other",
+            "consent",
             "info_reference",
             "info_whishes",
         ]
@@ -26,9 +29,21 @@ class VolunteerRequestForm(BaseVolunteerRequestForm):
     phone = forms.CharField(label="Telefon", required=True, max_length=50)
     age = forms.IntegerField(label="Alder", required=False)
     zip = forms.CharField(label="Postnummer", required=False, max_length=4)
+    consent = forms.BooleanField(
+        required=True,
+        error_messages={
+            "required": "Du skal give samtykke til opbevaring af dine oplysninger for at fortsætte."
+        },
+    )
 
     def __init__(self, *args, **kwargs):
+        consent_url = kwargs.pop("consent_url", "/consent/")
         super(VolunteerRequestForm, self).__init__(*args, **kwargs)
+        self.fields["consent"].label = mark_safe(
+            "Jeg giver samtykke til, at Coding Pirates opbevarer og behandler mine oplysninger "
+            f'i henhold til <a href="{consent_url}" target="_blank" '
+            'rel="noopener noreferrer">privatlivspolitikken</a>.'
+        )
 
         # Make basic personal fields required
         for field_name in ["name", "email", "phone"]:
@@ -51,6 +66,10 @@ class VolunteerRequestForm(BaseVolunteerRequestForm):
                 Div(Field("age"), css_class="col-md-4"),
                 Div(Field("zip"), css_class="col-md-4"),
                 css_class="row",
+            ),
+            Div(
+                Field("consent"),
+                css_class="col-md-12",
             ),
             Div(
                 Field("allow_contact_from_cpdk"),

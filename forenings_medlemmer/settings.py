@@ -146,6 +146,31 @@ if env.bool("USE_SQLITE", False):
 else:
     DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "auth": {"format": "%(asctime)s %(levelname)s %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "auth_console": {"class": "logging.StreamHandler", "formatter": "auth"},
+    },
+    "loggers": {
+        "members.auth": {
+            "handlers": ["auth_console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    }
+}
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",

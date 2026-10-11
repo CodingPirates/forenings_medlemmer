@@ -43,14 +43,14 @@ class Volunteer(models.Model):
     )
 
     info_reference = models.TextField(
-        "Reference",
-        help_text="Hvor har du hørt om Coding Pirates (SoMe, Facebook, Instagram, LinkedIn, en ven, en kollega, etc)?",
+        "Hvor har du hørt om Coding Pirates?",
+        help_text="SoMe, Facebook, Instagram, LinkedIn, en ven, en kollega, etc",
         max_length=200,
         blank=True,
         null=True,
     )
     info_whishes = models.TextField(
-        "Ønsker",
+        "Ønsker til frivilligt arbejde",
         help_text="Hvilke ønsker har du til at være frivillig hos Coding Pirates?",
         max_length=1024,
         blank=True,

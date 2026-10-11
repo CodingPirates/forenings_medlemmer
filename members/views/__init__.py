@@ -22,6 +22,9 @@ from members.views.departmentView import departmentView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.userCreated import userCreated
 from members.views.volunteerSignup import volunteerSignup
+from members.views.volunteerRequestCancel import volunteerRequestCancel
 from members.views.ConsentPopup import consent_popup
 from members.views.ConsentPreview import consent_preview
 from members.views.ConsentPage import consent_page
+
+import members.utils.auth_logging  # noqa: F401  (registers login signal handlers)

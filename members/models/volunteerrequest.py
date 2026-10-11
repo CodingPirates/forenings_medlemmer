@@ -20,12 +20,12 @@ class VolunteerRequest(models.Model):
     age = models.IntegerField("Alder", blank=True, null=True)
     zip = models.CharField("Postnummer", max_length=4, blank=True, null=True)
     info_reference = models.TextField(
-        "Reference",
+        "Hvor har du hørt om Coding Pirates?",
         max_length=200,
-        help_text="Hvor har du hørt om Coding Pirates (SoMe, Facebook, Instagram, LinkedIn, en ven, en kollega, etc) ?",
+        help_text="SoMe, Facebook, Instagram, LinkedIn, en ven, en kollega, etc",
     )
     info_whishes = models.TextField(
-        "Ønsker",
+        "Ønsker til frivilligt arbejde",
         max_length=1024,
         help_text="Hvilke ønsker har du til at være frivillig hos Coding Pirates ?",
     )
@@ -34,6 +34,9 @@ class VolunteerRequest(models.Model):
     )
     allow_contact_from_other = models.BooleanField(
         "Må andre afdelinger kontakte mig?", default=False
+    )
+    consent = models.BooleanField(
+        "Samtykke til opbevaring af oplysninger", default=False
     )
     token = models.UUIDField(default=uuid.uuid4, null=False)
     created = models.DateTimeField(

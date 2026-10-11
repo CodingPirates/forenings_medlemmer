@@ -28,6 +28,7 @@ from members.views import (
     departmentView,
     paymentGatewayErrorView,
     userCreated,
+    volunteerRequestCancel,
     volunteerSignup,
 )
 from members.views.SlackInviteApproval import slack_invite_approval
@@ -90,6 +91,11 @@ urlpatterns = [
     re_path(r"^membership/$", Membership, name="membership"),
     re_path(r"^support_membership/$", SupportMembership, name="support_membership"),
     re_path(r"^volunteer$", volunteerSignup, name="volunteer_signup"),
+    re_path(
+        r"^volunteer/request/(?P<item_id>\d+)/cancel/$",
+        volunteerRequestCancel,
+        name="volunteer_request_cancel",
+    ),
     re_path(
         r"^volunteer_account_created/$",
         VolunteerAccountCreated,

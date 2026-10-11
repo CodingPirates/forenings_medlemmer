@@ -186,7 +186,7 @@
                             <h5><i class="fas fa-clock text-info"></i> Seneste Anmodninger</h5>
                             {% if overview_data.volunteer_requests %}
                                 <div class="table-responsive">
-                                    <table class="table table-sm table-striped">
+                                    <table class="table table-sm table-bordered">
                                         <thead>
                                             <tr>
                                                 <th>Person</th>
@@ -197,38 +197,49 @@
                                         </thead>
                                         <tbody>
                                             {% for request in overview_data.volunteer_requests %}
+                                            {% for item in request.request_items %}
                                             <tr>
-                                                <td><strong>{{ request.person.name }}</strong></td>
-                                                <td>{{ request.created|date:"Y-m-d" }}</td>
+                                                {% if forloop.first %}
+                                                    <td rowspan="{{ request.request_items|length }}"><strong>{{ request.person.name }}</strong></td>
+                                                    <td rowspan="{{ request.request_items|length }}">{{ request.created|date:"Y-m-d" }}</td>
+                                                {% endif %}
                                                 <td>
                                                     <small>
-                                                        {% for item in request.request_items %}
-                                                            {% if item.activity %}
-                                                                {{ item.activity.name }}
-                                                            {% else %}
-                                                                {{ item.department.name }}
-                                                            {% endif %}
-                                                            {% if not forloop.last %}, {% endif %}
-                                                        {% endfor %}
+                                                        {% if item.activity %}
+                                                            <span class="badge bg-light text-dark border">Aktivitet</span>
+                                                            {{ item.activity.name }}
+                                                            <span class="text-muted">(afdeling: {{ item.department.name }})</span>
+                                                        {% else %}
+                                                            <span class="badge bg-light text-dark border">Afdeling</span>
+                                                            {{ item.department.name }}
+                                                        {% endif %}
                                                     </small>
                                                 </td>
                                                 <td>
                                                     <small>
-                                                        {% for item in request.unique_status_items %}
-                                                            {% if item.status == "ACTIVE" %}
-                                                                <span class="badge bg-success">{{ item.get_status_display }}</span>
-                                                            {% elif item.status == "CLOSED" or item.status == "REJECTED" or item.status == "NOT_INTERESTED" %}
-                                                                <span class="badge bg-secondary">{{ item.get_status_display }}</span>
-                                                            {% elif item.status == "WAITING" %}
-                                                                <span class="badge bg-info">{{ item.get_status_display }}</span>
-                                                            {% else %}
-                                                                <span class="badge bg-warning">{{ item.get_status_display }}</span>
-                                                            {% endif %}
-                                                            {% if not forloop.last %}&nbsp;{% endif %}
-                                                        {% endfor %}
+                                                        {% if item.status == "ACTIVE" %}
+                                                            <span class="badge bg-success">{{ item.get_status_display }}</span>
+                                                        {% elif item.status == "CLOSED" or item.status == "REJECTED" or item.status == "NOT_INTERESTED" %}
+                                                            <span class="badge bg-secondary">{{ item.get_status_display }}</span>
+                                                        {% elif item.status == "WAITING" %}
+                                                            <span class="badge bg-info">{{ item.get_status_display }}</span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning">{{ item.get_status_display }}</span>
+                                                        {% endif %}
+                                                        {% if item.status == "NEW" %}
+                                                            <a href="{% url 'volunteer_request_cancel' item.id %}" class="btn btn-sm btn-outline-danger ms-2 py-0">Annullér</a>
+                                                        {% endif %}
                                                     </small>
                                                 </td>
                                             </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td><strong>{{ request.person.name }}</strong></td>
+                                                <td>{{ request.created|date:"Y-m-d" }}</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                            {% endfor %}
                                             {% endfor %}
                                         </tbody>
                                     </table>

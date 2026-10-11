@@ -1,10 +1,13 @@
+from django.contrib.auth import login
 from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.utils import timezone
 from django.urls import reverse
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
+import hashlib
 import os
 import random
+from django.core.cache import cache
 from datetime import timedelta
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
@@ -19,9 +22,90 @@ from members.models.volunteerrequest import VolunteerRequest
 from members.models.volunteerrequestitem import VolunteerRequestItem
 from members.models.volunteer import Volunteer
 from members.utils.user import user_to_person
+from members.utils.auth_logging import Event, log_auth_event
 from members.utils.admin_log import log_person_contact_preference_change
 from members.utils.volunteer_confirmation import log_volunteer_user_confirmation_change
 from members.models.emailtemplate import EmailTemplate
+
+
+MAX_VERIFICATION_ATTEMPTS = 5
+VERIFICATION_LOCKOUT_MINUTES = 15
+VERIFICATION_CODE_VALID_MINUTES = 30
+VERIFICATION_EXPIRED_MESSAGE = (
+    f"Koden er udløbet (gyldig i {VERIFICATION_CODE_VALID_MINUTES} minutter). "
+    "Udfyld formularen igen for at få en ny kode."
+)
+VERIFICATION_LOCKED_MESSAGE = (
+    f"For mange forkerte forsøg. Vent {VERIFICATION_LOCKOUT_MINUTES} minutter, "
+    "inden du udfylder formularen igen for at få en ny kode."
+)
+
+
+def _verification_cache_key(kind, email):
+    digest = hashlib.sha256(email.strip().lower().encode()).hexdigest()
+    return f"volunteer_verification_{kind}:{digest}"
+
+
+def clear_verification_session(session):
+    for key in [
+        "volunteer_verification_code",
+        "volunteer_verification_code_sent_at",
+        "volunteer_form_data",
+        "volunteer_form_departments",
+        "volunteer_form_activities",
+    ]:
+        session.pop(key, None)
+
+
+def verification_code_expired(sent_at):
+    if sent_at is None:
+        return True
+    age = timezone.now().timestamp() - sent_at
+    return age > VERIFICATION_CODE_VALID_MINUTES * 60
+
+
+def verification_locked(email):
+    return bool(email) and bool(cache.get(_verification_cache_key("lock", email)))
+
+
+def register_verification_failure(email):
+    """Count a wrong code for this email; returns True when the email is now locked"""
+    timeout = VERIFICATION_LOCKOUT_MINUTES * 60
+    fail_key = _verification_cache_key("fail", email)
+    cache.add(fail_key, 0, timeout)
+    try:
+        failures = cache.incr(fail_key)
+    except ValueError:
+        failures = 1
+        cache.set(fail_key, failures, timeout)
+    if failures >= MAX_VERIFICATION_ATTEMPTS:
+        cache.set(_verification_cache_key("lock", email), True, timeout)
+        cache.delete(fail_key)
+        return True
+    return False
+
+
+def clear_verification_failures(email):
+    cache.delete(_verification_cache_key("fail", email))
+
+
+def find_loginable_person(email):
+    """Person with an active account whose username or account email is the given email"""
+    if not email:
+        return None
+    candidates = list(
+        Person.objects.select_related("user")
+        .filter(
+            Q(user__username__iexact=email) | Q(user__email__iexact=email),
+            user__is_active=True,
+            deleted_dtm__isnull=True,
+        )
+        .distinct()[:2]
+    )
+    # Ambiguous emails never match
+    if len(candidates) != 1:
+        return None
+    return candidates[0]
 
 
 def ensure_volunteer_request_template():
@@ -558,13 +642,36 @@ def volunteerSignup(request):
                 # Verification step
                 entered_code = request.POST.get("verification_code", "").strip()
                 session_code = request.session.get("volunteer_verification_code")
+                code_expired = bool(session_code) and verification_code_expired(
+                    request.session.get("volunteer_verification_code_sent_at")
+                )
+                if code_expired:
+                    session_code = None
                 form_data = request.session.get("volunteer_form_data")
                 departments_ids = request.session.get("volunteer_form_departments", [])
                 activities_ids = request.session.get("volunteer_form_activities", [])
 
+                lockout_email = (form_data or {}).get("email", "")
+                if lockout_email and verification_locked(lockout_email):
+                    log_auth_event(
+                        request,
+                        Event.CODE_REJECTED_LOCKED,
+                        lockout_email,
+                        "email-code",
+                    )
+                    clear_verification_session(request.session)
+                    return render(
+                        request,
+                        "members/volunteer_email_verification.html",
+                        {
+                            "email": lockout_email,
+                            "error": VERIFICATION_LOCKED_MESSAGE,
+                        },
+                    )
+
                 # Check if the entered code matches either the session code or the env variable code
                 env_code = os.getenv("VOLUNTEER_EMAIL_VERIFICATION_CODE")
-                is_valid_code = (entered_code == session_code) or (
+                is_valid_code = (session_code and entered_code == session_code) or (
                     env_code and entered_code == env_code
                 )
 
@@ -577,21 +684,39 @@ def volunteerSignup(request):
                             {"volunteer_request_form": VolunteerRequestForm()},
                         )
 
-                    volunteer_request = VolunteerRequest.objects.create(
-                        name=form_data.get("name"),
-                        email=form_data.get("email"),
-                        phone=form_data.get("phone"),
-                        age=form_data.get("age") or None,
-                        zip=form_data.get("zip"),
-                        allow_contact_from_cpdk=form_data.get(
-                            "allow_contact_from_cpdk", False
-                        ),
-                        allow_contact_from_other=form_data.get(
-                            "allow_contact_from_other", False
-                        ),
-                        info_reference=form_data.get("info_reference", ""),
-                        info_whishes=form_data.get("info_whishes", ""),
-                    )
+                    # The env test code (test environments only) behaves like a real code
+                    account_person = find_loginable_person(form_data.get("email"))
+
+                    if account_person is not None:
+                        volunteer_request = VolunteerRequest.objects.create(
+                            person=account_person,
+                            consent=form_data.get("consent", False),
+                            allow_contact_from_cpdk=form_data.get(
+                                "allow_contact_from_cpdk", False
+                            ),
+                            allow_contact_from_other=form_data.get(
+                                "allow_contact_from_other", False
+                            ),
+                            info_reference=form_data.get("info_reference", ""),
+                            info_whishes=form_data.get("info_whishes", ""),
+                        )
+                    else:
+                        volunteer_request = VolunteerRequest.objects.create(
+                            name=form_data.get("name"),
+                            email=form_data.get("email"),
+                            phone=form_data.get("phone"),
+                            age=form_data.get("age") or None,
+                            zip=form_data.get("zip"),
+                            consent=form_data.get("consent", False),
+                            allow_contact_from_cpdk=form_data.get(
+                                "allow_contact_from_cpdk", False
+                            ),
+                            allow_contact_from_other=form_data.get(
+                                "allow_contact_from_other", False
+                            ),
+                            info_reference=form_data.get("info_reference", ""),
+                            info_whishes=form_data.get("info_whishes", ""),
+                        )
 
                     # Create items and collect them for notification emails
                     departments = []
@@ -626,14 +751,41 @@ def volunteerSignup(request):
                     )
 
                     # Clear session keys
+                    if lockout_email:
+                        clear_verification_failures(lockout_email)
                     for k in [
                         "volunteer_verification_code",
                         "volunteer_form_data",
                         "volunteer_form_departments",
                         "volunteer_form_activities",
+                        "volunteer_verification_code_sent_at",
                     ]:
                         if k in request.session:
                             del request.session[k]
+
+                    if account_person is not None:
+                        user = account_person.user
+                        if user.is_staff or user.is_superuser:
+                            log_auth_event(
+                                request,
+                                Event.CODE_OK_NO_AUTOLOGIN,
+                                user.get_username(),
+                                "email-code",
+                                user,
+                            )
+                            # Privileged accounts must log in with their password
+                            return HttpResponseRedirect(
+                                reverse("person_login")
+                                + "?next="
+                                + reverse("volunteer_signup")
+                            )
+                        request.login_method = (
+                            "email-code"
+                            if entered_code == session_code
+                            else "env-test-code"
+                        )
+                        login(request, user)
+                        return HttpResponseRedirect(reverse("volunteer_signup"))
 
                     return render(
                         request,
@@ -642,6 +794,40 @@ def volunteerSignup(request):
                     )
                 else:
                     # Invalid code
+                    if code_expired:
+                        log_auth_event(
+                            request,
+                            Event.CODE_EXPIRED,
+                            lockout_email,
+                            "email-code",
+                        )
+                    if code_expired and not (env_code and entered_code == env_code):
+                        request.session.pop("volunteer_verification_code", None)
+                        request.session.pop("volunteer_verification_code_sent_at", None)
+                        return render(
+                            request,
+                            "members/volunteer_email_verification.html",
+                            {
+                                "email": lockout_email,
+                                "error": VERIFICATION_EXPIRED_MESSAGE,
+                            },
+                        )
+                    log_auth_event(
+                        request, Event.CODE_FAILED, lockout_email, "email-code"
+                    )
+                    if lockout_email and register_verification_failure(lockout_email):
+                        log_auth_event(
+                            request, Event.CODE_LOCKOUT, lockout_email, "email-code"
+                        )
+                        clear_verification_session(request.session)
+                        return render(
+                            request,
+                            "members/volunteer_email_verification.html",
+                            {
+                                "email": lockout_email,
+                                "error": VERIFICATION_LOCKED_MESSAGE,
+                            },
+                        )
                     return render(
                         request,
                         "members/volunteer_email_verification.html",
@@ -658,6 +844,21 @@ def volunteerSignup(request):
                 volunteer_request_form = VolunteerRequestForm(request.POST)
                 if volunteer_request_form.is_valid():
                     cd = volunteer_request_form.cleaned_data
+                    if verification_locked(cd.get("email")):
+                        log_auth_event(
+                            request,
+                            Event.CODE_REQUEST_BLOCKED,
+                            cd.get("email"),
+                            "email-code",
+                        )
+                        return render(
+                            request,
+                            "members/volunteer_email_verification.html",
+                            {
+                                "email": cd.get("email"),
+                                "error": VERIFICATION_LOCKED_MESSAGE,
+                            },
+                        )
                     # store form data in session until verification
                     request.session["volunteer_form_data"] = {
                         "name": cd.get("name"),
@@ -665,6 +866,7 @@ def volunteerSignup(request):
                         "phone": cd.get("phone"),
                         "age": cd.get("age"),
                         "zip": cd.get("zip"),
+                        "consent": cd.get("consent", False),
                         "allow_contact_from_cpdk": cd.get(
                             "allow_contact_from_cpdk", False
                         ),
@@ -689,6 +891,9 @@ def volunteerSignup(request):
                         code = f"{random.randint(100000, 999999)}"
 
                     request.session["volunteer_verification_code"] = code
+                    request.session["volunteer_verification_code_sent_at"] = (
+                        timezone.now().timestamp()
+                    )
 
                     # Send verification email using EmailTemplate
                     try:
