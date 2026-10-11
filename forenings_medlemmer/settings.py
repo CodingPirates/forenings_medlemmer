@@ -31,9 +31,11 @@ if env.str("SENTRY_DSN") != "not set":
 logger = logging.getLogger(__name__)
 
 TESTING = os.path.basename(sys.argv[1]) == "test"
-USE_DAWA_ON_SAVE = not TESTING
+USE_ADRESSEVASK_ON_SAVE = not TESTING
 
 DATAFORSYNINGEN_BASE_URL = "https://api.dataforsyningen.dk"
+ADRESSEVAELGER_BASE_URL = "https://adressevaelger.dk"
+ADRESSEVAELGER_TOKEN = env.str("ADRESSEVAELGER_TOKEN", default="adressevaelger123")
 
 DATAFORDELER_API_KEY = env.str("DATAFORDELER_API_KEY", default="")
 
