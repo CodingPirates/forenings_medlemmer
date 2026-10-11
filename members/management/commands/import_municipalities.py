@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from members.models import Municipality
 
 # run locally:
-# docker compose run web ./manage.py import_municipalities members/management/commands/municipalities.csv
+# docker compose run web ./manage.py import_municipalities members/management/commands/assets/municipalities.csv
 
 
 class Command(BaseCommand):
