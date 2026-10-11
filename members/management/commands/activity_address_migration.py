@@ -107,7 +107,7 @@ class Command(BaseCommand):
                         print(
                             f"    using address_check. dawa=[{address_check.ext_address_id}] pk=[{address_check.pk}]"
                         )
-                print(f"   _dawa_id = [{_ext_address_id}]")
+                print(f"   _ext_address_id = [{_ext_address_id}]")
                 if _create_new_address:
                     print("     Creating new address")
                     address_new = Address.objects.create(
