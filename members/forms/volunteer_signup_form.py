@@ -165,7 +165,10 @@ class vol_signupForm(forms.Form):
     zipcode = forms.CharField(label="Postnummer", max_length=4.0, required=True)
     city = forms.CharField(label="By", max_length=200, required=True)
     dawa_id = forms.CharField(
-        label="Dawa ID", max_length=200, widget=forms.HiddenInput(), required=False
+        label="DAWA ID",
+        max_length=200,
+        widget=forms.HiddenInput(),
+        required=False,
     )
     form_id = forms.CharField(
         label="Form ID", max_length=10, widget=forms.HiddenInput(), initial="signup"
