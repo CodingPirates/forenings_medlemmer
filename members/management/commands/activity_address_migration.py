@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 # it's mapped via DAWA to "Frode Jakobsens Plads"
 
                 print("    address is None. Checking Dawa online")
-                _dawa_id = ""
+                _ext_address_id = ""
 
                 # build text for DAWA request
                 text = f"{_streetname} {_housenumber}"
@@ -86,13 +86,15 @@ class Command(BaseCommand):
                 )
                 _category = wash_response.json()["kategori"]
                 if wash_response.status_code == 200 and _category != "C":
-                    _dawa_id = wash_response.json()["resultater"][0]["adresse"]["id"]
+                    _ext_address_id = wash_response.json()["resultater"][0]["adresse"][
+                        "id"
+                    ]
 
-                    print(f"  Checking for existing address w Dawa [{_dawa_id}]")
+                    print(f"  Checking for existing address w Dawa [{_ext_address_id}]")
 
                     address_check = (
                         Address.objects.filter(
-                            dawa_id=_dawa_id,
+                            ext_address_id=_ext_address_id,
                         )
                         .order_by("id")
                         .first()
@@ -100,12 +102,12 @@ class Command(BaseCommand):
 
                     if address_check is not None:
                         activity.address = address_check
-                        _dawa_id = address_check.dawa_id
+                        _ext_address_id = address_check.ext_address_id
                         _create_new_address = False
                         print(
-                            f"    using address_check. dawa=[{address_check.dawa_id}] pk=[{address_check.pk}]"
+                            f"    using address_check. dawa=[{address_check.ext_address_id}] pk=[{address_check.pk}]"
                         )
-                print(f"   _dawa_id = [{_dawa_id}]")
+                print(f"   _ext_address_id = [{_ext_address_id}]")
                 if _create_new_address:
                     print("     Creating new address")
                     address_new = Address.objects.create(
@@ -118,7 +120,7 @@ class Command(BaseCommand):
                         city=_city,
                     )
                     print(
-                        f"    Created new address to match DAWA [{address_new.dawa_id}]"
+                        f"    Created new address to match DAWA [{address_new.ext_address_id}]"
                     )
                     activity.address = address_new
 
