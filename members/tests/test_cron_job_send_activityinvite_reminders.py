@@ -27,6 +27,8 @@ class TestCronJobSendActivityInviteReminders(TestCase):
         self.activity = ActivityFactory(
             start_date=self.today,
             end_date=self.today + timedelta(days=365),
+            signup_closing=self.today + timedelta(days=10),
+            max_participants=30,
             min_age=5,
             max_age=17,
             department=self.department,
@@ -119,3 +121,38 @@ class TestCronJobSendActivityInviteReminders(TestCase):
 
         invite.refresh_from_db()
         self.assertIsNone(invite.reminder_sent_at)
+
+    def test_no_reminder_when_activity_is_full(self):
+        self.activity.max_participants = 1
+        self.activity.save()
+        ActivityParticipant.objects.create(
+            activity=self.activity,
+            person=self._person(),
+            photo_permission=ActivityParticipant.PHOTO_OK,
+        )
+        invite = self._add_invite(self._person())
+
+        call_command("cron_job_send_activityinvite_reminders")
+
+        invite.refresh_from_db()
+        self.assertIsNone(invite.reminder_sent_at)
+
+    def test_no_reminder_after_signup_closing(self):
+        self.activity.signup_closing = self.today - timedelta(days=1)
+        self.activity.save()
+        invite = self._add_invite(self._person())
+
+        call_command("cron_job_send_activityinvite_reminders")
+
+        invite.refresh_from_db()
+        self.assertIsNone(invite.reminder_sent_at)
+
+    def test_reminder_sent_on_signup_closing_date(self):
+        self.activity.signup_closing = self.today
+        self.activity.save()
+        invite = self._add_invite(self._person())
+
+        call_command("cron_job_send_activityinvite_reminders")
+
+        invite.refresh_from_db()
+        self.assertEqual(invite.reminder_sent_at, self.today)

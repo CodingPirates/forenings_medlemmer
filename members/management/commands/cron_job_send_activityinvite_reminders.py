@@ -36,6 +36,7 @@ class Command(BaseCommand):
                 reminder_sent_at__isnull=True,
                 rejected_at__isnull=True,
                 expire_dtm__lte=three_days_from_now,
+                activity__signup_closing__gte=now,
             )
             .exclude(expire_dtm__lt=now)
             .exclude(
@@ -45,6 +46,9 @@ class Command(BaseCommand):
         )
 
         for invite in invites:
+            if invite.activity.seats_left() == 0:
+                continue
+
             context = {
                 "activity": invite.activity,
                 "activity_invite": invite,
