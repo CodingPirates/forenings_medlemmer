@@ -45,13 +45,8 @@ class Command(BaseCommand):
             )
         )
 
-        activities_with_seats = {}
         for invite in invites:
-            if invite.activity_id not in activities_with_seats:
-                activities_with_seats[invite.activity_id] = (
-                    invite.activity.seats_left() > 0
-                )
-            if not activities_with_seats[invite.activity_id]:
+            if invite.activity.seats_left() == 0:
                 continue
 
             context = {
