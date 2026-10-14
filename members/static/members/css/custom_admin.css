@@ -39,3 +39,8 @@ td.field-get_payment_amount .payment-amount {
     text-align: right;
 }
 
+.form-row.field-remove_from_waiting_list_on_invite .vCheckboxLabel,
+.form-row.field-remove_from_waiting_lists_on_signup .vCheckboxLabel {
+    white-space: nowrap;
+}
+
