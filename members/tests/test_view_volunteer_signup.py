@@ -327,7 +327,9 @@ class TestVolunteerSignupView(TestCase):
 
         apps = {a["app_label"]: a for a in response.context["app_list"]}
         self.assertIn("AuthLog", [m["object_name"] for m in apps["auth"]["models"]])
-        self.assertNotIn("AuthLog", [m["object_name"] for m in apps["members"]["models"]])
+        self.assertNotIn(
+            "AuthLog", [m["object_name"] for m in apps["members"]["models"]]
+        )
 
     @mock.patch.dict(os.environ, {"VOLUNTEER_EMAIL_VERIFICATION_CODE": "001337"})
     def test_env_test_code_does_not_work_after_lockout(self):
@@ -380,13 +382,19 @@ class TestVolunteerSignupView(TestCase):
         self.assertIn(
             "Login fejlet method=password identifier=existing@example.com", output
         )
-        self.assertIn("Login OK method=password identifier=existing@example.com", output)
+        self.assertIn(
+            "Login OK method=password identifier=existing@example.com", output
+        )
         self.assertIn(
             "Forkert kode method=email-code identifier=existing@example.com", output
         )
-        self.assertIn("Login OK method=email-code identifier=existing@example.com", output)
+        self.assertIn(
+            "Login OK method=email-code identifier=existing@example.com", output
+        )
 
-        entries = list(AuthLog.objects.order_by("id").values_list("event", "method", "success"))
+        entries = list(
+            AuthLog.objects.order_by("id").values_list("event", "method", "success")
+        )
         self.assertEqual(
             entries,
             [

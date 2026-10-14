@@ -41,9 +41,11 @@ def log_auth_event(request, event, identifier="", method="", user=None):
                 identifier=(identifier or "")[:254],
                 user=user if user is not None and user.pk else None,
                 ip_address=ip,
-                user_agent=(request.META.get("HTTP_USER_AGENT", "")[:255])
-                if request is not None
-                else "",
+                user_agent=(
+                    (request.META.get("HTTP_USER_AGENT", "")[:255])
+                    if request is not None
+                    else ""
+                ),
             )
     except Exception:
         logger.exception("Could not save AuthLog entry")
