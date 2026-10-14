@@ -1,8 +1,10 @@
 import requests
+from django.conf import settings
 from functools import lru_cache
+from members.models.municipality import Municipality
 
-_TOKEN = "adressevaelger123"  # TODO December 2026: check if KDS has launched user management and replace this token
-_BASE_URL = "https://adressevaelger.dk"
+_TOKEN = settings.ADRESSEVAELGER_TOKEN
+_BASE_URL = settings.ADRESSEVAELGER_BASE_URL
 
 
 @lru_cache(maxsize=1)
@@ -53,7 +55,7 @@ def apply_address_data(obj, parsed):
     obj.city = parsed["city"]
     obj.zipcode = parsed["zipcode"]
     obj.region = parsed["region"]
-    obj.dawa_id = parsed["id_lokalid"]
+    obj.ext_address_id = parsed["id_lokalid"]
     if parsed["latitude"] is not None:
         obj.latitude = parsed["latitude"]
         obj.longitude = parsed["longitude"]
@@ -64,7 +66,6 @@ def parse_address_data(data):
     Extract a normalised dict from an Adressevælger /adresser/{id} response.
     Looks up region and municipality name from the Municipality table.
     """
-    from members.models.municipality import Municipality
 
     adr = data["adresse"]
     husnummer = adr["husnummer"]

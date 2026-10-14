@@ -3,6 +3,12 @@ import requests
 from django.db import models
 from django.conf import settings
 
+from members.utils.address_lookup import (
+    get_address_by_id,
+    parse_address_data,
+    apply_address_data,
+)
+
 from .department import Department
 from .union import Union
 from .activity import Activity
@@ -43,11 +49,13 @@ class Address(models.Model):
     (hvor vi henter adressedata). \
     Spørg os i #medlemsssystem_support på Slack hvis du mangler hjælp.
     """
-    dawa_overwrite = models.BooleanField(
-        "Overskriv DAWA", default=False, help_text=help_temp
+    ext_address_overwrite = models.BooleanField(
+        "Overskriv eksterne adresse data", default=False, help_text=help_temp
     )
-    dawa_id = models.CharField("DAWA id", max_length=200, blank=True)
-    dawa_category = models.CharField("DAWA kategori", max_length=1, blank=True)
+    ext_address_id = models.CharField("Eksternt adresse id", max_length=200, blank=True)
+    ext_address_accuracy = models.CharField(
+        "Ekstern adresse nøjagtighed", max_length=5, blank=True
+    )
     created_at = models.DateTimeField(
         "Oprettet", auto_now=False, auto_now_add=True, auto_created=True
     )
@@ -62,53 +70,38 @@ class Address(models.Model):
         return f"{address}, {self.zipcode} {self.city}"
 
     def save(self, *args, **kwargs):
-        if settings.USE_DAWA_ON_SAVE and not self.dawa_overwrite:
-            self.get_dawa_data()
+        if settings.USE_ADRESSEVASK_ON_SAVE and not self.ext_address_overwrite:
+            self.get_ext_address_data()
         super().save(*args, **kwargs)
 
-    def get_dawa_data(self):
-        if self.dawa_id == "":
+    def get_ext_address_data(self):
+        if self.ext_address_id == "":
             wash_resp = requests.request(
                 "GET",
-                f"{settings.DATAFORSYNINGEN_BASE_URL}/datavask/adresser",
-                params={"betegnelse": str(self)},
+                f"{settings.ADRESSEVAELGER_BASE_URL}/vask/",
+                params={"token": settings.ADRESSEVAELGER_TOKEN, "adresse": str(self)},
             )
-            _category = wash_resp.json()["kategori"]
-            # DAWA category "C" means that it was a low probability address match
-            if wash_resp.status_code != 200 or _category == "C":
+            _accuracy = wash_resp.json()["vaskestatus"]["kode"]
+            _status = wash_resp.json()["vaskeresultat"]["status"]
+            # Address accuracy is determined by codes shown here: https://confluence.kds.dk/display/ADV/Adressevask
+            # Also verify that status is 3 - in other words the address is current
+            if wash_resp.status_code != 200 or _accuracy < 900 or _status != 3:
                 return False
             else:
-                self.dawa_id = wash_resp.json()["resultater"][0]["adresse"]["id"]
-                self.dawa_category = _category
+                self.ext_address_id = wash_resp.json()["vaskeresultat"][
+                    "adresse_id_lokalid"
+                ]
+                self.ext_address_accuracy = _accuracy
 
-        from members.utils.address_lookup import (
-            get_address_by_id,
-            parse_address_data,
-            apply_address_data,
-        )
-
-        data = get_address_by_id(self.dawa_id)
+        data = get_address_by_id(self.ext_address_id)
         if data is None:
-            self.dawa_id = ""
+            self.ext_address_id = ""
             return False
 
         parsed = parse_address_data(data)
         apply_address_data(self, parsed)
         self.municipality = parsed["municipality_name"]
         return True
-
-    @staticmethod
-    def get_by_dawa_id(dawa_id):
-        addresses = Address.objects.filter(dawa_id=dawa_id)
-        if len(addresses) > 0:
-            return addresses[0]
-        else:
-            address = Address(dawa_id=dawa_id)
-            if address.get_dawa_data():
-                address.save()
-                return address
-            else:
-                return None
 
     @staticmethod
     def get_all_address_ids(model):
