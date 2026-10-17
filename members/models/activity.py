@@ -55,13 +55,13 @@ class Activity(models.Model):
     updated_dtm = models.DateTimeField("Opdateret", auto_now=True)
     open_invite = models.BooleanField("Fri tilmelding", default=False)
     remove_from_waiting_list_on_invite = models.BooleanField(
-        "Fjern fra venteliste ved invitation",
-        help_text="Hvis denne er slået til, fjernes personen automatisk fra denne afdelings venteliste ved invitation.",
+        "Fjern fra venteliste ved invitation til et forløb",
+        help_text="Hvis denne er slået til, fjernes personen automatisk fra denne afdelings venteliste ved invitation til et forløb.",
         default=True,
     )
     remove_from_waiting_lists_on_signup = models.BooleanField(
-        "Fjern fra ventelister ved tilmelding",
-        help_text="Hvis denne er slået til, fjernes personen automatisk fra alle ventelister ved tilmelding.",
+        "Fjern fra ventelister ved tilmelding til et forløb",
+        help_text="Hvis denne er slået til, fjernes personen automatisk fra alle ventelister ved tilmelding til et forløb..",
         default=True,
     )
     help_price = f"Hvis det er et forløb / en sæsonaktivitet fratrækkes der automatisk {ACTIVITY_MIN_AMOUNT} kr. til Coding Pirates Denmark pr. barn."
