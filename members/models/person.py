@@ -38,6 +38,14 @@ class Person(models.Model):
                 "view_consent_information",
                 "Can view consent information for persons",
             ),
+            (
+                "see_contacts_shared_with_cpdk",
+                "See contacts shared with CPDK",
+            ),
+            (
+                "see_contacts_shared_with_other",
+                "See contacts shared with other",
+            ),
         )
 
     PARENT = "PA"
@@ -103,6 +111,12 @@ class Person(models.Model):
     placename = models.CharField("Stednavn", max_length=200, blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField("Telefon", max_length=50, blank=True)
+    allow_contact_from_cpdk = models.BooleanField(
+        "Må Coding Pirates Denmark kontakte mig?", default=False
+    )
+    allow_contact_from_other = models.BooleanField(
+        "Må andre afdelinger kontakte mig?", default=False
+    )
     gender = models.CharField(
         "Køn", max_length=20, choices=MEMBER_GENDER_CHOICES, default=None, null=True
     )

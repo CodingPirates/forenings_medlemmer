@@ -4,6 +4,8 @@ import socket
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from members.tests.factories import (
     PersonFactory,
@@ -39,12 +41,18 @@ class EntryPageTest(StaticLiveServerTestCase):
         # Login
         log_in(self, self.person)
 
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.LINK_TEXT, "Familie"))
+        )
         self.browser.find_element(By.LINK_TEXT, "Familie")
         self.browser.find_element(By.XPATH, "//button[text()='Log ud']")
 
     def test_entry_page(self):
         self.browser.get(f"{self.live_server_url}")
 
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.LINK_TEXT, "Log ind"))
+        )
         self.browser.find_element(By.LINK_TEXT, "Log ind")
         self.browser.find_element(By.LINK_TEXT, "Tilmeld barn")
         self.browser.find_element(By.LINK_TEXT, "Bliv frivillig")

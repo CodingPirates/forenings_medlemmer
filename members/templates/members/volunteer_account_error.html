@@ -1,0 +1,19 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+<h1>Fejl</h1>
+
+<div class="alert alert-danger">
+    <h4>{{ error }}</h4>
+    <p>{{ message|default:"Linket du har fulgt er ikke længere gyldigt eller allerede blevet brugt." }}</p>
+</div>
+
+<p>
+    Hvis du mener dette er en fejl, kan du kontakte os på 
+    <a href="mailto:kontakt@codingpirates.dk">kontakt@codingpirates.dk</a>
+</p>
+
+<p>
+    <a href="{% url 'entry_page' %}" class="btn btn-primary">Tilbage til forsiden</a>
+</p>
+{% endblock %}

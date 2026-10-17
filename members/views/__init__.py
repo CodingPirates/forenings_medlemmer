@@ -1,5 +1,7 @@
 # flake8: noqa  # ignored since it is being used in the files
 from members.views.AccountCreate import AccountCreate
+from members.views.VolunteerAccountCreate import VolunteerAccountCreate
+from members.views.VolunteerAccountCreated import VolunteerAccountCreated
 from members.views.Activities import Activities
 from members.views.ActivitySignup import ActivitySignup
 from members.views.AdminSignup import AdminSignup
@@ -20,6 +22,9 @@ from members.views.departmentView import departmentView
 from members.views.paymentGatewayErrorView import paymentGatewayErrorView
 from members.views.userCreated import userCreated
 from members.views.volunteerSignup import volunteerSignup
+from members.views.volunteerRequestCancel import volunteerRequestCancel
 from members.views.ConsentPopup import consent_popup
 from members.views.ConsentPreview import consent_preview
 from members.views.ConsentPage import consent_page
+
+import members.utils.auth_logging  # noqa: F401  (registers login signal handlers)
