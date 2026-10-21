@@ -138,7 +138,13 @@ class Activity(models.Model):
                 min_amount = self.MEMBERSHIP_MIN_AMOUNT
 
             if activitytype == "FORLØB":
-                min_amount = self.ACTIVITY_MIN_AMOUNT
+                if (
+                    self.season_fee is not None
+                    and self.season_fee < self.ACTIVITY_MIN_AMOUNT
+                ):
+                    min_amount = self.season_fee
+                else:
+                    min_amount = self.ACTIVITY_MIN_AMOUNT
 
         return min_amount
 
