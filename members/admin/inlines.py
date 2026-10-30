@@ -125,7 +125,14 @@ class PaymentInline(admin.TabularInline):
 
     classes = ["showheader"]
     model = Payment
-    fields = ("added_at", "payment_type", "confirmed_at", "rejected_at", "amount_ore")
+    fields = (
+        "added_at",
+        "payment_type",
+        "confirmed_at",
+        "rejected_at",
+        "refunded_at",
+        "amount_ore",
+    )
     readonly_fields = ("family",)
     extra = 0
 
