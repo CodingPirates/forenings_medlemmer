@@ -16,6 +16,8 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from members.admin.admin_actions import AdminActions
+from members.admin.consent_utils import family_consent_link
+from members.admin.filters.common_filters import PersonFamilyConsentFilter
 from members.models import (
     Activity,
     ActivityInvite,
@@ -164,29 +166,13 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         verbose_name_plural = "Invitationer"
 
     list_per_page = settings.LIST_PER_PAGE
-    list_display = (
-        "id",
-        "person_link",
-        "activity_link",
-        "person_age_years",
-        "person_zipcode",
-        "invite_dtm",
-        "expire_dtm",
-        "reminder_sent_at",
-        "rejected_at",
-        "price_in_dkk",
-        "price_note",
-        "extra_email_info",
-        "participating",
-        "activity_department_union_link",
-        "activity_department_link",
-        "decline_reason",
-    )
+
     list_filter = (
         ActivityInviteUnionListFilter,
         ActivityInviteDepartmentListFilter,
         ActivityInviteListCurrentFilter,
         ActivityInviteListFinishedFilter,
+        PersonFamilyConsentFilter,
     )
     date_hierarchy = "activity__start_date"
 
@@ -226,6 +212,38 @@ class ActivityInviteAdmin(admin.ModelAdmin):
         ):
             return qs
         return qs.filter(activity__department__adminuserinformation__user=request.user)
+
+    def get_list_display(self, request):
+        base = [
+            "id",
+            "person_link",
+            "activity_link",
+            "person_age_years",
+            "person_zipcode",
+            "invite_dtm",
+            "expire_dtm",
+            "reminder_sent_at",
+            "rejected_at",
+            "price_in_dkk",
+            "price_note",
+            "extra_email_info",
+            "participating",
+        ]
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_consent_information"
+        ):
+            base += ["family_consent_id"]
+        base += [
+            "activity_department_union_link",
+            "activity_department_link",
+            "decline_reason",
+        ]
+        return base
+
+    def family_consent_id(self, item):
+        return family_consent_link(item.person.family)
+
+    family_consent_id.short_description = "Privatlivspolitik"
 
     fieldsets = (
         (

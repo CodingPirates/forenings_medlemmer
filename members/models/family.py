@@ -85,3 +85,11 @@ class Family(models.Model):
         non_anonymized_persons_in_family = self.person_set.filter(anonymized=False)
         if non_anonymized_persons_in_family.count() == 0:
             self.anonymize(request)
+
+    def get_consent_id(self):
+        max_consent = -1
+        for person in self.get_persons():
+            if hasattr(person, "consent_id") and person.consent_id is not None:
+                max_consent = max(max_consent, person.consent_id)
+
+        return max_consent if max_consent != -1 else None

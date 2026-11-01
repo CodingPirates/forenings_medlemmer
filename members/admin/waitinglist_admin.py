@@ -16,6 +16,8 @@ import members.models.emailtemplate
 
 # import members.admin.admin_actions
 from members.admin.admin_actions import AdminActions
+from members.admin.consent_utils import family_consent_link
+from members.admin.filters.common_filters import PersonFamilyConsentFilter
 from members.models import (
     Activity,
     AdminUserInformation,
@@ -218,25 +220,37 @@ class WaitingListAdmin(admin.ModelAdmin):
 
     list_per_page = settings.LIST_PER_PAGE
 
-    list_display = (
-        "id",
-        "department_link",
-        "person_link",
-        "person_age_years",
-        "person_gender_text",
-        "zipcode",
-        "municipality",
-        "user_waiting_list_number",
-        "user_created",
-        "user_added_waiting_list",
-        "union_link",
-    )
+    def get_list_display(self, request):
+        base = [
+            "id",
+            "department_link",
+            "person_link",
+            "person_age_years",
+            "person_gender_text",
+            "zipcode",
+            "municipality",
+            "user_waiting_list_number",
+            "user_created",
+            "user_added_waiting_list",
+            "union_link",
+        ]
+
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_consent_information"
+        ):
+            base.append("family_consent_id")
+        return base
+
+    @admin.display(description="Privatlivspolitik")
+    def family_consent_id(self, item):
+        return family_consent_link(item.person.family)
 
     list_filter = (
         person_waitinglist_union_filter,
         person_waitinglist_department_filter,
         person_waitinglist_municipality_filter,
         person_waitinglist_region_filter,
+        PersonFamilyConsentFilter,
         "person__gender",
         WaitingListActivityFilter,
         WaitingListMinAgeFilter,
