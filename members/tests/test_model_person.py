@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.contrib.auth.models import User, Group
+from django.contrib.admin.models import CHANGE, LogEntry
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from members.models.person import Person
 from datetime import date, datetime, timedelta
 from django.utils import timezone
@@ -245,6 +247,25 @@ class TestModelPerson(TestCase):
         self.assertEqual(email.body_text, "")
         self.assertEqual(email.receiver, "")
 
+    def test_anonymize_person_creates_django_admin_log_entry(self):
+        with freeze_time(timezone.now() - timedelta(days=3 * 365)):
+            person = PersonFactory()
+
+        user = User.objects.create_user(username="admin", password="password")
+        permission = Permission.objects.get(codename="anonymize_persons")
+        user.user_permissions.add(permission)
+        request = type("Request", (object,), {"user": user})()
+
+        person.anonymize(request)
+
+        log_entry = LogEntry.objects.get(
+            content_type=ContentType.objects.get_for_model(Person),
+            object_id=str(person.pk),
+        )
+        self.assertEqual(log_entry.user, user)
+        self.assertEqual(log_entry.action_flag, CHANGE)
+        self.assertEqual(log_entry.change_message, "Person anonymiseret.")
+
     def test_anonymize_person_removes_department_union_and_group_relations(self):
         """Anonymizing removes department, union and group relationships."""
         with freeze_time(timezone.now() - timedelta(days=3 * 365)):
@@ -487,6 +508,26 @@ class TestModelPerson(TestCase):
 
         # parent cannot be anonymized, since child has payments in the last 5 years
         self.assertFalse(parent.is_anonymization_candidate()[0])
+
+    def test_child_with_old_data_is_anonymization_candidate_despite_recent_sibling_payment(
+        self,
+    ):
+        """A sibling's recent payment must not prevent an inactive child from being anonymized."""
+        six_years_ago = timezone.now() - timedelta(days=6 * 365)
+        with freeze_time(six_years_ago):
+            first_child = PersonFactory(membertype=Person.CHILD)
+            second_child = PersonFactory(
+                family=first_child.family,
+                membertype=Person.CHILD,
+            )
+
+        PaymentFactory(
+            person=second_child,
+            family=second_child.family,
+            added_at=timezone.now() - timedelta(days=1 * 365),
+        )
+
+        self.assertTrue(first_child.is_anonymization_candidate()[0])
 
     def test_person_created_over_2_years_with_payments_over_5_years_is_anonymization_candidate(
         self,
