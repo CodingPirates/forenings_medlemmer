@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,12 @@ def consent_page(request):
         .order_by("-released_at")
         .first()
     )
+
+    if latest_consent is None:
+        return HttpResponse(
+            "Der er endnu ikke oprettet en privatlivspolitik.",
+            content_type="text/plain; charset=utf-8",
+        )
 
     has_consented = False
     consent_at = ""

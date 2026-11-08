@@ -1,0 +1,112 @@
+{% extends 'members/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Create Volunteer Account" %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    <i class="fa fa-user-plus"></i>
+                    Opret din konto - Frivillig
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h4>Velkommen, {{ volunteer_request.name }}!</h4>
+                    <p><strong>Din frivillig-anmodning er blevet godkendt!</strong></p>
+                    <p>For at fortsætte skal du oprette en konto i vores system.</p>
+                    
+                    <div class="mt-3">
+                        <h6>Dine godkendte frivillig-anmodninger:</h6>
+                        <ul class="list-unstyled">
+                            {% for item in volunteer_request.volunteerrequestitem_set.all %}
+                                {% if item.status == "WAITING" %}
+                                <li><i class="fa fa-check text-success"></i> 
+                                    <strong>{{ item.department.name }}</strong>
+                                    {% if item.activity %} - {{ item.activity.name }}{% endif %}
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="fa fa-info-circle"></i> Om formularen nedenfor:</h6>
+                    <p class="mb-1">• Udfyld dine personlige oplysninger i afsnittet 'Forældres oplysninger'</p>
+                    <p class="mb-1">• Afsnittet 'Barnets oplysninger' er <strong>valgfrit</strong> for frivillige</p>
+                    <p class="mb-1">• Kontroller og opdater dine frivillig-oplysninger hvis nødvendigt</p>
+                    <p class="mb-0">• Brug adresse-søgefeltet for nemt at finde din adresse</p>
+                </div>
+
+                {% crispy signupform %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include DAWA scripts for address lookup -->
+<script src="{% static 'members/js/dawa-autocomplete.js' %}"></script>
+<script src="{% static 'members/js/dawa-form-fill.js' %}"></script>
+
+<script>
+    // Make child fields visually optional and add helpful text
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the child fieldset and modify it
+        const fieldsets = document.querySelectorAll('fieldset');
+        fieldsets.forEach(function(fieldset) {
+            const legend = fieldset.querySelector('legend');
+            if (legend && legend.textContent.includes('Barnets oplysninger')) {
+                // Add optional text to legend
+                legend.innerHTML = legend.innerHTML + ' <small class="text-muted">(Valgfrit for frivillige)</small>';
+                
+                // Style the fieldset to show it's optional
+                fieldset.style.border = '2px dashed #dee2e6';
+                fieldset.style.padding = '15px';
+                fieldset.style.margin = '15px 0';
+                fieldset.style.borderRadius = '8px';
+                fieldset.style.backgroundColor = '#f8f9fa';
+                
+                // Add helper text
+                const helpText = document.createElement('div');
+                helpText.className = 'alert alert-light mt-2 mb-3';
+                helpText.innerHTML = '<small><i class="fa fa-info-circle"></i> Du kan springe disse felter over hvis du ikke har børn der skal deltage i aktiviteter.</small>';
+                legend.parentNode.insertBefore(helpText, legend.nextSibling);
+            }
+        });
+        
+        // Update parent section title to be more clear for volunteers
+        fieldsets.forEach(function(fieldset) {
+            const legend = fieldset.querySelector('legend');
+            if (legend && legend.textContent.includes('Forældres oplysninger')) {
+                legend.innerHTML = 'Dine personlige oplysninger';
+            }
+            
+            // Make volunteer info section visible and styled
+            if (legend && legend.textContent.includes('Frivillig information')) {
+                fieldset.style.display = 'block';
+                fieldset.style.border = '2px solid #007bff';
+                fieldset.style.padding = '15px';
+                fieldset.style.margin = '15px 0';
+                fieldset.style.borderRadius = '8px';
+                fieldset.style.backgroundColor = '#e7f3ff';
+                legend.innerHTML = 'Frivillig information <small class="text-muted">(Kontroller og opdater hvis nødvendigt)</small>';
+            }
+        });
+        
+        // Hide volunteer info section for non-volunteer signups (regular account creation)
+        // This will be visible by default for volunteer account creation
+        const volunteerSections = document.querySelectorAll('.volunteer-fieldset');
+        volunteerSections.forEach(function(section) {
+            section.style.display = 'block'; // Always show for volunteer account creation
+        });
+    });
+</script>
+{% endblock %}

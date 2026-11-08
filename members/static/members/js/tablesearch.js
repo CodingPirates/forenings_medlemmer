@@ -31,3 +31,43 @@ function filter_rows_in_table(textbox_name, section_class, table_class ) {
     }
   }
 }
+
+function filter_volunteer_checkboxes() {
+  // This function filters volunteer request form checkboxes for departments and activities
+  var input = document.getElementById('search-filter');
+  var filter = input.value.toUpperCase();
+  
+  // Filter department checkboxes
+  var departmentSection = document.querySelector('#div_id_departments');
+  if (departmentSection) {
+    var departmentCheckboxes = departmentSection.querySelectorAll('.form-check');
+    for (var i = 0; i < departmentCheckboxes.length; i++) {
+      var label = departmentCheckboxes[i].querySelector('label');
+      if (label) {
+        var labelText = label.textContent || label.innerText;
+        if (filter == "" || labelText.toUpperCase().indexOf(filter) > -1) {
+          departmentCheckboxes[i].style.display = "block";
+        } else {
+          departmentCheckboxes[i].style.display = "none";
+        }
+      }
+    }
+  }
+  
+  // Filter activity checkboxes
+  var activitySection = document.querySelector('#div_id_activities');
+  if (activitySection) {
+    var activityCheckboxes = activitySection.querySelectorAll('.form-check');
+    for (var i = 0; i < activityCheckboxes.length; i++) {
+      var label = activityCheckboxes[i].querySelector('label');
+      if (label) {
+        var labelText = label.textContent || label.innerText;
+        if (filter == "" || labelText.toUpperCase().indexOf(filter) > -1) {
+          activityCheckboxes[i].style.display = "block";
+        } else {
+          activityCheckboxes[i].style.display = "none";
+        }
+      }
+    }
+  }
+}
