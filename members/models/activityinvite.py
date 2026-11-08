@@ -132,12 +132,16 @@ class ActivityInvite(models.Model):
                     True,
                 )
 
-            # remove from department waiting list
-            if self.activity.is_season():
+            # Remove from the activity department's waiting list when configured.
+            if (
+                self.activity.is_season()
+                and self.activity.remove_from_waiting_list_on_invite
+            ):
                 members.models.waitinglist.WaitingList.objects.filter(
                     person=self.person, department=self.activity.department
                 ).delete()
-        return super(ActivityInvite, self).save(*args, **kwargs)
+        else:
+            return super(ActivityInvite, self).save(*args, **kwargs)
 
     def __str__(self):
         return "{}, {}".format(self.activity, self.person)

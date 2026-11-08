@@ -21,6 +21,7 @@ class TestModelActivityParticipant(TestCase):
     def setUp(self):
         self.union = UnionFactory()
         self.department = DepartmentFactory(union=self.union)
+        self.other_department = DepartmentFactory(union=self.union)
 
         self.activity = ActivityFactory(
             start_date=datetime.now(),
@@ -45,12 +46,34 @@ class TestModelActivityParticipant(TestCase):
         waitinglist.save()
         self.waitinglist_id = waitinglist.id
 
+        other_waitinglist = WaitingList(
+            person=self.person,
+            department=self.other_department,
+            on_waiting_list_since=datetime.now() - timedelta(days=1),
+        )
+        other_waitinglist.save()
+        self.other_waitinglist_id = other_waitinglist.id
+
     def test_save_waiting_list(self):
         self.participant = ActivityParticipant(
             note="test_save_waiting_list", activity=self.activity, person=self.person
         )
         self.participant.save()
         self.assertFalse(WaitingList.objects.filter(pk=self.waitinglist_id).exists())
+        self.assertFalse(
+            WaitingList.objects.filter(pk=self.other_waitinglist_id).exists()
+        )
+
+    def test_save_keeps_waiting_lists_when_removal_is_disabled(self):
+        self.activity.remove_from_waiting_lists_on_signup = False
+        self.activity.save()
+
+        ActivityParticipant.objects.create(activity=self.activity, person=self.person)
+
+        self.assertTrue(WaitingList.objects.filter(pk=self.waitinglist_id).exists())
+        self.assertTrue(
+            WaitingList.objects.filter(pk=self.other_waitinglist_id).exists()
+        )
 
     def test_utc_to_local_ymdhm(self):
         # test of : Get local current timestamp (t1_local) and convert to utc (t1_utc)
