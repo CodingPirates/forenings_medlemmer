@@ -22,6 +22,7 @@ from members.models.slackinvitesetup import SlackInvitationSetup
 from members.models.slackinvitelog import SlackInviteLog
 import members.models.payment
 import members.models.person
+import members.models.permissions
 import members.models.anonymization_candidate
 import members.models.quickpaytransaction
 import members.models.union
