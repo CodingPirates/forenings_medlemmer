@@ -17,6 +17,7 @@ from rangefilter.filters import (
     DateRangeFilterBuilder,
 )
 
+from .admin_actions import AdminActions
 from .filters.member_admin_filters import (
     MemberCurrentYearListFilter,
     MemberLastYearListFilter,
@@ -154,7 +155,7 @@ class MemberAdmin(admin.ModelAdmin):
 
     autocomplete_fields = ("union", "person")
 
-    actions = ["export_csv_member_info"]
+    actions = ["export_csv_member_info", AdminActions.create_volunteer_action]
 
     def get_actions(self, request):
         actions = super().get_actions(request)

@@ -1,0 +1,15 @@
+.notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media only screen and (max-width: 667px) {
+  .notification > div:first-child {
+    margin-bottom: 0.5em;
+  }
+
+  .notification > div > .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,51 @@
+{% if admin_notifications %}
+    <style>
+        .admin-notifications {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 12px;
+            flex-wrap: wrap;
+        }
+
+        .admin-notification-pill {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+            line-height: 1.2;
+            text-decoration: none !important;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+        }
+
+        .admin-notification-pill--warning {
+            background: #ffe08a;
+            color: #3d2d00 !important;
+            border: 1px solid #d9ad26;
+        }
+
+        .admin-notification-pill:hover,
+        .admin-notification-pill:focus {
+            color: #2a1f00 !important;
+            text-decoration: none !important;
+            background: #ffd65c;
+        }
+
+        .admin-notifications a:link,
+        .admin-notifications a:visited {
+            color: #3d2d00 !important;
+        }
+    </style>
+    <div class="admin-notifications">
+        {% for notification in admin_notifications %}
+            <a
+                href="{{ notification.url }}"
+                class="admin-notification-pill admin-notification-pill--{{ notification.level }}"
+                title="{{ notification.label }}"
+            >
+                {{ notification.label }}
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

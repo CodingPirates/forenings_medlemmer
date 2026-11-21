@@ -71,6 +71,7 @@ class PersonAdmin(admin.ModelAdmin):
     autocomplete_fields = ["municipality", "user", "family"]
     actions = [
         AdminActions.invite_many_to_activity_action,
+        AdminActions.create_volunteer_action,
         "export_emaillist",
         "export_csv",
     ]
@@ -168,6 +169,8 @@ class PersonAdmin(admin.ModelAdmin):
                 {
                     "classes": ("collapse",),
                     "fields": (
+                        "allow_contact_from_cpdk",
+                        "allow_contact_from_other",
                         "consent_preview_link",
                         "consent_by",
                         "consent_at",
@@ -247,6 +250,8 @@ class PersonAdmin(admin.ModelAdmin):
             readonly_fields = []
         # Add consent fields to readonly
         readonly_fields += [
+            "allow_contact_from_cpdk",
+            "allow_contact_from_other",
             "anonymization_status",
             "consent_reminder_sent_at",
             "consent",
