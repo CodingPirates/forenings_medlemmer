@@ -148,6 +148,7 @@ if env.bool("USE_SQLITE", False):
 else:
     DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
 
+'''
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -165,6 +166,7 @@ LOGGING = {
         },
     },
 }
+'''
 
 CACHES = {
     "default": {

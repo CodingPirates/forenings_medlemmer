@@ -227,6 +227,15 @@ class TestVolunteerSignupView(TestCase):
             },
         )
 
+    def _assert_auth_warnings(self, logs, events):
+        self.assertEqual(
+            [
+                (record.levelname, record.getMessage().split(" method=", 1)[0])
+                for record in logs.records
+            ],
+            [("WARNING", event.label) for event in events],
+        )
+
     def test_anonymous_request_with_existing_account_logs_in_after_code(self):
         user = self.person.user
         user.username = "existing@example.com"
@@ -263,14 +272,18 @@ class TestVolunteerSignupView(TestCase):
         real_code = self.client.session["volunteer_verification_code"]
         wrong_code = "000000" if real_code != "000000" else "111111"
 
-        for _ in range(4):
+        with self.assertLogs("members.auth", level="WARNING") as logs:
+            for _ in range(4):
+                response = self.client.post(
+                    reverse("volunteer_signup"), {"verification_code": wrong_code}
+                )
+                self.assertContains(response, "Forkert verifikationskode")
+
             response = self.client.post(
                 reverse("volunteer_signup"), {"verification_code": wrong_code}
             )
-            self.assertContains(response, "Forkert verifikationskode")
-
-        response = self.client.post(
-            reverse("volunteer_signup"), {"verification_code": wrong_code}
+        self._assert_auth_warnings(
+            logs, [AuthLog.Event.CODE_FAILED] * 5 + [AuthLog.Event.CODE_LOCKOUT]
         )
         self.assertContains(response, "Vent 15 minutter")
 
@@ -282,7 +295,9 @@ class TestVolunteerSignupView(TestCase):
         self.assertFalse(VolunteerRequest.objects.filter(person=self.person).exists())
 
         # A fresh session for the same email is still locked, and no code is sent
-        response = self._start_anonymous_request("Existing@example.com")
+        with self.assertLogs("members.auth", level="WARNING") as logs:
+            response = self._start_anonymous_request("Existing@example.com")
+        self._assert_auth_warnings(logs, [AuthLog.Event.CODE_REQUEST_BLOCKED])
         self.assertContains(response, "Vent 15 minutter")
         self.assertNotIn("volunteer_verification_code", self.client.session)
 
@@ -334,10 +349,16 @@ class TestVolunteerSignupView(TestCase):
     @mock.patch.dict(os.environ, {"VOLUNTEER_EMAIL_VERIFICATION_CODE": "001337"})
     def test_env_test_code_does_not_work_after_lockout(self):
         self._start_anonymous_request("existing@example.com")
-        for _ in range(5):
-            self.client.post(
-                reverse("volunteer_signup"), {"verification_code": "999999"}
-            )
+        real_code = self.client.session["volunteer_verification_code"]
+        wrong_code = "999999" if real_code != "999999" else "888888"
+        with self.assertLogs("members.auth", level="WARNING") as logs:
+            for _ in range(5):
+                self.client.post(
+                    reverse("volunteer_signup"), {"verification_code": wrong_code}
+                )
+        self._assert_auth_warnings(
+            logs, [AuthLog.Event.CODE_FAILED] * 5 + [AuthLog.Event.CODE_LOCKOUT]
+        )
 
         self.client.post(reverse("volunteer_signup"), {"verification_code": "001337"})
 
@@ -443,9 +464,11 @@ class TestVolunteerSignupView(TestCase):
         session["volunteer_verification_code_sent_at"] -= 31 * 60
         session.save()
 
-        response = self.client.post(
-            reverse("volunteer_signup"), {"verification_code": code}
-        )
+        with self.assertLogs("members.auth", level="WARNING") as logs:
+            response = self.client.post(
+                reverse("volunteer_signup"), {"verification_code": code}
+            )
+        self._assert_auth_warnings(logs, [AuthLog.Event.CODE_EXPIRED])
         self.assertContains(response, "Koden er udløbet")
         self.assertFalse(
             VolunteerRequest.objects.filter(email="expired@example.com").exists()
