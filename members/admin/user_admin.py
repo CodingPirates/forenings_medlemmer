@@ -119,16 +119,6 @@ class UserAdmin(UserAdmin):
     inlines = (AdminUserInformationInline, PersonInline)
     list_per_page = settings.LIST_PER_PAGE
 
-    list_display = (
-        "username",
-        "email",
-        "first_name",
-        "last_name",
-        "is_staff",
-        "is_active",
-        "last_login",
-    )
-
     readonly_fields = ["date_joined", "last_login"]
 
     def get_queryset(self, request):
@@ -139,8 +129,26 @@ class UserAdmin(UserAdmin):
         #    return qs.filter(is_superuser=False)
         return qs
 
+    def get_list_display(self, request):
+        list_display = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "is_staff",
+            "is_active",
+            "last_login",
+        )
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_superuser_status"
+        ):
+            list_display += ("is_superuser",)
+        return list_display
+
     def get_list_filter(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_superuser_status"
+        ):
             return [
                 "is_staff",
                 "is_superuser",
@@ -159,16 +167,28 @@ class UserAdmin(UserAdmin):
             ]
 
     def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
+        readonly_fields = list(super().get_readonly_fields(request, obj))
 
-        if obj and not request.user.is_superuser and obj.is_superuser:
-            return tuple(readonly_fields) + ("username", "email")
+        if not request.user.is_superuser:
+            readonly_fields.append("is_superuser")
+            if obj and obj.is_superuser:
+                readonly_fields += ["username", "email"]
 
         return readonly_fields
 
     def get_fieldsets(self, request, obj=None):
         if not obj:
             return self.add_fieldsets
+
+        perm_fields = ("is_active", "is_staff", "groups")
+
+        if request.user.has_perm("members.view_superuser_status"):
+            perm_fields = (
+                "is_active",
+                "is_staff",
+                "is_superuser",
+                "groups",
+            )
 
         if request.user.is_superuser:
             perm_fields = (
@@ -178,8 +198,6 @@ class UserAdmin(UserAdmin):
                 "groups",
                 "user_permissions",
             )
-        else:
-            perm_fields = ("is_active", "is_staff", "groups")
 
         if obj and not request.user.is_superuser and obj.is_superuser:
             first_section_fields = ("username",)

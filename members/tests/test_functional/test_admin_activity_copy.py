@@ -25,7 +25,6 @@ from members.models import (
 
 class AdminActivityCopyTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         self.client = Client()
@@ -194,7 +193,7 @@ class AdminActivityCopyTest(StaticLiveServerTestCase):
         select_element = Select(
             self.browser.find_element(By.XPATH, '//select[@name="action"]')
         )
-        select_element.select_by_visible_text("Kopier én aktiviet")
+        select_element.select_by_visible_text("Kopier én aktivitet")
         # Click the submit button.
         self.browser.find_element(
             By.XPATH, '//*[@class="actions"]/button[@type="submit"]'

@@ -35,7 +35,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from members.models.slackinvitelog import SlackInviteLog
 from members.models.slackinvitesetup import SlackInvitationSetup
 
-
 BROWSER_SELECTION = 1  # 1=Chrome, 2=Firefox
 MAX_SNAPSHOT_HTML_CHARS = 250_000
 MAX_LOG_HTML_CHARS = 150_000

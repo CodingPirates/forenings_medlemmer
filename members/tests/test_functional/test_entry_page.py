@@ -12,7 +12,6 @@ from members.tests.factories import (
 )
 from members.tests.test_functional.functional_helpers import log_in
 
-
 """
 This tests the entry page
 """
@@ -20,7 +19,6 @@ This tests the entry page
 
 class EntryPageTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         self.person = PersonFactory.create()

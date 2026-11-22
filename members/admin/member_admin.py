@@ -74,12 +74,8 @@ def generate_member_csv(member_queryset, include_address=False):
         municipality = (
             member.person.municipality.name if member.person.municipality else ""
         )
-        member_since = (
-            member.member_since.strftime("%Y-%m-%d") if member.member_since else ""
-        )
-        member_until = (
-            member.member_until.strftime("%Y-%m-%d") if member.member_until else ""
-        )
+        member_since = member.member_since.strftime("%Y-%m-%d")
+        member_until = member.member_until.strftime("%Y-%m-%d")
 
         # Find betalingsdato (accepted_at) for medlemmet
         payment = None
