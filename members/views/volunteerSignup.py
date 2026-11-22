@@ -130,6 +130,8 @@ def ensure_volunteer_request_template():
         body_html += "\n"
         body_html += "<p>Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.</p>\n"
         body_html += "\n"
+        body_html += "<p>Du kan få hjælp på slack i #medlemssystemsupport eller sende en email til medlemssystem@codingpirates.dk.</p>\n"
+        body_html += "\n"
         body_html += "<p>Med venlig hilsen,<br>\n"
         body_html += "Coding Pirates Danmark</p>"
 
@@ -147,6 +149,8 @@ def ensure_volunteer_request_template():
         body_text += "Log venligst ind på {{ site }}/admin/ for at se detaljerne og kontakte personen.\n"
         body_text += "\n"
         body_text += "Der er ikke inkluderet personlige oplysninger i denne email af hensyn til privatlivsbeskyttelse.\n"
+        body_text += "\n"
+        body_text += "Du kan få hjælp på slack i #medlemssystemsupport eller sende en email til medlemssystem@codingpirates.dk.\n"
         body_text += "\n"
         body_text += "Med venlig hilsen,\n"
         body_text += "Coding Pirates Danmark"
