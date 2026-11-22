@@ -605,7 +605,7 @@ class AdminActions(admin.ModelAdmin):
                     activity=activity,
                     start_date=create_volunteer_form.cleaned_data["start_date"],
                     end_date=create_volunteer_form.cleaned_data["end_date"],
-                    user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+                    volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
                 )
 
                 send_volunteer_user_confirmation_email(volunteer)

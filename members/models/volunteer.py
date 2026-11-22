@@ -5,10 +5,10 @@ from django.utils import timezone
 
 
 class Volunteer(models.Model):
-    class UserConfirmationStatus(models.TextChoices):
-        APPROVED_BY_USER = "APPROVED_BY_USER", "Godkendt af bruger"
-        WAITING_FOR_USER = "WAITING_FOR_USER", "Venter på bruger"
-        REJECTED_BY_USER = "REJECTED_BY_USER", "Afvist af bruger"
+    class VolunteerConfirmationStatus(models.TextChoices):
+        APPROVED_BY_VOLUNTEER = "APPROVED_BY_VOLUNTEER", "Godkendt af frivillig"
+        WAITING_FOR_VOLUNTEER = "WAITING_FOR_VOLUNTEER", "Venter på frivillig"
+        REJECTED_BY_VOLUNTEER = "REJECTED_BY_VOLUNTEER", "Afvist af frivillig"
 
     class Meta:
         verbose_name = "Frivillig"
@@ -35,11 +35,11 @@ class Volunteer(models.Model):
 
     start_date = models.DateField("Startdato", blank=True, null=True, default=None)
     end_date = models.DateField("Slutdato", blank=True, null=True, default=None)
-    user_confirmation_status = models.CharField(
-        "Brugerbekræftelse",
+    volunteer_confirmation_status = models.CharField(
+        "Frivilligbekræftelse",
         max_length=32,
-        choices=UserConfirmationStatus.choices,
-        default=UserConfirmationStatus.APPROVED_BY_USER,
+        choices=VolunteerConfirmationStatus.choices,
+        default=VolunteerConfirmationStatus.APPROVED_BY_VOLUNTEER,
     )
 
     info_reference = models.TextField(

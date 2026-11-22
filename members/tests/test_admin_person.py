@@ -106,8 +106,8 @@ class TestPersonAdmin(TestCase):
         self.assertEqual(str(volunteer.start_date), "2026-06-07")
         self.assertEqual(str(volunteer.end_date), "2026-06-30")
         self.assertEqual(
-            volunteer.user_confirmation_status,
-            Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+            volunteer.volunteer_confirmation_status,
+            Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
         )
         self.assertTrue(
             EmailItem.objects.filter(

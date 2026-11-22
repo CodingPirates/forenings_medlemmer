@@ -157,18 +157,18 @@ class VolunteerAdminForm(forms.ModelForm):
             self.fields["activity"].queryset = Activity.objects.none()
 
 
-class VolunteerUserConfirmationStatusListFilter(admin.SimpleListFilter):
-    title = "Brugerbekræftelse"
-    parameter_name = "user_confirmation_status"
+class VolunteerConfirmationStatusListFilter(admin.SimpleListFilter):
+    title = "Frivilligbekræftelse"
+    parameter_name = "volunteer_confirmation_status"
 
     def lookups(self, request, model_admin):
-        return Volunteer.UserConfirmationStatus.choices
+        return Volunteer.VolunteerConfirmationStatus.choices
 
     def queryset(self, request, queryset):
         if self.value() is None:
             return queryset
 
-        return queryset.filter(user_confirmation_status=self.value())
+        return queryset.filter(volunteer_confirmation_status=self.value())
 
 
 class VolunteerAdmin(admin.ModelAdmin):
@@ -246,7 +246,7 @@ class VolunteerAdmin(admin.ModelAdmin):
         list_display = list(super().get_list_display(request))
 
         if request.user.is_superuser:
-            list_display.append("get_user_confirmation_status")
+            list_display.append("get_volunteer_confirmation_status")
 
         return tuple(list_display)
 
@@ -254,7 +254,7 @@ class VolunteerAdmin(admin.ModelAdmin):
         list_filter = list(super().get_list_filter(request))
 
         if request.user.is_superuser:
-            list_filter.append(VolunteerUserConfirmationStatusListFilter)
+            list_filter.append(VolunteerConfirmationStatusListFilter)
 
         return tuple(list_filter)
 
@@ -428,11 +428,13 @@ class VolunteerAdmin(admin.ModelAdmin):
     get_activity_name.short_description = "Aktivitet"
     get_activity_name.admin_order_field = "activity__name"
 
-    def get_user_confirmation_status(self, obj):
-        return obj.get_user_confirmation_status_display()
+    def get_volunteer_confirmation_status(self, obj):
+        return obj.get_volunteer_confirmation_status_display()
 
-    get_user_confirmation_status.short_description = "Brugerbekræftelse"
-    get_user_confirmation_status.admin_order_field = "user_confirmation_status"
+    get_volunteer_confirmation_status.short_description = "Frivilligbekræftelse"
+    get_volunteer_confirmation_status.admin_order_field = (
+        "volunteer_confirmation_status"
+    )
 
     def get_allow_contact_from_cpdk(self, obj):
         return obj.person.allow_contact_from_cpdk

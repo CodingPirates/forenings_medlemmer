@@ -592,7 +592,7 @@ class TestVolunteerSignupView(TestCase):
             person=self.person,
             department=self.department,
             removed=None,
-            user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+            volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
         )
 
         response = self.client.get(reverse("volunteer_signup"))
@@ -610,7 +610,7 @@ class TestVolunteerSignupView(TestCase):
             person=self.person,
             department=self.department,
             removed=None,
-            user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+            volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
         )
 
         response = self.client.post(
@@ -626,22 +626,22 @@ class TestVolunteerSignupView(TestCase):
 
         pending_volunteer.refresh_from_db()
         self.assertEqual(
-            pending_volunteer.user_confirmation_status,
-            Volunteer.UserConfirmationStatus.APPROVED_BY_USER,
+            pending_volunteer.volunteer_confirmation_status,
+            Volunteer.VolunteerConfirmationStatus.APPROVED_BY_VOLUNTEER,
         )
 
         log_entry = LogEntry.objects.filter(object_id=str(pending_volunteer.pk)).latest(
             "action_time"
         )
-        self.assertIn("Brugerbekræftelse", log_entry.get_change_message())
-        self.assertIn("Godkendt af bruger", log_entry.get_change_message())
+        self.assertIn("Frivilligbekræftelse", log_entry.get_change_message())
+        self.assertIn("Godkendt af frivillig", log_entry.get_change_message())
 
     def test_reject_pending_admin_created_volunteer_updates_status_and_logs(self):
         pending_volunteer = VolunteerFactory(
             person=self.person,
             department=self.department,
             removed=None,
-            user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+            volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
         )
 
         response = self.client.post(
@@ -657,15 +657,15 @@ class TestVolunteerSignupView(TestCase):
 
         pending_volunteer.refresh_from_db()
         self.assertEqual(
-            pending_volunteer.user_confirmation_status,
-            Volunteer.UserConfirmationStatus.REJECTED_BY_USER,
+            pending_volunteer.volunteer_confirmation_status,
+            Volunteer.VolunteerConfirmationStatus.REJECTED_BY_VOLUNTEER,
         )
 
         log_entry = LogEntry.objects.filter(object_id=str(pending_volunteer.pk)).latest(
             "action_time"
         )
-        self.assertIn("Brugerbekræftelse", log_entry.get_change_message())
-        self.assertIn("Afvist af bruger", log_entry.get_change_message())
+        self.assertIn("Frivilligbekræftelse", log_entry.get_change_message())
+        self.assertIn("Afvist af frivillig", log_entry.get_change_message())
 
     def test_volunteer_account_created_page_renders(self):
         response = self.client.get(reverse("volunteer_account_created"))

@@ -307,7 +307,7 @@ def volunteerSignup(request):
                         person__family=family,
                         person__deleted_dtm__isnull=True,
                         removed__isnull=True,
-                        user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+                        volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
                     )
                 except (Volunteer.DoesNotExist, AttributeError):
                     return HttpResponseForbidden(
@@ -316,20 +316,24 @@ def volunteerSignup(request):
 
                 action = request.POST.get("confirmation_action")
                 if action == "accept":
-                    new_status = Volunteer.UserConfirmationStatus.APPROVED_BY_USER
+                    new_status = (
+                        Volunteer.VolunteerConfirmationStatus.APPROVED_BY_VOLUNTEER
+                    )
                 elif action == "reject":
-                    new_status = Volunteer.UserConfirmationStatus.REJECTED_BY_USER
+                    new_status = (
+                        Volunteer.VolunteerConfirmationStatus.REJECTED_BY_VOLUNTEER
+                    )
                 else:
                     return HttpResponseForbidden("Ugyldig handling.")
 
-                old_status = volunteer.get_user_confirmation_status_display()
-                volunteer.user_confirmation_status = new_status
-                volunteer.save(update_fields=["user_confirmation_status"])
+                old_status = volunteer.get_volunteer_confirmation_status_display()
+                volunteer.volunteer_confirmation_status = new_status
+                volunteer.save(update_fields=["volunteer_confirmation_status"])
                 log_volunteer_user_confirmation_change(
                     request,
                     volunteer,
                     old_status,
-                    volunteer.get_user_confirmation_status_display(),
+                    volunteer.get_volunteer_confirmation_status_display(),
                 )
 
                 return HttpResponseRedirect(reverse("volunteer_signup"))
@@ -538,7 +542,7 @@ def volunteerSignup(request):
                         person__family=family,
                         person__deleted_dtm__isnull=True,
                         removed__isnull=True,
-                        user_confirmation_status=Volunteer.UserConfirmationStatus.APPROVED_BY_USER,
+                        volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.APPROVED_BY_VOLUNTEER,
                     )
                     .select_related("person", "department", "activity")
                     .order_by("-added_at")
@@ -549,7 +553,7 @@ def volunteerSignup(request):
                         person__family=family,
                         person__deleted_dtm__isnull=True,
                         removed__isnull=True,
-                        user_confirmation_status=Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+                        volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
                     )
                     .select_related("person", "department", "activity")
                     .order_by("-added_at")
@@ -561,7 +565,7 @@ def volunteerSignup(request):
                         deleted_dtm__isnull=True,
                         volunteer__isnull=False,
                         volunteer__removed__isnull=True,
-                        volunteer__user_confirmation_status=Volunteer.UserConfirmationStatus.APPROVED_BY_USER,
+                        volunteer__volunteer_confirmation_status=Volunteer.VolunteerConfirmationStatus.APPROVED_BY_VOLUNTEER,
                     )
                     .distinct()
                     .order_by("name")

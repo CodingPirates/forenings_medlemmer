@@ -46,7 +46,7 @@ def volunteerRequestCancel(request, item_id):
                     {
                         "changed": {
                             "fields": [
-                                f"Status: {old_status} → {item.get_status_display()} (annulleret af bruger)"
+                                f"Status: {old_status} → {item.get_status_display()} (annulleret af frivillig)"
                             ]
                         }
                     }

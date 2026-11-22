@@ -81,6 +81,6 @@ def log_volunteer_user_confirmation_change(request, volunteer, old_status, new_s
         object_repr=str(volunteer),
         action_flag=CHANGE,
         change_message=(
-            f"Brugerbekræftelse ændret fra '{old_status}' til '{new_status}'."
+            f"Frivilligbekræftelse ændret fra '{old_status}' til '{new_status}'."
         ),
     )

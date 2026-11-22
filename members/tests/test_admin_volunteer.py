@@ -10,7 +10,7 @@ from members.admin.volunteer_admin import (
     VolunteerAdminForm,
     VolunteerVisibilityListFilter,
     VolunteerActivityListFilter,
-    VolunteerUserConfirmationStatusListFilter,
+    VolunteerConfirmationStatusListFilter,
 )
 from members.models import AdminUserInformation, EmailItem, EmailTemplate, Volunteer
 from members.tests.factories import (
@@ -128,31 +128,33 @@ class TestVolunteerAdmin(TestCase):
             ),
         )
 
-    def test_superuser_list_display_includes_user_confirmation_status(self):
+    def test_superuser_list_display_includes_volunteer_confirmation_status(self):
         request = self.make_request()
         request.user = self.superuser
 
         list_display = self.admin.get_list_display(request)
 
-        self.assertIn("get_user_confirmation_status", list_display)
+        self.assertIn("get_volunteer_confirmation_status", list_display)
 
-    def test_non_superuser_list_display_excludes_user_confirmation_status(self):
+    def test_non_superuser_list_display_excludes_volunteer_confirmation_status(self):
         list_display = self.admin.get_list_display(self.make_request())
 
-        self.assertNotIn("get_user_confirmation_status", list_display)
+        self.assertNotIn("get_volunteer_confirmation_status", list_display)
 
-    def test_superuser_list_filter_includes_user_confirmation_status_filter(self):
+    def test_superuser_list_filter_includes_volunteer_confirmation_status_filter(self):
         request = self.make_request()
         request.user = self.superuser
 
         list_filter = self.admin.get_list_filter(request)
 
-        self.assertIn(VolunteerUserConfirmationStatusListFilter, list_filter)
+        self.assertIn(VolunteerConfirmationStatusListFilter, list_filter)
 
-    def test_non_superuser_list_filter_excludes_user_confirmation_status_filter(self):
+    def test_non_superuser_list_filter_excludes_volunteer_confirmation_status_filter(
+        self,
+    ):
         list_filter = self.admin.get_list_filter(self.make_request())
 
-        self.assertNotIn(VolunteerUserConfirmationStatusListFilter, list_filter)
+        self.assertNotIn(VolunteerConfirmationStatusListFilter, list_filter)
 
     def test_activity_is_not_an_autocomplete_field(self):
         self.assertEqual(
@@ -599,8 +601,8 @@ class TestVolunteerAdmin(TestCase):
         self.assertEqual(str(created_volunteer.start_date), "2026-06-07")
         self.assertEqual(str(created_volunteer.end_date), "2026-06-30")
         self.assertEqual(
-            created_volunteer.user_confirmation_status,
-            Volunteer.UserConfirmationStatus.WAITING_FOR_USER,
+            created_volunteer.volunteer_confirmation_status,
+            Volunteer.VolunteerConfirmationStatus.WAITING_FOR_VOLUNTEER,
         )
         self.assertTrue(
             EmailItem.objects.filter(
