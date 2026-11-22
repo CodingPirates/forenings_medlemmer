@@ -253,3 +253,7 @@ class MemberAdmin(MemberSummaryExportMixin, admin.ModelAdmin):
     export_csv_member_address.short_description = (
         "Eksporter medlemsinformation med adresser (CSV)"
     )
+
+    fieldsets = [
+        (None, {"fields": ["person", "union", "member_since", "member_until"]}),
+    ]
