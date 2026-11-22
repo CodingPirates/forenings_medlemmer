@@ -367,19 +367,28 @@ def volunteerSignup(request):
                     request.POST.get("allow_contact_from_other") == "on"
                 )
 
-                if person.allow_contact_from_cpdk != new_allow_contact_from_cpdk:
-                    person.allow_contact_from_cpdk = new_allow_contact_from_cpdk
+                now = timezone.now()
+                if (
+                    person.allow_contact_from_cpdk_at is not None
+                ) != new_allow_contact_from_cpdk:
+                    person.allow_contact_from_cpdk_at = (
+                        now if new_allow_contact_from_cpdk else None
+                    )
                     changed_fields.append("Må Coding Pirates Denmark kontakte mig?")
 
-                if person.allow_contact_from_other != new_allow_contact_from_other:
-                    person.allow_contact_from_other = new_allow_contact_from_other
+                if (
+                    person.allow_contact_from_other_at is not None
+                ) != new_allow_contact_from_other:
+                    person.allow_contact_from_other_at = (
+                        now if new_allow_contact_from_other else None
+                    )
                     changed_fields.append("Må andre afdelinger kontakte mig?")
 
                 if changed_fields:
                     person.save(
                         update_fields=[
-                            "allow_contact_from_cpdk",
-                            "allow_contact_from_other",
+                            "allow_contact_from_cpdk_at",
+                            "allow_contact_from_other_at",
                         ]
                     )
                     log_person_contact_preference_change(
@@ -397,8 +406,8 @@ def volunteerSignup(request):
                 # Create volunteer request with selected person
                 volunteer_request = VolunteerRequest.objects.create(
                     person=selected_person,
-                    allow_contact_from_cpdk=selected_person.allow_contact_from_cpdk,
-                    allow_contact_from_other=selected_person.allow_contact_from_other,
+                    allow_contact_from_cpdk_at=selected_person.allow_contact_from_cpdk_at,
+                    allow_contact_from_other_at=selected_person.allow_contact_from_other_at,
                     info_reference=logged_in_form.cleaned_data["info_reference"],
                     info_whishes=logged_in_form.cleaned_data["info_whishes"],
                 )
@@ -476,16 +485,16 @@ def volunteerSignup(request):
                         volunteer_request.person = person
                         volunteer_request.finished = timezone.now()
                         volunteer_request.save()
-                        person.allow_contact_from_cpdk = (
-                            volunteer_request.allow_contact_from_cpdk
+                        person.allow_contact_from_cpdk_at = (
+                            volunteer_request.allow_contact_from_cpdk_at
                         )
-                        person.allow_contact_from_other = (
-                            volunteer_request.allow_contact_from_other
+                        person.allow_contact_from_other_at = (
+                            volunteer_request.allow_contact_from_other_at
                         )
                         person.save(
                             update_fields=[
-                                "allow_contact_from_cpdk",
-                                "allow_contact_from_other",
+                                "allow_contact_from_cpdk_at",
+                                "allow_contact_from_other_at",
                             ]
                         )
 
@@ -693,18 +702,21 @@ def volunteerSignup(request):
 
                     # The env test code (test environments only) behaves like a real code
                     account_person = find_loginable_person(form_data.get("email"))
-                    consent_at = timezone.now() if form_data.get("consent") else None
+                    now = timezone.now()
+                    consent_at = now if form_data.get("consent") else None
+                    allow_contact_from_cpdk_at = (
+                        now if form_data.get("allow_contact_from_cpdk") else None
+                    )
+                    allow_contact_from_other_at = (
+                        now if form_data.get("allow_contact_from_other") else None
+                    )
 
                     if account_person is not None:
                         volunteer_request = VolunteerRequest.objects.create(
                             person=account_person,
                             consent_at=consent_at,
-                            allow_contact_from_cpdk=form_data.get(
-                                "allow_contact_from_cpdk", False
-                            ),
-                            allow_contact_from_other=form_data.get(
-                                "allow_contact_from_other", False
-                            ),
+                            allow_contact_from_cpdk_at=allow_contact_from_cpdk_at,
+                            allow_contact_from_other_at=allow_contact_from_other_at,
                             info_reference=form_data.get("info_reference", ""),
                             info_whishes=form_data.get("info_whishes", ""),
                         )
@@ -716,12 +728,8 @@ def volunteerSignup(request):
                             age=form_data.get("age") or None,
                             zip=form_data.get("zip"),
                             consent_at=consent_at,
-                            allow_contact_from_cpdk=form_data.get(
-                                "allow_contact_from_cpdk", False
-                            ),
-                            allow_contact_from_other=form_data.get(
-                                "allow_contact_from_other", False
-                            ),
+                            allow_contact_from_cpdk_at=allow_contact_from_cpdk_at,
+                            allow_contact_from_other_at=allow_contact_from_other_at,
                             info_reference=form_data.get("info_reference", ""),
                             info_whishes=form_data.get("info_whishes", ""),
                         )

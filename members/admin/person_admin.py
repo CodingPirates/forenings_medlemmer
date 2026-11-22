@@ -169,8 +169,8 @@ class PersonAdmin(admin.ModelAdmin):
                 {
                     "classes": ("collapse",),
                     "fields": (
-                        "allow_contact_from_cpdk",
-                        "allow_contact_from_other",
+                        "allow_contact_from_cpdk_at",
+                        "allow_contact_from_other_at",
                         "consent_preview_link",
                         "consent_by",
                         "consent_at",
@@ -250,8 +250,8 @@ class PersonAdmin(admin.ModelAdmin):
             readonly_fields = []
         # Add consent fields to readonly
         readonly_fields += [
-            "allow_contact_from_cpdk",
-            "allow_contact_from_other",
+            "allow_contact_from_cpdk_at",
+            "allow_contact_from_other_at",
             "anonymization_status",
             "consent_reminder_sent_at",
             "consent",

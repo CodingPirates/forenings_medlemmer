@@ -146,7 +146,7 @@
                                                                 type="checkbox"
                                                                 name="allow_contact_from_cpdk"
                                                                 id="id_allow_contact_from_cpdk_{{ person.id }}"
-                                                                {% if person.allow_contact_from_cpdk %}checked{% endif %}
+                                                                {% if person.allow_contact_from_cpdk_at %}checked{% endif %}
                                                             >
                                                             <label class="form-check-label small" for="id_allow_contact_from_cpdk_{{ person.id }}">
                                                                 Må Coding Pirates Denmark kontakte mig
@@ -158,7 +158,7 @@
                                                                 type="checkbox"
                                                                 name="allow_contact_from_other"
                                                                 id="id_allow_contact_from_other_{{ person.id }}"
-                                                                {% if person.allow_contact_from_other %}checked{% endif %}
+                                                                {% if person.allow_contact_from_other_at %}checked{% endif %}
                                                             >
                                                             <label class="form-check-label small" for="id_allow_contact_from_other_{{ person.id }}">
                                                                 Må andre afdelinger kontakte mig?

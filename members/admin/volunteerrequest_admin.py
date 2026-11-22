@@ -7,8 +7,8 @@ class VolunteerRequestAdmin(admin.ModelAdmin):
         "get_email",
         "get_phone",
         "get_age",
-        "allow_contact_from_cpdk",
-        "allow_contact_from_other",
+        "allow_contact_from_cpdk_at",
+        "allow_contact_from_other_at",
         "get_new",
         "created",
         "finished",
@@ -24,8 +24,8 @@ class VolunteerRequestAdmin(admin.ModelAdmin):
         "get_new",
         "created",
         "finished",
-        "allow_contact_from_cpdk",
-        "allow_contact_from_other",
+        "allow_contact_from_cpdk_at",
+        "allow_contact_from_other_at",
         "info_whishes",
         "info_reference",
     )
@@ -41,8 +41,8 @@ class VolunteerRequestAdmin(admin.ModelAdmin):
             "Ønsker og referencer",
             {
                 "fields": (
-                    "allow_contact_from_cpdk",
-                    "allow_contact_from_other",
+                    "allow_contact_from_cpdk_at",
+                    "allow_contact_from_other_at",
                     "info_whishes",
                     "info_reference",
                 ),

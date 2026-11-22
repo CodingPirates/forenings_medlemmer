@@ -23,8 +23,8 @@ class TestVolunteerSignupView(TestCase):
         self.factory = RequestFactory()
         self.person = PersonFactory(
             address_invalid=True,
-            allow_contact_from_cpdk=False,
-            allow_contact_from_other=False,
+            allow_contact_from_cpdk_at=None,
+            allow_contact_from_other_at=None,
         )
         self.department = DepartmentFactory(closed_at=None)
         self.volunteer = VolunteerFactory(
@@ -47,8 +47,8 @@ class TestVolunteerSignupView(TestCase):
         self.assertRedirects(response, reverse("volunteer_signup"))
 
         self.person.refresh_from_db()
-        self.assertTrue(self.person.allow_contact_from_cpdk)
-        self.assertTrue(self.person.allow_contact_from_other)
+        self.assertIsNotNone(self.person.allow_contact_from_cpdk_at)
+        self.assertIsNotNone(self.person.allow_contact_from_other_at)
 
         log_entry = LogEntry.objects.filter(object_id=str(self.person.pk)).latest(
             "action_time"
@@ -67,8 +67,8 @@ class TestVolunteerSignupView(TestCase):
             removed=None,
             person=PersonFactory(
                 address_invalid=True,
-                allow_contact_from_cpdk=False,
-                allow_contact_from_other=False,
+                allow_contact_from_cpdk_at=None,
+                allow_contact_from_other_at=None,
             ),
         )
 
@@ -85,8 +85,8 @@ class TestVolunteerSignupView(TestCase):
         self.assertEqual(response.status_code, 403)
 
         other_volunteer.person.refresh_from_db()
-        self.assertFalse(other_volunteer.person.allow_contact_from_cpdk)
-        self.assertFalse(other_volunteer.person.allow_contact_from_other)
+        self.assertIsNone(other_volunteer.person.allow_contact_from_cpdk_at)
+        self.assertIsNone(other_volunteer.person.allow_contact_from_other_at)
         self.assertFalse(
             LogEntry.objects.filter(
                 object_id=str(other_volunteer.person.pk),
@@ -99,8 +99,8 @@ class TestVolunteerSignupView(TestCase):
             family=self.person.family,
             user=None,
             address_invalid=True,
-            allow_contact_from_cpdk=False,
-            allow_contact_from_other=False,
+            allow_contact_from_cpdk_at=None,
+            allow_contact_from_other_at=None,
         )
 
         response = self.client.post(
@@ -116,8 +116,8 @@ class TestVolunteerSignupView(TestCase):
         self.assertEqual(response.status_code, 403)
 
         other_person_in_family.refresh_from_db()
-        self.assertFalse(other_person_in_family.allow_contact_from_cpdk)
-        self.assertFalse(other_person_in_family.allow_contact_from_other)
+        self.assertIsNone(other_person_in_family.allow_contact_from_cpdk_at)
+        self.assertIsNone(other_person_in_family.allow_contact_from_other_at)
 
     def test_updates_contact_preference_for_person_with_multiple_active_volunteer_roles(
         self,
@@ -140,14 +140,14 @@ class TestVolunteerSignupView(TestCase):
         self.assertRedirects(response, reverse("volunteer_signup"))
 
         self.person.refresh_from_db()
-        self.assertTrue(self.person.allow_contact_from_cpdk)
-        self.assertTrue(self.person.allow_contact_from_other)
+        self.assertIsNotNone(self.person.allow_contact_from_cpdk_at)
+        self.assertIsNotNone(self.person.allow_contact_from_other_at)
 
     def test_logged_in_volunteer_request_saves_contact_preference(self):
-        self.person.allow_contact_from_cpdk = True
-        self.person.allow_contact_from_other = True
+        self.person.allow_contact_from_cpdk_at = timezone.now()
+        self.person.allow_contact_from_other_at = timezone.now()
         self.person.save(
-            update_fields=["allow_contact_from_cpdk", "allow_contact_from_other"]
+            update_fields=["allow_contact_from_cpdk_at", "allow_contact_from_other_at"]
         )
 
         response = self.client.post(
@@ -163,8 +163,8 @@ class TestVolunteerSignupView(TestCase):
         self.assertEqual(response.status_code, 200)
 
         volunteer_request = VolunteerRequest.objects.get(person=self.person)
-        self.assertTrue(volunteer_request.allow_contact_from_cpdk)
-        self.assertTrue(volunteer_request.allow_contact_from_other)
+        self.assertIsNotNone(volunteer_request.allow_contact_from_cpdk_at)
+        self.assertIsNotNone(volunteer_request.allow_contact_from_other_at)
 
     def test_anonymous_volunteer_request_requires_and_saves_consent(self):
         self.client.logout()
@@ -676,8 +676,8 @@ class TestVolunteerSignupView(TestCase):
     def test_accept_request_copies_contact_preference_to_person(self):
         volunteer_request = VolunteerRequest.objects.create(
             person=self.person,
-            allow_contact_from_cpdk=True,
-            allow_contact_from_other=True,
+            allow_contact_from_cpdk_at=timezone.now(),
+            allow_contact_from_other_at=timezone.now(),
             info_reference="LinkedIn",
             info_whishes="Jeg vil gerne hjælpe med undervisning.",
         )
@@ -701,14 +701,14 @@ class TestVolunteerSignupView(TestCase):
         )
         self.person.refresh_from_db()
         self.assertEqual(created_volunteer.person_id, self.person.pk)
-        self.assertTrue(self.person.allow_contact_from_cpdk)
-        self.assertTrue(self.person.allow_contact_from_other)
+        self.assertIsNotNone(self.person.allow_contact_from_cpdk_at)
+        self.assertIsNotNone(self.person.allow_contact_from_other_at)
 
     def test_recent_requests_show_status_from_volunteerrequestitem(self):
         volunteer_request = VolunteerRequest.objects.create(
             person=self.person,
-            allow_contact_from_cpdk=True,
-            allow_contact_from_other=False,
+            allow_contact_from_cpdk_at=timezone.now(),
+            allow_contact_from_other_at=None,
             info_reference="LinkedIn",
             info_whishes="Jeg vil gerne hjælpe.",
         )

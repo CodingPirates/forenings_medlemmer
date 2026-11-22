@@ -52,10 +52,10 @@ class TestPersonAdmin(TestCase):
         contact_fields = fieldsets[0][1]["fields"]
         consent_fields = fieldsets[-1][1]["fields"]
 
-        self.assertNotIn("allow_contact_from_cpdk", contact_fields)
-        self.assertNotIn("allow_contact_from_other", contact_fields)
-        self.assertIn("allow_contact_from_cpdk", consent_fields)
-        self.assertIn("allow_contact_from_other", consent_fields)
+        self.assertNotIn("allow_contact_from_cpdk_at", contact_fields)
+        self.assertNotIn("allow_contact_from_other_at", contact_fields)
+        self.assertIn("allow_contact_from_cpdk_at", consent_fields)
+        self.assertIn("allow_contact_from_other_at", consent_fields)
 
     def test_contact_sharing_fields_are_readonly_for_superuser(self):
         readonly_fields = self.admin.get_readonly_fields(
@@ -63,8 +63,8 @@ class TestPersonAdmin(TestCase):
             self.person,
         )
 
-        self.assertIn("allow_contact_from_cpdk", readonly_fields)
-        self.assertIn("allow_contact_from_other", readonly_fields)
+        self.assertIn("allow_contact_from_cpdk_at", readonly_fields)
+        self.assertIn("allow_contact_from_other_at", readonly_fields)
 
     def test_create_volunteer_action_requires_single_person(self):
         request = self.make_post_request(self.user)

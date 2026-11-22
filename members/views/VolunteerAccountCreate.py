@@ -112,6 +112,7 @@ def VolunteerAccountCreate(request, token):
             )
 
             # create person (volunteer)
+            now = timezone.now()
             person = Person.objects.create(
                 membertype=Person.PARENT,  # Volunteers are typically parents
                 name=signup.cleaned_data["parent_name"],
@@ -125,11 +126,11 @@ def VolunteerAccountCreate(request, token):
                 placename=signup.cleaned_data["placename"],
                 email=signup.cleaned_data["parent_email"],
                 phone=signup.cleaned_data["parent_phone"],
-                allow_contact_from_cpdk=signup.cleaned_data.get(
-                    "allow_contact_from_cpdk", False
+                allow_contact_from_cpdk_at=(
+                    now if signup.cleaned_data.get("allow_contact_from_cpdk") else None
                 ),
-                allow_contact_from_other=signup.cleaned_data.get(
-                    "allow_contact_from_other", False
+                allow_contact_from_other_at=(
+                    now if signup.cleaned_data.get("allow_contact_from_other") else None
                 ),
                 birthday=signup.cleaned_data["parent_birthday"],
                 gender=signup.cleaned_data["parent_gender"],
@@ -137,7 +138,7 @@ def VolunteerAccountCreate(request, token):
                 user=user,
                 consent=latest_consent,
                 consent_by=user,
-                consent_at=timezone.now(),
+                consent_at=now,
             )
             person.save()
 
@@ -241,8 +242,10 @@ def VolunteerAccountCreate(request, token):
         "parent_email": volunteer_request.email,
         "parent_phone": volunteer_request.phone,
         "zipcode": volunteer_request.zip,
-        "allow_contact_from_cpdk": volunteer_request.allow_contact_from_cpdk,
-        "allow_contact_from_other": volunteer_request.allow_contact_from_other,
+        "allow_contact_from_cpdk": volunteer_request.allow_contact_from_cpdk_at
+        is not None,
+        "allow_contact_from_other": volunteer_request.allow_contact_from_other_at
+        is not None,
         "volunteer_info_reference": volunteer_request.info_reference,
         "volunteer_info_whishes": volunteer_request.info_whishes,
     }

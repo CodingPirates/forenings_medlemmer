@@ -68,10 +68,10 @@ class VolunteerVisibilityListFilter(admin.SimpleListFilter):
             return queryset.filter(department__pk=self.value().split(":", 1)[1])
 
         if self.value() == "shared_other":
-            return queryset.filter(person__allow_contact_from_other=True)
+            return queryset.filter(person__allow_contact_from_other_at__isnull=False)
 
         if self.value() == "shared_cpdk":
-            return queryset.filter(person__allow_contact_from_cpdk=True)
+            return queryset.filter(person__allow_contact_from_cpdk_at__isnull=False)
 
         if self.value() == "all":
             return queryset
@@ -338,22 +338,22 @@ class VolunteerAdmin(admin.ModelAdmin):
             base_filter = Q(department__in=departments)
 
             if request.user.has_perm("members.see_contacts_shared_with_other"):
-                base_filter |= Q(person__allow_contact_from_other=True)
+                base_filter |= Q(person__allow_contact_from_other_at__isnull=False)
 
             if request.user.has_perm("members.see_contacts_shared_with_cpdk"):
-                base_filter |= Q(person__allow_contact_from_cpdk=True)
+                base_filter |= Q(person__allow_contact_from_cpdk_at__isnull=False)
 
             qs = qs.filter(base_filter).distinct()
 
             if visibility == "shared_other" and request.user.has_perm(
                 "members.see_contacts_shared_with_other"
             ):
-                return qs.filter(person__allow_contact_from_other=True)
+                return qs.filter(person__allow_contact_from_other_at__isnull=False)
 
             if visibility == "shared_cpdk" and request.user.has_perm(
                 "members.see_contacts_shared_with_cpdk"
             ):
-                return qs.filter(person__allow_contact_from_cpdk=True)
+                return qs.filter(person__allow_contact_from_cpdk_at__isnull=False)
 
             return qs
 
@@ -437,18 +437,20 @@ class VolunteerAdmin(admin.ModelAdmin):
     )
 
     def get_allow_contact_from_cpdk(self, obj):
-        return obj.person.allow_contact_from_cpdk
+        return obj.person.allow_contact_from_cpdk_at is not None
 
     get_allow_contact_from_cpdk.short_description = "Delt med CPDK"
     get_allow_contact_from_cpdk.boolean = True
-    get_allow_contact_from_cpdk.admin_order_field = "person__allow_contact_from_cpdk"
+    get_allow_contact_from_cpdk.admin_order_field = "person__allow_contact_from_cpdk_at"
 
     def get_allow_contact_from_other(self, obj):
-        return obj.person.allow_contact_from_other
+        return obj.person.allow_contact_from_other_at is not None
 
     get_allow_contact_from_other.short_description = "Delt med andre"
     get_allow_contact_from_other.boolean = True
-    get_allow_contact_from_other.admin_order_field = "person__allow_contact_from_other"
+    get_allow_contact_from_other.admin_order_field = (
+        "person__allow_contact_from_other_at"
+    )
 
     def export_volunteer_info_csv(self, request, queryset):
         result = """"Forening";"Afdeling";"Aktivitet";"Navn";"Email";"Startdato";"Slutdato"\n"""

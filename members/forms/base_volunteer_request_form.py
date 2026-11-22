@@ -74,13 +74,18 @@ class BaseVolunteerRequestForm(forms.ModelForm):
         fields = [
             "info_reference",
             "info_whishes",
-            "allow_contact_from_cpdk",
-            "allow_contact_from_other",
         ]
         widgets = {
             "info_reference": forms.Textarea(attrs={"rows": 3}),
             "info_whishes": forms.Textarea(attrs={"rows": 5}),
         }
+
+    allow_contact_from_cpdk = forms.BooleanField(
+        label="Må Coding Pirates Denmark kontakte mig?", required=False
+    )
+    allow_contact_from_other = forms.BooleanField(
+        label="Må andre afdelinger kontakte mig?", required=False
+    )
 
     # Shared fields for departments and activities
     departments = DepartmentWithAddressChoiceField(

@@ -16,8 +16,6 @@ class VolunteerRequestForm(BaseVolunteerRequestForm):
             "phone",
             "age",
             "zip",
-            "allow_contact_from_cpdk",
-            "allow_contact_from_other",
             "info_reference",
             "info_whishes",
         ]

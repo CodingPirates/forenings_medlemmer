@@ -3,6 +3,7 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.test import RequestFactory, TestCase
+from django.utils import timezone
 
 from members.admin.admin_actions import AdminActions
 from members.admin.volunteer_admin import (
@@ -56,8 +57,8 @@ class TestVolunteerAdmin(TestCase):
         self.shared_other_volunteer = VolunteerFactory(
             department=self.other_department,
             person=PersonFactory(
-                allow_contact_from_cpdk=False,
-                allow_contact_from_other=True,
+                allow_contact_from_cpdk_at=None,
+                allow_contact_from_other_at=timezone.now(),
                 address_invalid=True,
             ),
             removed=None,
@@ -65,8 +66,8 @@ class TestVolunteerAdmin(TestCase):
         self.shared_cpdk_volunteer = VolunteerFactory(
             department=self.other_department,
             person=PersonFactory(
-                allow_contact_from_cpdk=True,
-                allow_contact_from_other=False,
+                allow_contact_from_cpdk_at=timezone.now(),
+                allow_contact_from_other_at=None,
                 address_invalid=True,
             ),
             removed=None,

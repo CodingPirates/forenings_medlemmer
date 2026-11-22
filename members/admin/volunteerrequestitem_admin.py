@@ -178,16 +178,16 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
         for obj in queryset.filter(status="NEW"):
             if obj.volunteer_request.person:
                 if obj.activity:
-                    obj.volunteer_request.person.allow_contact_from_cpdk = (
-                        obj.volunteer_request.allow_contact_from_cpdk
+                    obj.volunteer_request.person.allow_contact_from_cpdk_at = (
+                        obj.volunteer_request.allow_contact_from_cpdk_at
                     )
-                    obj.volunteer_request.person.allow_contact_from_other = (
-                        obj.volunteer_request.allow_contact_from_other
+                    obj.volunteer_request.person.allow_contact_from_other_at = (
+                        obj.volunteer_request.allow_contact_from_other_at
                     )
                     obj.volunteer_request.person.save(
                         update_fields=[
-                            "allow_contact_from_cpdk",
-                            "allow_contact_from_other",
+                            "allow_contact_from_cpdk_at",
+                            "allow_contact_from_other_at",
                         ]
                     )
                     volunteer = Volunteer.objects.create(
@@ -204,16 +204,16 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                     except AttributeError:
                         pass
                 else:
-                    obj.volunteer_request.person.allow_contact_from_cpdk = (
-                        obj.volunteer_request.allow_contact_from_cpdk
+                    obj.volunteer_request.person.allow_contact_from_cpdk_at = (
+                        obj.volunteer_request.allow_contact_from_cpdk_at
                     )
-                    obj.volunteer_request.person.allow_contact_from_other = (
-                        obj.volunteer_request.allow_contact_from_other
+                    obj.volunteer_request.person.allow_contact_from_other_at = (
+                        obj.volunteer_request.allow_contact_from_other_at
                     )
                     obj.volunteer_request.person.save(
                         update_fields=[
-                            "allow_contact_from_cpdk",
-                            "allow_contact_from_other",
+                            "allow_contact_from_cpdk_at",
+                            "allow_contact_from_other_at",
                         ]
                     )
                     volunteer = Volunteer.objects.create(
@@ -282,16 +282,16 @@ class VolunteerRequestItemAdmin(admin.ModelAdmin):
                 # Link the volunteer request to the person
                 obj.volunteer_request.person = person
                 obj.volunteer_request.save()
-                person.allow_contact_from_cpdk = (
-                    obj.volunteer_request.allow_contact_from_cpdk
+                person.allow_contact_from_cpdk_at = (
+                    obj.volunteer_request.allow_contact_from_cpdk_at
                 )
-                person.allow_contact_from_other = (
-                    obj.volunteer_request.allow_contact_from_other
+                person.allow_contact_from_other_at = (
+                    obj.volunteer_request.allow_contact_from_other_at
                 )
                 person.save(
                     update_fields=[
-                        "allow_contact_from_cpdk",
-                        "allow_contact_from_other",
+                        "allow_contact_from_cpdk_at",
+                        "allow_contact_from_other_at",
                     ]
                 )
 

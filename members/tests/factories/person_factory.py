@@ -35,8 +35,8 @@ class PersonFactory(DjangoModelFactory):
         lambda n: "person{0}@example.com".format(n)
     )  # Faker("email")
     phone = Faker("phone_number")
-    allow_contact_from_cpdk = False
-    allow_contact_from_other = False
+    allow_contact_from_cpdk_at = None
+    allow_contact_from_other_at = None
     gender = FuzzyChoice([code for (code, name) in Person.MEMBER_GENDER_CHOICES])
     birthday = Faker("date_of_birth", minimum_age=0, maximum_age=100)
     # has_certificate = Faker("date")
