@@ -382,19 +382,6 @@ class VolunteerAdmin(admin.ModelAdmin):
         return self.user_manages_department(request.user, obj.department)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """
-        # Only show departments that user can access
-        if db_field.name == "department":
-            if request.user.is_superuser or request.user.has_perm(
-                "members.view_all_departments"
-            ):
-                kwargs["queryset"] = Department.objects.all()
-            else:
-                kwargs["queryset"] = Department.objects.filter(
-                    adminuserinformation__user=request.user
-                )
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-        """
         if db_field.name == "activity":
             if "department" in request.GET:
                 department_id = request.GET.get("department")
