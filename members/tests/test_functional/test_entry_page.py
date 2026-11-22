@@ -17,7 +17,6 @@ This tests the entry page
 
 class EntryPageTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         self.person = PersonFactory.create()

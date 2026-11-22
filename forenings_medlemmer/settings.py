@@ -166,6 +166,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+if TESTING:
+    # MD5PasswordHasher is faster than the default PBKDF2PasswordHasher,
+    # but should only be used for testing.
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

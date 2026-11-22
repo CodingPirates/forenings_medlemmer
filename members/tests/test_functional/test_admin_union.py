@@ -25,7 +25,6 @@ def get_select_element_by_onchange(browser, index):
 
 class UnionAdminTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         self.client = Client()
