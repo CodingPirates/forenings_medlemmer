@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from members.models.address import Address
 
-
 # run locally:
 # docker compose run web ./manage.py update_ext_address_info
 
