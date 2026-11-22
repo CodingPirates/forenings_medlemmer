@@ -140,7 +140,8 @@ class Activity(models.Model):
             if activitytype == "FORLØB":
                 min_amount = (
                     self.season_fee
-                    if self.season_fee is not None and self.season_fee < self.ACTIVITY_MIN_AMOUNT
+                    if self.season_fee is not None
+                    and self.season_fee < self.ACTIVITY_MIN_AMOUNT
                     else self.ACTIVITY_MIN_AMOUNT
                 )
 
