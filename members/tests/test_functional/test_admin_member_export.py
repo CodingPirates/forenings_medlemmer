@@ -67,8 +67,7 @@ class MemberSummaryExportTest(StaticLiveServerTestCase):
 
     def test_download_returns_to_filtered_member_list(self):
         url, wait = self.open_summary()
-        self.browser.execute_script(
-            """
+        self.browser.execute_script("""
             const originalFetch = window.fetch;
             window.fetch = async (...args) => {
                 const response = await originalFetch(...args);
@@ -81,8 +80,7 @@ class MemberSummaryExportTest(StaticLiveServerTestCase):
                 return originalClick.call(this);
             };
             document.querySelector('input[name="date"]').value = "2026-06-01";
-            """
-        )
+            """)
         self.browser.find_element(
             By.CSS_SELECTOR, '#member-summary-export input[type="submit"]'
         ).click()

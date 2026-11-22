@@ -31,7 +31,6 @@ from members.models import (
     WaitingList,
 )
 
-
 MEMBER_SUMMARY_MIN_DATE = date(2026, 1, 1)
 
 
