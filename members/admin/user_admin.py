@@ -119,16 +119,6 @@ class UserAdmin(UserAdmin):
     inlines = (AdminUserInformationInline, PersonInline)
     list_per_page = settings.LIST_PER_PAGE
 
-    list_display = (
-        "username",
-        "email",
-        "first_name",
-        "last_name",
-        "is_staff",
-        "is_active",
-        "last_login",
-    )
-
     readonly_fields = ["date_joined", "last_login"]
 
     def get_queryset(self, request):
@@ -139,8 +129,26 @@ class UserAdmin(UserAdmin):
         #    return qs.filter(is_superuser=False)
         return qs
 
+    def get_list_display(self, request):
+        list_display = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "is_staff",
+            "is_active",
+            "last_login",
+        )
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_superuser_status"
+        ):
+            list_display += ("is_superuser",)
+        return list_display
+
     def get_list_filter(self, request):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_superuser_status"
+        ):
             return [
                 "is_staff",
                 "is_superuser",
@@ -158,12 +166,25 @@ class UserAdmin(UserAdmin):
                 AdminUserDepartmentListFilter,
             ]
 
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return self.readonly_fields + ["is_superuser"]
+        return self.readonly_fields
+
     def get_fieldsets(self, request, obj=None):
         # 20230924: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
         if not obj:
             return self.add_fieldsets
 
         perm_fields = ("is_active", "is_staff", "groups")
+
+        if request.user.has_perm("members.view_superuser_status"):
+            perm_fields = (
+                "is_active",
+                "is_staff",
+                "is_superuser",
+                "groups",
+            )
 
         if request.user.is_superuser:
             perm_fields = (
