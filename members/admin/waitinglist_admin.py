@@ -238,7 +238,7 @@ class WaitingListAdmin(admin.ModelAdmin):
         if request.user.is_superuser or request.user.has_perm(
             "members.view_consent_information"
         ):
-            base.append("family_consent_id")
+            base += ["family_consent_id"]
         return base
 
     @admin.display(description="Privatlivspolitik")
