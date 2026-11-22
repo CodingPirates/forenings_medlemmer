@@ -18,7 +18,6 @@ This test goes to the volunteer signup.
 
 class VolunteerTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         if not os.path.exists("test-screens"):

@@ -18,7 +18,6 @@ used to log in.
 
 class DepartmentListTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         self.department_1 = DepartmentFactory.create(

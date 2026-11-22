@@ -7,7 +7,6 @@ from selenium.webdriver.common.by import By
 
 class MembershipTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         chrome_options = webdriver.ChromeOptions()
