@@ -4,6 +4,36 @@ from django.utils import timezone
 from members.models import AdminUserInformation, Union
 
 
+class MemberPaymentListFilter(admin.SimpleListFilter):
+    title = "Betalt"
+    parameter_name = "payment_status"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", "Ja"),
+            ("no", "Nej"),
+            ("all", "Alle"),
+        )
+
+    def choices(self, changelist):
+        value = self.value() or "yes"
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": value == lookup,
+                "query_string": changelist.get_query_string(
+                    {self.parameter_name: lookup}
+                ),
+                "display": title,
+            }
+
+    def queryset(self, request, queryset):
+        if self.value() in (None, "yes"):
+            return queryset.filter(latest_payment_confirmed_at__isnull=False)
+        if self.value() == "no":
+            return queryset.filter(latest_payment_confirmed_at__isnull=True)
+        return queryset
+
+
 class MemberCurrentYearListFilter(admin.SimpleListFilter):
     title = "Medlem i år " + str(timezone.now().year)
     parameter_name = "member_list_current_year"

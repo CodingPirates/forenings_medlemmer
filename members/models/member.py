@@ -18,6 +18,7 @@ class Member(models.Model):
         verbose_name_plural = "Medlemmer"
         permissions = [
             ("member_export_address", "Kan eksportere medlemsadresser"),
+            ("member_export_summary", "Kan eksportere medlemsoversigt pr. forening"),
         ]
 
     union = models.ForeignKey(
