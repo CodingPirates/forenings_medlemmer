@@ -55,7 +55,6 @@ from .slackinvitelog_admin import SlackInviteLogAdmin
 from .authlog_admin import AuthLogAdmin
 from .slackinvitesetup_admin import SlackInvitationSetupAdmin
 
-
 default_each_context = admin.site.each_context
 
 

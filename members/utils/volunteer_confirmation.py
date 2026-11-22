@@ -5,7 +5,6 @@ from django.urls import reverse
 
 from members.models import EmailTemplate
 
-
 VOLUNTEER_USER_CONFIRMATION_TEMPLATE_ID = "VOLUNTEER_USER_CONFIRMATION"
 
 

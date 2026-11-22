@@ -27,7 +27,6 @@ from members.utils.admin_log import log_person_contact_preference_change
 from members.utils.volunteer_confirmation import log_volunteer_user_confirmation_change
 from members.models.emailtemplate import EmailTemplate
 
-
 MAX_VERIFICATION_ATTEMPTS = 5
 VERIFICATION_LOCKOUT_MINUTES = 15
 VERIFICATION_CODE_VALID_MINUTES = 30
