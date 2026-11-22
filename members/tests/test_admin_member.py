@@ -10,11 +10,8 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import translation
 
-from members.admin.member_admin import (
-    MemberAdmin,
-    MemberSummaryExportForm,
-    generate_member_csv,
-)
+from members.admin.admin_actions import MemberSummaryExportForm
+from members.admin.member_admin import MemberAdmin, generate_member_csv
 from members.models import AdminUserInformation, Member, Payment
 
 from .factories import MemberFactory, PersonFactory, UnionFactory
@@ -185,7 +182,7 @@ class MemberAdminPaymentTest(TestCase):
     def test_summary_minimum_date_updates_help_and_validation(self):
         with (
             patch(
-                "members.admin.member_admin.MEMBER_SUMMARY_MIN_DATE", date(2027, 2, 3)
+                "members.admin.admin_actions.MEMBER_SUMMARY_MIN_DATE", date(2027, 2, 3)
             ),
             translation.override("da"),
         ):
@@ -238,3 +235,82 @@ class MemberAdminPaymentTest(TestCase):
         self.assertContains(response, "export_csv_member_summary")
         response = self.client.post(url, data)
         self.assertEqual(response["Content-Type"], "text/csv; charset=utf-8")
+
+    def test_union_summary_exports_only_selected_unions(self):
+        union = UnionFactory(name="Valgt forening")
+        other_union = UnionFactory(name="Anden valgt forening")
+        excluded_union = UnionFactory(name="Ikke valgt forening")
+        for selected_union in (union, other_union, excluded_union):
+            member = MemberFactory(
+                union=selected_union,
+                member_since=date(2026, 1, 1),
+                member_until=date(2026, 12, 31),
+            )
+            if selected_union == union:
+                Payment.objects.create(
+                    member=member,
+                    family=member.person.family,
+                    body_text="Medlemskab",
+                    confirmed_at=datetime(2026, 3, 1, 12, tzinfo=timezone.utc),
+                )
+        url = reverse("admin:members_union_changelist")
+        data = {
+            "action": "export_csv_member_summary",
+            "_selected_action": [union.pk, other_union.pk],
+        }
+        response = self.client.post(url, data)
+        self.assertContains(response, "medlemskaber i de valgte foreninger")
+        self.assertContains(response, "Tilbage til foreningsoversigten")
+        self.assertEqual(
+            {obj.pk for obj in response.context["queryset"]},
+            {union.pk, other_union.pk},
+        )
+        response = self.client.post(
+            url, {**data, "export_summary": "1", "date": "2026-06-01"}
+        )
+        rows = list(
+            csv.reader(StringIO(response.content.decode("utf-8-sig")), delimiter=";")
+        )
+        self.assertEqual(
+            rows[1:],
+            [["Anden valgt forening", "0", "1"], ["Valgt forening", "1", "0"]],
+        )
+        response = self.client.post(
+            url, {**data, "export_summary": "1", "date": "2025-12-31"}
+        )
+        self.assertTrue(response.context["form"].has_error("date"))
+
+    def test_union_summary_permission_and_union_access(self):
+        user = User.objects.create_user(username="union-staff", is_staff=True)
+        PersonFactory(user=user)
+        AdminUserInformation.objects.create(user=user).unions.add(self.paid.union)
+        hidden = MemberFactory(
+            member_since=date(2026, 1, 1), member_until=date(2026, 12, 31)
+        )
+        self.paid.member_since = date(2026, 1, 1)
+        self.paid.member_until = date(2026, 12, 31)
+        self.paid.save()
+        self.client.force_login(user)
+        url = reverse("admin:members_union_changelist")
+        data = {
+            "action": "export_csv_member_summary",
+            "_selected_action": [self.paid.union_id, hidden.union_id],
+            "export_summary": "1",
+            "date": "2026-06-01",
+        }
+        self.assertNotContains(self.client.get(url), "export_csv_member_summary")
+        self.assertNotEqual(
+            self.client.post(url, data).get("Content-Type"), "text/csv; charset=utf-8"
+        )
+        user.user_permissions.add(
+            Permission.objects.get(
+                content_type__app_label="members", codename="member_export_summary"
+            )
+        )
+        self.assertContains(self.client.get(url), "export_csv_member_summary")
+        response = self.client.post(url, data)
+        self.assertEqual(response["Content-Type"], "text/csv; charset=utf-8")
+        rows = list(
+            csv.reader(StringIO(response.content.decode("utf-8-sig")), delimiter=";")
+        )
+        self.assertEqual(rows[1:], [[self.paid.union.name, "1", "0"]])

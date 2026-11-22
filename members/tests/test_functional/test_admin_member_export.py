@@ -104,3 +104,25 @@ class MemberSummaryExportTest(StaticLiveServerTestCase):
             self.member.union.name,
             self.browser.execute_script('return sessionStorage.getItem("summaryCsv")'),
         )
+
+    def test_union_export_back_button_restores_selection(self):
+        url = self.live_server_url + reverse("admin:members_union_changelist")
+        self.browser.get(url)
+        selector = f'input.action-select[value="{self.member.union_id}"]'
+        self.browser.find_element(By.CSS_SELECTOR, selector).click()
+        Select(self.browser.find_element(By.NAME, "action")).select_by_value(
+            "export_csv_member_summary"
+        )
+        self.browser.find_element(By.NAME, "index").click()
+        wait = WebDriverWait(self.browser, 10)
+        wait.until(EC.presence_of_element_located((By.ID, "member-summary-export")))
+        self.assertEqual(
+            self.browser.find_element(By.ID, "back-to-members").get_attribute("value"),
+            "Tilbage til foreningsoversigten",
+        )
+        self.browser.find_element(By.ID, "back-to-members").click()
+        wait.until(EC.presence_of_element_located((By.ID, "result_list")))
+        self.assertEqual(self.browser.current_url, url)
+        self.assertTrue(
+            self.browser.find_element(By.CSS_SELECTOR, selector).is_selected()
+        )

@@ -6,15 +6,15 @@
     {% csrf_token %}
     <input type="hidden" name="action" value="export_csv_member_summary">
     <input type="hidden" name="export_summary" value="1">
-    {% for member in queryset %}
-      <input type="hidden" name="_selected_action" value="{{ member.pk }}">
+    {% for obj in queryset %}
+      <input type="hidden" name="_selected_action" value="{{ obj.pk }}">
     {% endfor %}
-    <p>Oversigten omfatter de valgte medlemskaber, hvor datoen ligger mellem medlemskabets start og slutning.</p>
+    <p>Oversigten omfatter {{ selection_description }}, hvor datoen ligger mellem medlemskabets start og slutning.</p>
     <p>{{ form.date.help_text }}</p>
     <p>{{ form.date.errors }}{{ form.date.label_tag }} {{ form.date }}</p>
     <p id="export-error" role="alert"></p>
     <div class="submit-row">
-      <input class="default" type="button" id="back-to-members" value="Tilbage til medlemsoversigten">
+      <input class="default" type="button" id="back-to-members" value="{{ return_label }}">
       <input class="default" type="submit" value="Eksporter CSV">
     </div>
   </form>

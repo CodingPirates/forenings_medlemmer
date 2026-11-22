@@ -1,18 +1,12 @@
 from glob import escape
 import codecs
 import csv
-from datetime import date
 from io import StringIO
-from django import forms
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import admin
-from django.core.exceptions import PermissionDenied
-from django.core.validators import MinValueValidator
-from django.db.models import Count, Exists, OuterRef, Q, Subquery
-from django.shortcuts import render
+from django.db.models import OuterRef, Subquery
 from django.urls import reverse
-from django.utils import formats
 from django.utils.safestring import mark_safe
 
 from members.models import (
@@ -24,6 +18,7 @@ from rangefilter.filters import (
     DateRangeFilterBuilder,
 )
 
+from .admin_actions import MemberSummaryExportMixin
 from .filters.member_admin_filters import (
     MemberCurrentYearListFilter,
     MemberLastYearListFilter,
@@ -130,27 +125,7 @@ def generate_member_csv(member_queryset, include_address=False):
     return output.getvalue()
 
 
-MEMBER_SUMMARY_MIN_DATE = date(2026, 1, 1)
-
-
-class MemberSummaryExportForm(forms.Form):
-    date = forms.DateField(
-        label="Dato",
-        widget=forms.DateInput(attrs={"type": "date"}),
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        minimum_date = formats.date_format(MEMBER_SUMMARY_MIN_DATE, "j. F Y")
-        message = f"Datoen skal være {minimum_date} eller senere."
-        self.fields["date"].widget.attrs["min"] = MEMBER_SUMMARY_MIN_DATE.isoformat()
-        self.fields["date"].help_text = message
-        self.fields["date"].validators.append(
-            MinValueValidator(MEMBER_SUMMARY_MIN_DATE, message=message)
-        )
-
-
-class MemberAdmin(admin.ModelAdmin):
+class MemberAdmin(MemberSummaryExportMixin, admin.ModelAdmin):
     search_fields = [
         "person__name",
         "person__email",
@@ -256,61 +231,6 @@ class MemberAdmin(admin.ModelAdmin):
         return response
 
     export_csv_member_info.short_description = "Eksporter medlemsinformation (CSV)"
-
-    def has_export_member_summary_permission(self, request):
-        return request.user.has_perm("members.member_export_summary")
-
-    @admin.action(
-        permissions=["export_member_summary"],
-        description="Eksporter medlemsoversigt pr. forening (CSV)",
-    )
-    def export_csv_member_summary(self, request, queryset):
-        if not self.has_export_member_summary_permission(request):
-            raise PermissionDenied
-        form = MemberSummaryExportForm(
-            request.POST if "export_summary" in request.POST else None
-        )
-        if form.is_bound and form.is_valid():
-            date = form.cleaned_data["date"]
-            paid_by_date = Payment.objects.filter(
-                member=OuterRef("pk"), confirmed_at__date__lte=date
-            )
-            summary = (
-                queryset.filter(member_since__lte=date, member_until__gte=date)
-                .annotate(paid_by_date=Exists(paid_by_date))
-                .order_by()
-                .values("union_id", "union__name")
-                .annotate(
-                    paid=Count("pk", filter=Q(paid_by_date=True), distinct=True),
-                    unpaid=Count("pk", filter=Q(paid_by_date=False), distinct=True),
-                )
-                .order_by("union__name", "union_id")
-            )
-            response = HttpResponse(content_type="text/csv; charset=utf-8")
-            response["Content-Disposition"] = (
-                f'attachment; filename="medlemsoversigt-{date.isoformat()}.csv"'
-            )
-            response.write(codecs.BOM_UTF8.decode("UTF-8"))
-            writer = csv.writer(response, delimiter=";", lineterminator="\n")
-            writer.writerow(
-                [
-                    "Forening",
-                    "Betalt senest " + date.isoformat(),
-                    "Betalt senere eller ikke betalt",
-                ]
-            )
-            for row in summary:
-                writer.writerow([row["union__name"], row["paid"], row["unpaid"]])
-            return response
-
-        context = {
-            **self.admin_site.each_context(request),
-            "title": "Eksporter medlemsoversigt pr. forening",
-            "form": form,
-            "queryset": queryset,
-            "opts": self.model._meta,
-        }
-        return render(request, "admin/member_summary_export.html", context)
 
     def export_csv_member_address(self, request, queryset):
         # Sikkerhedstjek: kun superuser eller brugere med 'members.export_address' permission

@@ -12,7 +12,9 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
-from members.models import Address, AdminUserInformation, Department, Person
+from members.models import Address, AdminUserInformation, Department, Member, Person
+
+from .admin_actions import MemberSummaryExportMixin
 
 
 def generate_union_csv(queryset):
@@ -141,7 +143,9 @@ class AdminUserUnionInline(admin.TabularInline):
         return False
 
 
-class UnionAdmin(admin.ModelAdmin):
+class UnionAdmin(MemberSummaryExportMixin, admin.ModelAdmin):
+    summary_selection_description = "medlemskaber i de valgte foreninger"
+    summary_return_label = "Tilbage til foreningsoversigten"
     list_per_page = settings.LIST_PER_PAGE
     inlines = [AdminUserUnionInline]
     list_display = (
@@ -182,7 +186,10 @@ class UnionAdmin(admin.ModelAdmin):
         "secretary",
     )
 
-    actions = ["export_csv_union_info"]
+    actions = ["export_csv_union_info", "export_csv_member_summary"]
+
+    def get_summary_member_queryset(self, request, queryset):
+        return Member.objects.filter(union_id__in=queryset.values("pk"))
 
     def _has_direct_union_access(self, user, obj=None):
         if user.is_superuser or user.has_perm("members.view_all_unions"):
