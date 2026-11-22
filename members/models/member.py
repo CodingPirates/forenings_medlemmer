@@ -29,9 +29,7 @@ class Member(models.Model):
     )
     member_until = models.DateField(
         "Medlemskab slut",
-        blank=True,
         default=end_of_year,
-        null=True,
     )
     price_in_dkk = models.DecimalField(
         "Pris",

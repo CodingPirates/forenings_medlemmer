@@ -161,7 +161,7 @@
                 </td>
                 <td>Coding Pirates {{ member.union.name }}</td>
                 <td>
-                  {% if member.member_since == member.member_until or member.member_until is None %}
+                  {% if member.member_since == member.member_until %}
                     {{ member.member_since }}
                   {% else %}
                     {{ member.member_since }} <br> - {{ member.member_until }}
