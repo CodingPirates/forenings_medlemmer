@@ -41,6 +41,7 @@ class PaymentAdmin(admin.ModelAdmin):
         "get_accepted_at_display",
         "get_cancelled_at_display",
         "get_rejected_at_display",
+        "get_refunded_at_display",
         "get_activityparticipant_display",
         "get_member_display",
     ]
@@ -75,6 +76,11 @@ class PaymentAdmin(admin.ModelAdmin):
         return self.utc_to_local_ymdhms(obj.rejected_at) if obj.rejected_at else ""
 
     get_rejected_at_display.short_description = "Afvist"
+
+    def get_refunded_at_display(self, obj):
+        return self.utc_to_local_ymdhms(obj.refunded_at) if obj.refunded_at else ""
+
+    get_refunded_at_display.short_description = "Refunderet"
 
     def get_activityparticipant_display(self, obj):
         return obj.activityparticipant

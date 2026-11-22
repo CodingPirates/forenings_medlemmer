@@ -1,6 +1,8 @@
 import random
 from datetime import timedelta, datetime, time
+from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -269,19 +271,26 @@ class Person(models.Model):
             ):
                 return False, "Har logget ind seneste 2 år."
 
-        # We verify both person and family, i.e. a parent cannot be anonymized if there are payments for any of the children in family
-        if (
-            Payment.objects.filter(
-                person=self, added_at__gte=five_full_fiscal_years
-            ).exists()
-            or Payment.objects.filter(
-                family=self.family, added_at__gte=five_full_fiscal_years
-            ).exists()
-        ):
+        # A person cannot be anonymized while they have recent payments. For parents
+        # and guardians, payments for any family member also prevent anonymization.
+        # Children are evaluated individually, so a sibling's payment does not keep
+        # an otherwise inactive child in the system.
+        if Payment.objects.filter(
+            person=self, added_at__gte=five_full_fiscal_years
+        ).exists():
             return (
                 False,
-                "Der eksisterer betaling indenfor seneste 5 fulde regnskabsår.",
+                "Der eksisterer betaling for personen indenfor seneste 5 fulde regnskabsår.",
             )
+
+        if self.membertype in (self.PARENT, self.GUARDIAN):
+            if Payment.objects.filter(
+                family=self.family, added_at__gte=five_full_fiscal_years
+            ).exists():
+                return (
+                    False,
+                    "Der eksisterer betaling indenfor seneste 5 fulde regnskabsår for familien.",
+                )
 
         # otherwise, the person can be anonymized
         return True, ""
@@ -384,6 +393,16 @@ class Person(models.Model):
         )
         self.anonymized = True
         self.save()
+
+        if user_id := getattr(request.user, "pk", None):
+            LogEntry.objects.create(
+                user_id=user_id,
+                content_type=ContentType.objects.get_for_model(self),
+                object_id=self.pk,
+                object_repr=str(self),
+                action_flag=CHANGE,
+                change_message="Person anonymiseret.",
+            )
 
         # Remove person from all waiting lists
         for waiting_list in self.waitinglist_set.all():

@@ -197,7 +197,7 @@ class ActivityAdmin(admin.ModelAdmin):
             return redirect(f"copy_activity/?id={activity.pk}")
         return
 
-    copy_activity_action.short_description = "Kopier én aktiviet"
+    copy_activity_action.short_description = "Kopier én aktivitet"
 
     def copy_activity_view(self, request):
         if not (
