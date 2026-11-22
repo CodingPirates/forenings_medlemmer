@@ -20,7 +20,7 @@ class DepartmentFactory(DjangoModelFactory):
     department_email = Faker("email")
     created = Faker("date_time", tzinfo=TIMEZONE)
     updated_dtm = LazyAttribute(lambda d: datetime_after(d.created))
-    closed_dtm = LazyAttribute(lambda d: datetime_after(d.created))
+    closed_at = LazyAttribute(lambda d: datetime_after(d.created))
     isVisible = Faker("boolean")
     isOpening = Faker("boolean")
     has_waiting_list = Faker("boolean")

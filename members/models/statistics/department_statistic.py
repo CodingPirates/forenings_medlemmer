@@ -113,5 +113,5 @@ class DepartmentStatistics(models.Model):
             DepartmentStatistics.objects.create(
                 department=department, timestamp=timestamp
             )
-            for department in Department.objects.filter(closed_dtm=None)
+            for department in Department.objects.filter(closed_at=None)
         ]

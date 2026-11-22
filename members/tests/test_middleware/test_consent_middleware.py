@@ -118,7 +118,7 @@ class TestConsentMiddlewareIntegration(TestCase):
             email="login-only@example.com",
             password=self.password,
         )
-        self.department = DepartmentFactory.create(closed_dtm=None)
+        self.department = DepartmentFactory.create(closed_at=None)
 
     def test_logged_in_user_without_person_is_forced_to_signup_before_consent(self):
         logged_in = self.client.login(

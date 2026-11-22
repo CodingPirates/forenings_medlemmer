@@ -28,8 +28,8 @@ class TestVolunteerRequestItemAdmin(TestCase):
             is_superuser=True,
         )
 
-        self.direct_department = DepartmentFactory(name="Odense", closed_dtm=None)
-        self.other_department = DepartmentFactory(name="Aarhus", closed_dtm=None)
+        self.direct_department = DepartmentFactory(name="Odense", closed_at=None)
+        self.other_department = DepartmentFactory(name="Aarhus", closed_at=None)
         self.admin_info = AdminUserInformation.objects.create(user=self.user)
         self.admin_info.departments.add(self.direct_department)
 

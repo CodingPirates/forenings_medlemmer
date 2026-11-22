@@ -131,11 +131,11 @@ class AdminActions(admin.ModelAdmin):
             "members.view_all_departments"
         ):
             department_list_query = Department.objects.filter(
-                closed_dtm__isnull=True
+                closed_at__isnull=True
             ).order_by("name")
         else:
             department_list_query = Department.objects.filter(
-                adminuserinformation__user=request.user, closed_dtm__isnull=True
+                adminuserinformation__user=request.user, closed_at__isnull=True
             ).order_by("name")
         department_list = [("-", "-")]
         for department in department_list_query:

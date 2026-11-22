@@ -159,7 +159,7 @@ class PersonWaitinglistListFilter(admin.SimpleListFilter):
             request.user
         ).order_by("name"):
             if (
-                department.closed_dtm is None
+                department.closed_at is None
                 and department.union.closed_at is None
                 and department.has_waiting_list is True
                 and department.waitinglist_count() > 0

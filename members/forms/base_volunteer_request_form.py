@@ -84,7 +84,7 @@ class BaseVolunteerRequestForm(forms.ModelForm):
 
     # Shared fields for departments and activities
     departments = DepartmentWithAddressChoiceField(
-        queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
+        queryset=Department.objects.filter(closed_at__isnull=True).order_by("name"),
         widget=forms.CheckboxSelectMultiple,
         label="Afdelinger",
         help_text="Vælg hvilke afdelinger du er interesseret i at være frivillig for",

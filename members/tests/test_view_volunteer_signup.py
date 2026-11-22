@@ -26,7 +26,7 @@ class TestVolunteerSignupView(TestCase):
             allow_contact_from_cpdk=False,
             allow_contact_from_other=False,
         )
-        self.department = DepartmentFactory(closed_dtm=None)
+        self.department = DepartmentFactory(closed_at=None)
         self.volunteer = VolunteerFactory(
             person=self.person,
             removed=None,

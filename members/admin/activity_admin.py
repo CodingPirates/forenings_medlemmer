@@ -540,8 +540,8 @@ class ActivityAdmin(admin.ModelAdmin):
         # Only show own departments when creating new activity
         if db_field.name == "department":
             departments = Department.objects.filter(
-                models.Q(closed_dtm__isnull=True)
-                | models.Q(closed_dtm__gt=timezone.now().date())
+                models.Q(closed_at__isnull=True)
+                | models.Q(closed_at__gt=timezone.now().date())
             )
             # If editing an existing activity, include its department even if closed
             obj = getattr(request, "activity_obj", None)
@@ -563,8 +563,8 @@ class ActivityAdmin(admin.ModelAdmin):
             if obj and obj.department_id:
                 departments = Department.objects.filter(
                     models.Q(pk=obj.department_id)
-                    | models.Q(closed_dtm__isnull=True)
-                    | models.Q(closed_dtm__gt=timezone.now().date())
+                    | models.Q(closed_at__isnull=True)
+                    | models.Q(closed_at__gt=timezone.now().date())
                 )
 
             if request.user.is_superuser or request.user.has_perm(
@@ -603,8 +603,8 @@ class ActivityAdmin(admin.ModelAdmin):
         # Only set initial for new objects (not editing existing)
         if obj is None:
             departments = Department.objects.filter(
-                models.Q(closed_dtm__isnull=True)
-                | models.Q(closed_dtm__gt=timezone.now().date())
+                models.Q(closed_at__isnull=True)
+                | models.Q(closed_at__gt=timezone.now().date())
             )
             if not (
                 request.user.is_superuser

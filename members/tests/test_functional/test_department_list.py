@@ -23,21 +23,21 @@ class DepartmentListTest(StaticLiveServerTestCase):
         self.department_1 = DepartmentFactory.create(
             created=(timezone.now() - timedelta(days=5)).date(),
             isVisible=True,
-            closed_dtm=None,
+            closed_at=None,
         )
         self.department_1.address.region = "Region Hovedstaden"
         self.department_1.address.save()
         self.department_3 = DepartmentFactory.create(
             created=(timezone.now() - timedelta(days=5)).date(),
             isVisible=False,
-            closed_dtm=None,
+            closed_at=None,
         )
         self.department_3.address.region = "Region Hovedstaden"
         self.department_3.address.save()
         self.department_2 = DepartmentFactory.create(
             created=(timezone.now() - timedelta(days=5)).date(),
             isVisible=True,
-            closed_dtm=None,
+            closed_at=None,
         )
         self.department_2.address.region = "Region Syddanmark"
         self.department_2.address.save()

@@ -26,7 +26,7 @@ class SignUpTest(StaticLiveServerTestCase):
             self.name, "admin@example.com", self.password
         )
         # An open department is required for the admin signup form
-        self.department = DepartmentFactory.create(closed_dtm=None)
+        self.department = DepartmentFactory.create(closed_at=None)
 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--disable-dev-shm-usage")

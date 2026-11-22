@@ -43,8 +43,8 @@ class TestVolunteerAdmin(TestCase):
             is_superuser=True,
         )
 
-        self.direct_department = DepartmentFactory(name="Odense", closed_dtm=None)
-        self.other_department = DepartmentFactory(name="Aarhus", closed_dtm=None)
+        self.direct_department = DepartmentFactory(name="Odense", closed_at=None)
+        self.other_department = DepartmentFactory(name="Aarhus", closed_at=None)
 
         self.admin_info = AdminUserInformation.objects.create(user=self.user)
         self.admin_info.departments.add(self.direct_department)
@@ -294,7 +294,7 @@ class TestVolunteerAdmin(TestCase):
         self.assertIn("Delt med Coding Pirates Denmark", displays)
 
     def test_default_visibility_filter_uses_first_direct_department(self):
-        first_department = DepartmentFactory(name="Aalborg", closed_dtm=None)
+        first_department = DepartmentFactory(name="Aalborg", closed_at=None)
         self.admin_info.departments.add(first_department)
 
         first_department_volunteer = VolunteerFactory(

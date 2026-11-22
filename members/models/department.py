@@ -46,7 +46,7 @@ class Department(models.Model):
         default=timezone.now,
         help_text="Dato for oprettelse af denne afdeling",
     )
-    closed_dtm = models.DateField(
+    closed_at = models.DateField(
         "Lukket",
         blank=True,
         null=True,
@@ -95,15 +95,15 @@ class Department(models.Model):
     def clean(self):
         errors = {}
 
-        if self.pk and self.closed_dtm is not None:
+        if self.pk and self.closed_at is not None:
             has_conflicting_participants = Activity.objects.filter(
                 department=self,
-                end_date__gt=self.closed_dtm,
+                end_date__gt=self.closed_at,
                 activityparticipant__isnull=False,
             ).exists()
 
             if has_conflicting_participants:
-                errors["closed_dtm"] = (
+                errors["closed_at"] = (
                     "Afdelingen kan ikke lukkes, fordi der er deltagere på en aktivitet "
                     "med slutdato efter afdelingens lukkedato."
                 )
@@ -115,7 +115,7 @@ class Department(models.Model):
     def get_open_departments():
         result = []
         a_year_ago = (timezone.now() - timedelta(days=366)).date()
-        for department in Department.objects.filter(closed_dtm=None).order_by(
+        for department in Department.objects.filter(closed_at=None).order_by(
             "address__region", "name"
         ):
             department_activties = Activity.objects.filter(

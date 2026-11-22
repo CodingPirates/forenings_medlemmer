@@ -64,7 +64,7 @@ class UnionAdminTest(StaticLiveServerTestCase):
         )
         # An open department is required for the admin signup form. Reuse an
         # existing union so the CSV export test still sees only union1/union2.
-        self.department = DepartmentFactory.create(closed_dtm=None, union=self.union1)
+        self.department = DepartmentFactory.create(closed_at=None, union=self.union1)
         self.family = Family.objects.create()
         self.user1 = User.objects.create_user(
             username="user1", password="password", email="user1@example.com"

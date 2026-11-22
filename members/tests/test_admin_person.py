@@ -26,7 +26,7 @@ class TestPersonAdmin(TestCase):
             is_staff=True,
             is_superuser=True,
         )
-        self.department = DepartmentFactory(closed_dtm=None)
+        self.department = DepartmentFactory(closed_at=None)
         self.activity = ActivityFactory(department=self.department)
         self.admin_info = AdminUserInformation.objects.create(user=self.user)
         self.admin_info.departments.add(self.department)
@@ -140,7 +140,7 @@ class TestPersonAdmin(TestCase):
         self.assertFalse(Volunteer.objects.filter(person=self.person).exists())
 
     def test_create_volunteer_action_refreshes_activities_for_selected_department(self):
-        other_department = DepartmentFactory(closed_dtm=None)
+        other_department = DepartmentFactory(closed_at=None)
         self.admin_info.departments.add(other_department)
         visible_activity = ActivityFactory(
             department=self.department,

@@ -157,7 +157,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             "isOpening",
             "has_waiting_list",
             "created",
-            "closed_dtm",
+            "closed_at",
             "waitinglist_count_link",
         ]
         if request.user.is_superuser:
@@ -172,7 +172,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             "isVisible",
             "isOpening",
             "created",
-            "closed_dtm",
+            "closed_at",
             "has_waiting_list",
             "address__municipality",
         ]
@@ -183,11 +183,11 @@ class DepartmentAdmin(admin.ModelAdmin):
         return base
 
     def get_search_results(self, request, queryset, search_term):
-        # Only show open departments in autocomplete (closed_dtm is None or in the future)
+        # Only show open departments in autocomplete (closed_at is None or in the future)
         if request.path.endswith("/autocomplete/"):
             queryset = queryset.filter(
-                models.Q(closed_dtm__isnull=True)
-                | models.Q(closed_dtm__gt=timezone.now().date())
+                models.Q(closed_at__isnull=True)
+                | models.Q(closed_at__gt=timezone.now().date())
             )
         return super().get_search_results(request, queryset, search_term)
 
@@ -214,18 +214,18 @@ class DepartmentAdmin(admin.ModelAdmin):
     ]
 
     @staticmethod
-    def _get_posted_closed_dtm(request):
-        raw_closed_dtm = request.POST.get("closed_dtm")
-        if not raw_closed_dtm:
+    def _get_posted_closed_at(request):
+        raw_closed_at = request.POST.get("closed_at")
+        if not raw_closed_at:
             return None
 
-        parsed = parse_date(raw_closed_dtm)
+        parsed = parse_date(raw_closed_at)
         if parsed is not None:
             return parsed
 
         for fmt in ("%d-%m-%Y", "%d/%m-%Y"):
             try:
-                return datetime.strptime(raw_closed_dtm, fmt).date()
+                return datetime.strptime(raw_closed_at, fmt).date()
             except ValueError:
                 continue
 
@@ -239,16 +239,15 @@ class DepartmentAdmin(admin.ModelAdmin):
         ):
             department = self.get_object(request, object_id)
             if department is not None:
-                new_closed_dtm = self._get_posted_closed_dtm(request)
+                new_closed_at = self._get_posted_closed_at(request)
 
                 is_new_closing_date = (
-                    new_closed_dtm is not None
-                    and department.closed_dtm != new_closed_dtm
+                    new_closed_at is not None and department.closed_at != new_closed_at
                 )
                 if is_new_closing_date:
                     has_participant_conflict = Activity.objects.filter(
                         department=department,
-                        end_date__gt=new_closed_dtm,
+                        end_date__gt=new_closed_at,
                         activityparticipant__isnull=False,
                     ).exists()
                     if has_participant_conflict:
@@ -284,7 +283,7 @@ class DepartmentAdmin(admin.ModelAdmin):
                             "opts": self.model._meta,
                             "original": department,
                             "department": department,
-                            "new_closed_dtm": new_closed_dtm,
+                            "new_closed_at": new_closed_at,
                             "open_volunteers": open_volunteers.order_by("person__name"),
                             "unfinished_request_items": unfinished_request_items.order_by(
                                 "created"
@@ -302,22 +301,22 @@ class DepartmentAdmin(admin.ModelAdmin):
         )
 
     def save_model(self, request, obj, form, change):
-        old_closed_dtm = None
+        old_closed_at = None
         if change and obj.pk:
-            old_closed_dtm = (
+            old_closed_at = (
                 self.model.objects.filter(pk=obj.pk)
-                .values_list("closed_dtm", flat=True)
+                .values_list("closed_at", flat=True)
                 .first()
             )
 
-        posted_closed_dtm = self._get_posted_closed_dtm(request)
-        if change and posted_closed_dtm is not None and obj.closed_dtm is None:
-            obj.closed_dtm = posted_closed_dtm
+        posted_closed_at = self._get_posted_closed_at(request)
+        if change and posted_closed_at is not None and obj.closed_at is None:
+            obj.closed_at = posted_closed_at
 
-        if change and obj.closed_dtm is not None:
+        if change and obj.closed_at is not None:
             has_participant_conflict = Activity.objects.filter(
                 department=obj,
-                end_date__gt=obj.closed_dtm,
+                end_date__gt=obj.closed_at,
                 activityparticipant__isnull=False,
             ).exists()
             if has_participant_conflict:
@@ -331,13 +330,13 @@ class DepartmentAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
         is_new_closing_date = (
-            change and obj.closed_dtm is not None and old_closed_dtm != obj.closed_dtm
+            change and obj.closed_at is not None and old_closed_at != obj.closed_at
         )
         if is_new_closing_date:
             updated_count = Volunteer.objects.filter(
                 department=obj,
                 end_date__isnull=True,
-            ).update(end_date=obj.closed_dtm)
+            ).update(end_date=obj.closed_at)
 
             closed_request_count = VolunteerRequestItem.objects.filter(
                 department=obj,
@@ -347,7 +346,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             info_messages = []
             if updated_count:
                 info_messages.append(
-                    f"Satte slutdato på {updated_count} frivillige til {obj.closed_dtm:%Y-%m-%d}."
+                    f"Satte slutdato på {updated_count} frivillige til {obj.closed_at:%Y-%m-%d}."
                 )
             if closed_request_count:
                 info_messages.append(
@@ -519,7 +518,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         (
             "Yderlige data",
             {
-                "fields": ("has_waiting_list", "created", "closed_dtm"),
+                "fields": ("has_waiting_list", "created", "closed_at"),
                 "description": "<p>Venteliste betyder at børn har mulighed for at skrive sig på ventelisten (tilkendegive interesse for denne afdeling). Den skal typisk altid være krydset af.</p>",
                 "classes": ("collapse",),
             },
@@ -581,8 +580,8 @@ class DepartmentAdmin(admin.ModelAdmin):
             if d.created is not None:
                 info1 += d.created.strftime("%Y-%m-%d")
             info1 += ";"
-            if d.closed_dtm is not None:
-                info1 += d.closed_dtm.strftime("%Y-%m-%d")
+            if d.closed_at is not None:
+                info1 += d.closed_at.strftime("%Y-%m-%d")
             info1 += ";"
             info2 = d.address.streetname
             if d.address.housenumber != "":

@@ -24,10 +24,10 @@ class VolunteerTest(StaticLiveServerTestCase):
             os.mkdir("test-screens")
 
         self.open_department = DepartmentFactory.create(
-            name="Åben afdeling", closed_dtm=None
+            name="Åben afdeling", closed_at=None
         )
         self.closed_department = DepartmentFactory.create(
-            name="Lukket afdeling", closed_dtm=Faker("past_datetime")
+            name="Lukket afdeling", closed_at=Faker("past_datetime")
         )
 
         chrome_options = webdriver.ChromeOptions()

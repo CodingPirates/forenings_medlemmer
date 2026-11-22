@@ -24,7 +24,7 @@ class ActivitiesListTest(StaticLiveServerTestCase):
         test_department = DepartmentFactory.create(
             name="Test Afdeling",
             created=(timezone.now() - timedelta(days=5)).date(),
-            closed_dtm=None,
+            closed_at=None,
             address=test_address,
         )
         test_department.save()
