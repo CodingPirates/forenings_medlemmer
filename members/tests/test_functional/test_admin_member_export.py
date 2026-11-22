@@ -14,7 +14,6 @@ from members.tests.factories import MemberFactory, PersonFactory
 
 class MemberSummaryExportTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         user = User.objects.create_superuser(
