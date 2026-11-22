@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+  <form method="post" id="member-summary-export">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="export_csv_member_summary">
+    <input type="hidden" name="export_summary" value="1">
+    {% for obj in queryset %}
+      <input type="hidden" name="_selected_action" value="{{ obj.pk }}">
+    {% endfor %}
+    <p>Oversigten omfatter {{ selection_description }}, hvor datoen ligger mellem medlemskabets start og slutning.</p>
+    <p>{{ form.date.help_text }}</p>
+    <p>{{ form.date.errors }}{{ form.date.label_tag }} {{ form.date }}</p>
+    <p id="export-error" role="alert"></p>
+    <div class="submit-row">
+      <input class="default" type="button" id="back-to-members" value="{{ return_label }}">
+      <input class="default" type="submit" value="Eksporter CSV">
+    </div>
+  </form>
+</div>
+<script>
+  const form = document.getElementById("member-summary-export");
+  document.getElementById("back-to-members").addEventListener("click", () => {
+    window.history.back();
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const error = document.getElementById("export-error");
+    const button = form.querySelector('input[type="submit"]');
+    error.textContent = "";
+    button.disabled = true;
+    try {
+      const response = await fetch(window.location.href, {
+        method: "POST",
+        body: new FormData(form),
+        credentials: "same-origin",
+      });
+      if (response.redirected) {
+        throw new Error("Anmodningen blev omdirigeret. Kontrollér, at du er logget ind.");
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      if (!response.headers.get("content-type")?.startsWith("text/csv")) {
+        const html = await response.text();
+        const page = new DOMParser().parseFromString(html, "text/html");
+        const validationError = page.querySelector(".errorlist");
+        throw new Error(validationError?.textContent.trim() || "Eksporten kunne ikke gennemføres.");
+      }
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `medlemsoversigt-${form.elements.date.value}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.history.back();
+    } catch (exception) {
+      error.textContent = `Eksporten mislykkedes: ${exception.message}`;
+      button.disabled = false;
+    }
+  });
+</script>
+{% endblock %}

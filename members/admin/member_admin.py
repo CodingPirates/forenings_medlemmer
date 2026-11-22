@@ -5,6 +5,7 @@ from io import StringIO
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import admin
+from django.db.models import OuterRef, Subquery
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -17,10 +18,12 @@ from rangefilter.filters import (
     DateRangeFilterBuilder,
 )
 
+from .admin_actions import MemberSummaryExportMixin
 from .filters.member_admin_filters import (
     MemberCurrentYearListFilter,
     MemberLastYearListFilter,
     MemberAdminListFilter,
+    MemberPaymentListFilter,
 )
 
 
@@ -76,19 +79,16 @@ def generate_member_csv(member_queryset, include_address=False):
         member_since = member.member_since.strftime("%Y-%m-%d")
         member_until = member.member_until.strftime("%Y-%m-%d")
 
-        # Find betalingsdato (accepted_at) for medlemmet
-        payment = None
-        accepted_at = ""
-        try:
-            payment = (
-                Payment.objects.filter(member=member, accepted_at__isnull=False)
-                .order_by("-accepted_at")
-                .first()
-            )
-            if payment and payment.accepted_at:
-                accepted_at = payment.accepted_at.strftime("%Y-%m-%d")
-        except Exception:
-            accepted_at = ""
+        payment = (
+            Payment.objects.filter(member=member, confirmed_at__isnull=False)
+            .order_by("-confirmed_at")
+            .first()
+        )
+        confirmed_at = (
+            payment.confirmed_at.strftime("%Y-%m-%d")
+            if payment and payment.confirmed_at
+            else ""
+        )
 
         row = [
             member.person.name,
@@ -102,7 +102,7 @@ def generate_member_csv(member_queryset, include_address=False):
             member.union.name,
             member_since,
             member_until,
-            accepted_at,
+            confirmed_at,
         ]
         if include_address:
             street = member.person.streetname or ""
@@ -125,7 +125,7 @@ def generate_member_csv(member_queryset, include_address=False):
     return output.getvalue()
 
 
-class MemberAdmin(admin.ModelAdmin):
+class MemberAdmin(MemberSummaryExportMixin, admin.ModelAdmin):
     search_fields = [
         "person__name",
         "person__email",
@@ -138,10 +138,12 @@ class MemberAdmin(admin.ModelAdmin):
         "union_link",
         "member_since",
         "member_until",
+        "confirmed_at",
     ]
 
     list_filter = [
         "person__gender",
+        MemberPaymentListFilter,
         MemberCurrentYearListFilter,
         MemberLastYearListFilter,
         MemberAdminListFilter,
@@ -150,7 +152,11 @@ class MemberAdmin(admin.ModelAdmin):
 
     autocomplete_fields = ("union", "person")
 
-    actions = ["export_csv_member_info"]
+    actions = [
+        "export_csv_member_summary",
+        "export_csv_member_info",
+        "export_csv_member_address",
+    ]
 
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -169,7 +175,18 @@ class MemberAdmin(admin.ModelAdmin):
         return actions
 
     def get_queryset(self, request):
-        qs = super(MemberAdmin, self).get_queryset(request)
+        latest_payment = Payment.objects.filter(
+            member=OuterRef("pk"), confirmed_at__isnull=False
+        ).order_by("-confirmed_at")
+        qs = (
+            super(MemberAdmin, self)
+            .get_queryset(request)
+            .annotate(
+                latest_payment_confirmed_at=Subquery(
+                    latest_payment.values("confirmed_at")[:1]
+                )
+            )
+        )
         if (
             request.user.is_superuser
             or request.user.has_perm("members.view_all_persons")
@@ -181,6 +198,12 @@ class MemberAdmin(admin.ModelAdmin):
                 adminuserinformation__user=request.user
             ).values("id")
             return qs.filter(union__in=unions)
+
+    @admin.display(description="Betalingsdato", ordering="latest_payment_confirmed_at")
+    def confirmed_at(self, item):
+        if item.latest_payment_confirmed_at:
+            return item.latest_payment_confirmed_at.strftime("%Y-%m-%d")
+        return ""
 
     def person_link(self, item):
         url = reverse("admin:members_person_change", args=[item.person_id])
@@ -230,3 +253,7 @@ class MemberAdmin(admin.ModelAdmin):
     export_csv_member_address.short_description = (
         "Eksporter medlemsinformation med adresser (CSV)"
     )
+
+    fieldsets = [
+        (None, {"fields": ["person", "union", "member_since", "member_until"]}),
+    ]
