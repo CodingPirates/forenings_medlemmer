@@ -4,7 +4,6 @@ from datetime import timedelta
 
 from django.conf import settings
 
-
 LOCALE = "dk_DK"
 TIMEZONE = zoneinfo.ZoneInfo(settings.TIME_ZONE)
 # Setting default locale (this is not documented or intended by factory_boy)

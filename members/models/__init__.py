@@ -30,7 +30,6 @@ import members.models.volunteer
 import members.models.waitinglist
 import members.models.zipcoderegion  # noqa  # fine to have all models included
 
-
 # Export models not files
 from .activity import Activity
 from .activitytype import ActivityType

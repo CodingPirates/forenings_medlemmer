@@ -10,7 +10,6 @@ from members.tests.factories import (
 )
 from members.tests.test_functional.functional_helpers import log_in
 
-
 """
 This tests the entry page
 """
