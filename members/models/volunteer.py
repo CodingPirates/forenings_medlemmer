@@ -5,6 +5,11 @@ from django.utils import timezone
 
 
 class Volunteer(models.Model):
+    class VolunteerConfirmationStatus(models.TextChoices):
+        APPROVED_BY_VOLUNTEER = "APPROVED_BY_VOLUNTEER", "Godkendt af frivillig"
+        WAITING_FOR_VOLUNTEER = "WAITING_FOR_VOLUNTEER", "Venter på frivillig"
+        REJECTED_BY_VOLUNTEER = "REJECTED_BY_VOLUNTEER", "Afvist af frivillig"
+
     class Meta:
         verbose_name = "Frivillig"
         verbose_name_plural = "Frivillige"
@@ -13,6 +18,13 @@ class Volunteer(models.Model):
     department = models.ForeignKey(
         "Department", on_delete=models.CASCADE, verbose_name="Afdeling"
     )
+    activity = models.ForeignKey(
+        "Activity",
+        on_delete=models.CASCADE,
+        verbose_name="Aktivitet",
+        blank=True,
+        null=True,
+    )
 
     def has_certificate(self):
         return self.person.has_certificate
@@ -20,6 +32,30 @@ class Volunteer(models.Model):
     added_at = models.DateTimeField("Start", default=timezone.now)
     confirmed = models.DateTimeField("Bekræftet", blank=True, null=True, default=None)
     removed = models.DateTimeField("Slut", blank=True, null=True, default=None)
+
+    start_date = models.DateField("Startdato", blank=True, null=True, default=None)
+    end_date = models.DateField("Slutdato", blank=True, null=True, default=None)
+    volunteer_confirmation_status = models.CharField(
+        "Frivilligbekræftelse",
+        max_length=32,
+        choices=VolunteerConfirmationStatus.choices,
+        default=VolunteerConfirmationStatus.APPROVED_BY_VOLUNTEER,
+    )
+
+    info_reference = models.TextField(
+        "Hvor har du hørt om Coding Pirates?",
+        help_text="SoMe, Facebook, Instagram, LinkedIn, en ven, en kollega, etc",
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+    info_whishes = models.TextField(
+        "Ønsker til frivilligt arbejde",
+        help_text="Hvilke ønsker har du til at være frivillig hos Coding Pirates?",
+        max_length=1024,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return self.person.__str__()

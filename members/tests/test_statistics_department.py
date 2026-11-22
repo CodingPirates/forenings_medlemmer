@@ -23,7 +23,7 @@ class TestDepartmentStatistics(TestCase):
 
         self.nr_departments = 3
         departments = DepartmentFactory.create_batch(
-            self.nr_departments, closed_dtm=None
+            self.nr_departments, closed_at=None
         )
 
         self.testDepartments = []

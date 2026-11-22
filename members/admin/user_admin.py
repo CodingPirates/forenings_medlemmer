@@ -167,12 +167,16 @@ class UserAdmin(UserAdmin):
             ]
 
     def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+
         if not request.user.is_superuser:
-            return self.readonly_fields + ["is_superuser"]
-        return self.readonly_fields
+            readonly_fields.append("is_superuser")
+            if obj and obj.is_superuser:
+                readonly_fields += ["username", "email"]
+
+        return readonly_fields
 
     def get_fieldsets(self, request, obj=None):
-        # 20230924: https://stackoverflow.com/questions/16102222/djangoremove-superuser-checkbox-from-django-admin-panel-when-login-staff-users
         if not obj:
             return self.add_fieldsets
 
@@ -195,8 +199,13 @@ class UserAdmin(UserAdmin):
                 "user_permissions",
             )
 
+        if obj and not request.user.is_superuser and obj.is_superuser:
+            first_section_fields = ("username",)
+        else:
+            first_section_fields = ("username", "password")
+
         return [
-            (None, {"fields": ("username", "password")}),
+            (None, {"fields": first_section_fields}),
             (("Personal info"), {"fields": ("first_name", "last_name", "email")}),
             (("Permissions"), {"fields": perm_fields}),
             (("Important dates"), {"fields": ("last_login", "date_joined")}),

@@ -18,7 +18,7 @@ from rangefilter.filters import (
     DateRangeFilterBuilder,
 )
 
-from .admin_actions import MemberSummaryExportMixin
+from .admin_actions import AdminActions, MemberSummaryExportMixin
 from .filters.member_admin_filters import (
     MemberCurrentYearListFilter,
     MemberLastYearListFilter,
@@ -156,6 +156,7 @@ class MemberAdmin(MemberSummaryExportMixin, admin.ModelAdmin):
         "export_csv_member_summary",
         "export_csv_member_info",
         "export_csv_member_address",
+        AdminActions.create_volunteer_action,
     ]
 
     def get_actions(self, request):

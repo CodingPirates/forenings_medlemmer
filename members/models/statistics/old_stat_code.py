@@ -44,7 +44,7 @@ def old_stat_code(timestamp):
         + dailyStatisticsGeneral.volunteers_female
     )
     dailyStatisticsGeneral.departments = Department.objects.filter(
-        closed_dtm=None
+        closed_at=None
     ).count()
     dailyStatisticsGeneral.unions = Union.objects.count()
     dailyStatisticsGeneral.waitinglist_male = (

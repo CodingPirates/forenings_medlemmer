@@ -19,7 +19,7 @@ class DepartmentSignupTest(StaticLiveServerTestCase):
         self.department_1 = DepartmentFactory.create(
             created=(timezone.now() - timedelta(days=5)).date(),
             isVisible=True,
-            closed_dtm=None,
+            closed_at=None,
         )
         self.department_1.address.region = "Region Hovedstaden"
         self.department_1.address.save()

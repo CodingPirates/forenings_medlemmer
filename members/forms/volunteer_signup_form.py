@@ -134,7 +134,7 @@ class vol_signupForm(forms.Form):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     volunteer_department = SafeModelChoiceField(
-        queryset=Department.objects.filter(closed_dtm__isnull=True).order_by("name"),
+        queryset=Department.objects.filter(closed_at__isnull=True).order_by("name"),
         required=True,
         label="Afdeling",
         empty_label="-",

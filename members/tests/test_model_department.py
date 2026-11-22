@@ -8,7 +8,7 @@ from .factories import DepartmentFactory, ActivityFactory
 
 class TestModelDepartment(TestCase):
     def test_get_open_departments(self):
-        open_departments = DepartmentFactory.create_batch(10, closed_dtm=None)
+        open_departments = DepartmentFactory.create_batch(10, closed_at=None)
         [
             ActivityFactory.create(
                 start_date=timezone.now(),
@@ -20,19 +20,19 @@ class TestModelDepartment(TestCase):
         # Department young than a year and no activities
         new_departments = DepartmentFactory.create_batch(
             10,
-            closed_dtm=None,
+            closed_at=None,
             created=timezone.now() - timedelta(days=randint(0, 350)),
         )
         expected = set(open_departments + new_departments)
 
         # Closed departments
-        DepartmentFactory.create_batch(10, closed_dtm=timezone.now())
+        DepartmentFactory.create_batch(10, closed_at=timezone.now())
 
         # depatments older than a year not closed but no activities in the
         # last year or nor activites at all
         old_departments = DepartmentFactory.create_batch(
             10,
-            closed_dtm=None,
+            closed_at=None,
             created=timezone.now() - timedelta(days=randint(367, 999)),
         )
         [

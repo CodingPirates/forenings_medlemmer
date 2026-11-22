@@ -24,10 +24,10 @@ class VolunteerTest(StaticLiveServerTestCase):
             os.mkdir("test-screens")
 
         self.open_department = DepartmentFactory.create(
-            name="Åben afdeling", closed_dtm=None
+            name="Åben afdeling", closed_at=None
         )
         self.closed_department = DepartmentFactory.create(
-            name="Lukket afdeling", closed_dtm=Faker("past_datetime")
+            name="Lukket afdeling", closed_at=Faker("past_datetime")
         )
 
         chrome_options = webdriver.ChromeOptions()
@@ -45,10 +45,10 @@ class VolunteerTest(StaticLiveServerTestCase):
     def test_volunteer_signup(self):
         self.browser.get(f"{self.live_server_url}/volunteer")
 
-        options_texts = [
+        department_labels = [
             e.text
             for e in self.browser.find_elements(
-                By.XPATH, "//*/select[@id='id_volunteer_department']/option"
+                By.XPATH, "//div[@id='div_id_departments']//label"
             )
         ]
         # Save HTML file
@@ -59,9 +59,9 @@ class VolunteerTest(StaticLiveServerTestCase):
 
         self.assertIn(
             "Åben afdeling",
-            options_texts,
+            " ".join(department_labels),
         )
         self.assertNotIn(
             "Lukket afdeling",
-            options_texts,
+            " ".join(department_labels),
         )
