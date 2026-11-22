@@ -9,10 +9,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         fixed_count = 0
         for member in Member.objects.all():
-            if (
-                member.member_since
-                and member.member_since.year > member.member_until.year
-            ):
+            if member.member_since.year > member.member_until.year:
                 # Example: member_since=2026-01-01, member_until=2025-12-31
                 correct_until = date(member.member_since.year, 12, 31)
                 self.stdout.write(
