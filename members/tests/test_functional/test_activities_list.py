@@ -14,7 +14,6 @@ from members.models import Address
 
 class ActivitiesListTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         test_address = AddressFactory.create(

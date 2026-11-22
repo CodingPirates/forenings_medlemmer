@@ -16,7 +16,6 @@ This test goes to the account login page
 
 class AccountLoginTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         self.person = PersonFactory.create()

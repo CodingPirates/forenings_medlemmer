@@ -1,11 +1,11 @@
 import random
 
 from django.utils import timezone
-from factory import Faker, LazyAttribute, SubFactory
+from factory import Faker, LazyAttribute, LazyFunction, SubFactory
 from factory.django import DjangoModelFactory
 
 from forenings_medlemmer.settings import MINIMUM_SEASON_PRICE_IN_DKK
-from members.models import Activity
+from members.models import Activity, ActivityType
 from members.tests.factories.address_factory import AddressFactory
 from members.tests.factories.department_factory import DepartmentFactory
 from members.tests.factories.factory_helpers import (
@@ -32,6 +32,16 @@ class ActivityFactory(DjangoModelFactory):
     fallback_date = Faker("date_time", tzinfo=TIMEZONE)
 
     department = SubFactory(DepartmentFactory)
+    # needed since we removed `serialized_rollback` for tests, i.e. we recreate db
+    activitytype = LazyFunction(
+        lambda: ActivityType.objects.get_or_create(
+            id="FORLØB",
+            defaults={
+                "display_name": "Forløb",
+                "description": "Aktivitetsforløb med klubaftener.",
+            },
+        )[0]
+    )
     name = Faker("activity")
     open_hours = Faker("numerify", text="kl. ##:00-##:00")
     responsible_name = Faker("name")

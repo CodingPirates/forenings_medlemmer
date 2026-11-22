@@ -1,5 +1,4 @@
 import datetime
-from random import randint
 
 from django.test import TestCase
 from django.utils import timezone
@@ -19,10 +18,10 @@ from members.tests.factories import (
 
 class TestDepartmentStatistics(TestCase):
     def setUp(self):
-        self.nr_closed_Departments = randint(1, 30)
+        self.nr_closed_Departments = 2
         DepartmentFactory.create_batch(self.nr_closed_Departments)
 
-        self.nr_departments = randint(1, 30)
+        self.nr_departments = 3
         departments = DepartmentFactory.create_batch(
             self.nr_departments, closed_dtm=None
         )
@@ -32,12 +31,12 @@ class TestDepartmentStatistics(TestCase):
             testDepartment = {"department": department}
 
             # creates activites
-            testDepartment["nrActivities"] = randint(1, 30)
+            testDepartment["nrActivities"] = 4
             testDepartment["isActive"] = [
-                randint(0, 1) == 1 for _ in range(testDepartment["nrActivities"])
+                i % 2 == 0 for i in range(testDepartment["nrActivities"])
             ]
             testDepartment["nrActive"] = sum(testDepartment["isActive"])
-            testDepartment["nr_participants"] = randint(0, 100)
+            testDepartment["nr_participants"] = 10
             testDepartment["activities"] = [
                 ActivityFactory(
                     department=testDepartment["department"],
@@ -49,7 +48,7 @@ class TestDepartmentStatistics(TestCase):
             testDepartment["nr_members"] = 0
             testDepartment["participants"] = []
             for i in range(testDepartment["nr_participants"]):
-                activityIndex = randint(0, testDepartment["nrActivities"] - 1)
+                activityIndex = i % testDepartment["nrActivities"]
                 testDepartment["participants"].append(
                     ActivityParticipantFactory(
                         activity=testDepartment["activities"][activityIndex]
@@ -63,7 +62,7 @@ class TestDepartmentStatistics(TestCase):
                 ].is_eligable_for_membership():
                     testDepartment["nr_members"] += 1
 
-            testDepartment["nr_waitinglist"] = randint(1, 100)
+            testDepartment["nr_waitinglist"] = 5
             waitlist = WaitingListFactory.create_batch(
                 testDepartment["nr_waitinglist"],
                 department=testDepartment["department"],
@@ -73,7 +72,7 @@ class TestDepartmentStatistics(TestCase):
             )
             testDepartment["nr_volunteers"] = len(
                 VolunteerFactory.create_batch(
-                    randint(0, 50), department=testDepartment["department"]
+                    3, department=testDepartment["department"]
                 )
             )
 

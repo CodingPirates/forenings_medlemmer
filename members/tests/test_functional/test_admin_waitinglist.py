@@ -34,7 +34,6 @@ def get_select_element_by_onchange(browser, index):
 
 class WaitingListAdminSeleniumTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         # TODO: Find out why/if we need to create a superuser here

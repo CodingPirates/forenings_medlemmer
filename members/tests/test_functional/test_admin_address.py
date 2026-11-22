@@ -24,7 +24,6 @@ from members.tests.test_functional.helpers import complete_admin_signup
 
 class AddressAdminTest(StaticLiveServerTestCase):
     host = socket.gethostbyname(socket.gethostname())
-    serialized_rollback = True
 
     def setUp(self):
         self.admin_user = User.objects.create_superuser(
