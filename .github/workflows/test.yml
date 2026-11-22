@@ -1,6 +1,13 @@
 name: Run tests & Analyse code
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   Test:
@@ -9,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: technote-space/auto-cancel-redundant-job@v1
       - name: Setup Enviroment
         run: cp .env.example .env
       - name: Builds the stack
