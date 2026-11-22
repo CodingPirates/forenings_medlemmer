@@ -1,6 +1,7 @@
 services:
   web:
     build: .
+    image: forenings_medlemmer-web:latest
     command: "${SERVER_COMMAND} 0.0.0.0:${PORT}"
     volumes:
       - .:/app
