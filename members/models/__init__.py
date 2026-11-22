@@ -22,13 +22,13 @@ from members.models.slackinvitesetup import SlackInvitationSetup
 from members.models.slackinvitelog import SlackInviteLog
 import members.models.payment
 import members.models.person
+import members.models.permissions
 import members.models.anonymization_candidate
 import members.models.quickpaytransaction
 import members.models.union
 import members.models.volunteer
 import members.models.waitinglist
 import members.models.zipcoderegion  # noqa  # fine to have all models included
-
 
 # Export models not files
 from .activity import Activity

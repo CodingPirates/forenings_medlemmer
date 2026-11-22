@@ -6,6 +6,8 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from members.admin.admin_actions import AdminActions
+from members.admin.consent_utils import family_consent_link
+from members.admin.filters.common_filters import PersonFamilyConsentFilter
 from members.models import (
     Activity,
     AdminUserInformation,
@@ -202,21 +204,35 @@ class ParticipantPaymentListFilter(admin.SimpleListFilter):
 
 class ActivityParticipantAdmin(admin.ModelAdmin):
     list_per_page = settings.LIST_PER_PAGE
-    list_display = [
-        "id",
-        "activity_link",
-        "added_at",
-        "activity_person_link",
-        "activity_person_gender",
-        "person_age_years",
-        "photo_permission",
-        "note",
-        "activity_payment_info_html",
-        "activity_family_email_link",
-        "person_zipcode",
-        "activity_activitytype",
-        "activity_department_link",
-    ]
+
+    def get_list_display(self, request):
+        base = [
+            "id",
+            "activity_link",
+            "added_at",
+            "activity_person_link",
+            "activity_person_gender",
+            "person_age_years",
+            "photo_permission",
+            "note",
+            "activity_payment_info_html",
+            "activity_family_email_link",
+        ]
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_consent_information"
+        ):
+            base += ["family_consent_id"]
+        base += [
+            "person_zipcode",
+            "activity_activitytype",
+            "activity_department_link",
+        ]
+
+        return base
+
+    @admin.display(description="Privatlivspolitik")
+    def family_consent_id(self, item):
+        return family_consent_link(item.person.family)
 
     list_filter = (
         ActivityParticipantUnionFilter,
@@ -225,6 +241,7 @@ class ActivityParticipantAdmin(admin.ModelAdmin):
         ActivityParticipantListLastYearFilter,
         ActivityParticipantListOldYearsFilter,
         ParticipantPaymentListFilter,
+        PersonFamilyConsentFilter,
         "activity__activitytype",
     )
     autocomplete_fields = (
