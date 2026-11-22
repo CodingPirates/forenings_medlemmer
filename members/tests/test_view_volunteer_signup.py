@@ -210,7 +210,7 @@ class TestVolunteerSignupView(TestCase):
 
         self.assertEqual(response.status_code, 200)
         volunteer_request = VolunteerRequest.objects.get(email="volunteer@example.com")
-        self.assertTrue(volunteer_request.consent)
+        self.assertIsNotNone(volunteer_request.consent_at)
 
     def _start_anonymous_request(self, email):
         self.client.logout()
@@ -255,7 +255,7 @@ class TestVolunteerSignupView(TestCase):
         self.assertRedirects(response, reverse("volunteer_signup"))
         self.assertEqual(self.client.session["_auth_user_id"], str(self.person.user.pk))
         volunteer_request = VolunteerRequest.objects.get(person=self.person)
-        self.assertTrue(volunteer_request.consent)
+        self.assertIsNotNone(volunteer_request.consent_at)
         self.assertEqual(volunteer_request.volunteerrequestitem_set.count(), 1)
 
         overview = self.client.get(reverse("volunteer_signup"))

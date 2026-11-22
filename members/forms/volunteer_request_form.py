@@ -18,7 +18,6 @@ class VolunteerRequestForm(BaseVolunteerRequestForm):
             "zip",
             "allow_contact_from_cpdk",
             "allow_contact_from_other",
-            "consent",
             "info_reference",
             "info_whishes",
         ]

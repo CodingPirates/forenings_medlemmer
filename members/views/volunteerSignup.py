@@ -693,11 +693,12 @@ def volunteerSignup(request):
 
                     # The env test code (test environments only) behaves like a real code
                     account_person = find_loginable_person(form_data.get("email"))
+                    consent_at = timezone.now() if form_data.get("consent") else None
 
                     if account_person is not None:
                         volunteer_request = VolunteerRequest.objects.create(
                             person=account_person,
-                            consent=form_data.get("consent", False),
+                            consent_at=consent_at,
                             allow_contact_from_cpdk=form_data.get(
                                 "allow_contact_from_cpdk", False
                             ),
@@ -714,7 +715,7 @@ def volunteerSignup(request):
                             phone=form_data.get("phone"),
                             age=form_data.get("age") or None,
                             zip=form_data.get("zip"),
-                            consent=form_data.get("consent", False),
+                            consent_at=consent_at,
                             allow_contact_from_cpdk=form_data.get(
                                 "allow_contact_from_cpdk", False
                             ),

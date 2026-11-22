@@ -35,8 +35,8 @@ class VolunteerRequest(models.Model):
     allow_contact_from_other = models.BooleanField(
         "Må andre afdelinger kontakte mig?", default=False
     )
-    consent = models.BooleanField(
-        "Samtykke til opbevaring af oplysninger", default=False
+    consent_at = models.DateTimeField(
+        "Samtykke til opbevaring af oplysninger", blank=True, null=True
     )
     token = models.UUIDField(default=uuid.uuid4, null=False)
     created = models.DateTimeField(
