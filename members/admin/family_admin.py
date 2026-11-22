@@ -5,7 +5,8 @@ from django.utils.html import format_html
 
 from members.models import Department
 
-from .filters.common_filters import AnonymizedFilter
+from .consent_utils import family_consent_link
+from .filters.common_filters import AnonymizedFilter, FamilyConsentFilter
 from .inlines import (
     EmailItemInline,
     PaymentInline,
@@ -14,13 +15,22 @@ from .inlines import (
 
 
 class FamilyAdmin(admin.ModelAdmin):
-    list_filter = (AnonymizedFilter,)
+    list_filter = (AnonymizedFilter, FamilyConsentFilter)
 
     def get_list_display(self, request):
-        return (
+        base = [
             "id",
             "email",
-        )
+        ]
+        if request.user.is_superuser or request.user.has_perm(
+            "members.view_consent_information"
+        ):
+            base += ["consent_id"]
+        return base
+
+    @admin.display(description="Privatlivspolitik")
+    def consent_id(self, obj):
+        return family_consent_link(obj)
 
     search_fields = ("email",)
 
