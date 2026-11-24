@@ -8,7 +8,13 @@ from members.models.person import Person
 from members.models.emailtemplate import EmailTemplate
 from django.core.management import call_command
 
-from members.tests.factories import FamilyFactory, PersonFactory
+from members.tests.factories import (
+    FamilyFactory,
+    PersonFactory,
+    WaitingListFactory,
+    DepartmentFactory,
+    ConsentFactory,
+)
 
 
 class TestModelFamily(TestCase):
@@ -118,3 +124,74 @@ class TestModelFamily(TestCase):
             msg="Alle personer i en familie skal være anonymiseret, for at familien kan anonymiseres.",
         ):
             family.anonymize()
+
+
+class TestFamilyGetConsentId(TestCase):
+    """Test Family.get_consent_id() method."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.family = FamilyFactory.create()
+
+    def test_get_consent_id_no_persons(self):
+        """Test get_consent_id when family has no persons."""
+        result = self.family.get_consent_id()
+        self.assertIsNone(result)
+
+    def test_get_consent_id_persons_without_consent(self):
+        """Test get_consent_id when persons have no consent."""
+        PersonFactory.create(family=self.family)
+        PersonFactory.create(family=self.family)
+        result = self.family.get_consent_id()
+        self.assertIsNone(result)
+
+    def test_get_consent_id_one_person_with_consent(self):
+        """Test get_consent_id when one person has a consent."""
+        consent = ConsentFactory.create()
+        PersonFactory.create(family=self.family, consent=consent)
+        result = self.family.get_consent_id()
+        self.assertEqual(result, consent.id)
+
+    def test_get_consent_id_multiple_persons_one_with_consent(self):
+        """Test get_consent_id when multiple persons but only one has consent."""
+        consent = ConsentFactory.create()
+        PersonFactory.create(family=self.family, consent=consent)
+        PersonFactory.create(family=self.family, consent=None)
+        result = self.family.get_consent_id()
+        self.assertEqual(result, consent.id)
+
+    def test_get_consent_id_multiple_persons_multiple_consents(self):
+        """Test get_consent_id when multiple persons have different consents."""
+        consent1 = ConsentFactory.create()
+        consent2 = ConsentFactory.create()
+        PersonFactory.create(family=self.family, consent=consent1)
+        PersonFactory.create(family=self.family, consent=consent2)
+        result = self.family.get_consent_id()
+        # Should return the maximum consent ID
+        self.assertEqual(result, max(consent1.id, consent2.id))
+
+    def test_get_consent_id_with_waiting_list(self):
+        """Test get_consent_id when person is on a waiting list.
+
+        This is a regression test for the bug where accessing the waiting list
+        admin page with one waiting list entry would raise:
+        TypeError: '>' not supported between instances of 'int' and 'NoneType'
+        """
+        # Create a person with no consent on a waiting list
+        person = PersonFactory.create(family=self.family, consent=None)
+        department = DepartmentFactory.create()
+        WaitingListFactory.create(person=person, department=department)
+
+        # This should not raise an error
+        result = self.family.get_consent_id()
+        self.assertIsNone(result)
+
+    def test_get_consent_id_with_waiting_list_and_consent(self):
+        """Test get_consent_id when person with consent is on a waiting list."""
+        consent = ConsentFactory.create()
+        person = PersonFactory.create(family=self.family, consent=consent)
+        department = DepartmentFactory.create()
+        WaitingListFactory.create(person=person, department=department)
+
+        result = self.family.get_consent_id()
+        self.assertEqual(result, consent.id)
