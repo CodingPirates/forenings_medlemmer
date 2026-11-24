@@ -18,11 +18,13 @@ class MembershipSignupForm(forms.Form):
                 Div(
                     Div(
                         Div(
-                            HTML("""
+                            HTML(
+                                """
                     <p class="lead">Du melder nu <strong>{{person.name}}</strong> ind som medlem i Coding Pirates <strong>{{union.name}}</strong>.
                     Medlemsskabet starter i dag og løber til og med d. 31. december {% now "Y" %}. Det koster <strong>{{ price | floatformat:2}} kr</strong> at melde sig ind. Medlemskabet giver adgang til at stemme hos Coding Pirates {{union.name}}{% if union.name != 'Denmark' %} og Coding Pirates Denmark{% endif %}</p>
                     <p class="lead"><em>Medlemskabet er kun gyldig når der er betalt!</em></p>
-                    """),
+                    """
+                            ),
                             css_class="col-md-12",
                         ),
                         css_class="row",

@@ -95,7 +95,8 @@ class LoggedInVolunteerRequestForm(BaseVolunteerRequestForm):
             ),
             Fieldset(
                 "Interesse områder",
-                HTML("""
+                HTML(
+                    """
                     <div class="mb-3">
                         <label for="search-filter" class="form-label">Søg efter afdeling eller aktivitet:</label>
                         <input
@@ -106,7 +107,8 @@ class LoggedInVolunteerRequestForm(BaseVolunteerRequestForm):
                             placeholder="Søg efter afdelingsnavn, aktivitetsnavn, by, postnummer, gade..."
                         />
                     </div>
-                """),
+                """
+                ),
                 Div(
                     Field("departments"),
                     css_class="col-md-6",

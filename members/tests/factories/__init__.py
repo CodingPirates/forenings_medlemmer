@@ -1,4 +1,5 @@
 from .address_factory import AddressFactory
+from .consent_factory import ConsentFactory
 from .union_factory import UnionFactory
 from .department_factory import DepartmentFactory
 from .family_factory import FamilyFactory
@@ -14,6 +15,7 @@ __all__ = [
     ActivityParticipantFactory,
     PaymentFactory,
     AddressFactory,
+    ConsentFactory,
     UnionFactory,
     WaitingListFactory,
     DepartmentFactory,

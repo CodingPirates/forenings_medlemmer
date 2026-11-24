@@ -20,7 +20,8 @@ class ActivitySignupForm(forms.Form):
                 Div(
                     Div(
                         Div(
-                            HTML("""
+                            HTML(
+                                """
                     <p class="lead">Du tilmelder nu <strong>{{person.name}}</strong> til aktiviteten {{activity.name}} på <strong>{{activity.department.name}}</strong>.
                     Aktiviteten finder sted fra {{ activity.start_date|date:"j. F"}} til {{ activity.end_date|date:"j. F"}} og det koster følgende at være med:</p>
                     <table border="4px">
@@ -44,7 +45,8 @@ class ActivitySignupForm(forms.Form):
                       </tr>
                     </table>
                     <p class="lead"><em>Tilmeldingen er kun gyldig når der er betalt!</em></p>
-                    """),
+                    """
+                            ),
                             css_class="col-md-12",
                         ),
                         css_class="row",
