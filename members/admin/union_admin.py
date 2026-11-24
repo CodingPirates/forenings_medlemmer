@@ -254,8 +254,10 @@ class UnionAdmin(MemberSummaryExportMixin, admin.ModelAdmin):
         ):
             info_fields.append("new_membership_model_activated_at")
 
-        name_and_address_description = "<p>Udfyld navnet på foreningen (f.eks København, \
+        name_and_address_description = (
+            "<p>Udfyld navnet på foreningen (f.eks København, \
                         vestjylland) og adressen<p>"
+        )
         if self._has_readonly_union_access(request, obj):
             name_and_address_description = (
                 "<p>Du har ikke adgang til at ændre denne side. "
