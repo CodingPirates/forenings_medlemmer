@@ -77,7 +77,11 @@ class MemberSummaryExportMixin:
         if form.is_bound and form.is_valid():
             date = form.cleaned_data["date"]
             paid_by_date = Payment.objects.filter(
-                member=OuterRef("pk"), confirmed_at__date__lte=date
+                member=OuterRef("pk"),
+                confirmed_at__date__lte=date,
+                cancelled_at__isnull=True,
+                refunded_at__isnull=True,
+                rejected_at__isnull=True,
             )
             summary = (
                 self.get_summary_member_queryset(request, queryset)
