@@ -46,7 +46,7 @@ class MemberAdminPaymentTest(TestCase):
 
     def test_payment_filter_and_latest_date(self):
         for parameters, expected in (
-            ({}, {self.paid.pk}),
+            ({}, {self.paid.pk, self.unpaid.pk, self.no_payment.pk}),
             ({"payment_status": "yes"}, {self.paid.pk}),
             ({"payment_status": "no"}, {self.unpaid.pk, self.no_payment.pk}),
             (
@@ -68,6 +68,49 @@ class MemberAdminPaymentTest(TestCase):
                     self.assertContains(response, "2024-02-01")
                     self.assertIn("2024-02-01", generate_member_csv([paid]))
 
+    def test_payment_date_hidden_for_invalid_latest_payment(self):
+        invalid_members = []
+        for field in ("cancelled_at", "refunded_at", "rejected_at"):
+            member = MemberFactory()
+            invalid_members.append(member)
+            for confirmed_at, extra in (
+                (self.earlier, {}),
+                (self.latest, {field: self.latest}),
+                (None, {}),
+            ):
+                Payment.objects.create(
+                    member=member,
+                    family=member.person.family,
+                    body_text="Medlemskab",
+                    confirmed_at=confirmed_at,
+                    **extra,
+                )
+
+        invalid_ids = {member.pk for member in invalid_members}
+        for status, expected in (
+            (None, invalid_ids | {self.paid.pk, self.unpaid.pk, self.no_payment.pk}),
+            ("yes", {self.paid.pk}),
+            ("no", invalid_ids | {self.unpaid.pk, self.no_payment.pk}),
+            ("all", invalid_ids | {self.paid.pk, self.unpaid.pk, self.no_payment.pk}),
+        ):
+            with self.subTest(status=status):
+                parameters = {"payment_status": status} if status else {}
+                response = self.client.get(self.url, parameters)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    {member.pk for member in response.context["cl"].result_list},
+                    expected,
+                )
+
+        response = self.client.get(self.url, {"payment_status": "all"})
+        results = {member.pk: member for member in response.context["cl"].result_list}
+        member_admin = MemberAdmin(Member, admin.site)
+        for member in invalid_members:
+            with self.subTest(member=member.pk):
+                self.assertIsNone(results[member.pk].latest_payment_confirmed_at)
+                self.assertEqual(member_admin.confirmed_at(results[member.pk]), "")
+        self.assertEqual(member_admin.confirmed_at(results[self.paid.pk]), "2024-02-01")
+
     def test_filter_choices_show_default_and_allow_all(self):
         response = self.client.get(self.url)
         changelist = response.context["cl"]
@@ -77,7 +120,7 @@ class MemberAdminPaymentTest(TestCase):
         choices = list(payment_filter.choices(changelist))
         self.assertEqual(
             [(choice["display"], choice["selected"]) for choice in choices],
-            [("Ja", True), ("Nej", False), ("Alle", False)],
+            [("Ja", False), ("Nej", False), ("Alle", True)],
         )
         self.assertIn("payment_status=all", choices[2]["query_string"])
 

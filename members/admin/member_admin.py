@@ -5,7 +5,7 @@ from io import StringIO
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import admin
-from django.db.models import OuterRef, Subquery
+from django.db.models import Case, OuterRef, Subquery, When
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -86,7 +86,11 @@ def generate_member_csv(member_queryset, include_address=False):
         )
         confirmed_at = (
             payment.confirmed_at.strftime("%Y-%m-%d")
-            if payment and payment.confirmed_at
+            if payment
+            and payment.confirmed_at
+            and payment.cancelled_at is None
+            and payment.refunded_at is None
+            and payment.rejected_at is None
             else ""
         )
 
@@ -184,7 +188,16 @@ class MemberAdmin(MemberSummaryExportMixin, admin.ModelAdmin):
             .get_queryset(request)
             .annotate(
                 latest_payment_confirmed_at=Subquery(
-                    latest_payment.values("confirmed_at")[:1]
+                    latest_payment.annotate(
+                        latest_payment_confirmed_at=Case(
+                            When(
+                                cancelled_at__isnull=True,
+                                refunded_at__isnull=True,
+                                rejected_at__isnull=True,
+                                then="confirmed_at",
+                            )
+                        )
+                    ).values("latest_payment_confirmed_at")[:1]
                 )
             )
         )

@@ -16,7 +16,7 @@ class MemberPaymentListFilter(admin.SimpleListFilter):
         )
 
     def choices(self, changelist):
-        value = self.value() or "yes"
+        value = self.value() or "all"
         for lookup, title in self.lookup_choices:
             yield {
                 "selected": value == lookup,
@@ -27,7 +27,7 @@ class MemberPaymentListFilter(admin.SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        if self.value() in (None, "yes"):
+        if self.value() == "yes":
             return queryset.filter(latest_payment_confirmed_at__isnull=False)
         if self.value() == "no":
             return queryset.filter(latest_payment_confirmed_at__isnull=True)
